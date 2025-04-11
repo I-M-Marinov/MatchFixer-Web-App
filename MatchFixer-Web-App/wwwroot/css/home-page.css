@@ -1,0 +1,114 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Special+Gothic+Expanded+One&display=swap');
+
+
+.matchFixer {
+    font-family: "Special Gothic Expanded One", sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+}
+
+.abreviature {
+    font-family: "Special Gothic Expanded One", sans-serif !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    color: #0DAB76;
+}
+
+.pulse-goal {
+    animation: goalPulse 3s infinite;
+    color: #0d6efd;
+}
+
+@keyframes goalPulse {
+    0%, 100% {
+        letter-spacing: normal;
+    }
+
+    50% {
+        letter-spacing: 2px;
+    }
+}
+
+.shaky-text:hover {
+    animation: shaky 0.8s infinite;
+    cursor: pointer;
+}
+
+@keyframes shaky {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(2px, -2px);
+    }
+
+    50% {
+        transform: translate(-2px, 2px);
+    }
+
+    75% {
+        transform: translate(2px, 2px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+
+.ball-wrapper {
+    position: absolute; 
+    top: 5em;
+    left: 0;
+    width: 100vw;
+    height: 7em;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.animated-ball {
+    position: absolute;
+    animation: bounceAndRoll 12s linear;
+    width: 80px;
+    will-change: transform;
+    pointer-events: none;
+    object-fit: contain;
+    image-rendering: auto;
+    z-index: 10;
+}
+
+.soccer-hero{
+    margin-top: 7em;
+    z-index: 20;
+}
+
+@keyframes bounceAndRoll {
+    0% {
+        left: -80px;
+        bottom: 0;
+        transform: translateX(-120px) rotate(0deg);
+    }
+
+    20% {
+        bottom: 30px;
+    }
+
+    40% {
+        bottom: 20px;
+    }
+
+    60% {
+        bottom: 30px;
+    }
+
+    80% {
+        bottom: 0;
+    }
+
+    100% {
+        left: 120%;
+        bottom: 0;
+        transform: translateX(110vw) rotate(1080deg);
+    }
+}
