@@ -2,7 +2,65 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="ball-wrapper" id="ballWrapper"></div>
+
+
+<div class="container text-center mt-5">
+	<div class="soccer-hero">
+        <h1 class="display-5 mt-4">Winning isn’t luck — it’s
+	        <div class="shaky-text">
+		        <span class="fw-bold matchFixer">
+			        <span class="abreviature">M</span>atch<span class="abreviature">F</span>ixer.
+		        </span>
+	        </div>
+		</h1>
+		<p class="lead pulse-goal">We don’t fix matches… we help you predict them suspiciously well!</p>
+	</div>
 </div>
+
+
+<script>
+
+        window.addEventListener("DOMContentLoaded", () => {
+        const wrapper = document.getElementById("ballWrapper");
+
+        const ballImages = [
+            "/images/balls/soccer-ball1.svg",
+            "/images/balls/soccer-ball2.svg",
+            "/images/balls/soccer-ball3.svg",
+            "/images/balls/soccer-ball4.svg",
+            "/images/balls/soccer-ball5.svg",
+            "/images/balls/soccer-ball6.svg",
+            "/images/balls/soccer-ball7.svg",
+            "/images/balls/soccer-ball8.svg",
+            "/images/balls/soccer-ball9.svg",
+            "/images/balls/soccer-ball10.svg"
+        ];
+       
+        function spawnBall() {
+            const ball = document.createElement("img");
+
+            const randomIndex = Math.floor(Math.random() * ballImages.length);
+            ball.src = ballImages[randomIndex];
+            ball.alt = "ball";
+            ball.className = "animated-ball";
+
+            ball.style.bottom = `${Math.random() * 100}px`;
+            ball.style.width = "100px";
+            ball.style.height = "100px";
+            ball.style.objectFit = "cover"; 
+
+
+            wrapper.appendChild(ball);
+
+            setTimeout(() => {
+                wrapper.removeChild(ball);
+            }, 9000);
+        }
+
+        setInterval(spawnBall, 800);
+    });
+
+
+</script>
