@@ -1,0 +1,53 @@
+﻿.navbar {
+    background-color: #3370A8 !important;
+    border-bottom: 2px #020100 solid !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.navbar-nav {
+    gap: 2em;
+}
+
+.navbar-collapse {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2em;
+}
+
+.navbar-collapse ul:nth-child(3) {
+    position: absolute;
+    right: 20px;
+    top: 1.5px;
+}
+
+.nav-item a:hover {
+    color: #f1d302 !important;
+    transform: scale(1.20);
+    animation: ease-in 1s linear;
+}
+
+.nav-link {
+    font-family: "Cairo", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    font-size: 1.3em;
+}
+
+.rounded-circle {
+    width: 50px !important;
+    height: auto !important;
+    justify-self: center !important;
+}
+
+.nav-profile{
+    justify-content: center !important;
+}
+
+.profile-dropdown-menu li {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
