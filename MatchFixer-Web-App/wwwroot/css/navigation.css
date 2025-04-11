@@ -51,3 +51,18 @@
     justify-content: center !important;
     align-items: center !important;
 }
+
+.dropdown-menu{
+    border: 2px groove #808080;
+    width: 15em;
+    border-radius: -1em;
+}
+
+.hover-dropdown:hover .dropdown-menu {
+    display: block;
+    top: 4.5em;
+    right: 0.5em;
+    margin-top: 0; 
+}
+
+
