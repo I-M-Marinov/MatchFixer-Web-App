@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000; 1,200..1000&family=Special+Gothic+Expanded+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Special+Gothic+Expanded+One&display=swap');
 @import "/css/navigation.css";
+@import "/css/home-page.css";
 * {
     font-family: "Nunito", sans-serif !important;
     font-weight: 400 !important;
@@ -25,9 +26,14 @@ html {
     min-height: 100%;
 }
 
+.main{
+    width: 100% !important;
+}
+
 body {
     font-size: 1.2em;
     margin-bottom: 60px;
+    background-color: #BFC0C0 !important;
 }
 
 
