@@ -5,19 +5,106 @@
 
 <div class="ball-wrapper" id="ballWrapper"></div>
 
-
 <div class="container text-center mt-5">
 	<div class="soccer-hero">
-        <h1 class="display-5 mt-4">Winning isn’t luck — it’s
-	        <div class="shaky-text">
-		        <span class="fw-bold matchFixer">
-			        <span class="abreviature">M</span>atch<span class="abreviature">F</span>ixer.
-		        </span>
-	        </div>
+		<h1 class="display-5 mt-4">Winning isn’t luck — it’s
+			<div class="shaky-text">
+				<span class="fw-bold matchFixer">
+					<span class="abreviature">M</span>atch<span class="abreviature">F</span>ixer.
+				</span>
+			</div>
 		</h1>
-		<p class="lead pulse-goal">We don’t fix matches… we help you predict them suspiciously well!</p>
+		<p class="lead pulse-goal">We don’t fix matches…</p>
+		<p class="pulse-goal">We help you predict them suspiciously well!</p>
 	</div>
 </div>
+
+
+<!-- Left Drawer Trigger -->
+<button class="drawer-toggle left-toggle">About Us <i class="bi bi-arrow-right-square-fill"></i></button>
+
+<!-- Right Drawer Trigger -->
+<button class="drawer-toggle right-toggle"><i class="bi bi-arrow-left-square-fill"></i> Responsible Bets</button>
+
+<!-- Second Right Drawer Trigger -->
+<button class="drawer-toggle right-toggle2"><i class="bi bi-question-lg"></i> FAQs </button>
+
+<!-- Left Drawer -->
+<div id="leftDrawer" class="drawer left-drawer">
+	<h3>We are MatchFixers</h3>
+	<p>At MatchFixer, we believe football betting should be thrilling, fair, and maybe a little suspiciously lucky. 
+		We're a squad of football fanatics, data nerds, and UI wizards who decided to blend clever algorithms 
+		with a cheeky name and a smooth user experience.
+	</p>
+	
+	<p>Our platform gives you up-to-date stats, and the kind of odds that make you go: 
+		“Wait, how do they know that?”</p>
+
+    <p>No scams. No sketchy stuff. Just eerily accurate betting tools.</p>
+</div>
+
+<!-- Right Drawer -->
+<div id="rightDrawer" class="drawer right-drawer">
+	<h3>Bet responsibly</h3>
+	<p>At MatchFixer, we’re all about good vibes, clever predictions, and having fun — but we take responsible betting seriously.
+
+	We encourage every user to treat betting as entertainment, not a source of income. Betting should never feel like pressure, a solution to financial problems, or something that causes stress. If it does, it’s time to take a breather.
+
+	Here are a few golden rules we stand by:
+
+	<p>🎯 Set a budget — and stick to it.</p>
+	<p>⏳ Take breaks — the game will still be there.</p>
+	<p>❌ Don’t chase losses — that’s a fast road to regret.</p>
+	<p>👀 Know the odds — and understand the risks.</p>
+	<p>🧘 Keep your cool — if it’s not fun, it’s not worth it.</p>
+	<p>If you ever feel like things are getting out of hand, there’s no shame in reaching out. We support self-exclusion tools, and we’re here to point you to helpful resources any time.</p>
+	<p>⚖️ Bet smart. Bet safe. Stay in control.</p>
+	<p>Because no match is worth losing yourself over.</p>
+</div>
+
+<div id="rightDrawer2" class="drawer-lower-level right-drawer2">
+	<h3>Frequently Asked Questions</h3>
+
+	<p>💸 How do payouts work?
+		Once a bet is settled and you win, your account is credited instantly. You can then choose to continue betting or withdraw your winnings to your preferred payment method—fast, simple, and secure.
+	</p>
+	<p>
+		🏛️ Is this legal?
+		Yes—our platform operates within legal jurisdictions where sports betting is permitted. We comply with local regulations and require users to confirm they meet the legal age in their region before betting.
+	</p>
+	<p>
+		💰 Can I withdraw anytime?
+		Absolutely. You can request a withdrawal at any time, as long as your balance meets the minimum payout threshold. Most withdrawals are processed within 24 hours.
+	</p>
+	<p>
+		🔒 Is my information secure?
+		Yes. We use bank-grade encryption and security practices to keep your data safe. Your privacy and account protection are our top priorities.
+	</p>
+	<p>
+		🧾 Are there any fees?
+		No hidden surprises here. We don’t charge fees for deposits or withdrawals. Some payment processors might, though—we’ll always let you know before you confirm anything.
+	</p>
+	<p>
+		🤔 What if I bet by mistake?
+		We’ve all been there. While confirmed bets can’t be reversed, we recommend reaching out to support immediately—we’ll always try to help where possible.
+	</p>
+	<p>
+		🧠 I’m new to betting. Will I understand how it works?
+		Of course! Our platform is designed to be intuitive, and we offer guides, tips, and even beginner-friendly betting options so you can learn the ropes.
+	</p>
+	
+</div>
+
+
+
+<div class="picture position-relative text-center">
+	<h1 id="welcome" class="overlay-text">Welcome to your personal playground !</h1>
+	<div class="picture">
+		<img src="~/images/football-island.jpg" id="football-island" class="img-fluid" />
+	</div>
+</div>
+
+
 
 
 <script>
@@ -61,6 +148,19 @@
 
         setInterval(spawnBall, 800);
     });
+
+
+    document.querySelector('.left-toggle').addEventListener('click', () => {
+      document.getElementById('leftDrawer').classList.toggle('open');
+    });
+
+    document.querySelector('.right-toggle').addEventListener('click', () => {
+      document.getElementById('rightDrawer').classList.toggle('open');
+    });
+
+	document.querySelector('.right-toggle2').addEventListener('click', () => {
+	  document.getElementById('rightDrawer2').classList.toggle('open');
+	});
 
 
 </script>
