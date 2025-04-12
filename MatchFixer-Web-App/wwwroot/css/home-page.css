@@ -256,21 +256,36 @@
 
 .left-toggle {
     top: 13.5em;
-    left: 0;
+    left: -5.15em;
     border-radius: 0 1em 1em 0;
+    transition: left 0.4s ease-in-out;
+}
+
+.left-toggle:hover {
+    left: 0;
 }
 
 .right-toggle {
     top: 13.5em;
+    right: -8.7em;
+    border-radius: 1em 0 0 1em;
+    transition: right 0.4s ease-in-out;
+}
+
+.right-toggle:hover {
     right: 0;
-    border-radius:  1em 0 0 1em ;
 }
 
 .right-toggle2 {
     top: 16.5em;
-    right: 0;
+    right: -3.3em;
     border-radius: 1em 0 0 1em;
     z-index: 1000;
+    transition: right 0.4s ease-in-out;
+}
+
+.right-toggle2:hover {
+    right: 0;
 }
 
 .right-toggle:hover,
