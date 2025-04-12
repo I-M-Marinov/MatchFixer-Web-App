@@ -26,15 +26,20 @@ html {
     min-height: 100%;
 }
 
-.main{
-    width: 100% !important;
-}
-
 body {
     font-size: 1.2em;
     margin-bottom: 60px;
-    background-color: #BFC0C0 !important;
+    background-color: #b6cccc !important;
 }
 
+.container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
 
-
+main {
+    width: 100vh !important;
+    
+}
