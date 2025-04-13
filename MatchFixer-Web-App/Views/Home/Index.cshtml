@@ -29,6 +29,9 @@
 <!-- Second Right Drawer Trigger -->
 <button class="drawer-toggle right-toggle2"><i class="bi bi-question-lg"></i> FAQs </button>
 
+<!-- Third Right Drawer Trigger -->
+<button class="drawer-toggle right-toggle3"><i class="bi bi-info-square-fill"></i> Disclaimer</button>
+
 <!-- Left Drawer -->
 <div id="leftDrawer" class="drawer left-drawer">
 	<h3>We are MatchFixers</h3>
@@ -62,6 +65,7 @@
 	<p>Because no match is worth losing yourself over.</p>
 </div>
 
+<!-- Right Drawer 2 -->
 <div id="rightDrawer2" class="drawer-lower-level right-drawer2">
 	<h3>Frequently Asked Questions</h3>
 
@@ -93,6 +97,17 @@
 		Of course! Our platform is designed to be intuitive, and we offer guides, tips, and even beginner-friendly betting options so you can learn the ropes.
 	</p>
 	
+</div>
+
+<!-- Right Drawer 3 -->
+<div id="rightDrawer3" class="drawer-lower-level2 right-drawer3">
+	<h3>Disclaimer</h3>
+	<p>
+		This project is a fictional application developed for educational and demonstration purposes only. 
+		It does not represent a real company, product, or service. Any resemblance to real entities, organizations, or events is purely coincidental. 
+		No part of this project should be interpreted as a real-world business offering or commercial platform.
+	</p>
+
 </div>
 
 
@@ -160,6 +175,10 @@
 
 	document.querySelector('.right-toggle2').addEventListener('click', () => {
 	  document.getElementById('rightDrawer2').classList.toggle('open');
+	});
+
+		document.querySelector('.right-toggle3').addEventListener('click', () => {
+	  document.getElementById('rightDrawer3').classList.toggle('open');
 	});
 
 
