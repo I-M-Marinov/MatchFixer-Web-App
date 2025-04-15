@@ -309,6 +309,7 @@
     border: none;
     padding: 0.5rem 1rem;
     cursor: pointer;
+    border: 2px solid black;
 }
 
 .drawer-toggle2 {
@@ -324,14 +325,14 @@
 
 .left-toggle {
     top: 13.5em;
-    left: -5.15em;
+    left: -5.25em;
     border-radius: 0 1em 1em 0;
     transition: left 0.4s ease-in-out;
 }
 
 .left-toggle2 {
     top: 16.5em;
-    left: -5.80em;
+    left: -5.95em;
     border-radius: 0 1em 1em 0;
     transition: left 0.4s ease-in-out;
 }
@@ -343,7 +344,7 @@
 
 .right-toggle {
     top: 13.5em;
-    right: -8.7em;
+    right: -8.8em;
     border-radius: 1em 0 0 1em;
     transition: right 0.4s ease-in-out;
 }
@@ -354,7 +355,7 @@
 
 .right-toggle2 {
     top: 16.5em;
-    right: -3.3em;
+    right: -3.4em;
     border-radius: 1em 0 0 1em;
     z-index: 1000;
     transition: right 0.4s ease-in-out;
@@ -362,7 +363,7 @@
 
 .right-toggle3 {
     top: 19.5em;
-    right: -5.6em;
+    right: -5.7em;
     border-radius: 1em 0 0 1em;
     z-index: 1000;
     transition: right 0.4s ease-in-out;
