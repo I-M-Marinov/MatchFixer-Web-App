@@ -12,7 +12,8 @@
     gap: 2em;
 }
 
-.navbar-nav .nav-item a {
+.navbar-nav .nav-item a,
+#logout-button {
     position: relative;
     color: #0DAB76 !important;
     text-shadow: 2px 5px 5px rgba(0,0,0,0.8) !important;
@@ -20,22 +21,23 @@
     font-optical-sizing: auto !important;
     font-weight: 700 !important;
     font-style: normal !important;
-
 }
 
-    .navbar-nav .nav-item a::after {
-        content: "";
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -5px;
-        left: 0;
-        background-color: #f1d302;
-        text-shadow: 0 29px 52px rgba(0,0,0,0.40), 0 25px 16px rgba(0,0,0,0.20);
-        transition: width 0.3s;
-    }
+.navbar-nav .nav-item a::after,
+#logout-button::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: #f1d302;
+    text-shadow: 0 29px 52px rgba(0,0,0,0.40), 0 25px 16px rgba(0,0,0,0.20);
+    transition: width 0.3s;
+}
 
-.navbar-nav .nav-item a:hover::after {
+.navbar-nav .nav-item a:hover::after,
+#logout-button:hover::after {
     width: 100%;
 }
 
@@ -53,7 +55,8 @@
     top: 1.5px;
 }
 
-.nav-item a:hover {
+.nav-item a:hover,
+#logout-button:hover {
     color: #f1d302 !important;
     transform: scale(1.20);
     animation: ease-in 1s linear;
