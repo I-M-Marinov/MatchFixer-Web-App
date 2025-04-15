@@ -132,10 +132,46 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    _logger.LogInformation("Sending confirmation to: " + Input.Email);
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+					var logoUrl = "https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png"; 
+
+					var emailBody = $@"
+					<!DOCTYPE html>
+					<html>
+					<head>
+					    <meta charset='UTF-8'>
+					    <title>Confirm Your Email</title>
+					</head>
+					<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;'>
+					    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+					        <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
+					            <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
+					        </div>
+					        <div style='padding: 30px; text-align: center;'>
+					            <h2 style='color: #333;'>Welcome to MatchFixer!</h2>
+					            <p style='color: #555; font-size: 16px;'>
+					                You're just one click away from joining a world where connections matter and fairness wins.
+					                <br /><br />
+					                Let's get you started on your journey!
+					            </p>
+					            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;'>
+					                Confirm Your Email
+					            </a>
+					            <p style='margin-top: 30px; font-size: 13px; color: #888;'>
+					                If you did not sign up for MatchFixer, please ignore this email.
+					            </p>
+					        </div>
+					    </div>
+					</body>
+					</html>
+					";
+
+					await _emailSender.SendEmailAsync(Input.Email, "MatchFixer - Please confirm your email", emailBody);
+
+
+					if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
