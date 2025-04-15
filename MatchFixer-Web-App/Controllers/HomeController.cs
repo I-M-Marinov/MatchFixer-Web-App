@@ -28,5 +28,5 @@ namespace MatchFixer_Web_App.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    }
+	}
 }

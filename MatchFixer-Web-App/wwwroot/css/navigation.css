@@ -90,14 +90,27 @@
 .dropdown-menu{
     border: 2px groove #808080;
     width: 15em;
+    height: auto;
     border-radius: -1em;
+    background-color: #3370A8;
+}
+
+.dropdown-menu button {
+    width: 14em;
+}
+
+.dropdown-menu button span {
+    color: #FAF3DD !important
+}
+
+.dropdown-menu button span {
+    text-align: center;
 }
 
 .hover-dropdown:hover .dropdown-menu {
     display: block;
     top: 4.5em;
-    right: 0.5em;
-    margin-top: 0; 
+    right: 2.5em;
 }
 
 
