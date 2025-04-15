@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using MatchFixer.Infrastructure.Contracts;
+using MatchFixer.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,11 @@ builder.Services.AddDbContext<MatchFixerDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+
+builder.Configuration.AddUserSecrets<Program>(); 
+builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Sender Service 
+builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
