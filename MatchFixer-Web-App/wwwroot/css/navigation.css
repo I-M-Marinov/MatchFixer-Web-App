@@ -12,6 +12,34 @@
     gap: 2em;
 }
 
+.navbar-nav .nav-item a {
+    position: relative;
+    color: #0DAB76 !important;
+    text-shadow: 2px 5px 5px rgba(0,0,0,0.8) !important;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+
+}
+
+    .navbar-nav .nav-item a::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #f1d302;
+        text-shadow: 0 29px 52px rgba(0,0,0,0.40), 0 25px 16px rgba(0,0,0,0.20);
+        transition: width 0.3s;
+    }
+
+.navbar-nav .nav-item a:hover::after {
+    width: 100%;
+}
+
+
 .navbar-collapse {
     display: flex;
     flex-direction: row;
