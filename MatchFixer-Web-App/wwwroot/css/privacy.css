@@ -1,6 +1,11 @@
 ﻿
+.accordion-item {
+    width: 50em;
+}
+
 accordion-item h2 {
     align-self: center;
+    min-width: 100%;
 }
 
 
