@@ -103,11 +103,11 @@
     width: 14.5em;
 }
 
-    .dropdown-menu button:hover {
-        background-color: #0DAB76 !important;
-        border-radius: 0.75em 0.2em 0.75em 0.2em;
-        border: 1px #f1d302 solid;
-    }
+.dropdown-menu button:hover {
+    background-color: #0DAB76 !important;
+    border-radius: 0.75em 0.2em 0.75em 0.2em;
+    border: 1px #f1d302 solid;
+}
 
 .dropdown-menu button span {
     color: #FAF3DD !important;
