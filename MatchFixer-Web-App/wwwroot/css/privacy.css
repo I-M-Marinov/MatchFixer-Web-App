@@ -1,0 +1,10 @@
+﻿
+accordion-item h2 {
+    align-self: center;
+}
+
+
+.accordion-button:hover {
+    color: #00ff90 !important;
+    text-shadow: 2px 5px 5px rgba(0,0,0,0.8) !important;
+}
