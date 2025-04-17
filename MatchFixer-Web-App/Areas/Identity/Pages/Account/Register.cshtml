@@ -1,4 +1,4 @@
-﻿@page
+﻿@* @page
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
@@ -60,6 +60,126 @@
             }
         </section>
     </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+ *@
+ 
+                                
+                                    @page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    :root {
+        --primary-color: #0066ff;
+        --accent-color: #00c2a8;
+        --input-border: #ced4da;
+    }
+
+    body, html {
+        height: 100%;
+    }
+
+    .register-container {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #fffff;
+        padding: 2rem;
+    }
+
+    .register-form {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .register-form h2 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .form-floating label {
+        color: #777;
+    }
+
+    .form-control:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 194, 168, 0.25);
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 194, 168, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: scale(0.98);
+    }
+
+    .external-login-btn {
+        margin: 0.25rem;
+    }
+</style>
+
+<div class="register-container">
+    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="register-form">
+        <h2>Create a new account</h2>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+            <label asp-for="Input.Email">Email</label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+            <label asp-for="Input.Password">Password</label>
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="confirm password" />
+            <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        {
+            <hr />
+            <h5 class="text-center mt-4 mb-3">Or register with</h5>
+            <div class="d-flex justify-content-center flex-wrap">
+                @foreach (var provider in Model.ExternalLogins!)
+                {
+                    <button type="submit" class="btn btn-outline-primary external-login-btn" name="provider" value="@provider.Name" title="Register using your @provider.DisplayName account">
+                        @provider.DisplayName
+                    </button>
+                }
+            </div>
+        }
+    </form>
 </div>
 
 @section Scripts {
