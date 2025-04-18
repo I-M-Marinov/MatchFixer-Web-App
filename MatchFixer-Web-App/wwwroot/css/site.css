@@ -3,6 +3,8 @@
 @import "/css/navigation.css";
 @import "/css/home-page.css";
 @import "/css/privacy.css";
+@import "/css/login.css";
+
 * {
     font-family: "Nunito", sans-serif !important;
     font-weight: 400 !important;
