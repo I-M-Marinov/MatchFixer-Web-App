@@ -1,0 +1,111 @@
+﻿
+@import "/css/effect.css";
+
+.login-container {
+    margin-top: 6.66em;
+    min-height: 70vh;
+    min-width: 40vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #08ffe1;
+    border-radius: 1em;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    background: #2A7B9B;
+    background: linear-gradient(269deg, rgba(42, 123, 155, 1) 37%, rgba(87, 199, 133, 0.85) 74%);
+}
+
+.login-card {
+    background-color: white;
+    padding: 2rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 30em;
+    animation: fadeInUp 0.6s ease;
+}
+
+.login-card h2 {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+    font-weight: 700;
+    color: #0DAB76;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.login-btn {
+    background: #0d6efd;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+}
+
+.login-btn:hover {
+    background: #084ec1;
+    box-shadow: 0 0 12px rgba(13, 110, 253, 0.6);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-floating input {
+    border-radius: 10px;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-links a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+.external-login button {
+    margin: 5px;
+    border-radius: 8px;
+}
+
+.bg {
+    animation: slide 1.5s ease-in-out infinite alternate;
+    background-image: linear-gradient(-25deg, #6c3 50%, #09f 50%);
+    bottom: 0;
+    left: -50%;
+    opacity: .5;
+    position: fixed;
+    right: -50%;
+    top: 0;
+    z-index: -1;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.bg2 {
+    animation-direction: alternate-reverse;
+    animation-duration: 4s;
+}
+
+.bg3 {
+    animation-duration: 5s;
+}
