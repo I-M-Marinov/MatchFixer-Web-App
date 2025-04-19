@@ -67,9 +67,10 @@
 
 .btn-primary:hover {
     background: var(--accent-color);
-    border: 2px black solid;
+    border: dotted 2px black;
     transform: scale(1.1);
     box-shadow: 0 4px 10px rgba(0, 194, 168, 0.3);
+    color: black;
 }
 
 .btn-primary:active {
@@ -105,8 +106,16 @@
 
 
 .bg-info {
+    background-color: #00c2a8 !important;
+    color: black !important;
     border: 2px black solid !important;
     text-align: center !important;
+}
+
+.centered-validation {
+    display: inline-block;
+    text-align: center;
+    margin: 1em auto 0 auto;
 }
 
 .form-floating .mb-3 {
