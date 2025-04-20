@@ -34,8 +34,11 @@
 			<label asp-for="Input.ConfirmPassword">Retype Password</label>
 			<span asp-validation-for="Input.ConfirmPassword" class="badge bg-info text-dark pt-2 centered-validation"></span>
 		</div>
+		
+		<div class="button-wrapper">
+			<button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+		</div>
 
-		<button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
 
 		@if ((Model.ExternalLogins?.Count ?? 0) > 0)
 		{
