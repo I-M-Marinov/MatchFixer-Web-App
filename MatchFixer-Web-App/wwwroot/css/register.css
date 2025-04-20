@@ -33,6 +33,9 @@
     max-width: 500px;
     width: 100%;
     animation: fadeInUp 0.8s ease-in-out;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    will-change: transform;
 }
 
 .register-form h2 {
@@ -54,25 +57,51 @@
     box-shadow: 0 0 0 0.2rem rgba(0, 194, 168, 0.25);
 }
 
+.btn-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .btn-primary {
     background: var(--primary-color);
     border-color: var(--primary-color);
+    position: relative;
+    z-index: 1;
     transition: all 0.3s ease;
+    transform: scale(1);
     font-family: "Orbitron", sans-serif !important;
     font-optical-sizing: auto !important;
     font-weight: 800 !important;
     font-style: normal !important;
+    transform-origin: center;
 }
 
 
-.btn-primary:hover {
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
     background: var(--accent-color);
     border: dotted 2px black;
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(0, 194, 168, 0.3);
-    color: black;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.3s ease-in-out;
+    z-index: -1;
+    border-radius: inherit;
 }
 
+.btn-primary:hover::after {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.btn-primary:hover {
+    color: black;
+    box-shadow: 0 4px 10px rgba(0, 194, 168, 0.3);
+}
 .btn-primary:active {
     transform: scale(0.98);
     box-shadow: 0 2px 5px rgba(0, 194, 168, 0.3);
@@ -113,7 +142,7 @@
 }
 
 .centered-validation {
-    display: inline-block;
+    display: block;
     text-align: center;
     margin: 1em auto 0 auto;
 }
