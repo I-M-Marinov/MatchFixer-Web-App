@@ -41,6 +41,11 @@
     width: 100%;
 }
 
+#logout-button:focus,
+#logout-button:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
 
 .navbar-collapse {
     display: flex;
