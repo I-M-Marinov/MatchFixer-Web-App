@@ -146,9 +146,11 @@
 }
 
 .centered-validation {
-    display: block;
+    display: flex;
+    justify-content: center;
     text-align: center;
-    margin: 1em auto 0 auto;
+    margin: 0.5em auto;
+    font-size: 0.6em;
 }
 
 .form-floating .mb-3 {
