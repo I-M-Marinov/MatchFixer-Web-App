@@ -1,4 +1,8 @@
-﻿:root {
+﻿
+@import "/css/container-effects.css";
+
+
+:root {
     --primary-color: #0066ff;
     --accent-color: #00c2a8;
     --input-border: #ced4da;
