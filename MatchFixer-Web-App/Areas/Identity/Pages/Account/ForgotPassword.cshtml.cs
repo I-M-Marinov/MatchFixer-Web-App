@@ -71,13 +71,49 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                return RedirectToPage("./ForgotPasswordConfirmation");
-            }
+                var logoUrl = "https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png";
+
+                var emailBody = $@"
+					<!DOCTYPE html>
+					<html>
+					<head>
+					    <meta charset='UTF-8'>
+					    <title>Reset Your Password</title>
+					</head>
+					<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
+					    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+					        <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
+					            <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
+					        </div>
+					        <div style='padding: 30px; text-align: center;'>
+					            <h2 style='color: #333;'>Please follow the link below to reset your MatchFixer password</h2>
+					            
+					            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #4287f5; border: 2px #05f09a solid; color: black; text-decoration: none; border-radius: 6px; font-weight: bold;'>
+					                Reset Your Password
+					            </a>
+
+					            <p style='margin-top: 30px; font-size: 13px; color: #888;'>
+					                If you did not request this password reset, please review your account and ensure it is not compromised.
+					            </p>
+								<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
+					               All Rights Reserved. MatchFixer ® 2025
+					            </p>
+					        </div>
+					    </div>
+					</body>
+					</html>
+					";
+
+				await _emailSender.SendEmailAsync(
+                    Input.Email,
+                    "MatchFixer - Reset Password",emailBody);
+
+				ModelState.AddModelError(string.Empty, "An email with a reset link was sent to the specified email.");
+
+				return Page();
+			}
 
             return Page();
         }
