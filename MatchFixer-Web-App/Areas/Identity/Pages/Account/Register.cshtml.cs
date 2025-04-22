@@ -156,11 +156,14 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 					                Let's get you started on your journey!
 					            </p>
 					            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
-					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;'>
+					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; color: black; border-radius: 6px; font-weight: bold;'>
 					                Confirm Your Email
 					            </a>
 					            <p style='margin-top: 30px; font-size: 13px; color: #888;'>
 					                If you did not sign up for MatchFixer, please ignore this email.
+					            </p>
+								<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
+					               All Rights Reserved. MatchFixer ® 2025
 					            </p>
 					        </div>
 					    </div>
