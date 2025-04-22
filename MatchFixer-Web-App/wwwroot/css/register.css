@@ -139,10 +139,19 @@
 
 
 .bg-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5em;
     background-color: #00c2a8 !important;
     color: black !important;
     border: 2px black solid !important;
     text-align: center !important;
+}
+
+.bg-info ul{
+    margin: 0;
+    padding: 0;
 }
 
 .centered-validation {
