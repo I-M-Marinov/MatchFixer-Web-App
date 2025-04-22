@@ -105,8 +105,10 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
             if (result.Succeeded)
             {
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
+	            ModelState.AddModelError(string.Empty, $"The password for {user.Email} was successfully reset !");
+				//return RedirectToPage("./ResetPasswordConfirmation");
+				return Page();
+			}
 
             foreach (var error in result.Errors)
             {
