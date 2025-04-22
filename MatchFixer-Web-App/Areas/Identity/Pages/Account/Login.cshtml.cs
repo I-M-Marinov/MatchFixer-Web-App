@@ -129,7 +129,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Login failed. Please check your email and password.");
                     return Page();
                 }
             }
