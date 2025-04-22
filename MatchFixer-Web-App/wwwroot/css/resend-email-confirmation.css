@@ -1,0 +1,36 @@
+﻿#resend-email-confirmation-title {
+    margin-top: 3.5em;
+}
+
+.resend-email-confirmation-container {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+
+.resend-email-confirmation-container form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#email-resend-confirmation-password {
+    width: 25em;
+}
+
+.bg-info2 {
+    background-color: #f1d302 !important;
+    color: black !important;
+    border: 2px black solid !important;
+    text-align: center !important;
+    padding: 0;
+    margin: 0.2em 0 1em 0 !important;
+}
+
+.bg-info2 ul{
+    padding: 0.5em;
+    margin: 0.2em;
+}
+
