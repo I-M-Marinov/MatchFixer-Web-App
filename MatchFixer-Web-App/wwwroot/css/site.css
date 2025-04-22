@@ -1,5 +1,8 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Orbitron:wght@400..900&family=Special+Gothic+Expanded+One&display=swap');
+@import "/css/container-effects.css";
+@import "/css/forgot-password.css";
+@import "/css/resend-email-confirmation.css";
 @import "/css/navigation.css";
 @import "/css/home-page.css";
 @import "/css/privacy.css";
@@ -95,14 +98,4 @@ body {
 
 h1 {
     font-family: monospace;
-}
-
-@keyframes slide {
-    0% {
-        transform: translateX(-25%);
-    }
-
-    100% {
-        transform: translateX(25%);
-    }
 }
