@@ -1,20 +1,27 @@
 ﻿@page
 @model ResendEmailConfirmationModel
 @{
-    ViewData["Title"] = "Resend email confirmation";
+    ViewData["Title"] = "Resend Confirmation";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h2>Enter your email.</h2>
+<div class="bg"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
+
+<h1 id="resend-email-confirmation-title">Enter your email below and we will send you a confirmation link.</h1>
+
 <hr />
-<div class="row">
+<div class="resend-email-confirmation-container">
     <div class="col-md-4">
         <form method="post">
-            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+	        @if (!ViewData.ModelState.IsValid)
+	        {
+		        <div asp-validation-summary="All" class="badge bg-info2 text-dark pt-2 centered-validation" role="alert"></div>
+	        }
             <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+                <input asp-for="Input.Email" id="email-resend-confirmation-password" class="form-control" aria-required="true" placeholder="name@example.com" />
                 <label asp-for="Input.Email" class="form-label"></label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                <span asp-validation-for="Input.Email" class="badge bg-info text-dark pt-2 centered-validation"></span>
             </div>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Resend</button>
         </form>
