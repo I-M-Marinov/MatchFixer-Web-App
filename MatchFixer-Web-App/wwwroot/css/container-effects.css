@@ -1,4 +1,14 @@
-﻿@keyframes fadeInUp {
+﻿@keyframes slide {
+    0% {
+        transform: translateX(-25%);
+    }
+
+    100% {
+        transform: translateX(25%);
+    }
+}
+
+@keyframes fadeInUp {
     0% {
         opacity: 0;
         transform: translateY(30px);
