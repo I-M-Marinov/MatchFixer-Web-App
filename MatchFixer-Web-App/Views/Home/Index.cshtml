@@ -287,25 +287,26 @@
         function spawnBall() {
             const ball = document.createElement("img");
 
-            const randomIndex = Math.floor(Math.random() * ballImages.length);
-            ball.src = ballImages[randomIndex];
+            const randomIndex = Math.floor(Math.random() * ballImages.length); // get the index of a random ball 
+            ball.src = ballImages[randomIndex]; // set the random ball to the sourse of the img element
             ball.alt = "ball";
             ball.className = "animated-ball";
 
-            ball.style.bottom = `${Math.random() * 100}px`;
-            ball.style.width = "100px";
-            ball.style.height = "100px";
+            ball.style.bottom = `${Math.random() * 5}em`;
+            ball.style.width = "5em"; // set the width of the ball
+			ball.style.height = "5em";  // set the height of the ball
             ball.style.objectFit = "cover"; 
 
 
-            wrapper.appendChild(ball);
+            wrapper.appendChild(ball); // append the ball image to the DOM 
 
+			// remove the ball from the DOM after 6 seconds
             setTimeout(() => {
                 wrapper.removeChild(ball);
-            }, 9000);
+            }, 6000);
         }
 
-        setInterval(spawnBall, 800);
+        setInterval(spawnBall, 800); // spawn a new random ball every 0.8 seconds
     });
 
 
