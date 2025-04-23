@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MatchFixer.Common\MatchFixer.Common.csproj" />
+  </ItemGroup>
+
 </Project>
