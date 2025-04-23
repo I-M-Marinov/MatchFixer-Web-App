@@ -13,8 +13,11 @@ namespace MatchFixer.Infrastructure
 		{
 		}
 
+		public virtual DbSet<ApplicationUser> ApplicationUsers { get; set; }
+ 		public virtual DbSet<ProfilePicture> ProfilePictures { get; set; }
 		public virtual DbSet<MatchEvent> MatchEvents { get; set; }
 		public virtual DbSet<Bet> Bets { get; set; }
+
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
@@ -35,6 +38,7 @@ namespace MatchFixer.Infrastructure
 			builder.Entity<Bet>(entity =>
 			{
 				entity.Property(e => e.Amount).HasPrecision(10, 2); 
+				entity.Property(e => e.WinAmount).HasPrecision(10, 2); 
 			});
 		}
 	}
