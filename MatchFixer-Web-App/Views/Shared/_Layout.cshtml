@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using MatchFixer.Infrastructure.Entities
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject SignInManager<ApplicationUser> SignInManager
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,30 +18,14 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-	            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/matchFixer-logo.png" alt="MatchFixer Logo" style="height: 40px; width: auto;" />
-
-	            </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                    <partial name="_UserDropDown" />
-                </div>
-            </div>
-        </nav>
+        @if (SignInManager.IsSignedIn(User))
+	    {
+            @await Html.PartialAsync("_LoggedInUser")
+	    }
+	    else
+	    {
+		    @await Html.PartialAsync("_GuestPartial") 
+	    }
     </header>
     <div class="container">
         <main role="main" class="pb-3">
