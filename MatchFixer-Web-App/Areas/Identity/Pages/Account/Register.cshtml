@@ -24,15 +24,25 @@
 		</div>
 
 		<div class="form-floating mb-3">
-			<input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/>
+			<input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" id="password-input1"  placeholder="password" />
 			<label asp-for="Input.Password">Password</label>
 			<span asp-validation-for="Input.Password" class="badge bg-info text-dark pt-2 centered-validation"></span>
+
+			<button type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2 toggle-password-button"
+			        onclick="togglePasswordVisibility('password-input1', 'toggle-password-icon1')" tabindex="-1">
+				<i class="bi bi-eye" id="toggle-password-icon1"></i>
+			</button>
 		</div>
 
 		<div class="form-floating mb-3">
-			<input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="confirm password"/>
+			<input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" id="password-input2" placeholder="confirm password" />
 			<label asp-for="Input.ConfirmPassword">Retype Password</label>
 			<span asp-validation-for="Input.ConfirmPassword" class="badge bg-info text-dark pt-2 centered-validation"></span>
+
+			<button type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2 toggle-password-button"
+			        onclick="togglePasswordVisibility('password-input2', 'toggle-password-icon2')" tabindex="-1">
+				<i class="bi bi-eye" id="toggle-password-icon2"></i>
+			</button>
 		</div>
 		
 		<div class="button-wrapper">
@@ -61,5 +71,19 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+	<partial name="_ValidationScriptsPartial" />
+
+	<script>
+		function togglePasswordVisibility(inputId, iconId) {
+
+			const passwordInput = document.getElementById(inputId);
+			const toggleIcon = document.getElementById(iconId);
+
+			const isPassword = passwordInput.type === "password";
+			passwordInput.type = isPassword ? "text" : "password";
+
+			toggleIcon.classList.toggle("bi-eye");
+			toggleIcon.classList.toggle("bi-eye-slash");
+		}
+	</script>
 }
