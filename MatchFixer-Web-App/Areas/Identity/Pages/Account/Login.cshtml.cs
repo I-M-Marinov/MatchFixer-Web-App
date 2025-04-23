@@ -116,9 +116,11 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
+
+                    return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
+					//return LocalRedirect(returnUrl);
+				}
+				if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 }
