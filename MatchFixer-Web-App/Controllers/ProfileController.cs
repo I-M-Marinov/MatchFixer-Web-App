@@ -63,5 +63,23 @@ namespace MatchFixer_Web_App.Controllers
 				return View("Profile", model);
 			}
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> ConfirmEmail(string userId, string code)
+		{
+			var (success, message) = await _profileService.ConfirmEmailAsync(userId, code);
+
+			if (success)
+			{
+				TempData["SuccessMessage"] = message;
+			}
+			else
+			{
+				TempData["ErrorMessage"] = message;
+			}
+			
+			return RedirectToAction("Profile", "Profile");
+		}
+
 	}
 }
