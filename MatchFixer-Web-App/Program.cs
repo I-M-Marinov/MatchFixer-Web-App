@@ -1,4 +1,6 @@
 
+using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MatchFixer.Infrastructure;
@@ -21,6 +23,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Configuration.AddUserSecrets<Program>(); 
 builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Sender Service 
 builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
+builder.Services.AddScoped<IProfileService, ProfileService>(); // Add the Profile Service 
+
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
