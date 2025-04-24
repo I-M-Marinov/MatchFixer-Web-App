@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchFixer.Infrastructure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchFixer.Common", "MatchFixer.Common\MatchFixer.Common.csproj", "{3B9A2861-663A-4ECD-99AC-8FAAB2298D2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchFixer.Core", "MatchFixer.Core\MatchFixer.Core.csproj", "{74145187-7199-4702-B50F-659154BF13E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3B9A2861-663A-4ECD-99AC-8FAAB2298D2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B9A2861-663A-4ECD-99AC-8FAAB2298D2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B9A2861-663A-4ECD-99AC-8FAAB2298D2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74145187-7199-4702-B50F-659154BF13E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74145187-7199-4702-B50F-659154BF13E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74145187-7199-4702-B50F-659154BF13E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74145187-7199-4702-B50F-659154BF13E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
