@@ -2,6 +2,7 @@
     background-color: #3370A8 !important;
     border-bottom: 2px #020100 solid !important;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    position: relative;
 }
 
 .container-fluid{
@@ -63,8 +64,6 @@
 .nav-item a:hover,
 #logout-button:hover {
     color: #f1d302 !important;
-    transform: scale(1.20);
-    animation: ease-in 1s linear;
 }
 
 .nav-link {
@@ -85,11 +84,16 @@
     justify-content: center !important;
 }
 
+
+.profile-dropdown-menu{
+    position: absolute;
+    top: 0.005em;
+    right: 0.5em;
+}
+
 .profile-dropdown-menu li {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
+    display: block;
+    padding: 0.2em 0.5em;
 }
 
 .dropdown-menu {
@@ -102,14 +106,21 @@
     height: auto;
     border-radius: 0.25em;
     background-color: #3370A8;
+    overflow: visible !important;
 }
 
 .dropdown-menu button {
-    width: 14.5em;
+    padding: 0.5em 1em;
+    line-height: 1.2;
+    white-space: nowrap;
+    background-color: transparent;
+    border-radius: 0;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
 }
 
 .dropdown-menu button:hover {
-    background-color: #0DAB76 !important;
+    background-color: #0DAB76;
     border-radius: 0.75em 0.2em 0.75em 0.2em;
     border: 1px #f1d302 solid;
 }
@@ -117,14 +128,14 @@
 .dropdown-menu button span {
     color: #FAF3DD !important;
     text-shadow: 2px 5px 5px rgba(0,0,0,0.8) !important;
+    white-space: nowrap;
 }
 
 .dropdown-menu li:hover span {
     color: #f1d302 !important;
-    transform: scale(1.15);
 }
 
-.dropdown-menu button span {
+.dropdown-menu li button span {
     text-align: center;
 }
 
@@ -134,4 +145,13 @@
     right: 0.1em;
 }
 
+.dropdown-menu h6 {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+    font-size: 1.5em;
+    color: #08ac93;
+    text-shadow: 3px 2px 2px #000000;
+}
 
