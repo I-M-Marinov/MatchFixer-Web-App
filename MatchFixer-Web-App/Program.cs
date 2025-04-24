@@ -8,6 +8,7 @@ using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Services;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +21,13 @@ builder.Services.AddDbContext<MatchFixerDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
-builder.Configuration.AddUserSecrets<Program>(); 
+builder.Configuration.AddUserSecrets<Program>();
+builder.Services.AddHttpContextAccessor(); // Add HTTP Context Accessor
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>(); // Add URL Helper Factory
 builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Sender Service 
 builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>(); // Add the Profile Service 
+
 
 
 
