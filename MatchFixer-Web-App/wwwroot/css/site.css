@@ -8,6 +8,7 @@
 @import "/css/privacy.css";
 @import "/css/register.css";
 @import "/css/login.css";
+@import "/css/profile/profile.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
@@ -46,7 +47,7 @@ body {
     background-color: #b6cccc !important;
 }
 
-.container {
+.layout-container {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -67,11 +68,12 @@ body {
     bottom: 0;
     left: -50%;
     opacity: .5;
-    position: fixed;
+    position: absolute;
     right: -50%;
     top: 0;
     z-index: -1;
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    overflow: hidden;
 }
 
 .bg2 {
