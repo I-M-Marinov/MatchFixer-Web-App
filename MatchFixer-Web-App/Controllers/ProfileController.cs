@@ -1,12 +1,67 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MatchFixer.Infrastructure.Entities;
+using MatchFixer.Core.Contracts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using MatchFixer_Web_App.Models.Profile;
 
 namespace MatchFixer_Web_App.Controllers
 {
 	public class ProfileController : Controller
 	{
-		public IActionResult Profile()
+		private readonly IProfileService _profileService;
+
+
+		public ProfileController(IProfileService profileService)
 		{
-			return View();
+			_profileService = profileService;
+		}
+
+
+		[HttpGet]
+		public async Task<IActionResult> Profile()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+
+			var viewModel = await _profileService.GetProfileAsync(userId);
+			if (viewModel == null)
+			{
+				return NotFound();
+			}
+
+			return View(viewModel);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View("Profile", model);
+			}
+
+			try
+			{
+				var (success, message) = await _profileService.UpdateProfileAsync(model);
+
+				if (success)
+				{
+					TempData["SuccessMessage"] = message; // Store success message
+				}
+				else
+				{
+					TempData["ErrorMessage"] = message; // Store error or no-change
+				}
+
+				return RedirectToAction("Profile", "Profile");
+			}
+			catch (Exception ex)
+			{
+				// Handle the error and display it
+				ModelState.AddModelError(string.Empty, $"Error updating profile: {ex.Message}");
+				return View("Profile", model);
+			}
 		}
 	}
 }
