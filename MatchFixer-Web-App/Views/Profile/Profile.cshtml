@@ -1,5 +1,152 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using MatchFixer_Web_App.Models.Profile
+@model ProfileViewModel
+
 @{
+    ViewData["Title"] = $"{Model.FullName}'s Profile";
 }
+
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert alert-success">
+		@TempData["SuccessMessage"]
+	</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert alert-danger">
+		@TempData["ErrorMessage"]
+	</div>
+}
+
+<div class="background-profile"></div>
+
+<section class="profile-wrapper d-flex justify-content-start mx-auto py-5">
+    <div class="profile-container d-flex gap-4 w-100">
+        <!-- Left: Side-by-side Profile Cards -->
+        <div class="profile-card d-flex gap-4 flex-wrap">
+
+            <!-- Card 1: Image + Name -->
+            <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 300px;">
+                <div class="text-center">
+                    <img src="@Model.ProfileImageUrl" class="rounded-circle border border-3 border-primary shadow-sm" alt="Profile Picture" />
+                    <h4 class="mt-3 fw-bold text-shadow">@Model.FullName</h4>
+                </div>
+            </div>
+
+            <form id="profile-form" method="post" action="@Url.Action("UpdateProfile", "Profile")" id="update-profile-form">
+                @Html.AntiForgeryToken()
+				
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="FirstName" value="@Model.FirstName" />
+                <input type="hidden" name="LastName" value="@Model.LastName" />
+
+                <!-- Profile Info Card -->
+                <div class="card shadow border-0 rounded-4 p-4 flex-fill profile-info-container" style="min-width: 550px;">
+                    <div class="profile-info">
+                        <!-- Email Row -->
+                        <div class="row mb-3 profile-detail">
+                            <div class="col-sm-4 fw-lighter">Email:</div>
+                            <div class="col-sm-8">
+                                <span class="profile-value">@Model.Email</span>
+                                <input type="email" class="d-none form-control" value="@Model.Email" name="Email" />
+                                <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+                                    <span class="custom-tooltip-wrapper">
+                                        <i class="ri-edit-2-line"></i>
+                                        <span class="custom-tooltip">Edit your email</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Date of Birth Row -->
+                        <div class="row mb-3 profile-detail">
+                            <div class="col-sm-4 fw-lighter">Date of Birth:</div>
+                            <div class="col-sm-8">
+                                <span class="profile-value">@Model.DateOfBirth.ToString("dd MMMM yyyy")</span>
+                                <input type="date" class="d-none form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" />
+                                <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+                                    <span class="custom-tooltip-wrapper">
+                                        <i class="ri-edit-2-line"></i>
+                                        <span class="custom-tooltip">Edit date of birth</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Country Row -->
+                        <div class="row mb-3 profile-detail">
+                            <div class="col-sm-4 fw-lighter">Country:</div>
+                            <div class="col-sm-8">
+                                <span class="profile-value">@Model.Country</span>
+                                <input type="text" class="d-none form-control" value="@Model.Country" name="Country" />
+                                <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+                                    <span class="custom-tooltip-wrapper">
+                                        <i class="ri-edit-2-line"></i>
+                                        <span class="custom-tooltip">Edit Country</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Member Since Row -->
+                        <div class="row mb-3 profile-detail">
+                            <div class="col-sm-4 fw-lighter">Member since:</div>
+                            <div class="col-sm-8">@Model.CreatedOn.ToString("dd MMMM yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-3">
+	                <button type="submit" class="btn btn-primary d-none" id="save-btn">Save Changes</button>
+                </div>
+            </form>
+
+
+        </div>
+        <!-- Right: Placeholder for future content -->
+        <div class="right-placeholder flex-grow-1">
+            <!-- Add whatever else you need here -->
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+        document.querySelectorAll('.edit-toggle-btn').forEach(button => {
+
+        if (!button.dataset.original) {
+            button.dataset.original = button.innerHTML;
+        }
+
+        button.addEventListener('click', () => {
+            const row = button.closest('.row');
+            const span = row.querySelector('.profile-value');
+            const input = row.querySelector('input');
+            const saveBtn = document.getElementById('save-btn');
+
+            span.classList.toggle('d-none');
+            input.classList.toggle('d-none');
+
+            if (input.classList.contains('d-none')) {
+
+                button.innerHTML = button.dataset.original;
+
+                const editableInputs = document.querySelectorAll('.profile-info-container input');
+                const anyInputsVisible = [...editableInputs].some(inp => !inp.classList.contains('d-none'));
+
+                if (!anyInputsVisible) {
+                    saveBtn.classList.add('d-none');
+                }
+
+            } else {
+                button.textContent = 'Cancel';
+                saveBtn.classList.remove('d-none');
+            }
+        });
+    });
+
+
+</script>
