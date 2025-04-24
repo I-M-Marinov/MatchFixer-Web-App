@@ -1,0 +1,174 @@
+﻿:root {
+    --primary-color: #3370A8;
+    --secondary-color: #00c2a8;
+    --accent-color: #f1d302;
+    --background-accent-color: #FAF3DD;
+}
+
+
+.background-profile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(1deg, rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 75%);
+    z-index: -1;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    overflow: hidden;
+}
+
+.profile-wrapper {
+    width: 100%;
+    max-width: 1200px;
+}
+
+.profile-container {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.profile-card img {
+    width: 100%;
+    min-width: 200px;
+    max-width: 300px !important;
+    height: auto;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #08ac93 !important;
+    box-shadow: 0 0 0 0.1rem black, 0 0 0 0.25rem #258cfb;
+}
+
+.profile-card h4 {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+    color: #08ac93;
+    text-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.profile-card {
+    flex: 0 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.profile-info-container {
+    background-color: var(--primary-color);
+    border: 2px solid var(--secondary-color);
+    min-width: 600px;
+    max-width: 700px !important;
+    height: auto;
+
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-detail {
+    display: flex;
+    margin-left: 1rem;
+    color: var(--background-accent-color);
+    border-bottom: 1px solid var(--secondary-color);
+    flex-wrap: nowrap;
+    gap: -1rem;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.profile-detail:first-of-type {
+    margin-top: 2rem;
+}
+
+.profile-detail div {
+    font-size: 1rem;
+    font-family: "Cairo", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 500 !important;
+    font-style: normal !important;
+}
+
+.profile-detail div:nth-child(2n+1) {
+    color: var(--accent-color);
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.fw-lighter {
+    text-align: center !important;
+}
+
+.name-image-container {
+    background-color: var(--primary-color);
+}
+
+.name-image-container {
+    -webkit-box-shadow: 6px 9px 18px 5px #000000;
+    box-shadow: 6px 9px 18px 5px #000000;
+}
+
+
+.text-shadow {
+    text-shadow: 3px 2px 2px #000000;
+}
+
+.edit-toggle-btn {
+    visibility: hidden;
+    border: none;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.edit-toggle-btn i {
+    color: black;
+}
+
+
+.profile-detail:hover .edit-toggle-btn {
+    visibility: visible;
+    background-color: var(--secondary-color);
+}
+
+/* --------------------------------------------------------
+|  CUSTOM TOOPTIP ( TITLE ) ON HOVER FOR ALL EDIT BUTTONS |
+-------------------------------------------------------- */
+
+.custom-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-tooltip {
+    visibility: hidden;
+    background-color: var(--secondary-color);
+    color: black;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 999;
+    bottom: 120%; 
+    left: 5rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
+.custom-tooltip-wrapper:hover .custom-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+#update-profile-form {
+    display: flex;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    align-content: center !important;
+}
