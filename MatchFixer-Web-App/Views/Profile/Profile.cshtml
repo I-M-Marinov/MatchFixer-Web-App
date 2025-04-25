@@ -99,7 +99,7 @@
 
                 <!-- Submit Button -->
                 <div class="text-center mt-3">
-	                <button type="submit" class="btn btn-primary d-none" id="save-btn">Save Changes</button>
+	                <button type="submit" class="btn btn-primary d-none" id="save-btn">Save</button>
                 </div>
             </form>
 
@@ -141,8 +141,14 @@
                     saveBtn.classList.add('d-none');
                 }
 
+                button.classList.remove('cancel-toggle-btn');
+                button.classList.add('edit-toggle-btn');
+
+
             } else {
                 button.textContent = 'Cancel';
+                button.classList.remove('edit-toggle-btn');
+                button.classList.add('cancel-toggle-btn');
                 saveBtn.classList.remove('d-none');
             }
         });
