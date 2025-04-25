@@ -147,6 +147,11 @@
     color: black !important;
     border: 2px black solid !important;
     text-align: center !important;
+    padding: 0.2em 0.75em; 
+    max-width: 100%; 
+    white-space: normal; 
+    word-wrap: break-word;
+    overflow-wrap: break-word; 
 }
 
 .bg-info ul{
