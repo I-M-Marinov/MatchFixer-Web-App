@@ -2,3 +2,33 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+
+/*-------------------------------------------------------------------------------------
+# HANDLE THE FADE OUT EFFECT OF SUCCESS AND ERROR MESSAGES IN ALL VIEWS 
+--------------------------------------------------------------------------------------*/
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Error message fade-out
+
+    var errorMessage = document.getElementById('error-message');
+    if (errorMessage) {
+        setTimeout(function () {
+            errorMessage.classList.add('fade-out');
+        }, 1000);
+        setTimeout(function () {
+            errorMessage.style.display = 'none';
+        }, 4500);
+    }
+
+    // Success message fade-out
+    var successMessage = document.getElementById('success-message');
+    if (successMessage) {
+        setTimeout(function () {
+            successMessage.classList.add('fade-out');
+        }, 1000);
+        setTimeout(function () {
+            successMessage.style.display = 'none';
+        }, 4500);
+    }
+});
