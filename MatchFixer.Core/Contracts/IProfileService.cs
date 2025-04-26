@@ -1,4 +1,4 @@
-﻿using MatchFixer_Web_App.Models.Profile;
+﻿using MatchFixer.Core.ViewModels.Profile;
 
 
 namespace MatchFixer.Core.Contracts
