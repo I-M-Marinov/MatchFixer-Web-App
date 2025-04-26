@@ -1,6 +1,6 @@
 ﻿using System.Text.Encodings.Web;
 using MatchFixer.Core.Contracts;
-using MatchFixer_Web_App.Models.Profile;
+using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Country = ISO3166.Country;
+using MatchFixer.Infrastructure.Contracts;
+using MatchFixer.Infrastructure.Services;
 
 namespace MatchFixer.Core.Services
 {
@@ -18,16 +22,20 @@ namespace MatchFixer.Core.Services
 		private readonly IEmailSender _emailSender;
 		private readonly IUrlHelper _urlHelper;
 		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly ITimezoneService _timezoneService;
+
 
 
 		public ProfileService(
 			UserManager<ApplicationUser> userManager, 
 			IEmailSender emailSender,
 			IUrlHelperFactory urlHelperFactory,
-			IHttpContextAccessor httpContextAccessor)
+			IHttpContextAccessor httpContextAccessor,
+			ITimezoneService timezoneService)
 		{
 			_userManager = userManager;
 			_emailSender = emailSender;
+
 
 			var actionContext = new ActionContext
 			{
@@ -39,6 +47,7 @@ namespace MatchFixer.Core.Services
 			_httpContextAccessor = httpContextAccessor;
 
 			_urlHelper = urlHelperFactory.GetUrlHelper(actionContext);
+			_timezoneService = timezoneService;
 		}
 
 		public async Task<ProfileViewModel> GetProfileAsync(string userId)
@@ -48,6 +57,15 @@ namespace MatchFixer.Core.Services
 			{
 				return null;
 			}
+
+			var countryOptions = Country.List
+				.OrderBy(c => c.Name)
+				.Select(c => new SelectListItem
+				{
+					Value = c.TwoLetterCode,
+					Text = c.Name
+				})
+				.ToList();
 
 			return new ProfileViewModel
 			{
@@ -59,9 +77,12 @@ namespace MatchFixer.Core.Services
 				Country = user.Country,
 				TimeZone = user.TimeZone,
 				CreatedOn = user.CreatedOn,
-				ProfileImageUrl = user.ProfilePicture?.ImageUrl ?? "/images/user.jpg"
+				ProfileImageUrl = user.ProfilePicture?.ImageUrl ?? "/images/default-user-image.png",
+				CountryOptions = countryOptions
 			};
 		}
+
+
 
 		public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
 		{
@@ -82,12 +103,26 @@ namespace MatchFixer.Core.Services
 				user.DateOfBirth = model.DateOfBirth;
 				changes.Add("Date of Birth");
 			}
-			// Check if user changed the country and if yes update it
+			// Check if user changed the timezone and if yes update it 
+			if (user.TimeZone != model.TimeZone)
+			{
+				var isValid = await IsValidTimezoneAsync(model.Country, model.TimeZone); // validate time zone
+				if (!isValid)
+				{
+					return (false, "Time Zone is missing or incorrect !");
+
+				}
+				user.TimeZone = model.TimeZone;
+				changes.Add("Time Zone");
+			}
+			// Check if user changed the country and if yes update it ( update the timezone as well to be safe ) 
 			if (user.Country != model.Country)
 			{
+				user.TimeZone = model.TimeZone;
 				user.Country = model.Country;
 				changes.Add("Country");
 			}
+			
 
 			// If no changes were detected, return a message
 			if (changes.Count == 0)
@@ -104,7 +139,7 @@ namespace MatchFixer.Core.Services
 			}
 
 			// If changes were made, return a message with the updated properties
-			string message = "Profile updated successfully. Changed: " + string.Join(", ", changes);
+			string message = "Your profile was updated successfully. You have made changes to: " + string.Join(", ", changes);
 			return (true, message);
 		}
 
@@ -193,6 +228,11 @@ namespace MatchFixer.Core.Services
 			}
 
 			return (false, "Email confirmation failed.");
+		}
+
+		private async Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
+		{
+			return await _timezoneService.IsValidTimezoneAsync(countryCode, timezone);
 		}
 
 	}
