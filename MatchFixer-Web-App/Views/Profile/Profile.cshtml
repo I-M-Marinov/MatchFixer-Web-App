@@ -1,23 +1,28 @@
-﻿@using MatchFixer_Web_App.Models.Profile
-@model ProfileViewModel
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model MatchFixer.Core.ViewModels.Profile.ProfileViewModel
 
 @{
     ViewData["Title"] = $"{Model.FullName}'s Profile";
 }
 
-@if (TempData["SuccessMessage"] != null)
-{
-	<div class="alert alert-success">
-		@TempData["SuccessMessage"]
-	</div>
-}
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
 
-@if (TempData["ErrorMessage"] != null)
-{
-	<div class="alert alert-danger">
-		@TempData["ErrorMessage"]
-	</div>
-}
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
+
+	@Html.ValidationMessageFor(model => model.TimeZone, "", new { @class = "text-danger" })
+
+</div>
 
 <div class="background-profile"></div>
 
@@ -40,42 +45,47 @@
                 <input type="hidden" name="Id" value="@Model.Id" />
                 <input type="hidden" name="FirstName" value="@Model.FirstName" />
                 <input type="hidden" name="LastName" value="@Model.LastName" />
+                <input type="hidden" name="CreatedOn" value="@Model.CreatedOn" />
 
                 <!-- Profile Info Card -->
                 <div class="card shadow border-0 rounded-4 p-4 flex-fill profile-info-container" style="min-width: 550px;">
                     <div class="profile-info">
                         <!-- Email Row -->
                         <div class="row mb-3 profile-detail">
-                            <div class="col-sm-4 fw-lighter">Email:</div>
-                            <div class="col-sm-8">
-                                <span class="profile-value">@Model.Email</span>
-                                <input type="email" class="d-none form-control" value="@Model.Email" name="Email" />
-                                <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-                                    <span class="custom-tooltip-wrapper">
-                                        <i class="ri-edit-2-line"></i>
-                                        <span class="custom-tooltip">Edit your email</span>
-                                    </span>
-                                </button>
-                            </div>
+	                        <div class="row text-center">
+		                        <div class="col-sm-4 fw-lighter">Email:</div>
+		                        <div class="col-sm-8">
+			                        <span class="profile-value">@Model.Email</span>
+			                        <input type="email" class="d-none form-control" value="@Model.Email" name="Email" id="email-input"/>
+			                        <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+				                        <span class="custom-tooltip-wrapper">
+					                        <i class="ri-edit-2-line"></i>
+					                        <span class="custom-tooltip">Edit your email</span>
+				                        </span>
+			                        </button>
+		                        </div>
+	                        </div>
                         </div>
 
                         <!-- Date of Birth Row -->
                         <div class="row mb-3 profile-detail">
-                            <div class="col-sm-4 fw-lighter">Date of Birth:</div>
-                            <div class="col-sm-8">
-                                <span class="profile-value">@Model.DateOfBirth.ToString("dd MMMM yyyy")</span>
-                                <input type="date" class="d-none form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" />
-                                <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-                                    <span class="custom-tooltip-wrapper">
-                                        <i class="ri-edit-2-line"></i>
-                                        <span class="custom-tooltip">Edit date of birth</span>
-                                    </span>
-                                </button>
-                            </div>
+	                        <div class="row text-center">
+		                        <div class="col-sm-4 fw-lighter">Date of Birth:</div>
+		                        <div class="col-sm-8">
+			                        <span class="profile-value">@Model.DateOfBirth.ToString("dd MMMM yyyy")</span>
+                                    <input type="date" class="d-none form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" id="dateOfBirth-input" />
+			                        <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+				                        <span class="custom-tooltip-wrapper">
+					                        <i class="ri-edit-2-line"></i>
+					                        <span class="custom-tooltip">Edit date of birth</span>
+				                        </span>
+			                        </button>
+		                        </div>
+	                        </div>
                         </div>
 
                         <!-- Country Row -->
-                        <div class="row mb-3 profile-detail">
+                        @* <div class="row mb-3 profile-detail">
                             <div class="col-sm-4 fw-lighter">Country:</div>
                             <div class="col-sm-8">
                                 <span class="profile-value">@Model.Country</span>
@@ -87,12 +97,50 @@
                                     </span>
                                 </button>
                             </div>
+                        </div> *@
+						
+                        <!-- Country Dropdown -->
+                        <div class="row mb-3 profile-detail">
+	                        <div class="row text-center">
+		                        <div class="col-sm-4 fw-lighter">Country:</div>
+		                        <div class="col-sm-8">
+			                        <span class="profile-value">@Model.Country</span>
+
+                                    <select asp-for="Country" asp-items="Model.CountryOptions" id="Input_Country" class="d-none form-control text-center">
+				                        <option value="">Select your country</option>
+			                        </select>
+
+			                        <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+				                        <span class="custom-tooltip-wrapper">
+					                        <i class="ri-edit-2-line"></i>
+					                        <span class="custom-tooltip">Edit Country</span>
+				                        </span>
+			                        </button>
+		                        </div>
+	                        </div>
+                        </div>
+
+                        <!-- Timezone Dropdown Wrapper -->
+                        
+                        <input type="hidden" id="existingTimezone" value="@Model.TimeZone" />
+
+                        <div class="mb-3 profile-detail" id="timezoneWrapper" style="display: none;">
+                            <div class="row text-center">
+                                <div class="col-sm-4 fw-lighter">Time Zone:</div>
+                                <div class="col-sm-8">
+                                    <select id="timezoneDropdown" class="form-control text-center"></select>
+	                                <input type="hidden" id="timezoneHiddenInput" name="TimeZone" value="@Model.TimeZone"/>
+                                </div>
+
+	                        </div>
                         </div>
 
                         <!-- Member Since Row -->
                         <div class="row mb-3 profile-detail">
-                            <div class="col-sm-4 fw-lighter">Member since:</div>
-                            <div class="col-sm-8">@Model.CreatedOn.ToString("dd MMMM yyyy")</div>
+	                        <div class="row text-center">
+		                        <div class="col-sm-4 fw-lighter">Member since:</div>
+		                        <div class="col-sm-7">@Model.CreatedOn.ToString("dd MMMM yyyy")</div>
+		                    </div>
                         </div>
                     </div>
                 </div>
@@ -115,7 +163,7 @@
 
 <script>
 
-        document.querySelectorAll('.edit-toggle-btn').forEach(button => {
+       document.querySelectorAll('.edit-toggle-btn').forEach(button => {
 
         if (!button.dataset.original) {
             button.dataset.original = button.innerHTML;
@@ -124,35 +172,117 @@
         button.addEventListener('click', () => {
             const row = button.closest('.row');
             const span = row.querySelector('.profile-value');
-            const input = row.querySelector('input');
-            const saveBtn = document.getElementById('save-btn');
+            const input = row.querySelector('input, select');
+            const timezoneWrapper = document.getElementById("timezoneWrapper");
+
+            // Save the original value when editing starts
+            if (!input.dataset.originalValue) {
+                input.dataset.originalValue = input.value;  // Store original value
+            }
 
             span.classList.toggle('d-none');
             input.classList.toggle('d-none');
 
             if (input.classList.contains('d-none')) {
-
                 button.innerHTML = button.dataset.original;
-
-                const editableInputs = document.querySelectorAll('.profile-info-container input');
-                const anyInputsVisible = [...editableInputs].some(inp => !inp.classList.contains('d-none'));
-
-                if (!anyInputsVisible) {
-                    saveBtn.classList.add('d-none');
-                }
-
                 button.classList.remove('cancel-toggle-btn');
                 button.classList.add('edit-toggle-btn');
+                timezoneWrapper.style.display = "none";
 
-
+                // Revert the input or select to the original value
+                input.value = input.dataset.originalValue;  // Revert the value
             } else {
                 button.textContent = 'Cancel';
                 button.classList.remove('edit-toggle-btn');
                 button.classList.add('cancel-toggle-btn');
-                saveBtn.classList.remove('d-none');
             }
+
+            // Always check after toggling if any inputs are still visible
+            checkIfAnyEditableInputsAreVisible();
         });
     });
 
+    // Global event listener for cancel buttons
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('cancel-toggle-btn')) {
+            checkIfAnyEditableInputsAreVisible();
+        }
+    });
+
+    function checkIfAnyEditableInputsAreVisible() {
+        const editableElements = document.querySelectorAll('.profile-info-container input:not([type="hidden"]):not([name="CreatedOn"]), .profile-info-container select');
+        const saveBtn = document.getElementById('save-btn');
+        const anyVisible = [...editableElements].some(el => !el.classList.contains('d-none') && el.offsetParent !== null);
+
+        if (anyVisible) {
+            saveBtn.classList.remove('d-none');
+        } else {
+            saveBtn.classList.add('d-none');
+        }
+    }
+
+
+        document.getElementById("Input_Country").addEventListener("change", async function () {
+        const countryCode = this.value;
+
+        if (!countryCode) return;
+
+        const response = await fetch(`/api/timezones/${countryCode}`);
+        const timezones = await response.json();
+
+        const timezoneSelect = document.getElementById("timezoneDropdown");
+        const timezoneWrapper = document.getElementById("timezoneWrapper");
+        const timezoneHiddenInput = document.getElementById("timezoneHiddenInput");
+
+        timezoneSelect.innerHTML = "";
+        timezoneHiddenInput.value = "";
+
+        timezoneWrapper.style.display = "block";
+
+        if (timezones.length > 1) {
+            timezoneSelect.disabled = false; // Enable for user to choose
+
+            // Add a placeholder option
+            const placeholderOption = document.createElement("option");
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            placeholderOption.text = "Select your timezone";
+            timezoneSelect.appendChild(placeholderOption);
+
+            // Populate timezone options
+            timezones.forEach(zone => {
+                const option = document.createElement("option");
+                option.value = zone;
+                option.text = zone;
+                timezoneSelect.appendChild(option);
+            });
+
+            // Set hidden input when timezone selected
+            timezoneSelect.addEventListener("change", function () {
+                timezoneHiddenInput.value = this.value;
+            });
+        } else if (timezones.length === 1) {
+            timezoneSelect.disabled = true; // Disable dropdown
+            const option = document.createElement("option");
+            option.value = timezones[0];
+            option.text = timezones[0];
+            option.selected = true;
+            timezoneSelect.appendChild(option);
+
+            timezoneHiddenInput.value = timezones[0];
+        } else {
+            timezoneSelect.disabled = true;
+        }
+
+        // Preselect the timezone if already set
+        const existingTimezone = document.getElementById("existingTimezone").value;
+        if (existingTimezone) {
+            const selectedOption = Array.from(timezoneSelect.options).find(option => option.value === existingTimezone);
+            if (selectedOption) {
+                selectedOption.selected = true;
+                timezoneHiddenInput.value = existingTimezone;
+            }
+        }
+    });
 
 </script>
