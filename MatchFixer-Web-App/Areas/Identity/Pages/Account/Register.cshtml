@@ -45,6 +45,22 @@
 			</button>
 		</div>
 		
+		<div class="form-floating mb-3">
+			<select asp-for="Input.Country" asp-items="Model.CountryOptions" class="form-select">
+				<option value="">Select your country</option>
+			</select>
+			<label asp-for="Input.Country">Country</label>
+			<span asp-validation-for="Input.Country" class="badge bg-info text-dark pt-2 centered-validation"></span>
+		</div>
+		
+		<input asp-for="Input.Timezone" type="hidden" id="timezoneHiddenInput" />
+		<div id="timezoneWrapper" style="display:none;">
+			<label for="timezoneDropdown">Select Time Zone</label>
+			<select id="timezoneDropdown"></select>
+		</div>
+
+
+		
 		<div class="button-wrapper">
 			<button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
 		</div>
@@ -85,5 +101,52 @@
 			toggleIcon.classList.toggle("bi-eye");
 			toggleIcon.classList.toggle("bi-eye-slash");
 		}
+
+
+		document.getElementById("Input_Country").addEventListener("change", async function () {
+			const countryCode = this.value;
+
+			if (!countryCode) return;
+
+			const response = await fetch(`/api/timezones/${countryCode}`);
+			const timezones = await response.json();
+
+			const timezoneSelect = document.getElementById("timezoneDropdown");
+			const timezoneWrapper = document.getElementById("timezoneWrapper");
+			const timezoneHiddenInput = document.getElementById("timezoneHiddenInput");
+
+			timezoneSelect.innerHTML = "";
+			timezoneHiddenInput.value = "";
+
+			// if more than one timezone for the selected country 
+			if (timezones.length > 1) {
+				timezoneWrapper.style.display = "block";
+
+				const placeholderOption = document.createElement("option");
+				placeholderOption.disabled = true;
+				placeholderOption.selected = true;
+				placeholderOption.text = "Select your timezone";
+				timezoneSelect.appendChild(placeholderOption);
+
+				timezones.forEach(zone => {
+					const option = document.createElement("option");
+					option.value = zone;
+					option.text = zone;
+					timezoneSelect.appendChild(option);
+				});
+
+				timezoneSelect.addEventListener("change", function () {
+					timezoneHiddenInput.value = this.value;
+				});
+			} else if (timezones.length === 1) {
+				// if only one timezone, set it directly
+				timezoneWrapper.style.display = "none";
+				timezoneHiddenInput.value = timezones[0];
+			} else {
+				// No timezones
+				timezoneWrapper.style.display = "none";
+			}
+		});
+
 	</script>
 }
