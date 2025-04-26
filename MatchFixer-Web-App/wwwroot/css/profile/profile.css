@@ -74,7 +74,6 @@
     display: flex;
     margin-left: 1rem;
     color: var(--background-accent-color);
-    border-bottom: 1px solid var(--secondary-color);
     flex-wrap: nowrap;
     gap: -1rem;
     text-shadow: 1px 1px 2px #000000;
@@ -92,7 +91,11 @@
     font-style: normal !important;
 }
 
-.profile-detail div:nth-child(2n+1) {
+    .profile-detail .row {
+        border-bottom: 1px solid var(--secondary-color);
+    }
+
+.profile-detail div div:nth-child(2n+1) {
     color: var(--accent-color);
     text-shadow: 1px 1px 2px #000000;
 }
@@ -189,3 +192,64 @@
     align-items: center !important;
     align-content: center !important;
 }
+
+/*-------------------------------------------------------------------------------------
+# FADE OUT EFFECT FOR THE SUCCESS AND ERROR MESSAGES 
+--------------------------------------------------------------------------------------*/
+
+.success-message,
+.error-message {
+    position: fixed;
+    top: 5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    max-width: 90%;
+    text-align: center;
+}
+
+.success-message {
+    background-color: var(--secondary-color);
+    color: #0f5132;
+    border: 2px solid #badbcc;
+}
+
+.error-message {
+    background-color: var(--accent-color);
+    color: black;
+    border: 2px solid black;
+}
+
+.fade-out {
+    opacity: 0; /* Start fading out */
+    transition: opacity 4s ease-out; /* Transition effect */
+}
+
+
+#timezoneDropdown,
+#Input_Country,
+#dateOfBirth-input, 
+#email-input{
+    margin-bottom: 0.2em;
+    background-color: #badbcc;
+}
+
+#timezoneDropdown,
+#Input_Country {
+    width: 19em !important;
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%2308ac93" class="bi bi-caret-down-fill" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592c.86 0 1.319 1.013.753 1.658l-4.796 5.482a1 1 0 0 1-1.506 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5em center;
+    background-size: 0.85em;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+
+
+
