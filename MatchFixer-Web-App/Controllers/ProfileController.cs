@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MatchFixer_Web_App.Models.Profile;
+using MatchFixer.Core.ViewModels.Profile;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -38,7 +39,24 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return View("Profile", model);
+				// Check if there's a specific validation error for TimeZone
+				if (ModelState.ContainsKey(nameof(model.TimeZone)) && ModelState[nameof(model.TimeZone)].Errors.Any())
+				{
+					// Retrieve the first error message for TimeZone and save it to TempData
+					var timeZoneErrorMessage = ModelState[nameof(model.TimeZone)].Errors.FirstOrDefault()?.ErrorMessage;
+					TempData["ErrorMessage"] = timeZoneErrorMessage ?? "Time Zone is missing or incorrect!";
+				}
+				else
+				{
+					var firstErrorMessage = ModelState.Values
+						.SelectMany(v => v.Errors)
+						.FirstOrDefault()?.ErrorMessage;
+
+					// If we find any error message, save it to TempData
+					TempData["ErrorMessage"] = firstErrorMessage ?? "Some other error occurred!";
+				}
+
+				return RedirectToAction("Profile"); // Redirect back to the Profile view
 			}
 
 			try
@@ -80,6 +98,8 @@ namespace MatchFixer_Web_App.Controllers
 			
 			return RedirectToAction("Profile", "Profile");
 		}
+
+
 
 	}
 }
