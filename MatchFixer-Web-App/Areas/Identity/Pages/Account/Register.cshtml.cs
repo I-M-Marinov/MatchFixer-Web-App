@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using ISO3166;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -98,13 +100,36 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
-        }
+
+            [Required(ErrorMessage = "Country is required.")]
+            [Display(Name = "Country")]
+            public string Country { get; set; }
+
+            [Required]
+            [Display(Name = "Timezone")]
+            public string Timezone { get; set; }
+
+			public List<SelectListItem> CountryOptions { get; set; } = new();
+		}
+
+        public List<SelectListItem> CountryOptions { get; set; }
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+		public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            CountryOptions = Country.List
+	            .OrderBy(c => c.Name)
+	            .Select(c => new SelectListItem
+	            {
+		            Value = c.TwoLetterCode,
+		            Text = c.Name
+	            })
+	            .ToList();
+
+			ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -117,7 +142,13 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
+
+                user.Country = Input.Country;
+                user.TimeZone = Input.Timezone;
+				user.FirstName = "New";
+                user.LastName = "User";
+
+				var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
