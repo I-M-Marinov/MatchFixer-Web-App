@@ -23,6 +23,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddHttpClient(); // Add HTTP Client
+builder.Services.AddHostedService<UserCleanupService>();
 builder.Services.AddScoped<ITimezoneService, TimezoneService>(); // Add the Timezone Service ( NodaTime )
 builder.Services.AddHttpContextAccessor(); // Add HTTP Context Accessor
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>(); // Add URL Helper Factory
