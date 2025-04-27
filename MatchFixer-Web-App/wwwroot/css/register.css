@@ -10,7 +10,7 @@
 
 
 .register-container {
-    margin-top: 5.55em;
+    margin-top: 2.44em;
     min-height: 70vh;
     min-width: 40vw;
     display: flex;
@@ -171,4 +171,37 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.form-select {
+    height: calc(3.5rem + 2px); /* Same height as your text inputs */
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    background-color: #fff;
+    box-shadow: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-select:focus {
+    border-color: #556cc9; /* Match your input focus color */
+    box-shadow: 0 0 0 0.2rem rgba(0, 194, 168, 0.25); /* Same focus shadow as inputs */
+}
+
+.form-floating > select {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+}
+
+.form-floating > label {
+    padding: 0.55rem 0.75rem;
+    font-size: 0.85rem;
+    color: #0066ff;
+}
+
+#timezone-label {
+    padding: 0.10rem 0.75rem;
+    font-size: 0.70rem;
+    color: #0066ff;
 }
