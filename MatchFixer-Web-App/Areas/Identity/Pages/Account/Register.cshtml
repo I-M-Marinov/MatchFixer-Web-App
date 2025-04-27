@@ -46,21 +46,21 @@
 		</div>
 		
 		<div class="form-floating mb-3">
-			<select asp-for="Input.Country" asp-items="Model.CountryOptions" class="form-select">
+			<select asp-for="Input.Country" asp-items="Model.CountryOptions" class="form-select" id="Input_Country">
 				<option value="">Select your country</option>
 			</select>
-			<label asp-for="Input.Country">Country</label>
+			<label asp-for="Input.Country" id="country-label">Country</label>
 			<span asp-validation-for="Input.Country" class="badge bg-info text-dark pt-2 centered-validation"></span>
 		</div>
 		
-		<input asp-for="Input.Timezone" type="hidden" id="timezoneHiddenInput" />
-		<div id="timezoneWrapper" style="display:none;">
-			<label for="timezoneDropdown">Select Time Zone</label>
-			<select id="timezoneDropdown"></select>
+		<div class="form-floating mb-3">
+			<input asp-for="Input.Timezone" type="hidden" id="timezoneHiddenInput" />
+			<div id="timezoneWrapper" style="display:none;">
+				<select id="timezoneDropdown" class="form-select"></select>
+			</div>
+			<label for="timezoneDropdown" id="timezone-label">Time Zone</label>
 		</div>
 
-
-		
 		<div class="button-wrapper">
 			<button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
 		</div>
@@ -149,4 +149,13 @@
 		});
 
 	</script>
+	
+	<style>
+		#timezoneDropdown,
+		#Input_Country {
+			width: 26em !important;
+			background-color: #fff;
+			margin-bottom: 0em;
+		}
+	</style>
 }
