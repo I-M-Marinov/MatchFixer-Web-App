@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MatchFixer.Common\MatchFixer.Common.csproj" />
     <ProjectReference Include="..\MatchFixer.Infrastructure\MatchFixer.Infrastructure.csproj" />
   </ItemGroup>
 
