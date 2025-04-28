@@ -146,7 +146,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 user.Country = Input.Country;
                 user.TimeZone = Input.Timezone;
 				user.FirstName = "New";
-                user.LastName = "User";
+                user.LastName = "MatchFixer";
 
 				var result = await _userManager.CreateAsync(user, Input.Password);
 
