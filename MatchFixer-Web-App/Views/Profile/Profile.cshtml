@@ -3,6 +3,20 @@
 
 @{
     ViewData["Title"] = $"{Model.FullName}'s Profile";
+
+    var countryName = "";
+    if (!string.IsNullOrEmpty(Model.Country))
+    {
+        try
+        {
+            var region = new System.Globalization.RegionInfo(Model.Country);
+            countryName = region.EnglishName;
+        }
+        catch
+        {
+            countryName = Model.Country; // fallback
+        }
+    }
 }
 
 <div class="border-0 rounded-4 p-4 flex-fill">
@@ -31,13 +45,43 @@
         <!-- Left: Side-by-side Profile Cards -->
         <div class="profile-card d-flex gap-4 flex-wrap">
 
-            <!-- Card 1: Image + Name -->
-            <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 300px;">
-                <div class="text-center">
-                    <img src="@Model.ProfileImageUrl" class="rounded-circle border border-3 border-primary shadow-sm" alt="Profile Picture" />
-                    <h4 class="mt-3 fw-bold text-shadow">@Model.FullName</h4>
-                </div>
-            </div>
+	        <form id="profile-names-form" method="post" action="@Url.Action("UpdateNames", "Profile")">
+		        <input type="hidden" name="Id" value="@Model.Id" />
+		        @Html.AntiForgeryToken()
+
+		        <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 300px;">
+			        <div class="text-center">
+				        <img src="@Model.ProfileImageUrl" class="rounded-circle border border-3 border-primary shadow-sm" alt="Profile Picture"/>
+
+				        <!-- Display Full Name -->
+				        <h4 class="mt-3 fw-bold text-shadow profile-name-text">@Model.FullName</h4>
+
+				        <!-- Editable First Name and Last Name Inputs (hidden initially) -->
+				        <div class="d-none name-edit-inputs">
+					        <input type="text" class="form-control mb-2" id="first-name" name="FirstName" value="@Model.FirstName" placeholder="First Name"/>
+                            <input type="text" class="form-control mb-2" id="last-name" name="LastName" value="@Model.LastName" placeholder="Last Name" />
+				        </div>
+
+				        <!-- Edit button -->
+				        <div class="button-names-container">
+                            <button type="button" class="btn btn-sm btn-outline-primary edit-names-btn">
+                                <span class="custom-tooltip-wrapper">
+                                    <i class="ri-edit-2-line"></i>
+                                    <span class="custom-tooltip">Edit your name</span>
+                                </span>
+                            </button>
+
+                            <button type="submit" class="btn btn-sm btn-primary d-none save-names-btn mt-2">
+                                <span class="custom-tooltip-wrapper">
+                                    <i class="ri-save-line"></i>
+                                    <span class="custom-tooltip">Save</span>
+                                </span>
+                            </button>
+                        </div>
+			        </div>
+		        </div>
+	        </form>
+
 
             <form id="profile-form" method="post" action="@Url.Action("UpdateProfile", "Profile")" id="update-profile-form">
                 @Html.AntiForgeryToken()
@@ -83,28 +127,13 @@
 		                        </div>
 	                        </div>
                         </div>
-
-                        <!-- Country Row -->
-                        @* <div class="row mb-3 profile-detail">
-                            <div class="col-sm-4 fw-lighter">Country:</div>
-                            <div class="col-sm-8">
-                                <span class="profile-value">@Model.Country</span>
-                                <input type="text" class="d-none form-control" value="@Model.Country" name="Country" />
-                                <button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-                                    <span class="custom-tooltip-wrapper">
-                                        <i class="ri-edit-2-line"></i>
-                                        <span class="custom-tooltip">Edit Country</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div> *@
-						
+	
                         <!-- Country Dropdown -->
                         <div class="row mb-3 profile-detail">
 	                        <div class="row text-center">
 		                        <div class="col-sm-4 fw-lighter">Country:</div>
 		                        <div class="col-sm-8">
-			                        <span class="profile-value">@Model.Country</span>
+                                    <span class="profile-value">@countryName</span>
 
                                     <select asp-for="Country" asp-items="Model.CountryOptions" id="Input_Country" class="d-none form-control text-center">
 				                        <option value="">Select your country</option>
@@ -162,6 +191,32 @@
 
 
 <script>
+
+          document.addEventListener('click', function (event) {
+        if (event.target.closest('.edit-names-btn')) {
+            const card = event.target.closest('.name-image-container');
+            const nameText = card.querySelector('.profile-name-text');
+            const nameInputs = card.querySelector('.name-edit-inputs');
+            const saveNamesBtn = card.querySelector('.save-names-btn');
+
+            if (nameInputs && nameText && saveNamesBtn) {
+                const isHidden = nameInputs.classList.contains('d-none');
+
+                if (isHidden) {
+                    nameInputs.classList.remove('d-none');
+                    nameText.classList.add('d-none');
+                    saveNamesBtn.classList.remove('d-none');
+                } else {
+                    nameInputs.classList.add('d-none');
+                    nameText.classList.remove('d-none');
+                    saveNamesBtn.classList.add('d-none');
+                }
+            }
+
+            checkIfAnyEditableInputsAreVisible(); 
+        }
+    });
+
 
        document.querySelectorAll('.edit-toggle-btn').forEach(button => {
 
