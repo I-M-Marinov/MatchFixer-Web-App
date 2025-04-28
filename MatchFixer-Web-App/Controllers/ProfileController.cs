@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MatchFixer_Web_App.Models.Profile;
 using MatchFixer.Core.ViewModels.Profile;
+using System.ComponentModel.DataAnnotations;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -82,6 +83,53 @@ namespace MatchFixer_Web_App.Controllers
 			}
 		}
 
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateNames(ProfileViewModel model)
+		{
+			// Retrieve the current profile data using the service
+			var currentProfile = await _profileService.GetProfileAsync(model.Id);
+
+			model.Email = currentProfile.Email;
+			model.DateOfBirth = currentProfile.DateOfBirth;
+			model.Country = currentProfile.Country;
+			model.TimeZone = currentProfile.TimeZone;
+			model.ProfileImageUrl = currentProfile.ProfileImageUrl;
+			model.CountryOptions = currentProfile.CountryOptions;
+			model.CreatedOn = currentProfile.CreatedOn;
+
+			ValidateModel(model);
+
+			// Check if model state is valid after mapping the additional properties
+			if (!ModelState.IsValid)
+			{
+				var allErrors = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.Select(e => e.ErrorMessage)
+					.ToList();
+
+				TempData["ErrorMessage"] = allErrors.Any()
+					? string.Join("<br/>", allErrors)
+					: "An error occurred while updating your name.";
+
+				return RedirectToAction("Profile");
+			}
+
+			// Call the service to update the user's name
+			var result = await _profileService.UpdateNamesAsync(model);
+
+			if (!result.Success)
+			{
+				TempData["ErrorMessage"] = result.Message;
+				return RedirectToAction("Profile");
+			}
+
+			TempData["SuccessMessage"] = result.Message;
+			return RedirectToAction("Profile");
+		}
+
+
+
 		[HttpGet]
 		public async Task<IActionResult> ConfirmEmail(string userId, string code)
 		{
@@ -99,7 +147,22 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Profile", "Profile");
 		}
 
+		private void ValidateModel(ProfileViewModel model)
+		{
+			ModelState.Clear();
 
+			var validationResults = new List<ValidationResult>();
+			var validationContext = new ValidationContext(model);
+
+			if (!Validator.TryValidateObject(model, validationContext, validationResults, true))
+			{
+				// If validation fails, add errors to ModelState
+				foreach (var validationResult in validationResults)
+				{
+					ModelState.AddModelError(validationResult.MemberNames.First(), validationResult.ErrorMessage);
+				}
+			}
+		}
 
 	}
 }
