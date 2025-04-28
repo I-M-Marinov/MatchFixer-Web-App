@@ -82,8 +82,6 @@ namespace MatchFixer.Core.Services
 			};
 		}
 
-
-
 		public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
 		{
 			var user = await _userManager.FindByIdAsync(model.Id);
@@ -142,6 +140,37 @@ namespace MatchFixer.Core.Services
 			string message = "Your profile was updated successfully. You have made changes to: " + string.Join(", ", changes);
 			return (true, message);
 		}
+
+		public async Task<(bool Success, string Message)> UpdateNamesAsync(ProfileViewModel model)
+		{
+
+			if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName))
+			{
+				return (false, "First Name and Last Name are required.");
+			}
+
+			var user = await _userManager.FindByIdAsync(model.Id);
+
+			if (user == null)
+			{
+				return (false, "User not found.");
+			}
+
+			// Update fields
+			user.FirstName = model.FirstName.Trim();
+			user.LastName = model.LastName.Trim();
+
+			var result = await _userManager.UpdateAsync(user);
+
+			if (!result.Succeeded)
+			{
+				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+				return (false, $"Failed to update user: {errors}");
+			}
+			
+			return (true, "Name updated successfully.");
+		}
+
 
 		public async Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail, string scheme)
 		{
