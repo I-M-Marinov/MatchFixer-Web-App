@@ -126,6 +126,12 @@
     vertical-align: middle;
 }
 
+.edit-names-btn {
+    border: 1px solid var(--secondary-color);
+    padding: .25rem .5rem;
+
+}
+
 .cancel-toggle-btn {
     border: 2px solid var(--accent-color);
     color: var(--accent-color);
@@ -142,20 +148,38 @@
     align-self: center;
 }
 
-.edit-toggle-btn i {
+.edit-toggle-btn i{
     color: black;
 }
 
+.edit-names-btn i {
+    color: black;
+}
 
 .profile-detail:hover .edit-toggle-btn {
     visibility: visible;
     background-color: var(--secondary-color);
 }
 
+.name-image-container:hover .edit-names-btn {
+    color: black;
+    background-color: var(--secondary-color);
+}
+
+.name-image-container:hover .save-names-btn,
+.save-names-btn:hover {
+    color: black;
+    background-color: var(--secondary-color);
+}
+
+.save-names-btn {
+    color: black;
+    margin: .50rem;
+    border: 1px solid var(--secondary-color);
+}
 /* --------------------------------------------------------
 |  CUSTOM TOOPTIP ( TITLE ) ON HOVER FOR ALL EDIT BUTTONS |
 -------------------------------------------------------- */
-
 .custom-tooltip-wrapper {
     position: relative;
     display: inline-block;
@@ -230,10 +254,20 @@
 
 #timezoneDropdown,
 #Input_Country,
-#dateOfBirth-input, 
-#email-input{
+#dateOfBirth-input,
+#email-input,
+#last-name,
+#first-name {
     margin-bottom: 0.2em;
     background-color: #badbcc;
+}
+#first-name{
+    margin-top: 0.65em;
+}
+
+#last-name,
+#first-name {
+    text-align: center;
 }
 
 #timezoneDropdown,
@@ -252,8 +286,19 @@
     display: inline-block;
     max-height: 20em;
     overflow-y: auto;
-
 }
+
+    #timezoneDropdown{
+        margin-left: -0.6em;
+    }
+
+    .button-names-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5em;
+    }
 
 
 
