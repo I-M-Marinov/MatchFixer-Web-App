@@ -44,7 +44,7 @@
     <div class="profile-container d-flex gap-4 w-100">
         <!-- Left: Side-by-side Profile Cards -->
         <div class="profile-card d-flex gap-4 flex-wrap">
-	        <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 300px;">
+	        <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 250px;">
 		        <div class="text-center">
 				        <div>
 					        <form asp-action="UploadProfilePicture" asp-controller="Profile" enctype="multipart/form-data" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
@@ -56,12 +56,13 @@
 							        <input type="file" name="FormFile" accept="image/*" required id="fileInput" class="d-none" />
 
 							        <!-- Overlay label that triggers file input -->
-							        <label for="fileInput" class="overlay-label d-flex align-items-center justify-content-center">
+							        <label for="fileInput" class="overlay-label d-flex flex-row align-items-center justify-content-center">
 								        <i class="bi bi-cloud-arrow-up fs-4 text-white"></i>
+								        <span class="fs-6 text-white ms-2">Upload new</span>
 							        </label>
 
 						        </div>
-						        <button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn">
+								<button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn">
 							        <span class="custom-tooltip-wrapper">
 								        <i class="ri-save-line"></i>
 								        <span class="custom-tooltip">Upload the picture</span>
@@ -70,8 +71,8 @@
 					        </form>
 
 
-					        <div class="d-flex gap-2">
-						        <form asp-action="RemoveProfilePicture" asp-controller="Profile" method="post" class="d-inline">
+					        <div class="d-flex gap-2 remove-image-container">
+						        <form asp-action="RemoveProfilePicture" asp-controller="Profile" method="post">
 							        @Html.AntiForgeryToken()
 							        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm remove-picture-btn">
 								        <span class="custom-tooltip-wrapper">
