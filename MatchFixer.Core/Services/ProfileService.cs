@@ -1,6 +1,7 @@
 ﻿using System.Text.Encodings.Web;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Profile;
+using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +13,11 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Country = ISO3166.Country;
 using MatchFixer.Infrastructure.Contracts;
-using MatchFixer.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+using MatchFixer.Infrastructure.Models.Image;
+using System.Net;
+
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -23,6 +28,8 @@ namespace MatchFixer.Core.Services
 		private readonly IUrlHelper _urlHelper;
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly ITimezoneService _timezoneService;
+		private readonly MatchFixerDbContext _dbContext;
+		private readonly IImageService _imageService;
 
 
 
@@ -31,7 +38,9 @@ namespace MatchFixer.Core.Services
 			IEmailSender emailSender,
 			IUrlHelperFactory urlHelperFactory,
 			IHttpContextAccessor httpContextAccessor,
-			ITimezoneService timezoneService)
+			ITimezoneService timezoneService,
+			MatchFixerDbContext dbContext,
+			IImageService imageService)
 		{
 			_userManager = userManager;
 			_emailSender = emailSender;
@@ -48,6 +57,8 @@ namespace MatchFixer.Core.Services
 
 			_urlHelper = urlHelperFactory.GetUrlHelper(actionContext);
 			_timezoneService = timezoneService;
+			_dbContext = dbContext;
+			_imageService = imageService;
 		}
 
 		public async Task<ProfileViewModel> GetProfileAsync(string userId)
@@ -57,6 +68,11 @@ namespace MatchFixer.Core.Services
 			{
 				return null;
 			}
+
+			// Load the user again, this time with the profile picture loaded eagerly
+			user = await _dbContext.Users
+				.Include(u => u.ProfilePicture)
+				.FirstOrDefaultAsync(u => u.Id == user.Id);
 
 			var countryOptions = Country.List
 				.OrderBy(c => c.Name)
@@ -77,7 +93,7 @@ namespace MatchFixer.Core.Services
 				Country = user.Country,
 				TimeZone = user.TimeZone,
 				CreatedOn = user.CreatedOn,
-				ProfileImageUrl = user.ProfilePicture?.ImageUrl ?? "/images/default-user-image.png",
+				ProfileImageUrl = user.ProfilePicture?.ImageUrl,
 				CountryOptions = countryOptions
 			};
 		}
@@ -156,9 +172,26 @@ namespace MatchFixer.Core.Services
 				return (false, "User not found.");
 			}
 
-			// Update fields
-			user.FirstName = model.FirstName.Trim();
-			user.LastName = model.LastName.Trim();
+			var trimmedFirstName = model.FirstName?.Trim();
+			var trimmedLastName = model.LastName?.Trim();
+
+			var isFirstNameChanged = !string.Equals(user.FirstName, trimmedFirstName, StringComparison.Ordinal);
+			var isLastNameChanged = !string.Equals(user.LastName, trimmedLastName, StringComparison.Ordinal);
+
+			if (!isFirstNameChanged && !isLastNameChanged)
+			{
+				return (false, "No changes were made to your profile.");
+			}
+
+			if (isFirstNameChanged)
+			{
+				user.FirstName = trimmedFirstName!;
+			}
+
+			if (isLastNameChanged)
+			{
+				user.LastName = trimmedLastName!;
+			}
 
 			var result = await _userManager.UpdateAsync(user);
 
@@ -168,9 +201,8 @@ namespace MatchFixer.Core.Services
 				return (false, $"Failed to update user: {errors}");
 			}
 			
-			return (true, "Name updated successfully.");
+			return (true, "Changes were successful !");
 		}
-
 
 		public async Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail, string scheme)
 		{
@@ -258,6 +290,108 @@ namespace MatchFixer.Core.Services
 
 			return (false, "Email confirmation failed.");
 		}
+
+		public async Task<ImageResult> UploadProfilePictureAsync(string userId, ImageFileUploadModel imageFileUploadModel)
+		{
+			if (imageFileUploadModel.FormFile == null || imageFileUploadModel.FormFile.Length == 0)
+			{
+				return new ImageResult
+				{
+					IsSuccess = false,
+					Message = "No file uploaded."
+				};
+			}
+
+			var uploadResult = await _imageService.UploadImageAsync(imageFileUploadModel.FormFile);
+
+			if (uploadResult.StatusCode == HttpStatusCode.OK)
+			{
+				// Retrieve current user with their profile picture
+				
+				var user = await _dbContext.Users
+					.Include(u => u.ProfilePicture)
+					.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+
+
+				var newProfilePicture = new ProfilePicture
+				{
+					ImageUrl = uploadResult.Url.ToString(),
+					PublicId = uploadResult.PublicId
+				};
+
+				await _dbContext.ProfilePictures.AddAsync(newProfilePicture);
+				await _dbContext.SaveChangesAsync();
+
+				user.ProfilePictureId = newProfilePicture.Id;
+
+				await _userManager.UpdateAsync(user);
+
+				return new ImageResult
+				{
+					IsSuccess = true,
+					Message = "Profile picture uploaded successfully."
+				};
+			}
+
+			return new ImageResult
+			{
+				IsSuccess = false,
+				Message = "Failed to upload profile picture."
+			};
+		}
+
+		// Remove the profile picture
+		public async Task<ImageResult> RemoveProfilePictureAsync(string userId)
+		{
+			
+			var user = await _dbContext.Users
+				.Include(u => u.ProfilePicture)
+				.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+
+			if (user.ProfilePictureId == DefaultImageId)
+			{
+				return new ImageResult
+				{
+					IsSuccess = false,
+					Message = "Default profile picture already applied."
+				};
+			}
+			
+			if (string.IsNullOrEmpty(user.ProfilePicture.ImageUrl))
+			{
+				return new ImageResult
+				{
+					IsSuccess = false,
+					Message = "No profile picture to remove."
+				};
+			}
+
+			var deleteResult = await _imageService.DeleteImageAsync(user.ProfilePicture.PublicId);
+
+			if (deleteResult.IsSuccess)
+			{
+				// Remove the profile picture URL from the user record
+
+				_dbContext.ProfilePictures.Remove(user.ProfilePicture);
+
+				user.ProfilePictureId = DefaultImageId; // assign the default user image 
+
+				await _userManager.UpdateAsync(user);
+
+				return new ImageResult
+				{
+					IsSuccess = true,
+					Message = "Profile picture removed successfully."
+				};
+			}
+
+			return new ImageResult
+			{
+				IsSuccess = false,
+				Message = deleteResult.Message
+			};
+		}
+
 
 		private async Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
 		{
