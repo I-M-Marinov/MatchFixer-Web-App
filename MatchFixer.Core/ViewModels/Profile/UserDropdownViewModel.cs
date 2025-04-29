@@ -1,4 +1,4 @@
-﻿namespace MatchFixer_Web_App.Models.Profile
+﻿namespace MatchFixer.Core.ViewModels.Profile
 {
 	public class UserDropdownViewModel
 	{
