@@ -44,44 +44,78 @@
     <div class="profile-container d-flex gap-4 w-100">
         <!-- Left: Side-by-side Profile Cards -->
         <div class="profile-card d-flex gap-4 flex-wrap">
+	        <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 300px;">
+		        <div class="text-center">
+				        <div>
+					        <form asp-action="UploadProfilePicture" asp-controller="Profile" enctype="multipart/form-data" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
+						        @Html.AntiForgeryToken()
+						        <div class="profile-image-container position-relative">
+							        <img src="@Model.ProfileImageUrl" class="rounded-circle border border-3 border-primary shadow-sm profile-image" alt="Profile Picture" id="profileImage" />
 
-	        <form id="profile-names-form" method="post" action="@Url.Action("UpdateNames", "Profile")">
-		        <input type="hidden" name="Id" value="@Model.Id" />
-		        @Html.AntiForgeryToken()
+							        <!-- Invisible file input -->
+							        <input type="file" name="FormFile" accept="image/*" required id="fileInput" class="d-none" />
 
-		        <div class="card shadow border-0 rounded-4 p-4 flex-fill name-image-container" style="min-width: 300px;">
-			        <div class="text-center">
-				        <img src="@Model.ProfileImageUrl" class="rounded-circle border border-3 border-primary shadow-sm" alt="Profile Picture"/>
+							        <!-- Overlay label that triggers file input -->
+							        <label for="fileInput" class="overlay-label d-flex align-items-center justify-content-center">
+								        <i class="bi bi-cloud-arrow-up fs-4 text-white"></i>
+							        </label>
 
-				        <!-- Display Full Name -->
-				        <h4 class="mt-3 fw-bold text-shadow profile-name-text">@Model.FullName</h4>
+						        </div>
+						        <button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn">
+							        <span class="custom-tooltip-wrapper">
+								        <i class="ri-save-line"></i>
+								        <span class="custom-tooltip">Upload the picture</span>
+							        </span>
+						        </button>
+					        </form>
 
-				        <!-- Editable First Name and Last Name Inputs (hidden initially) -->
-				        <div class="d-none name-edit-inputs">
-					        <input type="text" class="form-control mb-2" id="first-name" name="FirstName" value="@Model.FirstName" placeholder="First Name"/>
-                            <input type="text" class="form-control mb-2" id="last-name" name="LastName" value="@Model.LastName" placeholder="Last Name" />
+
+					        <div class="d-flex gap-2">
+						        <form asp-action="RemoveProfilePicture" asp-controller="Profile" method="post" class="d-inline">
+							        @Html.AntiForgeryToken()
+							        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm remove-picture-btn">
+								        <span class="custom-tooltip-wrapper">
+									        <i class="bi bi-trash"></i>
+											<span class="custom-tooltip">Remove profile picture</span>
+								        </span>
+							        </button>
+						        </form>
+					        </div>
 				        </div>
 
-				        <!-- Edit button -->
-				        <div class="button-names-container">
-                            <button type="button" class="btn btn-sm btn-outline-primary edit-names-btn">
-                                <span class="custom-tooltip-wrapper">
-                                    <i class="ri-edit-2-line"></i>
-                                    <span class="custom-tooltip">Edit your name</span>
-                                </span>
-                            </button>
+				        <form id="profile-names-form" method="post" action="@Url.Action("UpdateNames", "Profile")">
+					        <input type="hidden" name="Id" value="@Model.Id" />
+					        @Html.AntiForgeryToken()
 
-                            <button type="submit" class="btn btn-sm btn-primary d-none save-names-btn mt-2">
-                                <span class="custom-tooltip-wrapper">
-                                    <i class="ri-save-line"></i>
-                                    <span class="custom-tooltip">Save</span>
-                                </span>
-                            </button>
-                        </div>
-			        </div>
+					        <!-- Display Full Name -->
+					        <h4 class="mt-3 fw-bold text-shadow profile-name-text">@Model.FullName</h4>
+
+					        <!-- Editable First Name and Last Name Inputs (hidden initially) -->
+					        <div class="d-none name-edit-inputs">
+						        <input type="text" class="form-control mb-2" id="first-name" name="FirstName" value="@Model.FirstName" placeholder="First Name"/>
+	                            <input type="text" class="form-control mb-2" id="last-name" name="LastName" value="@Model.LastName" placeholder="Last Name" />
+					        </div>
+
+					        <!-- Edit button -->
+					        <div class="button-names-container">
+	                            <button type="button" class="btn btn-sm btn-outline-primary edit-names-btn">
+	                                <span class="custom-tooltip-wrapper">
+	                                    <i class="ri-edit-2-line"></i>
+	                                    <span class="custom-tooltip">Edit your name</span>
+	                                </span>
+	                            </button>
+
+	                            <button type="submit" class="btn btn-sm btn-primary d-none save-names-btn mt-2">
+	                                <span class="custom-tooltip-wrapper">
+	                                    <i class="ri-save-line"></i>
+	                                    <span class="custom-tooltip">Save</span>
+	                                </span>
+	                            </button>
+	                        </div>
+
+				        </form>
 		        </div>
-	        </form>
-
+	        </div>
 
             <form id="profile-form" method="post" action="@Url.Action("UpdateProfile", "Profile")" id="update-profile-form">
                 @Html.AntiForgeryToken()
