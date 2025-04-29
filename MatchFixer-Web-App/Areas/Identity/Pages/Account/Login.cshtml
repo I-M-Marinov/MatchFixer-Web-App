@@ -9,6 +9,19 @@
 <div class="bg bg2"></div>
 <div class="bg bg3"></div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert success-message" id="success-message">
+		@TempData["SuccessMessage"]
+	</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert error-message" id="error-message">
+		@TempData["ErrorMessage"]
+	</div>
+}
 <div class="login-container">
     <div class="login-card">
 	    <form id="account" method="post">
