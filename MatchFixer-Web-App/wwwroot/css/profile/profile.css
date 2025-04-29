@@ -91,9 +91,9 @@
     font-style: normal !important;
 }
 
-    .profile-detail .row {
-        border-bottom: 1px solid var(--secondary-color);
-    }
+.profile-detail .row {
+    border-bottom: 1px solid var(--secondary-color);
+}
 
 .profile-detail div div:nth-child(2n+1) {
     color: var(--accent-color);
@@ -162,6 +162,11 @@
 }
 
 .name-image-container:hover .edit-names-btn {
+    color: black;
+    background-color: var(--secondary-color);
+}
+
+.profile-image-container:hover .upload-picture-btn {
     color: black;
     background-color: var(--secondary-color);
 }
@@ -342,15 +347,39 @@
     opacity: 1;
 }
 
-.upload-picture-btn
-{
+.upload-picture-btn{
     position: absolute;
     top: 0.1em;
-    left:0.1em;
+    right: 0.1em;
 }
 .remove-picture-btn {
-
     position: absolute;
     top: 0.6em;
-    right: 0.6em;
+    left: 0.6em;
+}
+
+
+.upload-picture-btn,
+.remove-picture-btn,
+.edit-names-btn {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Show remove button when hovering over the remove form */
+.text-center:hover .remove-picture-btn {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Show edit name button when hovering over the entire name-image container */
+.name-image-container:hover .edit-names-btn {
+    visibility: visible;
+    opacity: 1;
 }
