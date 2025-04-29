@@ -11,6 +11,8 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using ISO3166;
+using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -32,13 +34,15 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IUserService _userService;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserService userService)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -46,6 +50,8 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _userService = userService;
+
         }
 
         /// <summary>
@@ -147,6 +153,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 user.TimeZone = Input.Timezone;
 				user.FirstName = "New";
                 user.LastName = "MatchFixer";
+                user.ProfilePictureId = await _userService.GetOrCreateDefaultImageAsync();
 
 				var result = await _userManager.CreateAsync(user, Input.Password);
 
