@@ -1,12 +1,14 @@
 ﻿@using MatchFixer.Infrastructure.Entities
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @inject SignInManager<ApplicationUser> SignInManager
 
 
 <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
-	@await Component.InvokeAsync("UserDropdown")
 
+	@if (User.Identity.IsAuthenticated)
+	{
+		@await Component.InvokeAsync("UserDropdown")
+	}
 	<div class="container-fluid">
 
 		@if (SignInManager.IsSignedIn(User))
