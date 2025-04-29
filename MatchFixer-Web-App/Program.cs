@@ -10,6 +10,8 @@ using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
 
+using static MatchFixer.Infrastructure.SeedData.SeedData;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -28,11 +30,9 @@ builder.Services.AddScoped<ITimezoneService, TimezoneService>(); // Add the Time
 builder.Services.AddHttpContextAccessor(); // Add HTTP Context Accessor
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>(); // Add URL Helper Factory
 builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Sender Service 
+builder.Services.AddScoped<IUserService, UserService>(); // Add the User Service 
 builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>(); // Add the Profile Service 
-
-
-
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 	{
@@ -46,6 +46,18 @@ builder.Services.AddRazorPages();
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+
+	var services = scope.ServiceProvider;
+	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+	await SeedDefaultProfilePicture(userManager, services);          // Seed the Default User Image
+
+}
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
