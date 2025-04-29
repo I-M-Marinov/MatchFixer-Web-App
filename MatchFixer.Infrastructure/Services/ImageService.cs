@@ -38,10 +38,10 @@ namespace MatchFixer.Infrastructure.Services
 					{
 						File = new FileDescription(file.FileName, stream),
 						Transformation = new Transformation()
-							.Quality(100)
-							.Width(2000) // Set maximum width for the main image
-							.Height(2000) // Set maximum height for the main image
-							.Crop("limit") // Ensure the main image does not exceed these dimensions
+							.Width(500) // Final square width
+							.Height(500) // Final square height
+							.Crop("fill") // Crop to fill the square
+							.Gravity("auto") // Center subject automatically (or use "face" for profile pictures)
 					};
 
 					uploadResult = await _cloudinary.UploadAsync(uploadParams);
@@ -50,13 +50,13 @@ namespace MatchFixer.Infrastructure.Services
 
 			return uploadResult;
 		}
-		public async Task<DeleteImageResult> DeleteImageAsync(string publicId)
+		public async Task<ImageResult> DeleteImageAsync(string publicId)
 		{
 			var deletionParams = new DeletionParams(publicId);
 			var result = await _cloudinary.DestroyAsync(deletionParams);
 
 
-			return new DeleteImageResult
+			return new ImageResult
 			{
 				IsSuccess = result.StatusCode == HttpStatusCode.OK,
 				Message = result.StatusCode == HttpStatusCode.OK ? "Image deleted successfully." : "Image deletion failed."
