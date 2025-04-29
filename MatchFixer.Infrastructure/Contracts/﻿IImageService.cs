@@ -13,7 +13,7 @@ namespace MatchFixer.Infrastructure.Contracts
 		/// <summary>
 		/// Sends a publicId to Cloudinary to delete the image
 		/// </summary>
-		Task<DeleteImageResult> DeleteImageAsync(string publicId);
+		Task<ImageResult> DeleteImageAsync(string publicId);
 
 	}
 }
