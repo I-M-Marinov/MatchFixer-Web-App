@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Core.ViewModels.Profile;
+using MatchFixer.Infrastructure.Models.Image;
 
 
 namespace MatchFixer.Core.Contracts
@@ -10,6 +11,8 @@ namespace MatchFixer.Core.Contracts
 		Task<(bool Success, string Message)> UpdateNamesAsync(ProfileViewModel model);
 		Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail, string scheme);
 		Task<(bool Success, string Message)> ConfirmEmailAsync(string userId, string code);
+		Task<ImageResult> UploadProfilePictureAsync(string userId, ImageFileUploadModel imageFileUploadModel);
+		Task<ImageResult> RemoveProfilePictureAsync(string userId);
 
 	}
 }
