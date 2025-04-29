@@ -1,11 +1,9 @@
-﻿using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Core.Contracts;
-using Microsoft.AspNetCore.Identity;
+﻿using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using MatchFixer_Web_App.Models.Profile;
 using MatchFixer.Core.ViewModels.Profile;
 using System.ComponentModel.DataAnnotations;
+using MatchFixer.Infrastructure.Models.Image;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -145,6 +143,61 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			
 			return RedirectToAction("Profile", "Profile");
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+
+		public async Task<IActionResult> UploadProfilePicture(ImageFileUploadModel imageFileUploadModel)
+		{
+
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (ModelState.IsValid)
+			{
+				var result = await _profileService.UploadProfilePictureAsync(userId, imageFileUploadModel);
+
+				if (result.IsSuccess)
+				{
+					TempData["SuccessMessage"] = result.Message;
+				}
+				else
+				{
+					TempData["ErrorMessage"] = result.Message;
+				}
+			}
+			else
+			{
+				var firstErrorMessage = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.FirstOrDefault()?.ErrorMessage;
+
+				// If we find any error message, save it to TempData
+				TempData["ErrorMessage"] = firstErrorMessage;
+			}
+
+			return RedirectToAction("Profile");
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+
+		public async Task<IActionResult> RemoveProfilePicture()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			var result = await _profileService.RemoveProfilePictureAsync(userId);
+
+			if (result.IsSuccess)
+			{
+				TempData["SuccessMessage"] = result.Message;
+			}
+			else
+			{
+				TempData["ErrorMessage"] = result.Message;
+			}
+
+			return RedirectToAction("Profile");
 		}
 
 		private void ValidateModel(ProfileViewModel model)
