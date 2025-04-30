@@ -8,6 +8,7 @@
 @import "/css/privacy.css";
 @import "/css/register.css";
 @import "/css/login.css";
+@import "/css/profile/profile-responsive.css";
 @import "/css/profile/profile.css";
 
 * {
