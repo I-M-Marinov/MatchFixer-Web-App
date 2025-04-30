@@ -1,4 +1,5 @@
-﻿:root {
+﻿
+:root {
     --primary-color: #3370A8;
     --secondary-color: #00c2a8;
     --accent-color: #f1d302;
@@ -309,7 +310,7 @@
 
 
 /*-------------------------------------------------------------------------------------
-# PRIFILE PICTURE UPLOAD INPUT FIELD EFFECTS 
+# PROFILE PICTURE UPLOAD INPUT FIELD EFFECTS 
 --------------------------------------------------------------------------------------*/
 
 .profile-image-container {
@@ -383,3 +384,5 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     visibility: visible;
     opacity: 1;
 }
+
+
