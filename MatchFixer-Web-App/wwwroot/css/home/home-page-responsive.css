@@ -1,0 +1,130 @@
+﻿@media (max-width: 1870px) {
+	#welcome {
+		font-size: 3em; !important; 
+	}
+
+	#football-island {
+		width: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+}
+
+@media (max-width: 1350px) {
+	#welcome {
+		font-size: 2em !important;
+		 
+	}
+
+	#football-island {
+		width: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+}
+
+@media (max-width: 1000px) {
+	#welcome {
+		font-size: 1.70em !important; 
+	}
+
+	#football-island {
+		width: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+
+	#ballWrapper {
+		display: none;
+	}
+
+
+	.drawer.left-drawer {
+		height: 59% !important;
+	}
+
+	.drawer2.left-drawer2 {
+		height: 39% !important;
+	}
+}
+
+@media (max-width: 768px) {
+	#welcome {
+		font-size: 1.2em !important; 
+	}
+
+	#football-island {
+		width: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+
+	footer div div:nth-child(3) {
+		display: flex !important;
+		flex-direction: column !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+
+	#ballWrapper {
+		display: none;
+	}
+
+}
+
+@media (max-width: 480px) {
+	#welcome {
+		font-size: 1em !important;
+	}
+
+	#football-island {
+		width: 200vh;
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+
+	footer div {
+		display: flex !important;
+		flex-direction: column !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+
+	footer div div a {
+		font-size: 3rem;
+	}
+
+	footer div div:nth-child(3) div {
+		display: flex !important;
+		gap: 1rem !important;
+	}
+
+	footer div h3 {
+		font-size: 3rem !important;
+	}
+
+	footer div div h4 {
+		font-size: 2rem !important;
+	}
+
+	#ballWrapper {
+		display: none;
+	}
+
+	.pulse-goal {
+		font-size: 1em !important;
+		max-width: 100vw;
+		animation: goalPulseResponsive 3s infinite;
+	}
+
+	.drawer {
+		height: 52% !important;
+	}
+
+	.drawer2 {
+
+		height: 36% !important;
+	}
+
+	
+}
