@@ -1,15 +1,81 @@
 ﻿
+.accordion {
+    width: 100%;
+    min-width: 50em; 
+    border: hidden;
+}
+
 .accordion-item {
-    width: 50em;
+    min-width: inherit;
 }
 
-accordion-item h2 {
-    align-self: center;
-    min-width: 100%;
+.layout-container {
+    box-sizing: border-box;
 }
 
+.author-container-privacy {
+    padding: 0;
+    margin-left: 4em;
+}
+
+.author-container-privacy h4 {
+    font-family: "Special Gothic Expanded One", sans-serif !important;
+    font-size: 1.5em;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
+    color: #0DAB76;
+}
+
+.author-container-privacy p {
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
+    font-size: 1em;
+    font-family: "Special Gothic Expanded One", sans-serif !important;
+    color: #0DAB76;
+    font-weight: 600;
+}
+
+.accordion-header,
+.author-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.accordion-button {
+
+    justify-content: center;
+    text-align: center;
+    background-color: #0DAB76 !important;
+    text-align: center !important;
+}
 
 .accordion-button:hover {
-    color: #00ff90 !important;
-    text-shadow: 2px 5px 5px rgba(0,0,0,0.8) !important;
+    color: rgba(0,0,0,0.8) !important;
+    text-shadow: 2px 2px 2px #000000 !important;
+}
+
+
+.accordion-body {
+    background-color: #FAF3DD;
+    padding: 2em;
+}
+
+.accordion-body .example-2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 100%;
+}
+
+.accordion-body .example-2 li a svg {
+    flex-shrink: 0;
+    max-width: 100%;
+    height: auto;
+}
+
+.accordion-body {
+    width: 100%;
+    overflow-x: hidden;
+    word-break: break-word;
 }
