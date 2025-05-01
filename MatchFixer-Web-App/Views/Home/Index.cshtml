@@ -2,12 +2,9 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="bg"></div>
-<div class="bg bg2"></div>
-<div class="bg bg3"></div>
+<div class="home-background"></div>
 
-
-<div class="ball-wrapper" id="ballWrapper"></div>
+<div class="ball-wrapper d-none d-lg-block" id="ballWrapper"></div>
 
 <div class="container text-center mt-5">
 	<div class="soccer-hero">
@@ -268,46 +265,64 @@
 
 <script>
 
-        window.addEventListener("DOMContentLoaded", () => {
-        const wrapper = document.getElementById("ballWrapper");
+			window.addEventListener("DOMContentLoaded", () => {
+		const wrapper = document.getElementById("ballWrapper");
 
-        const ballImages = [
-            "/images/balls/soccer-ball1.svg",
-            "/images/balls/soccer-ball2.svg",
-            "/images/balls/soccer-ball3.svg",
-            "/images/balls/soccer-ball4.svg",
-            "/images/balls/soccer-ball5.svg",
-            "/images/balls/soccer-ball6.svg",
-            "/images/balls/soccer-ball7.svg",
-            "/images/balls/soccer-ball8.svg",
-            "/images/balls/soccer-ball9.svg",
-            "/images/balls/soccer-ball10.svg"
-        ];
-       
-        function spawnBall() {
-            const ball = document.createElement("img");
+		const ballImages = [
+			"/images/balls/soccer-ball1.svg",
+			"/images/balls/soccer-ball2.svg",
+			"/images/balls/soccer-ball3.svg",
+			"/images/balls/soccer-ball4.svg",
+			"/images/balls/soccer-ball5.svg",
+			"/images/balls/soccer-ball6.svg",
+			"/images/balls/soccer-ball7.svg",
+			"/images/balls/soccer-ball8.svg",
+			"/images/balls/soccer-ball9.svg",
+			"/images/balls/soccer-ball10.svg"
+		];
 
-            const randomIndex = Math.floor(Math.random() * ballImages.length); // get the index of a random ball 
-            ball.src = ballImages[randomIndex]; // set the random ball to the sourse of the img element
-            ball.alt = "ball";
-            ball.className = "animated-ball";
+		let isVisible = false;
 
-            ball.style.bottom = `${Math.random() * 5}em`;
-            ball.style.width = "5em"; // set the width of the ball
-			ball.style.height = "5em";  // set the height of the ball
-            ball.style.objectFit = "cover"; 
+		function spawnBall() {
+			if (!isVisible || !wrapper) return;
 
+			const ball = document.createElement("img");
 
-            wrapper.appendChild(ball); // append the ball image to the DOM 
+			const randomIndex = Math.floor(Math.random() * ballImages.length);
+			ball.src = ballImages[randomIndex];
+			ball.alt = "ball";
+			ball.className = "animated-ball";
 
-			// remove the ball from the DOM after 6 seconds
-            setTimeout(() => {
-                wrapper.removeChild(ball);
-            }, 6000);
-        }
+			ball.style.bottom = `${Math.random() * 5}em`;
+			ball.style.width = "5em";
+			ball.style.height = "5em";
+			ball.style.objectFit = "cover";
 
-        setInterval(spawnBall, 800); // spawn a new random ball every 0.8 seconds
-    });
+			wrapper.appendChild(ball);
+
+			setTimeout(() => {
+				if (wrapper.contains(ball)) {
+					wrapper.removeChild(ball);
+				}
+			}, 6000);
+		}
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach(entry => {
+					isVisible = entry.isIntersecting;
+				});
+			},
+			{ threshold: 0.1 } // 10% visible counts as "visible"
+		);
+
+		if (wrapper) {
+			observer.observe(wrapper);
+		}
+
+		setInterval(spawnBall, 800); // spawn every 0.8 seconds only if visible
+	});
+
 
 
 		document.addEventListener("DOMContentLoaded", function () {
