@@ -4,11 +4,10 @@
 @import "/css/forgot-password.css";
 @import "/css/resend-email-confirmation.css";
 @import "/css/navigation.css";
-@import "/css/home-page.css";
+@import "/css/home/home-page.css";
 @import "/css/privacy.css";
 @import "/css/register.css";
 @import "/css/login.css";
-@import "/css/profile/profile-responsive.css";
 @import "/css/profile/profile.css";
 
 * {
@@ -102,3 +101,9 @@ body {
 h1 {
     font-family: monospace;
 }
+
+.navbar-collapse,
+.navbar-nav {
+    gap: 1em;
+}
+
