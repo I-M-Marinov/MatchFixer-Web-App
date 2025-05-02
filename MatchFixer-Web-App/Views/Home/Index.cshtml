@@ -4,6 +4,21 @@
 
 <div class="home-background"></div>
 
+
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert success-message" id="success-message">
+		@TempData["SuccessMessage"]
+	</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert error-message" id="error-message">
+		@TempData["ErrorMessage"]
+	</div>
+}
+
 <div class="ball-wrapper d-none d-lg-block" id="ballWrapper"></div>
 
 <div class="container text-center mt-5">
