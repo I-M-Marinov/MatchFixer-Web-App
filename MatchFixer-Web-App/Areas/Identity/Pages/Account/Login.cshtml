@@ -4,6 +4,7 @@
     ViewData["Title"] = "Log in";
 }
 
+<div class="home-background"></div>
 
 <div class="bg"></div>
 <div class="bg bg2"></div>
@@ -95,6 +96,10 @@
 
 			toggleIcon.classList.toggle("bi-eye");
 			toggleIcon.classList.toggle("bi-eye-slash");
+		}
+
+		if (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+			window.location.reload(); // Force reload on back/forward
 		}
 	</script>
 }
