@@ -89,14 +89,23 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
-            if (!string.IsNullOrEmpty(ErrorMessage))
+	        Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+	        Response.Headers["Pragma"] = "no-cache";
+	        Response.Headers["Expires"] = "0";
+
+	        if (User.Identity.IsAuthenticated) // if the user is already logged in redirect him to the profile page, not the login page 
+	        {
+		        return RedirectToAction("Profile", "Profile");
+	        }
+
+			if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            returnUrl ??= Url.Content("~/");
+			returnUrl ??= Url.Content("~/");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -104,12 +113,22 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             ReturnUrl = returnUrl;
-        }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+            return Page();
+		}
+
+		public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+	        Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+	        Response.Headers["Pragma"] = "no-cache";
+	        Response.Headers["Expires"] = "0";
 
+	        if (User.Identity.IsAuthenticated) // if the user is already logged in redirect him to the profile page, not the login page 
+			{
+		        return RedirectToAction("Profile", "Profile");
+	        }
+
+			returnUrl ??= Url.Content("~/");
 
 			ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
