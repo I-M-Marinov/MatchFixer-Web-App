@@ -279,6 +279,7 @@
 }
 
 #timezoneDropdown,
+#timezoneDropdownInRegister,
 #Input_Country {
     width: 19em !important;
     appearance: none;

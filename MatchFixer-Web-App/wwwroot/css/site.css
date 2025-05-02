@@ -43,8 +43,6 @@ html {
 
 body {
     font-size: 1.2em;
-    margin-bottom: 60px;
-    background-color: #b6cccc !important;
 }
 
 .layout-container {
@@ -62,7 +60,7 @@ body {
     margin: 0;
 }
 
-.bg {
+/*.bg {
     animation: slide 1.5s ease-in-out infinite alternate;
     background-image: linear-gradient(-25deg, #6c3 50%, #09f 50%);
     bottom: 0;
@@ -83,6 +81,32 @@ body {
 
 .bg3 {
     animation-duration: 5s;
+}*/
+
+.bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Viewport width */
+    height: 100vh; /* Viewport height */
+    opacity: 0.35;
+    z-index: -1;
+    overflow: hidden;
+    background-image: linear-gradient(-120deg, #6c3 45%, #09f 25%);
+    box-shadow: 0 0 0 0rem #258cfb, 0 0 0 0rem #258cfb;
+    animation: slide 3s ease-in-out infinite alternate-reverse;
+    border: none;
+}
+
+.bg2 {
+    animation-direction: alternate-reverse;
+    animation-duration: 4s;
+    border: none;
+}
+
+.bg3 {
+    animation-duration: 5s;
+    border: none;
 }
 
 .content {

@@ -52,7 +52,7 @@
 
 .accordion-button:hover {
     color: rgba(0,0,0,0.8) !important;
-    text-shadow: 2px 2px 2px #000000 !important;
+    text-shadow: 2px 2px 2px #0db0f8 !important;
 }
 
 
@@ -78,4 +78,8 @@
     width: 100%;
     overflow-x: hidden;
     word-break: break-word;
+}
+
+.icon-content:hover .portfolio-icon path {
+    fill: #ff0000; /* change SVG color on hover */
 }
