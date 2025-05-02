@@ -19,8 +19,15 @@
     padding: 2rem;
     border-radius: 1em;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    background: #2A7B9B;
     background: linear-gradient(269deg, rgba(42, 123, 155, 1) 37%, rgba(87, 199, 133, 0.85) 74%);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease-in-out infinite;
+}
+
+
+
+#registerForm {
+    box-shadow: 5px 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 #register-logo {
@@ -182,4 +189,11 @@
     padding: 0.10rem 0.75rem;
     font-size: 0.70rem;
     color: #0066ff;
+}
+
+#timezoneDropdownInRegister,
+#Input_Country {
+    width: 26em !important;
+    background-color: #fff;
+    margin-bottom: 0em;
 }

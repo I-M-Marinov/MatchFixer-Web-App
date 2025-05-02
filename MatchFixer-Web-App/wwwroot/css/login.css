@@ -11,8 +11,9 @@
     background: #08ffe1;
     border-radius: 1em;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    background: #2A7B9B;
     background: linear-gradient(269deg, rgba(42, 123, 155, 1) 37%, rgba(87, 199, 133, 0.85) 74%);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease-in-out infinite;
 }
 
 #login-logo {
@@ -30,6 +31,7 @@
     width: 100%;
     max-width: 25em;
     animation: fadeInUp 0.8s ease-in;
+    box-shadow: 5px 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .login-card h2 {
