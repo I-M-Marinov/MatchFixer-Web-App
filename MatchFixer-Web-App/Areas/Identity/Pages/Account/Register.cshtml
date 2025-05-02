@@ -4,6 +4,8 @@
     ViewData["Title"] = "Register";
 }
 
+<div class="home-background"></div>
+
 <div class="bg"></div>
 <div class="bg bg2"></div>
 <div class="bg bg3"></div>
@@ -46,7 +48,7 @@
 		</div>
 		
 		<div class="form-floating mb-3">
-			<select asp-for="Input.Country" asp-items="Model.CountryOptions" class="form-select" id="Input_Country">
+			<select asp-for="Input.Country" asp-items="Model.CountryOptions" class="form-select" id="Input_CountryInRegister">
 				<option value="">Select your country</option>
 			</select>
 			<label asp-for="Input.Country" id="country-label">Country</label>
@@ -56,9 +58,9 @@
 		<div class="form-floating mb-3">
 			<input asp-for="Input.Timezone" type="hidden" id="timezoneHiddenInput" />
 			<div id="timezoneWrapper" style="display:none;">
-				<select id="timezoneDropdown" class="form-select"></select>
+				<select id="timezoneDropdownInRegister" class="form-select"></select>
 			</div>
-			<label for="timezoneDropdown" id="timezone-label">Time Zone</label>
+			<label for="timezoneDropdownInRegister" id="timezone-label">Time Zone</label>
 		</div>
 
 		<div class="button-wrapper">
@@ -103,7 +105,7 @@
 		}
 
 
-		document.getElementById("Input_Country").addEventListener("change", async function () {
+		document.getElementById("Input_CountryInRegister").addEventListener("change", async function () {
 			const countryCode = this.value;
 
 			if (!countryCode) return;
@@ -111,7 +113,7 @@
 			const response = await fetch(`/api/timezones/${countryCode}`);
 			const timezones = await response.json();
 
-			const timezoneSelect = document.getElementById("timezoneDropdown");
+			const timezoneSelect = document.getElementById("timezoneDropdownInRegister");
 			const timezoneWrapper = document.getElementById("timezoneWrapper");
 			const timezoneHiddenInput = document.getElementById("timezoneHiddenInput");
 
@@ -148,14 +150,10 @@
 			}
 		});
 
-	</script>
-	
-	<style>
-		#timezoneDropdown,
-		#Input_Country {
-			width: 26em !important;
-			background-color: #fff;
-			margin-bottom: 0em;
+		if (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+			window.location.reload(); // Force reload on back/forward
 		}
-	</style>
+
+	</script>
+
 }
