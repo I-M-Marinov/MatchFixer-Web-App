@@ -121,9 +121,18 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
         public List<SelectListItem> CountryOptions { get; set; }
 
 
-		public async Task OnGetAsync(string returnUrl = null)
+		public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
-            ReturnUrl = returnUrl;
+	        Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+	        Response.Headers["Pragma"] = "no-cache";
+	        Response.Headers["Expires"] = "0";
+
+	        if (User.Identity.IsAuthenticated) // if the user is already logged in redirect him to the profile page, not the register page 
+			{
+		        return RedirectToAction("Profile", "Profile");
+	        }
+
+			ReturnUrl = returnUrl;
 
             CountryOptions = Country.List
 	            .OrderBy(c => c.Name)
@@ -136,11 +145,21 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
 			ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-        }
+			return Page();
+		}
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+	        Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+	        Response.Headers["Pragma"] = "no-cache";
+	        Response.Headers["Expires"] = "0";
+
+	        if (User.Identity.IsAuthenticated) // if the user is already logged in redirect him to the profile page, not the register page 
+	        {
+		        return RedirectToAction("Profile", "Profile");
+	        }
+
+			returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
@@ -187,14 +206,26 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 					            <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
 					        </div>
 					        <div style='padding: 30px; text-align: center;'>
-					            <h2 style='color: #333;'>Welcome to MatchFixer!</h2>
+					            <h2 style='color: #333;'>🎉 Welcome to MatchFixer (Don’t worry, it’s legal... we checked)</h2>
 					            <p style='color: #555; font-size: 16px;'>
-					                You're just one click away from joining a world where connections matter and fairness wins.
+					                Hey there, future match “fixer”! 😉
+								<br />
+									You're now part of the most suspiciously fun soccer betting platform on the planet.
+								<br />
+									(Just kidding. We keep it clean... mostly.)
+								<br />
+									Here at MatchFixer, you're not bribing refs — you're calling the shots with your football smarts.
+								<br /> 
+									From miracle goals to VAR-induced chaos, your bets could make legends (or memes).
+								<br />
+									So lace up those virtual boots.
+								<br />
+									It’s time to outwit, outbet, and maybe out-laugh the competition.
 					                <br /><br />
 					                Let's get you started on your journey!
 					            </p>
 					            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
-					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; color: black; border-radius: 6px; font-weight: bold;'>
+					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; text-decoration: none; color: black; border-radius: 6px; font-weight: bold;'>
 					                Confirm Your Email
 					            </a>
 					            <p style='margin-top: 30px; font-size: 13px; color: #888;'>
@@ -214,8 +245,9 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
 					if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
+	                    TempData["SuccessMessage"] = "We have sent you a confirmation email. Please confirm your account."; // Store success message
+						return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+					}
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
