@@ -4,6 +4,7 @@ using System.Security.Claims;
 using MatchFixer.Core.ViewModels.Profile;
 using System.ComponentModel.DataAnnotations;
 using MatchFixer.Infrastructure.Models.Image;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -17,7 +18,7 @@ namespace MatchFixer_Web_App.Controllers
 			_profileService = profileService;
 		}
 
-
+		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> Profile()
 		{
@@ -32,6 +33,7 @@ namespace MatchFixer_Web_App.Controllers
 			return View(viewModel);
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
@@ -81,6 +83,7 @@ namespace MatchFixer_Web_App.Controllers
 			}
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> UpdateNames(ProfileViewModel model)
@@ -126,8 +129,6 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Profile");
 		}
 
-
-
 		[HttpGet]
 		public async Task<IActionResult> ConfirmEmail(string userId, string code)
 		{
@@ -145,6 +146,7 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Profile", "Profile");
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 
@@ -179,6 +181,7 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Profile");
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 
