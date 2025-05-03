@@ -313,6 +313,16 @@ namespace MatchFixer.Core.Services
 					.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
 
 
+				// Remove the profile picture that is to be changed the new one
+				var deleteResult = await _imageService.DeleteImageAsync(user.ProfilePicture.PublicId);
+
+				// Delete old picture entity if deletion from Cloudinary succeeded
+				if (deleteResult.IsSuccess)
+				{
+					_dbContext.ProfilePictures.Remove(user.ProfilePicture);
+				}
+
+
 				var newProfilePicture = new ProfilePicture
 				{
 					ImageUrl = uploadResult.Url.ToString(),
@@ -340,7 +350,6 @@ namespace MatchFixer.Core.Services
 			};
 		}
 
-		// Remove the profile picture
 		public async Task<ImageResult> RemoveProfilePictureAsync(string userId)
 		{
 			
@@ -381,7 +390,7 @@ namespace MatchFixer.Core.Services
 				return new ImageResult
 				{
 					IsSuccess = true,
-					Message = "Profile picture removed successfully."
+					Message = "Profile picture set to default successfully."
 				};
 			}
 
