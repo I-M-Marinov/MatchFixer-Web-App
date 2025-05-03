@@ -38,10 +38,20 @@ namespace MatchFixer.Infrastructure.Services
 					{
 						File = new FileDescription(file.FileName, stream),
 						Transformation = new Transformation()
-							.Width(500) // Final square width
-							.Height(500) // Final square height
-							.Crop("fill") // Crop to fill the square
-							.Gravity("auto") // Center subject automatically (or use "face" for profile pictures)
+							.Width(500)
+							.Height(500)
+							.Crop("fill")
+							.Gravity("auto")
+							.Chain()													// apply the image transformation before anything else 
+							.Overlay(new Layer().PublicId("matchfixer_watermark"))		// watermark's public id 
+							.Gravity("north_west")                                      // position the watermark  in the left top corner of the image 
+							.X(25)                                                      // move the watermark 20px to the right
+							.Y(10)                                                      // move the watermark 10px down 
+							.Width(150)													// resize the watermark
+							.Crop("scale")												// scale it 
+							.Opacity(40)												// visibility of the watermark
+							.Effect("brightness:30")									// slight adjustment to enhance watermark clarity 
+							.Flags("layer_apply")										// ensure the watermark layer is applied after the transformations on the image are done
 					};
 
 					uploadResult = await _cloudinary.UploadAsync(uploadParams);
