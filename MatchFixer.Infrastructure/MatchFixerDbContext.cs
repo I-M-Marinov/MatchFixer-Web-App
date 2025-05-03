@@ -17,6 +17,7 @@ namespace MatchFixer.Infrastructure
  		public virtual DbSet<ProfilePicture> ProfilePictures { get; set; }
 		public virtual DbSet<MatchEvent> MatchEvents { get; set; }
 		public virtual DbSet<Bet> Bets { get; set; }
+		public virtual DbSet<MatchResult> MatchResults { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
