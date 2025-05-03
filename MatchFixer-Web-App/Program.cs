@@ -33,6 +33,8 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Se
 builder.Services.AddScoped<IUserService, UserService>(); // Add the User Service 
 builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>(); // Add the Profile Service 
+builder.Services.AddHttpClient<FootballApiService>(); // Add the FootballAPI Service 
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 	{
@@ -54,6 +56,7 @@ using (var scope = app.Services.CreateScope())
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
 	await SeedDefaultProfilePicture(userManager, services);          // Seed the Default User Image
+	await SeedMatchResultsAsync(services);							// Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga
 
 }
 
