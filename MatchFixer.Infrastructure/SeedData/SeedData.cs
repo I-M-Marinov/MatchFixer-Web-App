@@ -1,17 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Infrastructure.Models;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using MatchFixer.Infrastructure.Services;
 
 
 namespace MatchFixer.Infrastructure.SeedData
@@ -39,6 +33,20 @@ namespace MatchFixer.Infrastructure.SeedData
 			}
 
 			await dbContext.SaveChangesAsync();
+		}
+
+		public static async Task SeedMatchResultsAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+			var footballApiService = serviceProvider.GetRequiredService<FootballApiService>();
+
+			// Safeguard: If there's already match data, skip seeding
+			if (await dbContext.MatchResults.AnyAsync())
+			{
+				return;
+			}
+
+			await footballApiService.FetchAndSaveFixturesAsync();
 		}
 	}
 }
