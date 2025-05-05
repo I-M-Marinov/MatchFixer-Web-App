@@ -1,0 +1,46 @@
+﻿@using MatchFixer.Core.ViewModels.MatchGuessGame
+@model MatchGuessGameViewModel
+
+@if (Model.IsAnswered)
+{
+	<div class="alert alert-info mt-3">
+		@if (Model.IsCorrect == true)
+		{
+			<strong>Correct!</strong>
+			<p>You earned 10 points.</p>
+		}
+		else
+		{
+			<strong>Incorrect.</strong>
+			<p>
+				The actual score was:
+				<strong>@Model.HomeTeam</strong> @Model.ActualHomeScore - 
+				@Model.ActualAwayScore <strong>@Model.AwayTeam</strong>.
+			</p>
+		}
+	</div>
+
+	<div id="countdown" class="mt-2">5</div>
+
+	<form id="nextQuestionForm" method="get" asp-action="Start">
+		<input type="hidden" name="question" value="@(Model.QuestionNumber + 1)" />
+		<input type="hidden" name="score" value="@Model.Score" />
+		<input type="hidden" name="total" value="@Model.TotalQuestions" />
+	</form>
+
+	<script>
+        let seconds = 5;
+        const countdown = document.getElementById('countdown');
+        const interval = setInterval(() => {
+            seconds--;
+            countdown.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(interval);
+            }
+        }, 1000);
+
+        setTimeout(() => {
+            document.getElementById('nextQuestionForm').submit();
+        }, 5000); // Wait 3 seconds before moving to next question
+    </script>
+}
