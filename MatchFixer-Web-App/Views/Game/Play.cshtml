@@ -1,0 +1,31 @@
+﻿@using MatchFixer.Core.ViewModels.MatchGuessGame
+@model MatchGuessGameViewModel
+
+<h2>Question @Model.QuestionNumber of @Model.TotalQuestions</h2>
+
+<form method="post" asp-action="Submit">
+	@Html.AntiForgeryToken()
+	<input type="hidden" name="MatchId" value="@Model.MatchId" />
+	<input type="hidden" name="QuestionNumber" value="@Model.QuestionNumber" />
+	<input type="hidden" name="Score" value="@Model.Score" />
+	<input type="hidden" name="TotalQuestions" value="@Model.TotalQuestions" />
+
+	<div class="d-flex justify-content-around align-items-center">
+		<div class="text-center">
+			<img src="@Model.HomeTeamLogo" width="60" /><br />
+			<strong>@Model.HomeTeam</strong>
+			<input type="number" name="UserHomeGuess" class="form-control" required />
+		</div>
+		<span>vs</span>
+		<div class="text-center">
+			<img src="@Model.AwayTeamLogo" width="60" /><br />
+			<strong>@Model.AwayTeam</strong>
+			<input type="number" name="UserAwayGuess" class="form-control" required />
+		</div>
+	</div>
+
+	<button class="btn btn-success mt-3" type="submit">Submit Answer</button>
+</form>
+
+@await Html.PartialAsync("_AnswerResult", Model)
+
