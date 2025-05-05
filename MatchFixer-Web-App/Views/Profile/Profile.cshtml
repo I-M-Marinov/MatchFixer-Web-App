@@ -48,12 +48,21 @@
 		        <div class="text-center">
 				        <div>
 					        <form asp-action="UploadProfilePicture" asp-controller="Profile" enctype="multipart/form-data" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
+                            <small id="fileError" class="alert error-message d-none">Please select an image before uploading.</small>
 						        @Html.AntiForgeryToken()
 						        <div class="profile-image-container position-relative">
-							        <img src="@Model.ProfileImageUrl" class="rounded-circle border border-3 border-primary shadow-sm profile-image" alt="Profile Picture" id="profileImage" />
+
+
+							        <div class="spinner-wrapper">
+								        <div class="spinner-ring" id="spinnerRing" style="display: none;"></div>
+								        <img src="@Model.ProfileImageUrl"
+								             class="rounded-circle border border-3 border-primary shadow-sm profile-image"
+								             alt="Profile Picture"
+								             id="profileImage"/>
+							        </div>
 
 							        <!-- Invisible file input -->
-							        <input type="file" name="FormFile" accept="image/*" required id="fileInput" class="d-none" />
+							        <input type="file" name="FormFile" accept="image/*" required id="fileInput" class="d-none"/>
 
 							        <!-- Overlay label that triggers file input -->
 							        <label for="fileInput" class="overlay-label d-flex flex-row align-items-center justify-content-center">
@@ -62,7 +71,7 @@
 							        </label>
 
 						        </div>
-								<button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn">
+						        <button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn" id="uploadBtn">
 							        <span class="custom-tooltip-wrapper">
 								        <i class="ri-save-line"></i>
 								        <span class="custom-tooltip">Upload the picture</span>
@@ -72,9 +81,9 @@
 
 
 					        <div class="d-flex gap-2 remove-image-container">
-						        <form asp-action="RemoveProfilePicture" asp-controller="Profile" method="post">
+                            <form id="removeForm" asp-action="RemoveProfilePicture" asp-controller="Profile" method="post">
 							        @Html.AntiForgeryToken()
-							        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm remove-picture-btn">
+							        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm remove-picture-btn" id="removePictureBtn">
 								        <span class="custom-tooltip-wrapper">
 									        <i class="bi bi-trash"></i>
 											<span class="custom-tooltip">Remove profile picture</span>
@@ -227,12 +236,51 @@
 
 <script>
 
-          document.addEventListener('click', function (event) {
-        if (event.target.closest('.edit-names-btn')) {
-            const card = event.target.closest('.name-image-container');
-            const nameText = card.querySelector('.profile-name-text');
-            const nameInputs = card.querySelector('.name-edit-inputs');
-            const saveNamesBtn = card.querySelector('.save-names-btn');
+        const uploadBtn = document.getElementById("uploadBtn");
+        const fileInput = document.getElementById("fileInput");
+        const spinnerRing = document.getElementById("spinnerRing");
+        const fileError = document.getElementById("fileError");
+
+
+        uploadBtn.addEventListener("click", function (event) {
+            if (fileInput.files.length === 0) {
+
+                event.preventDefault();
+                fileError.classList.remove("d-none");
+
+            } else {
+
+                fileError.classList.add("d-none");
+                spinnerRing.style.display = "block";
+            }
+        });
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length > 0) {
+                fileError.classList.add("d-none");
+            }
+        });
+
+        const removeForm = document.getElementById('removeForm');
+        const removeBtn = document.getElementById("removePictureBtn");
+
+        removeForm.addEventListener("submit", function (e) {
+            if (spinnerRing) {
+                e.preventDefault(); 
+                spinnerRing.style.display = "block";
+
+                setTimeout(() => {
+                    removeForm.submit(); 
+                }, 300); 
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (event.target.closest('.edit-names-btn')) {
+                const card = event.target.closest('.name-image-container');
+                const nameText = card.querySelector('.profile-name-text');
+                const nameInputs = card.querySelector('.name-edit-inputs');
+                const saveNamesBtn = card.querySelector('.save-names-btn');
 
             if (nameInputs && nameText && saveNamesBtn) {
                 const isHidden = nameInputs.classList.contains('d-none');
