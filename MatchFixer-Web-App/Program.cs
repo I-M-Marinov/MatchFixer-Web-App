@@ -33,6 +33,7 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Se
 builder.Services.AddScoped<IUserService, UserService>(); // Add the User Service 
 builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>(); // Add the Profile Service 
+builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>(); // Add the Match Guess Game Service 
 builder.Services.AddHttpClient<FootballApiService>(); // Add the FootballAPI Service 
 
 
