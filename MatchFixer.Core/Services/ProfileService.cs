@@ -313,13 +313,16 @@ namespace MatchFixer.Core.Services
 					.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
 
 
-				// Remove the profile picture that is to be changed the new one
-				var deleteResult = await _imageService.DeleteImageAsync(user.ProfilePicture.PublicId);
-
-				// Delete old picture entity if deletion from Cloudinary succeeded
-				if (deleteResult.IsSuccess)
+				if (user.ProfilePictureId != DefaultImageId)
 				{
-					_dbContext.ProfilePictures.Remove(user.ProfilePicture);
+					// Remove the profile picture that is to be changed the new one
+					var deleteResult = await _imageService.DeleteImageAsync(user.ProfilePicture.PublicId);
+
+					// Delete old picture entity if deletion from Cloudinary succeeded
+					if (deleteResult.IsSuccess)
+					{
+						_dbContext.ProfilePictures.Remove(user.ProfilePicture);
+					}
 				}
 
 
