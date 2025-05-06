@@ -1,0 +1,12 @@
+﻿#answer-result{
+    position: relative;
+}
+
+#countdown {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    color: black;
+    background-color: #12b981 !important;
+    font-size: 1em;
+}
