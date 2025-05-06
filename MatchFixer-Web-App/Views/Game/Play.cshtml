@@ -1,31 +1,45 @@
 ﻿@using MatchFixer.Core.ViewModels.MatchGuessGame
 @model MatchGuessGameViewModel
 
+<div class="background-profile"></div>
+
 <h2>Question @Model.QuestionNumber of @Model.TotalQuestions</h2>
 
-<form method="post" asp-action="Submit">
-	@Html.AntiForgeryToken()
-	<input type="hidden" name="MatchId" value="@Model.MatchId" />
-	<input type="hidden" name="QuestionNumber" value="@Model.QuestionNumber" />
-	<input type="hidden" name="Score" value="@Model.Score" />
-	<input type="hidden" name="TotalQuestions" value="@Model.TotalQuestions" />
+<form method="post" asp-action="Submit" class="mb-5">
+    @Html.AntiForgeryToken()
 
-	<div class="d-flex justify-content-around align-items-center">
-		<div class="text-center">
-			<img src="@Model.HomeTeamLogo" width="60" /><br />
-			<strong>@Model.HomeTeam</strong>
-			<input type="number" name="UserHomeGuess" class="form-control" required />
-		</div>
-		<span>vs</span>
-		<div class="text-center">
-			<img src="@Model.AwayTeamLogo" width="60" /><br />
-			<strong>@Model.AwayTeam</strong>
-			<input type="number" name="UserAwayGuess" class="form-control" required />
-		</div>
-	</div>
+    <input type="hidden" name="MatchId" value="@Model.MatchId" />
 
-	<button class="btn btn-success mt-3" type="submit">Submit Answer</button>
+    <div class="card shadow-lg rounded-4 p-4" style="width: 50rem;">
+        <div class="card-body text-center">
+            <h4 class="mb-4">Can you guess the actual result?</h4>
+
+            <div class="row align-items-center justify-content-center">
+                <div class="col-4 text-center">
+                    <img src="@Model.HomeTeamLogo" class="img-fluid mb-4" style="max-width: 100px;" alt="@Model.HomeTeam logo" />
+                    <h5 class="fw-bold">@Model.HomeTeam</h5>
+                    <input type="number" name="UserHomeGuess" class="form-control mt-2" placeholder="Home score" required />
+                </div>
+
+                <div class="col-1 text-center">
+                    <span class="fs-4 fw-bold">vs</span>
+                </div>
+
+                <div class="col-4 text-center">
+                    <img src="@Model.AwayTeamLogo" class="img-fluid mb-4" style="max-width: 100px;" alt="@Model.AwayTeam logo" />
+                    <h5 class="fw-bold">@Model.AwayTeam</h5>
+                    <input type="number" name="UserAwayGuess" class="form-control mt-2" placeholder="Away score" required />
+                </div>
+            </div>
+
+            <button class="btn btn-success mt-4 px-5 py-2 shadow-sm rounded-pill" type="submit">
+                Submit Answer
+            </button>
+        </div>
+    </div>
 </form>
 
-@await Html.PartialAsync("_AnswerResult", Model)
-
+@if (Model.IsAnswered && Model.QuestionNumber < Model.TotalQuestions)
+{
+    @await Html.PartialAsync("_AnswerResult", Model)
+}
