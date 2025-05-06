@@ -1,5 +1,5 @@
-﻿using MatchFixer.Core.ViewModels.MatchGuessGame;
-using MatchFixer.Infrastructure.Contracts;
+﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.ViewModels.MatchGuessGame;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchFixer_Web_App.Controllers
@@ -7,6 +7,7 @@ namespace MatchFixer_Web_App.Controllers
 	public class GameController : Controller
 	{
 		private readonly IMatchGuessGameService _gameService;
+		private const string SessionKey = "GameSession";
 
 		public GameController(IMatchGuessGameService gameService)
 		{
@@ -14,48 +15,38 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Start(int question = 1, int score = 0, int total = 5)
+		public async Task<IActionResult> Start()
 		{
-			var match = await _gameService.GetRandomMatchAsync();
-			if (match == null) return View("GameOver", score);
+			Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+			Response.Headers["Pragma"] = "no-cache";
+			Response.Headers["Expires"] = "0";
 
-			var matchViewModel = new MatchGuessGameViewModel
-			{
-				QuestionNumber = question,
-				TotalQuestions = total,
-				Score = score,
-				MatchId = match.Id,
-				HomeTeam = match.HomeTeam,
-				AwayTeam = match.AwayTeam,
-				HomeTeamLogo = match.HomeTeamLogo,
-				AwayTeamLogo = match.AwayTeamLogo
-			};
+			var (viewModel, isGameOver) = await _gameService.PrepareNextQuestionAsync(HttpContext.Session);
 
-			return View("Play", matchViewModel);
+			if (isGameOver)
+				return View("GameOver", viewModel.Score);
+
+			return View("Play", viewModel);
 		}
 
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Submit(MatchGuessGameViewModel model)
 		{
-			var match = await _gameService.GetMatchByIdAsync(model.MatchId);
-			if (match == null) return RedirectToAction("Start");
+			var (viewModel, isGameOver) = await _gameService.ProcessAnswerAsync(HttpContext.Session, model);
 
-			bool isCorrect = _gameService.CheckAnswer(match, model.UserHomeGuess ?? -1, model.UserAwayGuess ?? -1);
-			model.IsCorrect = isCorrect;
-			model.Score += isCorrect ? 10 : 0;
-			model.ActualHomeScore = match.HomeScore;
-			model.ActualAwayScore = match.AwayScore;
-			model.IsAnswered = true;
-			model.HomeTeam = match.HomeTeam;
-			model.AwayTeam = match.AwayTeam;
-			model.HomeTeamLogo = match.HomeTeamLogo;
-			model.AwayTeamLogo = match.AwayTeamLogo;
+			if (isGameOver || viewModel == null)
+				return View("GameOver", viewModel?.Score ?? 0);
 
-			if (model.QuestionNumber >= model.TotalQuestions)
-				return View("GameOver", model.Score);
+			return View("Play", viewModel);
+		}
 
-			//return RedirectToAction("Start", new { question = model.QuestionNumber + 1, score = model.Score, total = model.TotalQuestions });
-			return View("Play", model);
+
+		[HttpGet]
+		public IActionResult Reset()
+		{
+			HttpContext.Session.Remove(SessionKey);
+			return RedirectToAction("Start");
 		}
 	}
 
