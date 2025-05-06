@@ -44,6 +44,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 	.AddEntityFrameworkStores<MatchFixerDbContext>()
 	.AddDefaultTokenProviders();
 
+builder.Services.AddDistributedMemoryCache(); // In-memory session store
+builder.Services.AddSession(options =>
+{
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+	options.IdleTimeout = TimeSpan.FromMinutes(30); // session timeout 
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -77,6 +85,8 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseSession();
 
 app.UseRouting();
 
