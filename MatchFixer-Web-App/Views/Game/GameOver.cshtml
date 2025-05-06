@@ -1,4 +1,4 @@
 ﻿@model int
 <h2>Game Over!</h2>
 <p>Your final score: <strong>@Model</strong> points</p>
-<a class="btn btn-primary" href="@Url.Action("Start", "Game")">Play Again</a>
+<a href="@Url.Action("Reset", "Game")" class="btn btn-primary">Play Again</a>
