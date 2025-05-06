@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace MatchFixer.Core.ViewModels.MatchGuessGame
 {
 	public class MatchGuessGameViewModel
