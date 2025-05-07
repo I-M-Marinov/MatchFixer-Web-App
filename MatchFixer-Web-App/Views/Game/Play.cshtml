@@ -3,41 +3,72 @@
 
 <div class="background-profile"></div>
 
-<h2>Question @Model.QuestionNumber of @Model.TotalQuestions</h2>
+<div class="d-flex justify-content-center rounded-4 p-4 mb-1 gap-5">
+	<h2 class="d-flex justify-content-center">Guess at least 5 match results for a chance to double your points !</h2>
+</div>
 
 <form method="post" asp-action="Submit" class="mb-5">
-    @Html.AntiForgeryToken()
+	@Html.AntiForgeryToken()
 
-    <input type="hidden" name="MatchId" value="@Model.MatchId" />
+	<input type="hidden" name="MatchId" value="@Model.MatchId" />
 
-    <div class="card shadow-lg rounded-4 p-4" style="width: 50rem;">
-        <div class="card-body text-center">
-            <h4 class="mb-4">Can you guess the actual result?</h4>
+	<div class="card custom-card shadow-lg rounded-4 p-4">
+		<div class="card-body text-center">
+			<h4 class="mb-4">Can you guess the actual result?</h4>
+			<h2 class="d-flex justify-content-center" id="fix-number">Fix @Model.QuestionNumber of @Model.TotalQuestions</h2>
 
-            <div class="row align-items-center justify-content-center">
-                <div class="col-4 text-center">
-                    <img src="@Model.HomeTeamLogo" class="img-fluid mb-4" style="max-width: 100px;" alt="@Model.HomeTeam logo" />
-                    <h5 class="fw-bold">@Model.HomeTeam</h5>
-                    <input type="number" name="UserHomeGuess" class="form-control mt-2" placeholder="Home score" required />
-                </div>
+			<div class="row align-items-center justify-content-center">
+				<div class="col-4 text-center">
+					<div class="team-logo-wrapper mx-auto mb-3">
+						<img src="@Model.HomeTeamLogo" class="team-logo" alt="@Model.HomeTeam logo" />
+					</div>
+					<h5 class="fw-bold">@Model.HomeTeam</h5>
 
-                <div class="col-1 text-center">
-                    <span class="fs-4 fw-bold">vs</span>
-                </div>
+					<div class="score-input-wrapper">
+						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, -1)">−</button>
+						<input type="number" name="UserHomeGuess" class="form-control score-input text-center" placeholder=" " min="0" required />
+						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, 1)">+</button>
+					</div>				
+				</div>
 
-                <div class="col-4 text-center">
-                    <img src="@Model.AwayTeamLogo" class="img-fluid mb-4" style="max-width: 100px;" alt="@Model.AwayTeam logo" />
-                    <h5 class="fw-bold">@Model.AwayTeam</h5>
-                    <input type="number" name="UserAwayGuess" class="form-control mt-2" placeholder="Away score" required />
-                </div>
-            </div>
+				<div class="col-1 text-center">
+					<span class="fs-4 fw-bold">vs</span>
+				</div>
 
-            <button class="btn btn-success mt-4 px-5 py-2 shadow-sm rounded-pill" type="submit">
-                Submit Answer
-            </button>
-        </div>
-    </div>
+				<div class="col-4 text-center">
+					<div class="team-logo-wrapper mx-auto mb-3">
+						<img src="@Model.AwayTeamLogo" class="team-logo" alt="@Model.AwayTeam logo" />
+					</div>
+					<h5 class="fw-bold">@Model.AwayTeam</h5>
+					
+					<div class="score-input-wrapper">
+						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, -1)">−</button>
+						<input type="number" name="UserAwayGuess" class="form-control score-input text-center" placeholder=" " min="0" required />
+						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, 1)">+</button>
+					</div>
+					
+				</div>
+			</div>
+
+			<button class="btn btn-success mt-4 px-5 py-2 shadow-sm rounded-pill" type="submit">
+				Submit Answer
+			</button>
+		</div>
+	</div>
+
+
 </form>
+
+
+<script>
+	function changeScore(button, delta) {
+		const input = button.parentElement.querySelector('input');
+		const value = parseInt(input.value || '0', 10);
+		const newValue = Math.max(0, value + delta);
+		input.value = newValue;
+	}
+</script>
+
 
 @if (Model.IsAnswered && Model.QuestionNumber < Model.TotalQuestions)
 {
