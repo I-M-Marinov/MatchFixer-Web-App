@@ -1,4 +1,26 @@
 ﻿@model int
-<h2>Game Over!</h2>
-<p>Your final score: <strong>@Model</strong> points</p>
-<a href="@Url.Action("Reset", "Game")" class="btn btn-primary">Play Again</a>
+
+<div class="background-profile"></div>
+
+
+<div class="card custom-card shadow-lg rounded-4 p-4">
+	<div class="card-body text-center">
+		<div class="flex-column justify-content-center mt-2">
+			<div class="d-flex flex-column justify-content-center align-items-center mt-2 flex-wrap gap-2">
+				<h2>Game Over!</h2>
+				<p>Your final score: 
+					@if (Model >= 50)
+					{
+						<strong>@Model*2</strong>
+					}
+					else
+					{
+						<strong>@Model</strong>
+					}
+					points</p>
+				<a href="@Url.Action("Reset", "Game")" class="btn btn-primary">Play Again ?</a>
+			</div>				
+		</div>
+	</div>
+</div>
+
