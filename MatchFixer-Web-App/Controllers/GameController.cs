@@ -23,6 +23,9 @@ namespace MatchFixer_Web_App.Controllers
 
 			var (viewModel, isGameOver) = await _gameService.PrepareNextQuestionAsync(HttpContext.Session);
 
+			// for debugging purposes only 
+			Console.WriteLine($"{viewModel.ActualHomeScore} : {viewModel.ActualAwayScore}");
+
 			if (isGameOver)
 				return View("GameOver", viewModel.Score);
 
@@ -36,7 +39,7 @@ namespace MatchFixer_Web_App.Controllers
 			var (viewModel, isGameOver) = await _gameService.ProcessAnswerAsync(HttpContext.Session, model);
 
 			if (isGameOver || viewModel == null)
-				return View("GameOver", viewModel?.Score ?? 0);
+				return PartialView("GameOver", viewModel?.Score ?? 0);
 
 			return View("Play", viewModel);
 		}
