@@ -2,9 +2,10 @@
 @import "/css/container-effects.css";
 
 .login-container {
-    margin-top: 2.44em;
     min-height: 70vh;
-    min-width: 40vw;
+    width: 40vw;
+    margin: 0 auto;
+    margin-top: 2.44em;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,7 +13,7 @@
     border-radius: 1em;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     background: linear-gradient(269deg, rgba(42, 123, 155, 1) 37%, rgba(87, 199, 133, 0.85) 74%);
-    background-size: 200% 200%;
+    background-size: 200% 100%;
     animation: gradientShift 6s ease-in-out infinite;
 }
 
@@ -28,7 +29,7 @@
     padding: 2rem 2.5rem;
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    width: 100%;
+    width: 60%;
     max-width: 25em;
     animation: fadeInUp 0.8s ease-in;
     box-shadow: 5px 6px 20px rgba(0, 0, 0, 0.5);

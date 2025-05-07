@@ -266,7 +266,7 @@
 #email-input,
 #last-name,
 #first-name {
-    margin-bottom: 0.2em;
+    margin-bottom: 0.1em;
     background-color: #badbcc;
 }
 #first-name{
@@ -279,9 +279,11 @@
 }
 
 #timezoneDropdown,
-#timezoneDropdownInRegister,
 #Input_Country {
-    width: 19em !important;
+    max-width: 19em !important;
+}
+    
+#timezoneDropdown, #timezoneDropdownInRegister, #Input_Country, #Input_CountryInRegister{
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -297,7 +299,7 @@
     overflow-y: auto;
 }
 
-#timezoneDropdown{
+#timezoneDropdown {
     margin-left: -0.6em;
 }
 

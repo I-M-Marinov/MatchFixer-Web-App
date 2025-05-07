@@ -11,8 +11,10 @@
 
 .register-container {
     margin-top: 2.44em;
+    width: 40vw;
     min-height: 70vh;
-    min-width: 40vw;
+    margin: 0 auto;
+    margin-top: 2.44em;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -28,7 +30,26 @@
 
 #registerForm {
     box-shadow: 5px 6px 20px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
+
+
+.form-inner-wrapper {
+    width: 100%;
+    max-width: 19em !important; 
+    margin: 0 auto;
+}
+
+.form-inner-wrapper .form-floating,
+.form-inner-wrapper .form-select,
+.form-inner-wrapper .form-control {
+    width: 100%;
+}
+
 
 #register-logo {
     width: 100%;
@@ -148,7 +169,7 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    margin: 0.5em auto;
+    margin: 0.3em;
     font-size: 0.6em;
 }
 
@@ -162,7 +183,7 @@
     height: calc(3.5rem + 2px); /* Same height as your text inputs */
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 1px solid var(--input-border);
+    border: 2px solid var(--input-border);
     border-radius: 0.5rem;
     background-color: #fff;
     box-shadow: none;
@@ -193,7 +214,6 @@
 
 #timezoneDropdownInRegister,
 #Input_Country {
-    width: 26em !important;
     background-color: #fff;
     margin-bottom: 0em;
 }
