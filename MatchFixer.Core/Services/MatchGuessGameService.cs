@@ -62,6 +62,7 @@ namespace MatchFixer.Core.Services
 			session.SetObject(SessionKey, sessionState);
 
 			var match = await GetRandomMatchAsync();
+
 			if (match == null)
 			{
 				session.Remove(SessionKey);
@@ -78,6 +79,8 @@ namespace MatchFixer.Core.Services
 				TotalQuestions = sessionState.TotalQuestions,
 				Score = sessionState.Score,
 				MatchId = match.Id,
+				ActualHomeScore = match.HomeScore,
+				ActualAwayScore = match.AwayScore,
 				HomeTeam = match.HomeTeam,
 				AwayTeam = match.AwayTeam,
 				HomeTeamLogo = match.HomeTeamLogo,
