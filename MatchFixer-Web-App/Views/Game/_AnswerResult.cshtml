@@ -3,42 +3,55 @@
 
 @if (Model.IsAnswered)
 {
-	<div class="alert alert-info mt-3 position-relative" id="answer-result">
-		<span id="countdown" class="position-absolute top-0 end-0 badge bg-secondary m-2">5</span>
 
-		@if (Model.IsCorrect == true)
-		{
-			<strong>Correct!</strong>
-			<p>You earned 10 points.</p>
-		}
-		else
-		{
-			<strong>Incorrect.</strong>
-			<p>
-				The actual score was:
-				<strong>@Model.HomeTeam</strong> @Model.ActualHomeScore -
-				@Model.ActualAwayScore <strong>@Model.AwayTeam</strong>.
-			</p>
-		}
+	<div class="d-flex justify-content-center mt-4">
+		<div class="alert alert-info position-relative w-100 d-flex flex-column align-items-center text-center" style="max-width: 600px;" id="answer-result">
+			<span id="countdown" class="position-absolute top-0 end-0 badge bg-secondary m-2">5</span>
+
+			@if (Model.IsCorrect == true)
+			{
+				<div class="d-flex justify-content-center mt-2 bg-success">
+					<strong>Correct!</strong>
+				</div>
+				<p>You earned 10 points.</p>
+			}
+			else
+			{
+				<div class="d-flex justify-content-center align-items-center mt-4 bg-warning w-50">
+					<strong>Incorrect !</strong>
+				</div>
+				<div class="d-flex justify-content-center mt-2">
+					The actual score was:
+				</div>
+				<div class="d-flex justify-content-center mt-2">
+					<div class="d-flex justify-content-center align-items-center mt-2 flex-wrap gap-2">
+						<strong class="mx-2">@Model.HomeTeam</strong>
+						<span class="badge bg-secondary fs-5">@Model.ActualHomeScore</span>
+						<span class="mx-2">-</span>
+						<span class="badge bg-secondary fs-5">@Model.ActualAwayScore</span>
+						<strong class="mx-2">@Model.AwayTeam</strong>
+					</div>				
+				</div>
+
+			}
+		</div>
 	</div>
 
-	<form id="nextQuestionForm" method="get" asp-action="Start">
-		
-	</form>
+	<form id="nextQuestionForm" method="get" asp-action="Start"></form>
 
 	<script>
-        let seconds = 5;
-        const countdown = document.getElementById('countdown');
-        const interval = setInterval(() => {
-            seconds--;
-            countdown.textContent = seconds;
-            if (seconds <= 0) {
-                clearInterval(interval);
-            }
-        }, 1000);
+		let seconds = 5;
+		const countdown = document.getElementById('countdown');
+		const interval = setInterval(() => {
+			seconds--;
+			countdown.textContent = seconds;
+			if (seconds <= 0) {
+				clearInterval(interval);
+			}
+		}, 1000);
 
-        setTimeout(() => {
-            document.getElementById('nextQuestionForm').submit();
-        }, 5000); // Wait 5 seconds before moving to the next question
-    </script>
+		setTimeout(() => {
+			document.getElementById('nextQuestionForm').submit();
+		}, 5000);
+	</script>
 }
