@@ -7,28 +7,35 @@
 	<h2 class="d-flex justify-content-center">Guess at least 5 match results for a chance to double your points !</h2>
 </div>
 
-<form method="post" asp-action="Submit" class="mb-5">
+<form id="submitGuessesForm" method="post" asp-action="Submit" class="mb-5">
 	@Html.AntiForgeryToken()
 
 	<input type="hidden" name="MatchId" value="@Model.MatchId" />
 
 	<div class="card custom-card shadow-lg rounded-4 p-4">
+		<div class="overlay" id="cardOverlay"></div>
 		<div class="card-body text-center">
 			<h4 class="mb-4">Can you guess the actual result?</h4>
+			<div class="text-center mb-3">
+				<div id="question-timer-wrapper">
+					<span id="timer">15</span>
+				</div>
+			</div>
+
 			<h2 class="d-flex justify-content-center" id="fix-number">Fix @Model.QuestionNumber of @Model.TotalQuestions</h2>
 
 			<div class="row align-items-center justify-content-center">
 				<div class="col-4 text-center">
 					<div class="team-logo-wrapper mx-auto mb-3">
-						<img src="@Model.HomeTeamLogo" class="team-logo" alt="@Model.HomeTeam logo" />
+						<img src="@Model.HomeTeamLogo" class="team-logo" alt="@Model.HomeTeam logo"/>
 					</div>
 					<h5 class="fw-bold">@Model.HomeTeam</h5>
 
 					<div class="score-input-wrapper">
 						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, -1)">−</button>
-						<input type="number" name="UserHomeGuess" class="form-control score-input text-center" placeholder=" " min="0" required />
+						<input type="number" name="UserHomeGuess" class="form-control score-input text-center" placeholder=" " min="0" required/>
 						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, 1)">+</button>
-					</div>				
+					</div>
 				</div>
 
 				<div class="col-1 text-center">
@@ -37,16 +44,16 @@
 
 				<div class="col-4 text-center">
 					<div class="team-logo-wrapper mx-auto mb-3">
-						<img src="@Model.AwayTeamLogo" class="team-logo" alt="@Model.AwayTeam logo" />
+						<img src="@Model.AwayTeamLogo" class="team-logo" alt="@Model.AwayTeam logo"/>
 					</div>
 					<h5 class="fw-bold">@Model.AwayTeam</h5>
-					
+
 					<div class="score-input-wrapper">
 						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, -1)">−</button>
-						<input type="number" name="UserAwayGuess" class="form-control score-input text-center" placeholder=" " min="0" required />
+						<input type="number" name="UserAwayGuess" class="form-control score-input text-center" placeholder=" " min="0" required/>
 						<button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeScore(this, 1)">+</button>
 					</div>
-					
+
 				</div>
 			</div>
 
@@ -67,6 +74,41 @@
 		const newValue = Math.max(0, value + delta);
 		input.value = newValue;
 	}
+
+
+		document.addEventListener("DOMContentLoaded", function () {
+		let timeLeft = 15;
+		const timerElement = document.getElementById('timer');
+		const timerWrapper = document.getElementById('question-timer-wrapper');
+		const form = document.querySelector('form');
+
+		const countdown = setInterval(() => {
+			timeLeft--;
+			timerElement.textContent = timeLeft;
+
+			if (timeLeft <= 0) {
+				clearInterval(countdown);
+				autoSubmitForm();
+			}
+		}, 1000);
+
+		function autoSubmitForm() {
+			const submitGuessesForm = document.querySelector('#submitGuessesForm') || document.querySelector('form');
+			const homeInput = submitGuessesForm.querySelector('input[name="UserHomeGuess"]');
+			const awayInput = submitGuessesForm.querySelector('input[name="UserAwayGuess"]');
+
+			if (!homeInput.value) homeInput.value = 10;
+			if (!awayInput.value) awayInput.value = 10;
+
+			submitGuessesForm.submit();
+		}
+
+		// Listen for an event triggered by _AnswerResult to hide the timer
+		window.addEventListener("hideMainTimer", () => {
+			clearInterval(countdown);
+			if (timerWrapper) timerWrapper.style.display = "none";
+		});
+	});
 </script>
 
 
