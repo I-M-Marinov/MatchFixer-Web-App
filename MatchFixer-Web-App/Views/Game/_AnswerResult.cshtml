@@ -10,14 +10,21 @@
 
 			@if (Model.IsCorrect == true)
 			{
-				<div class="d-flex justify-content-center mt-2 bg-success">
+				<div id="correctGuess" class="d-flex justify-content-center mt-2 bg-success w-50">
 					<strong>Correct!</strong>
 				</div>
-				<p>You earned 10 points.</p>
+				@if (Model.Score > 50)
+				{
+					<p>You earned 20 points.</p>
+				}
+				else
+				{
+					<p>You earned 10 points.</p>
+				}
 			}
 			else
 			{
-				<div class="d-flex justify-content-center align-items-center mt-4 bg-warning w-50">
+				<div id="incorrectGuess" class="d-flex justify-content-center align-items-center mt-4 bg-warning w-50">
 					<strong>Incorrect !</strong>
 				</div>
 				<div class="d-flex justify-content-center mt-2">
@@ -40,18 +47,47 @@
 	<form id="nextQuestionForm" method="get" asp-action="Start"></form>
 
 	<script>
-		let seconds = 5;
-		const countdown = document.getElementById('countdown');
-		const interval = setInterval(() => {
-			seconds--;
-			countdown.textContent = seconds;
-			if (seconds <= 0) {
-				clearInterval(interval);
-			}
-		}, 1000);
+			document.addEventListener("DOMContentLoaded", function () {
+			let seconds = 5;
+			const countdown = document.getElementById('countdown');
+			const overlay = document.getElementById('cardOverlay');
 
-		setTimeout(() => {
-			document.getElementById('nextQuestionForm').submit();
-		}, 5000);
+			// show overlay
+
+			if (overlay) {
+				overlay.style.display = 'block';
+			}
+
+			// disable inputs and buttons
+
+			document.querySelectorAll('.custom-card input, .custom-card button').forEach(el => {
+				el.disabled = true;
+			});
+
+			const interval = setInterval(() => {
+				seconds--;
+				countdown.textContent = seconds;
+				if (seconds <= 0) {
+					clearInterval(interval);
+
+					// hide overlay and re-enable inputs 
+
+					if (overlay) {
+						overlay.style.display = 'none';
+					}
+					document.querySelectorAll('.custom-card input, .custom-card button').forEach(el => {
+						el.disabled = false;
+					});
+				}
+			}, 1000);
+
+			setTimeout(() => {
+				window.dispatchEvent(new Event("hideMainTimer"));
+			}, 0);
+
+			setTimeout(() => {
+				document.getElementById('nextQuestionForm').submit();
+			}, 5000);
+		});
 	</script>
 }
