@@ -25,6 +25,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			// for debugging purposes only 
 			Console.WriteLine($"{viewModel.ActualHomeScore} : {viewModel.ActualAwayScore}");
+			Console.WriteLine($" Score ---------------->>>>>> {viewModel.Score}");
 
 			if (isGameOver)
 				return View("GameOver", viewModel.Score);
