@@ -108,14 +108,26 @@ namespace MatchFixer.Core.Services
 				return (null, true); // Match no longer available
 			}
 
-			// Evaluate the guess
 			bool isCorrect = CheckAnswer(match, submittedModel.UserHomeGuess ?? -1, submittedModel.UserAwayGuess ?? -1);
-			sessionState.Score += isCorrect ? 10 : 0;
-			sessionState.LastQuestionAnswered = true;
 
+			// Track if this was the moment score hit exactly 50
+			bool hitFifty = sessionState.Score == 40 && isCorrect;
+
+			// Award points: 10 if under 50, 20 if already hit 50 or more 
+			int pointsToAdd = sessionState.Score >= 50 ? 20 : 10;
+
+			// If correctly guessed the result add the points to the score and if not don't
+			sessionState.Score += isCorrect ? pointsToAdd : 0;
+
+			// Double score only once, when exactly 50 is hit
+			if (hitFifty && sessionState.Score == 50)
+			{
+				sessionState.Score *= 2; // becomes 100
+			}
+
+			sessionState.LastQuestionAnswered = true;
 			bool isGameOver = sessionState.QuestionNumber == sessionState.TotalQuestions;
 
-			// Only increment if game is continuing
 			if (!isGameOver)
 			{
 				sessionState.QuestionNumber++;
@@ -130,7 +142,7 @@ namespace MatchFixer.Core.Services
 			{
 				IsCorrect = isCorrect,
 				Score = sessionState.Score,
-				QuestionNumber = sessionState.QuestionNumber - (isGameOver ? 0 : 1), // show current, not next
+				QuestionNumber = sessionState.QuestionNumber - (isGameOver ? 0 : 1),
 				TotalQuestions = sessionState.TotalQuestions,
 				MatchId = match.Id,
 				ActualHomeScore = match.HomeScore,
@@ -144,5 +156,6 @@ namespace MatchFixer.Core.Services
 
 			return (resultViewModel, isGameOver);
 		}
+
 	}
 }
