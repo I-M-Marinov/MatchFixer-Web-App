@@ -1,5 +1,6 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.MatchGuessGame;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchFixer_Web_App.Controllers
@@ -7,13 +8,37 @@ namespace MatchFixer_Web_App.Controllers
 	public class GameController : Controller
 	{
 		private readonly IMatchGuessGameService _gameService;
-		private const string SessionKey = "GameSession";
+		private readonly IMatchFixScoreService _scoreService;
+		private readonly ISessionService _sessionService;
 
-		public GameController(IMatchGuessGameService gameService)
+
+		public GameController(IMatchGuessGameService gameService, IMatchFixScoreService scoreService, ISessionService sessionService)
 		{
 			_gameService = gameService;
+			_scoreService = scoreService;
+			_sessionService = sessionService;
 		}
 
+		[Authorize]
+		[HttpGet]
+		public async Task<IActionResult> Landing()
+		{
+			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 
+
+			if (string.IsNullOrEmpty(userId))
+			{
+				TempData["Error"] = "Session expired. Please log in again.";
+
+				return RedirectToPage("/Account/Login", new { area = "Identity" });
+			}
+
+			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
+
+			var leaderboard = await _scoreService.GetTopPlayersAsync();
+			return View("GameStartScreen", leaderboard);
+		}
+
+		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> Start()
 		{
@@ -23,16 +48,16 @@ namespace MatchFixer_Web_App.Controllers
 
 			var (viewModel, isGameOver) = await _gameService.PrepareNextQuestionAsync(HttpContext.Session);
 
-			// for debugging purposes only 
+			// for debugging purposes only ( and honest cheating  :D ) 
 			Console.WriteLine($"{viewModel.ActualHomeScore} : {viewModel.ActualAwayScore}");
 			Console.WriteLine($" Score ---------------->>>>>> {viewModel.Score}");
 
-			if (isGameOver)
-				return View("GameOver", viewModel.Score);
+			if (isGameOver) return View("GameOver", viewModel.Score);
 
 			return View("Play", viewModel);
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Submit(MatchGuessGameViewModel model)
@@ -40,7 +65,7 @@ namespace MatchFixer_Web_App.Controllers
 			var (viewModel, isGameOver) = await _gameService.ProcessAnswerAsync(HttpContext.Session, model);
 
 			if (isGameOver || viewModel == null)
-				return PartialView("GameOver", viewModel?.Score ?? 0);
+				return View("GameOver", viewModel?.Score ?? 0);
 
 			return View("Play", viewModel);
 		}
@@ -49,7 +74,7 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpGet]
 		public IActionResult Reset()
 		{
-			HttpContext.Session.Remove(SessionKey);
+			_sessionService.ClearSession();
 			return RedirectToAction("Start");
 		}
 	}
