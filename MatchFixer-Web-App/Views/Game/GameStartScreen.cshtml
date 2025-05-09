@@ -1,0 +1,72 @@
+﻿@using MatchFixer.Core.ViewModels.MatchGuessGame;
+@model List<LeaderboardEntryViewModel>
+
+
+@{
+    ViewData["Title"] = "MatchFix Guess Game";
+}
+
+<div class="home-background"></div>
+
+<!-- Rules Modal -->
+<div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="rulesModalLabel">Rules</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">You’ll see real matchups with team logos.</li>
+                    <li class="list-group-item">Guess the correct score for both teams.</li>
+                    <li class="list-group-item">You earn points for correct or close guesses.</li>
+                    <li class="list-group-item">Try to get the highest score before the game ends!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Screen -->
+<div class="container py-5 text-center">
+    <h1 class="mb-4">⚽ Welcome to the MatchFix Guessing Game! ⚽</h1>
+    <p class="lead mb-5">Can you guess the actual scores?</p>
+
+    <div class="mb-4">
+        <a href="@Url.Action("Start", "Game")" class="btn btn-success btn-lg px-5 py-3 rounded-pill">
+            Start Game
+        </a>
+        <button type="button" class="btn btn-info btn-lg px-4 py-3 ms-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#rulesModal">
+	        Rules
+        </button>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="card mx-auto shadow-lg mt-5" style="max-width: 500px;">
+	    <div class="card-header bg-primary text-white">
+            🏆 Leaderboard 🏆
+	    </div>
+	    <ul class="list-group list-group-flush">
+		    @if (Model != null && Model.Any())
+		    {
+			    int rank = 1;
+			    foreach (var entry in Model)
+			    {
+				    <li class="list-group-item d-flex justify-content-between">
+					    <span>@rank. <img src="@entry.Picture" id="leaderboard-user-picture"/> @entry.UserName</span>
+					    <span>@entry.Score points</span>
+				    </li>
+				    rank++;
+			    }
+		    }
+		    else
+		    {
+			    <li class="list-group-item text-center text-muted">
+				    No scores yet. Be the first to play!
+			    </li>
+		    }
+	    </ul>
+    </div>
+
+</div>
