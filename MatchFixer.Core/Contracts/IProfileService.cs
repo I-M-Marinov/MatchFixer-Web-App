@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Core.ViewModels.Profile;
+using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.Image;
 
 
@@ -6,6 +7,7 @@ namespace MatchFixer.Core.Contracts
 {
 	public interface IProfileService
 	{
+		Task<ApplicationUser> GetCurrentUser(string userId);
 		Task<ProfileViewModel> GetProfileAsync(string userId);
 		Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model);
 		Task<(bool Success, string Message)> UpdateNamesAsync(ProfileViewModel model);
