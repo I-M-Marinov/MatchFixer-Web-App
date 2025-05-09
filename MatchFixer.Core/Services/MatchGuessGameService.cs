@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Http;
 
 using MatchFixer.Core.Contracts;
-using MatchFixer.Core.Extensions;
 using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Core.ViewModels.GameSessionState;
 using MatchFixer.Core.ViewModels.MatchGuessGame;
 using MatchFixer.Infrastructure;
+
+
 
 namespace MatchFixer.Core.Services
 {
@@ -14,19 +14,22 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _context;
 		private readonly Random _random = new();
+		private readonly ISessionService _sessionService;
 
-		public MatchGuessGameService(MatchFixerDbContext context)
+
+		public MatchGuessGameService(MatchFixerDbContext context, ISessionService sessionService)
 		{
 			_context = context;
+			_sessionService = sessionService;
 		}
 
 		public async Task<MatchResult?> GetRandomMatchAsync()
 		{
-			var totalMatches = await _context.MatchResults.CountAsync();
-			if (totalMatches == 0) return null;
+			var ids = await _context.MatchResults.Select(m => m.Id).ToListAsync();
+			if (!ids.Any()) return null;
 
-			int skip = _random.Next(0, totalMatches);
-			return await _context.MatchResults.Skip(skip).Take(1).FirstOrDefaultAsync();
+			int randomId = ids[_random.Next(ids.Count)];
+			return await _context.MatchResults.FirstOrDefaultAsync(m => m.Id == randomId);
 		}
 
 		public bool CheckAnswer(MatchResult match, int userHomeScore, int userAwayScore)
@@ -40,9 +43,8 @@ namespace MatchFixer.Core.Services
 
 		public async Task<(MatchGuessGameViewModel ViewModel, bool IsGameOver)> PrepareNextQuestionAsync(ISession session)
 		{
-			const string SessionKey = "GameSession";
 
-			var sessionState = session.GetObject<GameSessionState>(SessionKey) ?? new GameSessionState();
+			var sessionState = _sessionService.GetSessionState();
 
 			if (!sessionState.LastQuestionAnswered && sessionState.QuestionNumber > 1)
 			{
@@ -51,7 +53,8 @@ namespace MatchFixer.Core.Services
 
 			if (sessionState.QuestionNumber > sessionState.TotalQuestions)
 			{
-				session.Remove(SessionKey);
+				_sessionService.ClearSession();
+
 				return (new MatchGuessGameViewModel
 				{
 					Score = sessionState.Score
@@ -59,13 +62,15 @@ namespace MatchFixer.Core.Services
 			}
 
 			sessionState.LastQuestionAnswered = false;
-			session.SetObject(SessionKey, sessionState);
+
+			_sessionService.SetSessionState(sessionState);
 
 			var match = await GetRandomMatchAsync();
 
 			if (match == null)
 			{
-				session.Remove(SessionKey);
+				_sessionService.ClearSession();
+
 				return (new MatchGuessGameViewModel
 				{
 					Score = sessionState.Score
@@ -91,12 +96,11 @@ namespace MatchFixer.Core.Services
 		}
 
 		public async Task<(MatchGuessGameViewModel ViewModel, bool IsGameOver)> ProcessAnswerAsync(
-			ISession session,
-			MatchGuessGameViewModel submittedModel)
+	ISession session,
+	MatchGuessGameViewModel submittedModel)
 		{
-			const string SessionKey = "GameSession";
+			var sessionState = _sessionService.GetSessionState();
 
-			var sessionState = session.GetObject<GameSessionState>(SessionKey);
 			if (sessionState == null)
 			{
 				return (null, true); // Session expired
@@ -110,19 +114,27 @@ namespace MatchFixer.Core.Services
 
 			bool isCorrect = CheckAnswer(match, submittedModel.UserHomeGuess ?? -1, submittedModel.UserAwayGuess ?? -1);
 
-			// Track if this was the moment score hit exactly 50
 			bool hitFifty = sessionState.Score == 40 && isCorrect;
 
-			// Award points: 10 if under 50, 20 if already hit 50 or more 
-			int pointsToAdd = sessionState.Score >= 50 ? 20 : 10;
+			int pointsToAdd = 0;
 
-			// If correctly guessed the result add the points to the score and if not don't
-			sessionState.Score += isCorrect ? pointsToAdd : 0;
-
-			// Double score only once, when exactly 50 is hit
-			if (hitFifty && sessionState.Score == 50)
+			if (isCorrect)
 			{
-				sessionState.Score *= 2; // becomes 100
+				// Base points: 10 or 20
+				pointsToAdd = sessionState.Score >= 50 ? 20 : 10;
+
+				// Add base points to session
+				sessionState.Score += pointsToAdd;
+
+				// Apply 50-point doubling bonus if just hit 50
+				if (hitFifty && sessionState.Score == 50)
+				{
+					sessionState.Score *= 2; // becomes 100
+					pointsToAdd += 50; // Also add the bonus to DB
+				}
+
+				// Update DB score
+				await UpdateUserScoreAsync(Guid.Parse(sessionState.UserId), pointsToAdd);
 			}
 
 			sessionState.LastQuestionAnswered = true;
@@ -131,11 +143,11 @@ namespace MatchFixer.Core.Services
 			if (!isGameOver)
 			{
 				sessionState.QuestionNumber++;
-				session.SetObject(SessionKey, sessionState);
+				_sessionService.SetSessionState(sessionState);
 			}
 			else
 			{
-				session.Remove(SessionKey);
+				_sessionService.ClearSession();
 			}
 
 			var resultViewModel = new MatchGuessGameViewModel
@@ -155,6 +167,18 @@ namespace MatchFixer.Core.Services
 			};
 
 			return (resultViewModel, isGameOver);
+		}
+
+
+
+		private async Task UpdateUserScoreAsync(Guid userId, int score)
+		{
+			var user = await _context.ApplicationUsers.FindAsync(userId);
+			if (user != null)
+			{
+				user.MatchFixScore += score;
+				await _context.SaveChangesAsync();
+			}
 		}
 
 	}
