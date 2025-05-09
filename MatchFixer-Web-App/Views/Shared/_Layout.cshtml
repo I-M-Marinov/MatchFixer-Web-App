@@ -1,6 +1,5 @@
 ﻿@using MatchFixer.Infrastructure.Entities
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @inject SignInManager<ApplicationUser> SignInManager
 
 
@@ -44,5 +43,37 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-</body>
+	
+    <div id="cookieConsent" class="modal fade" tabindex="-1" aria-labelledby="cookieConsentLabel" aria-hidden="true">
+	    <div class="modal-dialog modal-dialog-bottom fixed-bottom mb-3">
+		    <div class="modal-content bg-light border">
+			    <div class="modal-body d-flex flex-column flex-md-row justify-content-between align-items-center">
+				    <div class="mb-2 mb-md-0">
+					    <strong>We use cookies</strong> to enhance your experience and keep your game session active. 
+					    By continuing, you agree to our use of cookies.
+				    </div>
+				    <div>
+					    <button class="btn btn-primary btn-sm me-2" id="acceptCookies">Accept</button>
+                        <a href="@Url.Action("Privacy", "Home")" class="btn btn-outline-secondary btn-sm">Learn More</a>
+				    </div>
+			    </div>
+		    </div>
+	    </div>
+    </div>
+	
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!localStorage.getItem("cookiesAccepted")) {
+            const cookieModal = new bootstrap.Modal(document.getElementById('cookieConsent'));
+            cookieModal.show();
+
+            document.getElementById("acceptCookies").addEventListener("click", function () {
+                localStorage.setItem("cookiesAccepted", "true");
+                cookieModal.hide();
+            });
+        }
+    });
+</script>
+
+    </body>
 </html>
