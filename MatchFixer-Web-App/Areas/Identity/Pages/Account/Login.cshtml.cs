@@ -2,19 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using MatchFixer.Infrastructure.Entities;
-using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+
+using MatchFixer.Infrastructure.Entities;
+
+using static MatchFixer.Common.GeneralConstants.SessionConstants;
 
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
@@ -156,8 +153,8 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-
-                    return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
+                    HttpContext.Session.SetString("UserId", user.Id.ToString()); // Store the UserId in the session
+					return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
 					//return LocalRedirect(returnUrl);
 				}
 				if (result.RequiresTwoFactor)
