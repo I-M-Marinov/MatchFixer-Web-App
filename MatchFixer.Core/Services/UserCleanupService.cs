@@ -31,7 +31,7 @@ namespace MatchFixer.Core.Services
 
 		private async Task CleanupUnconfirmedUsersAsync()
 		{
-			_logger.LogInformation("Starting unconfirmed users cleanup task...");
+			_logger.LogInformation("------------------------------------Starting unconfirmed users cleanup task------------------------------------");
 
 			using (var scope = _serviceProvider.CreateScope())
 			{
@@ -50,7 +50,7 @@ namespace MatchFixer.Core.Services
 						var result = await userManager.DeleteAsync(user);
 						if (result.Succeeded)
 						{
-							_logger.LogInformation($"Deleted unconfirmed user: {user.Email}");
+							_logger.LogInformation($"------------------------------------Deleted unconfirmed user: {user.Email}------------------------------------");
 						}
 						else
 						{
@@ -60,7 +60,7 @@ namespace MatchFixer.Core.Services
 				}
 			}
 
-			_logger.LogInformation("Finished unconfirmed users cleanup task.");
+			_logger.LogInformation("------------------------------------Finished unconfirmed users cleanup task.------------------------------------");
 		}
 
 	}
