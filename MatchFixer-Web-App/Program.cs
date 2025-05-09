@@ -23,18 +23,21 @@ builder.Services.AddDbContext<MatchFixerDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
-builder.Configuration.AddUserSecrets<Program>();
-builder.Services.AddHttpClient(); // Add HTTP Client
-builder.Services.AddHostedService<UserCleanupService>();
-builder.Services.AddScoped<ITimezoneService, TimezoneService>(); // Add the Timezone Service ( NodaTime )
-builder.Services.AddHttpContextAccessor(); // Add HTTP Context Accessor
-builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>(); // Add URL Helper Factory
-builder.Services.AddTransient<IEmailSender, EmailSender>(); // Register Email Sender Service 
-builder.Services.AddScoped<IUserService, UserService>(); // Add the User Service 
-builder.Services.AddScoped<IImageService, ImageService>();  // Add the Image Service 
-builder.Services.AddScoped<IProfileService, ProfileService>(); // Add the Profile Service 
-builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>(); // Add the Match Guess Game Service 
-builder.Services.AddHttpClient<FootballApiService>(); // Add the FootballAPI Service 
+builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
+builder.Services.AddHttpClient();												// Add HTTP Client
+builder.Services.AddHostedService<UserCleanupService>();						// Add User Cleanup Service ( background service ) 
+builder.Services.AddScoped<ITimezoneService, TimezoneService>();				// Add the Timezone Service ( NodaTime )
+builder.Services.AddHttpContextAccessor();                                      // Add HTTP Context Accessor
+builder.Services.AddScoped<ISessionService, SessionService>();					// Add the Session Service ( currently used mainly for the MatchFix Guessing Game ) 
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();			// Add URL Helper Factory
+builder.Services.AddTransient<IEmailSender, EmailSender>();						// Register Email Sender Service 
+builder.Services.AddScoped<IUserService, UserService>();						// Add the User Service 
+builder.Services.AddScoped<IImageService, ImageService>();						// Add the Image Service 
+builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Profile Service 
+builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
+builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
+builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
+
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
@@ -96,6 +99,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+	name: "default",
+	pattern: "{controller=Game}/{action=Landing}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();
