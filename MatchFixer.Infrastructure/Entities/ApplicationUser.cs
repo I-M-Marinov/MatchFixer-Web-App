@@ -46,6 +46,9 @@ namespace MatchFixer.Infrastructure.Entities
 		[Comment("Indicates whether the user is marked as deleted")]
 		public bool IsDeleted { get; set; } = false;
 
+		[Comment("Indicates the number of points the user has in the MatchFix Game")]
+		public int MatchFixScore { get; set; } = 0;
+
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 	}
 }
