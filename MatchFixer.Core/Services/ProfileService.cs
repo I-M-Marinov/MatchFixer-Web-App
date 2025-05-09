@@ -61,6 +61,18 @@ namespace MatchFixer.Core.Services
 			_imageService = imageService;
 		}
 
+		public async Task<ApplicationUser> GetCurrentUser(string userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+
+			if (user == null)
+			{
+				return null;
+			}
+
+			return user;
+		}
+
 		public async Task<ProfileViewModel> GetProfileAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
