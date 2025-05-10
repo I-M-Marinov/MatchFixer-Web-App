@@ -14,13 +14,12 @@
 	    <div class="modal-content">
 		    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    <div class="modal-header d-flex flex-column justify-content-center align-items-center">
-			    <h4 class="modal-title" id="rulesModalLabel">Rules</h4>
-
+				<h4 class="modal-title" id="rulesModalLabel">Rules</h4>
 		    </div>
 		    <div class="modal-body">
 			    <ul class="list-group list-group-flush">
 				    <li class="list-group-item">⚽ Guess the actual result of <span class="badge bg-primary p-2">10</span> football matches.</li>
-				    <li class="list-group-item">⚽ Football matches are from the 2023/24 Season in the Premier League, La Liga and the Bundesliga.</li>
+				    <li class="list-group-item">⚽ Football matches are from the 2023/24 Season in the Premier League, La Liga, Bundesliga and the Seria A.</li>
 				    <li class="list-group-item">⚽ You have <span class="badge bg-danger p-2">15</span> seconds per match ( fix ) to guess what the actual result is.</li>
 				    <li class="list-group-item">⚽ You have to guess the correct score for both teams.</li>
 				    <li class="list-group-item">⚽ You earn <span class="badge bg-success p-2">10</span> points for each correct result.</li>
@@ -34,48 +33,67 @@
 </div>
 
 <!-- Main Screen -->
-<div class="container py-5 text-center">
-    <h1 class="mb-4">⚽ Welcome to the MatchFix Guessing Game! ⚽</h1>
-    <p class="lead mb-5">Can you guess the actual scores?</p>
+<div class="container py-5 text-center d-flex flex-column justify-content-center align-items-center" style="padding: 0.8em; max-width:1200px;">
+	<h1 class="mb-4">⚽ Welcome to the MatchFix Game! ⚽</h1>
+	
+	<!-- League Logos  -->
+	<div class="mb-2" style="border: 3px dashed #3370a8; padding: 0.8em; border-radius: 0.5em; max-width: 700px;">
+		<div>
+			<ul class="d-flex justify-content-center gap-5 mb-2">
+				<li>
+					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/39.png" title="England's Premier League" />
+				</li>
+				<li>
+					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/140.png" title="Spain's LaLiga" />
+				</li>
+				<li>
+					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/78.png" title="Germany's Bundesliga" />
+				</li>
+				<li>
+					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/135.png" title="Italy's SeriaA" />
+				</li>
+			</ul>
+		</div>
+		<p id="season">2023/24 Season</p>
+	</div>
 
-    <div class="mb-4">
-        <a href="@Url.Action("Start", "Game")" class="btn btn-success btn-lg px-5 py-3 rounded-pill">
-            Start Game
-        </a>
-        <button type="button" class="btn btn-info btn-lg px-4 py-3 ms-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#rulesModal">
-	        Rules
-        </button>
-    </div>
+	<div class="mt-5 d-flex gap-4">
+		<a href="@Url.Action("Start", "Game")" class="btn btn-success btn-lg px-5 py-3 rounded-pill">
+			Start Game
+		</a>
+		<button type="button" id="rules-btn" class="btn btn-info btn-lg px-4 py-3 ms-3 rounded-pill btn-rotate-3d " data-bs-toggle="modal" data-bs-target="#rulesModal">
+			Rules
+		</button>
+	</div>
+</div>
 
-    <!-- Leaderboard -->
-    <div class="card mx-auto shadow-lg mt-5" style="max-width: 500px;">
-	    <div class="card-header bg-primary">
-            🏆 Leaderboard 🏆
-	    </div>
-	    <ul class="list-group list-group-flush">
-		    @if (Model != null && Model.Any())
-		    {
-			    int rank = 1;
-			    foreach (var entry in Model)
-			    {
-				    <li class="list-group-item d-flex justify-content-between align-items-center">
-					    <span class="d-flex align-items-center gap-2">
-						    @rank.
-                            <img src="@entry.Picture" alt="User Picture" id="leaderboard-user-picture" />
-						    @entry.UserName
-					    </span>
-						<span><span class="badge bg-primary p-2">@entry.Score</span> pts</span>
-				    </li>
-				    rank++;
-			    }
-		    }
-		    else
-		    {
-			    <li class="list-group-item text-center text-muted">
-				    No scores yet. Be the first to play!
-			    </li>
-		    }
-	    </ul>
-    </div>
-
+<!-- Leaderboard -->
+<div class="card mx-auto mt-5 leaderboard-box" style="max-width: 700px;">
+	<div id="leaderboard-title" class="card-header bg-primary text-center">
+		🏆 Leaderboard 🏆
+	</div>
+	<ul class="list-group list-group-flush">
+		@if (Model != null && Model.Any())
+		{
+			int rank = 1;
+			foreach (var entry in Model)
+			{
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="d-flex align-items-center gap-2">
+						@rank.
+						<img src="@entry.Picture" alt="User Picture" id="leaderboard-user-picture" />
+						@entry.UserName
+					</span>
+					<span><span class="badge bg-primary p-2 entry-score">@entry.Score</span> pts</span>
+				</li>
+				rank++;
+			}
+		}
+		else
+		{
+			<li class="list-group-item text-center text-muted">
+				No scores yet. Be the first to play!
+			</li>
+		}
+	</ul>
 </div>
