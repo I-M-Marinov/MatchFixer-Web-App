@@ -153,7 +153,6 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    HttpContext.Session.SetString("UserId", user.Id.ToString()); // Store the UserId in the session
 					return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
 					//return LocalRedirect(returnUrl);
 				}
