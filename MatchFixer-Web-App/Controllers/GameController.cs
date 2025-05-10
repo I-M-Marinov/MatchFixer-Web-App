@@ -24,14 +24,6 @@ namespace MatchFixer_Web_App.Controllers
 		public async Task<IActionResult> Landing()
 		{
 			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 
-
-			if (string.IsNullOrEmpty(userId))
-			{
-				TempData["Error"] = "Session expired. Please log in again.";
-
-				return RedirectToPage("/Account/Login", new { area = "Identity" });
-			}
-
 			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
 
 			var leaderboard = await _scoreService.GetTopPlayersAsync();
