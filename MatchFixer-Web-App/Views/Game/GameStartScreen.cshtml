@@ -11,20 +11,25 @@
 <!-- Rules Modal -->
 <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-center" id="rulesModalLabel">Rules</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">You’ll see real matchups with team logos.</li>
-                    <li class="list-group-item">Guess the correct score for both teams.</li>
-                    <li class="list-group-item">You earn points for correct or close guesses.</li>
-                    <li class="list-group-item">Try to get the highest score before the game ends!</li>
-                </ul>
-            </div>
-        </div>
+	    <div class="modal-content">
+		    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		    <div class="modal-header d-flex flex-column justify-content-center align-items-center">
+			    <h4 class="modal-title" id="rulesModalLabel">Rules</h4>
+
+		    </div>
+		    <div class="modal-body">
+			    <ul class="list-group list-group-flush">
+				    <li class="list-group-item">⚽ Guess the actual result of <span class="badge bg-primary p-2">10</span> football matches.</li>
+				    <li class="list-group-item">⚽ Football matches are from the 2023/24 Season in the Premier League, La Liga and the Bundesliga.</li>
+				    <li class="list-group-item">⚽ You have <span class="badge bg-danger p-2">15</span> seconds per match ( fix ) to guess what the actual result is.</li>
+				    <li class="list-group-item">⚽ You have to guess the correct score for both teams.</li>
+				    <li class="list-group-item">⚽ You earn <span class="badge bg-success p-2">10</span> points for each correct result.</li>
+				    <li class="list-group-item">⚽ If you guess the home or away team score only, you do not get points !</li>
+				    <li class="list-group-item">⚽ If you guess at least 5 results out of 10, your points ( <span class="badge bg-success p-2">50</span> ) would be doubled to ( <span class="badge bg-success p-2">100</span> ).</li>
+				    <li class="list-group-item">⚽ If you guessed <span class="badge bg-primary p-2">5</span> results out of <span class="badge bg-primary p-2">10</span>, you will start earning <span class="badge bg-success p-2">20</span> points per correct answer.</li>
+			    </ul>
+		    </div>
+	    </div>
     </div>
 </div>
 
@@ -44,7 +49,7 @@
 
     <!-- Leaderboard -->
     <div class="card mx-auto shadow-lg mt-5" style="max-width: 500px;">
-	    <div class="card-header bg-primary text-white">
+	    <div class="card-header bg-primary">
             🏆 Leaderboard 🏆
 	    </div>
 	    <ul class="list-group list-group-flush">
@@ -53,9 +58,13 @@
 			    int rank = 1;
 			    foreach (var entry in Model)
 			    {
-				    <li class="list-group-item d-flex justify-content-between">
-					    <span>@rank. <img src="@entry.Picture" id="leaderboard-user-picture"/> @entry.UserName</span>
-					    <span>@entry.Score points</span>
+				    <li class="list-group-item d-flex justify-content-between align-items-center">
+					    <span class="d-flex align-items-center gap-2">
+						    @rank.
+                            <img src="@entry.Picture" alt="User Picture" id="leaderboard-user-picture" />
+						    @entry.UserName
+					    </span>
+						<span><span class="badge bg-primary p-2">@entry.Score</span> pts</span>
 				    </li>
 				    rank++;
 			    }
