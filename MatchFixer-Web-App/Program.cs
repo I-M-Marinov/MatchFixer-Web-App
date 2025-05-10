@@ -1,14 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using MatchFixer.Core.Middlewares;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Services;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 using static MatchFixer.Infrastructure.SeedData.SeedData;
 
@@ -95,6 +96,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// custom middleware for initializing the session 
+app.UseMiddleware<SessionInitializationMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
