@@ -28,7 +28,8 @@ namespace MatchFixer.Infrastructure.Services
 			var leagueIds = new[] {
 			PremierLeagueId,
 			LaLigaId,
-			BundesligaId
+			BundesligaId,
+			SeriaAId
 		};
 
 			foreach (var leagueId in leagueIds)
