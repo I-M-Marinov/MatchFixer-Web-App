@@ -1,8 +1,27 @@
 ﻿@using MatchFixer.Core.ViewModels.MatchGuessGame
 @model MatchGuessGameViewModel
 
+@using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
 @{
 	ViewData["Title"] = "MatchFix Guess Game";
+
+	string leagueLogoUrl = null;
+
+	switch (Model.League)
+	{
+		case "Premier League":
+			leagueLogoUrl = PremierLeagueLogoUrl;
+			break;
+		case "La Liga":
+			leagueLogoUrl = LaLigaLogoUrl;
+			break;
+		case "Bundesliga":
+			leagueLogoUrl = BundesligaLogoUrl;
+			break;
+		case "Serie A":
+			leagueLogoUrl = SeriaALogoUrl;
+			break;
+	}
 }
 
 <div class="background-profile"></div>
@@ -20,14 +39,21 @@
 		<div class="overlay" id="cardOverlay"></div>
 		<div class="card-body text-center">
 			<h4 class="mb-4">Can you guess the actual result?</h4>
+			
 			<div class="text-center mb-3">
 				<div id="question-timer-wrapper">
 					<span id="timer">15</span>
 				</div>
 			</div>
 
-			<h2 class="d-flex justify-content-center" id="fix-number">Fix @Model.QuestionNumber of @Model.TotalQuestions</h2>
-
+			<h2 id="fix-number">Fix @Model.QuestionNumber of @Model.TotalQuestions</h2>
+			
+			<div class="d-flex flex-column align-items-center justify-content-center">
+				@if (!string.IsNullOrEmpty(leagueLogoUrl))
+				{
+					<img src="@leagueLogoUrl" id="leagueLogoImage" style="width: auto; height: 60px;"/>
+				}
+			</div>
 			<div class="row align-items-center justify-content-center">
 				<div class="col-4 text-center">
 					<div class="team-logo-wrapper mx-auto mb-3">
