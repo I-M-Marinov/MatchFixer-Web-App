@@ -8,6 +8,7 @@ namespace MatchFixer.Core.ViewModels.MatchGuessGame
 		public int Score { get; set; }
 
 		public int MatchId { get; set; }
+		public string League { get; set; }
 
 		public string HomeTeam { get; set; }
 		public string AwayTeam { get; set; }
