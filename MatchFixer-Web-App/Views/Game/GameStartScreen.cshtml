@@ -6,71 +6,89 @@
     ViewData["Title"] = "MatchFix Guess Game";
 }
 
-<div class="home-background"></div>
+<div class="game-background"></div>
+
+<div class="football-pitch">
+	<img style="width: 1200px; height: auto; object-fit: cover; z-index: -1; position:relative;" src="/images/football-pitch/football-pitch1.png" title="Germany's Bundesliga" />
+</div>
 
 <!-- Rules Modal -->
 <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-	    <div class="modal-content">
-		    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-		    <div class="modal-header d-flex flex-column justify-content-center align-items-center">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-header d-flex flex-column justify-content-center align-items-center">
 				<h4 class="modal-title" id="rulesModalLabel">Rules</h4>
-		    </div>
-		    <div class="modal-body">
-			    <ul class="list-group list-group-flush">
-				    <li class="list-group-item">⚽ Guess the actual result of <span class="badge bg-primary p-2">10</span> football matches.</li>
-				    <li class="list-group-item">⚽ Football matches are from the 2023/24 Season in the Premier League, La Liga, Bundesliga and the Seria A.</li>
-				    <li class="list-group-item">⚽ You have <span class="badge bg-danger p-2">15</span> seconds per match ( fix ) to guess what the actual result is.</li>
-				    <li class="list-group-item">⚽ You have to guess the correct score for both teams.</li>
-				    <li class="list-group-item">⚽ You earn <span class="badge bg-success p-2">10</span> points for each correct result.</li>
-				    <li class="list-group-item">⚽ If you guess the home or away team score only, you do not get points !</li>
-				    <li class="list-group-item">⚽ If you guess at least 5 results out of 10, your points ( <span class="badge bg-success p-2">50</span> ) would be doubled to ( <span class="badge bg-success p-2">100</span> ).</li>
-				    <li class="list-group-item">⚽ If you guessed <span class="badge bg-primary p-2">5</span> results out of <span class="badge bg-primary p-2">10</span>, you will start earning <span class="badge bg-success p-2">20</span> points per correct answer.</li>
-			    </ul>
-		    </div>
-	    </div>
-    </div>
+			</div>
+			<div class="modal-body">
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item">⚽ Guess the actual result of <span class="badge bg-primary p-2">10</span> football matches.</li>
+					<li class="list-group-item">⚽ Football matches are from the 2023/24 Season in the Premier League, La Liga, Bundesliga and the Seria A.</li>
+					<li class="list-group-item">⚽ You have <span class="badge bg-danger p-2">15</span> seconds per match ( fix ) to guess what the actual result is.</li>
+					<li class="list-group-item">⚽ You have to guess the correct score for both teams.</li>
+					<li class="list-group-item">⚽ You earn <span class="badge bg-success p-2">10</span> points for each correct result.</li>
+					<li class="list-group-item">⚽ If you guess the home or away team score only, you do not get points !</li>
+					<li class="list-group-item">⚽ If you guess at least 5 results out of 10, your points ( <span class="badge bg-success p-2">50</span> ) would be doubled to ( <span class="badge bg-success p-2">100</span> ).</li>
+					<li class="list-group-item">⚽ If you guessed <span class="badge bg-primary p-2">5</span> results out of <span class="badge bg-primary p-2">10</span>, you will start earning <span class="badge bg-success p-2">20</span> points per correct answer.</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 </div>
+
 
 <!-- Main Screen -->
 <div class="container py-5 text-center d-flex flex-column justify-content-center align-items-center" style="padding: 0.8em; max-width:1200px;">
-	<h1 class="mb-4">⚽ Welcome to the MatchFix Game! ⚽</h1>
+	<h1 id="welcome-to-matchfix" class="mb-4 animate__animated animate__zoomIn">⚽ Welcome to the MatchFix Game! ⚽</h1>
 	
 	<!-- League Logos  -->
-	<div class="mb-2" style="border: 3px dashed #3370a8; padding: 0.8em; border-radius: 0.5em; max-width: 700px;">
+	<div class="mb-2" style="padding: 0.8em; border-radius: 0.5em; max-width: 700px;">
 		<div>
 			<ul class="d-flex justify-content-center gap-5 mb-2">
 				<li>
-					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/39.png" title="England's Premier League" />
+					<img class="animate__animated animate__fadeInUp animate__slower" style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/39.png" title="England's Premier League" />
 				</li>
 				<li>
-					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/140.png" title="Spain's LaLiga" />
+					<img class="animate__animated animate__fadeInUp animate__slower" style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/140.png" title="Spain's LaLiga" />
 				</li>
 				<li>
-					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/78.png" title="Germany's Bundesliga" />
+					<img class="animate__animated animate__fadeInUp animate__slower" style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/78.png" title="Germany's Bundesliga" />
 				</li>
 				<li>
-					<img style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/135.png" title="Italy's SeriaA" />
+					<img class="animate__animated animate__fadeInUp animate__slower" style="width: 75px; height: auto; object-fit: cover;" src="https://media.api-sports.io/football/leagues/135.png" title="Italy's SeriaA" />
 				</li>
 			</ul>
 		</div>
-		<p id="season">2023/24 Season</p>
+		<p class="animate__animated animate__backInUp animate__slower" id="season">2023/24 Season</p>
 	</div>
 
-	<div class="mt-5 d-flex gap-4">
-		<a href="@Url.Action("Start", "Game")" class="btn btn-success btn-lg px-5 py-3 rounded-pill">
-			Start Game
-		</a>
-		<button type="button" id="rules-btn" class="btn btn-info btn-lg px-4 py-3 ms-3 rounded-pill btn-rotate-3d " data-bs-toggle="modal" data-bs-target="#rulesModal">
-			Rules
-		</button>
+	<div class="mt-5 d-flex gap-5 justify-content-center">
+		<div class="scale-button-wrapper">
+			<a href="@Url.Action("Start", "Game")"
+			   id="start-game-btn"
+			   class="btn btn-success btn-lg px-5 py-3 rounded-pill animate__animated animate__slideInLeft scale-hover">
+				Start Game
+			</a>
+		</div>
+
+		<div class="scale-button-wrapper">
+			<button type="button"
+			        id="rules-btn"
+			        class="btn btn-info btn-lg px-4 py-3 rounded-pill animate__animated animate__slideInRight scale-hover"
+			        data-bs-toggle="modal"
+			        data-bs-target="#rulesModal">
+				Rules
+			</button>
+		</div>
 	</div>
 </div>
 
 <!-- Leaderboard -->
 <div class="card mx-auto mt-5 leaderboard-box" style="max-width: 700px;">
-	<div id="leaderboard-title" class="card-header bg-primary text-center">
-		🏆 Leaderboard 🏆
+	<div class="card-header bg-gradient text-white text-center py-4" style="background: linear-gradient(90deg, #3478f6, #54bd93); border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+		<div id="leaderboard-title" class="card-header text-center">
+			<span class="leaderboard-cup"><img src="/images/football-pitch/cup.png"/> </span> Leaderboard
+		</div>
 	</div>
 	<ul class="list-group list-group-flush">
 		@if (Model != null && Model.Any())
@@ -78,13 +96,13 @@
 			int rank = 1;
 			foreach (var entry in Model)
 			{
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					<span class="d-flex align-items-center gap-2">
-						@rank.
-						<img src="@entry.Picture" alt="User Picture" id="leaderboard-user-picture" />
-						@entry.UserName
-					</span>
-					<span><span class="badge bg-primary p-2 entry-score">@entry.Score</span> pts</span>
+				<li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom" style="background-color: #f8f9fa;">
+					<div class="d-flex align-items-center gap-3">
+						<span class="fs-5 fw-bold text-muted medal-icon">@Html.Raw(GetMedal(rank))</span>
+						<img src="@entry.Picture" alt="User Picture" class="rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover;" />
+						<span class="fw-semibold">@entry.UserName</span>
+					</div>
+					<span class="badge bg-primary bg-gradient px-3 py-2 fs-6">@entry.Score pts</span>
 				</li>
 				rank++;
 			}
@@ -97,3 +115,17 @@
 		}
 	</ul>
 </div>
+
+
+@functions {
+	string GetMedal(int rank)
+	{
+		return rank switch
+		{
+			1 => "🥇",
+			2 => "🥈",
+			3 => "🥉",
+			_ => $"{rank}."
+		};
+	}
+}
