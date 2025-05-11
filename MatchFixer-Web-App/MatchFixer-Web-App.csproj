@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="animate.css" Version="3.3.0" />
     <PackageReference Include="ISO3166" Version="1.0.4" />
     <PackageReference Include="LibSassBuilder" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.13" />
@@ -21,8 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MatchFixer.Common\MatchFixer.Common.csproj" />
     <ProjectReference Include="..\MatchFixer.Core\MatchFixer.Core.csproj" />
     <ProjectReference Include="..\MatchFixer.Infrastructure\MatchFixer.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\football-pitch\" />
   </ItemGroup>
 
 </Project>
