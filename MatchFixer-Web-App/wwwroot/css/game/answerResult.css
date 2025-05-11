@@ -169,3 +169,137 @@ main {
 .btn-close:hover {
     background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ff0000'%3E%3Cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3E%3C/svg%3E") center / 1em auto no-repeat;
 }
+
+#season,
+#leaderboard-title,
+#rules-btn,
+#start-game-btn,
+#welcome-to-matchfix {
+    font-family: "Special Gothic Expanded One", sans-serif !important;
+}
+
+#welcome-to-matchfix {
+    text-shadow: 1px 1px 1px white;
+}
+
+#season {
+    font-size: 1.6em;
+    text-shadow: 1.5px 3px 1px rgb(0, 0, 0);
+    color: #3370a8;
+}
+
+#leaderboard-title {
+    font-size: 1.5em;
+    text-shadow: 1.5px 3px 1px black;
+    color: #12b981;
+    background: linear-gradient(90deg, #3478f6, #54bd93);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.entry-score{
+    font-size: 0.9em;
+}
+
+.leaderboard-box {
+    box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 0px 0px 0px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
+}
+
+/*---------------------------------------------------------------------
+|         Start and Rules buttons and effects for them                 |
+-----------------------------------------------------------------------*/
+
+#start-game-btn,
+#rules-btn {
+    font-size: 24px;
+    background: #3370a8;
+    border: none;
+    padding: 1em 1.5em;
+    color: #12b981;
+    position: relative;
+    transition: 0.3s ease;
+    cursor: pointer;
+    text-shadow: 2px 2px 2px #000000;
+}
+
+#start-game-btn:hover,
+#rules-btn:hover {
+    color: #2575bf;
+    transition-delay: 0.3s;
+    text-shadow: 2px 2px 2px white;
+}
+
+#start-game-btn:hover::before,
+#rules-btn:hover::before {
+    width: 100%;
+}
+
+#start-game-btn::after,
+#rules-btn::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0%;
+    height: 0;
+    width: 100%;
+    background-color: #ffc506;
+    border-radius: 50rem;
+    transition: 0.3s ease;
+    z-index: -1;
+}
+
+#start-game-btn:hover::after,
+#rules-btn:hover::after {
+    height: 100%;
+    transition-delay: 0.3s;
+    color: aliceblue;
+}
+
+
+.football-pitch {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1200px;
+    z-index: 0;
+    opacity: 0.65;
+    pointer-events: none;
+   
+}
+
+.football-pitch img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+
+}
+
+
+.game-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #3292b8;
+    background: linear-gradient(71deg,rgba(50, 146, 184, 1) 0%, rgba(87, 199, 133, 1) 39%);
+    z-index: -1;
+}
+
+.leaderboard-cup img{
+    width: 60px;
+    height: auto;
+    object-fit: contain;
+}
+
+
+.list-group-item:hover {
+    background-color: #eef7ff;
+    transition: background-color 0.3s ease;
+}
+
+.medal-icon {
+    font-size: 1.75rem !important; /* Adjust as needed */
+    line-height: 1;
+}
