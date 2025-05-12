@@ -224,6 +224,9 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 					                <br /><br />
 					                Let's get you started on your journey!
 					            </p>
+								<p style='color: #bf2217; font-size: 12px;'>
+										**Please note that this account would be active for 30 minutes and will be removed if not confirmed before time is up.
+								</p>
 					            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
 					               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; text-decoration: none; color: black; border-radius: 6px; font-weight: bold;'>
 					                Confirm Your Email
