@@ -203,6 +203,28 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Profile");
 		}
 
+		[HttpGet]
+		[Authorize]
+		public async Task<IActionResult> GetUserRank()
+		{
+			var userId = HttpContext.Session.GetString("UserId");
+
+			if (string.IsNullOrEmpty(userId))
+			{
+				return Unauthorized(new { message = "Session expired or user not authenticated." });
+			}
+
+			var userRank = await _profileService.GetUserRankAsync(userId);
+
+			if (userRank != null)
+			{
+				return Ok(new { rank = userRank });
+			}
+
+			return NotFound(new { message = "User not ranked in the top 3." });
+		}
+
+
 		private void ValidateModel(ProfileViewModel model)
 		{
 			ModelState.Clear();
