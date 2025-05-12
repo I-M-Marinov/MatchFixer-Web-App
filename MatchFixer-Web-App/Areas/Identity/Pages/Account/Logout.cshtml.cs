@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +18,22 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
+        private readonly ISessionService _sessionService;
 
-        public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger)
+
+		public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger, ISessionService sessionService)
         {
             _signInManager = signInManager;
             _logger = logger;
-        }
+            _sessionService = sessionService;
 
-        public async Task<IActionResult> OnPost(string returnUrl = null)
+		}
+
+		public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
+            _sessionService.ClearSession();
+			_logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);
