@@ -24,6 +24,7 @@ namespace MatchFixer_Web_App.Controllers
 		public async Task<IActionResult> Landing()
 		{
 			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 
+			Console.WriteLine($"USER ID ________________________________________________________ {userId}");
 			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
 
 			var leaderboard = await _scoreService.GetTopPlayersAsync();
@@ -66,7 +67,11 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpGet]
 		public IActionResult Reset()
 		{
+			// Clear the old GameSession
 			_sessionService.ClearSession();
+			// Re-initialize the GameSession state 
+			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 
+			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
 			return RedirectToAction("Start");
 		}
 	}
