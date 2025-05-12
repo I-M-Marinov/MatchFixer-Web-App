@@ -389,4 +389,28 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     opacity: 1;
 }
 
+.profile-matchfix-score {
+    background-color: #3370A8 !important;
+    
+}
+.profile-matchfix-score span {
+    font-size: 0.5em;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.profile-matchfix-score div {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+    font-size: 1.5em;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.rank-medal {
+    width: 60px;
+    height: 60px;
+    text-shadow: 1px 1px 2px #000000;
+    font-size: 1em !important;
+}
 
