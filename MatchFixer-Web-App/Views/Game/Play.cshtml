@@ -30,7 +30,7 @@
 	<h2 class="d-flex justify-content-center">Guess at least 5 match results for a chance to double your points !</h2>
 </div>
 
-<form id="submitGuessesForm" method="post" asp-action="Submit" class="mb-5">
+<form id="submitGuessesForm" method="post" asp-action="Submit" class="mb-3">
 	@Html.AntiForgeryToken()
 
 	<input type="hidden" name="MatchId" value="@Model.MatchId" />
