@@ -20,6 +20,8 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public string Email { get; set; } = null!;
 		public string? ProfileImageUrl { get; set; }
 		public DateTime CreatedOn { get; set; }
+		public int MatchFixScore { get; set; }
+		public int UserRank { get; set; }
 		public List<SelectListItem> CountryOptions { get; set; } = new();
 
 
