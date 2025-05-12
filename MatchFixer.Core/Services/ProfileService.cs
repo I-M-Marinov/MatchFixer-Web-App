@@ -105,6 +105,8 @@ namespace MatchFixer.Core.Services
 				Country = user.Country,
 				TimeZone = user.TimeZone,
 				CreatedOn = user.CreatedOn,
+				MatchFixScore = user.MatchFixScore,
+				UserRank = await GetUserRankAsync(user.Id.ToString()) ?? 0,
 				ProfileImageUrl = user.ProfilePicture?.ImageUrl,
 				CountryOptions = countryOptions
 			};
@@ -421,6 +423,24 @@ namespace MatchFixer.Core.Services
 		{
 			return await _timezoneService.IsValidTimezoneAsync(countryCode, timezone);
 		}
+
+
+		public async Task<int?> GetUserRankAsync(string userId)
+		{
+			var users = await _dbContext.Users
+				.OrderByDescending(u => u.MatchFixScore)
+				.AsNoTracking()
+				.ToListAsync();
+
+			var rankedUsers = users
+				.Select((user, index) => new { user.Id, Rank = index + 1 })
+				.Take(3)
+				.ToList();
+
+			var userRank = rankedUsers.FirstOrDefault(u => u.Id == Guid.Parse(userId));
+			return userRank?.Rank;
+		}
+
 
 	}
 }
