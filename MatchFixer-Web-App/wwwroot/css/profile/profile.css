@@ -31,7 +31,7 @@
     width: 100%;
 }
 
-.profile-card img {
+#profileImage {
     width: 100%;
     min-width: 200px;
     max-width: 300px !important;
@@ -389,10 +389,19 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     opacity: 1;
 }
 
-.profile-matchfix-score {
+.profile-matchfix-score,
+.profile-danger-zone {
     background-color: #3370A8 !important;
-    
 }
+
+#dangerZone-text {
+    font-family: "Nunito", sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    color: #d40000;
+    text-shadow: 1px 1px 1px #000000;
+}
+
 .profile-matchfix-score span {
     font-size: 0.5em;
     text-shadow: 1px 1px 2px #000000;
