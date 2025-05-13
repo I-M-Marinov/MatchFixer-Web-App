@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\football-pitch\" />
-    <Folder Include="wwwroot\images\ranks\" />
+    <Folder Include="wwwroot\images\danger-zone\" />
   </ItemGroup>
 
 </Project>
