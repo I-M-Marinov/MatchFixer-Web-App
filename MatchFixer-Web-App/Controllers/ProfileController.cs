@@ -224,6 +224,13 @@ namespace MatchFixer_Web_App.Controllers
 			return NotFound(new { message = "User not ranked in the top 3." });
 		}
 
+		[HttpGet]
+		[Authorize]
+		public async Task<IActionResult> DangerZone()
+		{
+			return View("DangerZone");
+		}
+
 
 		private void ValidateModel(ProfileViewModel model)
 		{
