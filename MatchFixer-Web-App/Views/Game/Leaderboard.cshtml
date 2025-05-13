@@ -1,0 +1,50 @@
+﻿@using MatchFixer.Core.ViewModels.MatchGuessGame;
+@model List<LeaderboardEntryViewModel>
+
+<div class="game-background"></div>
+
+<div class="card mx-auto mt-5 leaderboard-box" style="max-width: 700px;">
+	<div class="card-header bg-gradient text-white text-center py-4" style="background: linear-gradient(90deg, #3478f6, #54bd93); border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+		<div id="leaderboard-title" class="card-header text-center">
+			<span class="leaderboard-cup"><img src="/images/football-pitch/cup.png"/> </span> Leaderboard
+		</div>
+	</div>
+	<ul class="list-group list-group-flush">
+		@if (Model != null && Model.Any())
+		{
+			int rank = 1;
+			foreach (var entry in Model)
+			{
+				<li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom" style="background-color: #f8f9fa;">
+					<div class="d-flex align-items-center gap-3">
+						<span class="fs-5 fw-bold text-muted medal-icon">@Html.Raw(GetMedal(rank))</span>
+						<img src="@entry.Picture" alt="User Picture" class="rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover;" />
+						<span class="fw-semibold">@entry.UserName</span>
+					</div>
+					<span class="badge bg-primary bg-gradient px-3 py-2 fs-6">@entry.Score pts</span>
+				</li>
+				rank++;
+			}
+		}
+		else
+		{
+			<li class="list-group-item text-center text-muted">
+				No scores yet. Be the first to play!
+			</li>
+		}
+	</ul>
+</div>
+
+
+@functions {
+	string GetMedal(int rank)
+	{
+		return rank switch
+		{
+			1 => "🥇",
+			2 => "🥈",
+			3 => "🥉",
+			_ => $"{rank}."
+		};
+	}
+}
