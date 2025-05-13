@@ -1,4 +1,6 @@
-﻿@{
+﻿@using static MatchFixer.Common.ServiceConstants.FootballApiConstants
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -230,8 +232,8 @@
 	</div>
 </div>
 
-<footer style="background-color: #1f1f1f; color: #ffffff; padding: 2rem 0; border-radius: 0 1.5em 0 1.5em;">
-	<div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 2rem; padding: 0 1rem;">
+<footer style="background-color: #1f1f1f; color: #ffffff; padding: 2rem 0; border-radius: 0 1.5em 0 1.5em; margin: 0 auto; max-width: 1200px; width: 100%; ">
+	<div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2rem; padding: 0 1rem;">
 
 		<!-- App Info -->
 		<div style="flex: 1 1 250px;">
@@ -260,11 +262,14 @@
 					<img src="https://servantsofmystery.com/wp-content/uploads/2024/10/Betmaster-Casino.png" alt="BetMaster" style="border-radius: 4px; width: 150px; filter: contrast(175%);">
 				</div>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
-					<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/UK_Premier_League_logo.png/640px-UK_Premier_League_logo.png" alt="Premier League" style="border-radius: 4px; width: 100px; height: auto; filter: brightness(1) invert(1) contrast(175%);">
+					<img src="@PremierLeagueLogoUrl" alt="Premier League" style="border-radius: 4px; width: 50px; height: auto; filter: brightness(1) invert(1) contrast(175%);">
+					<img src="@LaLigaLogoUrl" alt="Premier League" style="border-radius: 4px; width: 50px; height: auto;">
+					<img src="@BundesligaLogoUrl" alt="Premier League" style="border-radius: 4px; width: 50px; height: auto;">
+					<img src="@SeriaALogoUrl" alt="Premier League" style="border-radius: 4px; width: 50px; height: auto;">
 				</div>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
-					<img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="Arsenal FC" style="width: 40px; height: 40px;">
-					<span>Arsenal FC</span>
+					<img src="https://media.api-sports.io/football/teams/33.png" alt="ManUnited" style="width: 40px; height: 40px;">
+					<span>Manchester United</span>
 				</div>
 			</div>
 		</div>
