@@ -74,6 +74,15 @@ namespace MatchFixer_Web_App.Controllers
 			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
 			return RedirectToAction("Start");
 		}
+
+		[Authorize]
+		[HttpGet]
+		public async Task<IActionResult> Leaderboard()
+		{
+			var leaderboard = await _scoreService.GetTopPlayersAsync();
+
+			return View("Leaderboard", leaderboard);
+		}
 	}
 
 }
