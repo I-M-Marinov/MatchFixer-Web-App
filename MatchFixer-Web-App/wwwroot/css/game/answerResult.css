@@ -146,10 +146,13 @@ main {
 }
 
 
+#rulesModal div{
+    max-width: 650px;
+    font-size: 0.905em;
+}
 /*---------------------------------------------------------------------
 |          Landing page for the MatchFix Guessing Game                 |
 -----------------------------------------------------------------------*/
-
 #leaderboard-user-picture {
     width: 45px;
     height: 45px;
@@ -173,6 +176,7 @@ main {
 #season,
 #leaderboard-title,
 #rules-btn,
+#leaderboard-btn,
 #start-game-btn,
 #welcome-to-matchfix {
     font-family: "Special Gothic Expanded One", sans-serif !important;
@@ -180,6 +184,7 @@ main {
 
 #welcome-to-matchfix {
     text-shadow: 1px 1px 1px white;
+    margin-top: 1.3em;
 }
 
 #season {
@@ -206,11 +211,12 @@ main {
 }
 
 /*---------------------------------------------------------------------
-|         Start and Rules buttons and effects for them                 |
+|         Start, Rules and Leaderboard buttons and effects for them                 |
 -----------------------------------------------------------------------*/
 
 #start-game-btn,
-#rules-btn {
+#rules-btn,
+#leaderboard-btn {
     font-size: 24px;
     background: #3370a8;
     border: none;
@@ -223,37 +229,41 @@ main {
 }
 
 #start-game-btn:hover,
-#rules-btn:hover {
+#rules-btn:hover,
+#leaderboard-btn:hover {
     color: #2575bf;
     transition-delay: 0.3s;
     text-shadow: 2px 2px 2px white;
 }
 
-#start-game-btn:hover::before,
-#rules-btn:hover::before {
+    #start-game-btn:hover::before,
+    #rules-btn:hover::before, 
+    #leaderboard-btn:hover::before {
     width: 100%;
 }
 
-#start-game-btn::after,
-#rules-btn::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0%;
-    height: 0;
-    width: 100%;
-    background-color: #ffc506;
-    border-radius: 50rem;
-    transition: 0.3s ease;
-    z-index: -1;
-}
+    #start-game-btn::after,
+    #rules-btn::after,
+    #leaderboard-btn::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0%;
+        height: 0;
+        width: 100%;
+        background-color: #ffc506;
+        border-radius: 50rem;
+        transition: 0.3s ease;
+        z-index: -1;
+    }
 
-#start-game-btn:hover::after,
-#rules-btn:hover::after {
-    height: 100%;
-    transition-delay: 0.3s;
-    color: aliceblue;
-}
+    #start-game-btn:hover::after,
+    #rules-btn:hover::after,
+    #leaderboard-btn:hover::after {
+        height: 100%;
+        transition-delay: 0.3s;
+        color: aliceblue;
+    }
 
 
 .football-pitch {
@@ -301,5 +311,4 @@ main {
 
 .medal-icon {
     font-size: 1.75rem !important; /* Adjust as needed */
-    line-height: 1;
 }
