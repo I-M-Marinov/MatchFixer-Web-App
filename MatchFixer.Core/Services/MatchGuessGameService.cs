@@ -171,8 +171,6 @@ namespace MatchFixer.Core.Services
 			return (resultViewModel, isGameOver);
 		}
 
-
-
 		private async Task UpdateUserScoreAsync(Guid userId, int score)
 		{
 			var user = await _context.ApplicationUsers.FindAsync(userId);

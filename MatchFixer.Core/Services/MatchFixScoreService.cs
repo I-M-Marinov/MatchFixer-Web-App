@@ -18,6 +18,7 @@ namespace MatchFixer.Core.Services
 		public async Task<List<LeaderboardEntryViewModel>> GetTopPlayersAsync(int count = 10)
 		{
 			return await _context.Users
+				.Where(u => u.IsActive == true)
 				.OrderByDescending(u => u.MatchFixScore)
 				.Take(count)
 				.Select(u => new LeaderboardEntryViewModel
