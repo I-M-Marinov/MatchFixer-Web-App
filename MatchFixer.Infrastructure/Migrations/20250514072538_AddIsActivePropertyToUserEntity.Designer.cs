@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250514072538_AddIsActivePropertyToUserEntity")]
+    partial class AddIsActivePropertyToUserEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,10 +128,6 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("WasDeactivatedByAdmin")
-                        .HasColumnType("bit")
-                        .HasComment("Indicates if the user was deactivated by an admin (vs. self-deactivation)");
 
                     b.HasKey("Id");
 
