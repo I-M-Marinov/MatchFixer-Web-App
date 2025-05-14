@@ -68,7 +68,8 @@ using (var scope = app.Services.CreateScope())
 	var services = scope.ServiceProvider;
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-	await SeedDefaultProfilePicture(userManager, services);          // Seed the Default User Image
+	await SeedDefaultProfilePicture(userManager, services);           // Seed the Default User Image
+	await SeedDeletedUsersProfilePicture(userManager, services);     // Seed the Deleted User Image ( when user deletes their profile ) 
 	await SeedMatchResultsAsync(services);							// Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga
 
 }
