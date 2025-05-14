@@ -147,9 +147,32 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, "Your email is not confirmed. Please confirm your email before logging in.");
                     return Page();
                 }
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+                if (!user.IsActive && user.WasDeactivatedByAdmin)
+                {
+	                TempData["ErrorMessage"] = "Account deactivated by an administrator. Contact support.";
+	                return Page();
+                }
+
+				if (!user.IsActive)
+                {
+	                user.IsActive = true;
+
+	                var userUpdated = await _userManager.UpdateAsync(user);
+	                if (!userUpdated.Succeeded)
+	                {
+		                TempData["ErrorMessage"] = "Failed to reactivate account.";
+		                return RedirectToAction("Index", "Home");
+	                }
+
+					await _signInManager.RefreshSignInAsync(user); 
+
+					TempData["SuccessMessage"] = $"Welcome back, {user.FullName}. Your account is active again !";
+					return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
+				}
+				// This doesn't count login failures towards account lockout
+				// To enable password failures to trigger account lockout, set lockoutOnFailure: true
+				var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
