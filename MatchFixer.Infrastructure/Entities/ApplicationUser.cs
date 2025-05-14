@@ -49,6 +49,12 @@ namespace MatchFixer.Infrastructure.Entities
 		[Comment("Indicates the number of points the user has in the MatchFix Game")]
 		public int MatchFixScore { get; set; } = 0;
 
+		[Comment("Indicates if the user's account is deactivated or active")]
+		public bool IsActive { get; set; } = true;
+
+		[Comment("Indicates if the user was deactivated by an admin (vs. self-deactivation)")]
+		public bool WasDeactivatedByAdmin { get; set; } = false;
+
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 	}
 }
