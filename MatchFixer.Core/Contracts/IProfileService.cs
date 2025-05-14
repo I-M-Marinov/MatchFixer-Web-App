@@ -16,6 +16,7 @@ namespace MatchFixer.Core.Contracts
 		Task<ImageResult> UploadProfilePictureAsync(string userId, ImageFileUploadModel imageFileUploadModel);
 		Task<ImageResult> RemoveProfilePictureAsync(string userId);
 		Task<int?> GetUserRankAsync(string userId);
-
+		Task<bool> DeactivateUserAsync(string userId);
+		Task<bool> AnonymizeUserAsync(string userId);
 	}
 }

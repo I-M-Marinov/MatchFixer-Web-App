@@ -1,8 +1,6 @@
-﻿using System.Text.Encodings.Web;
-using MatchFixer.Core.Contracts;
-using MatchFixer.Core.ViewModels.Profile;
-using MatchFixer.Infrastructure;
-using MatchFixer.Infrastructure.Entities;
+﻿using System.Net;
+using System.Text.Encodings.Web;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -12,10 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Country = ISO3166.Country;
+
+using MatchFixer.Core.Contracts;
+using MatchFixer.Core.ViewModels.Profile;
+using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Contracts;
-using Microsoft.EntityFrameworkCore;
 using MatchFixer.Infrastructure.Models.Image;
-using System.Net;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
@@ -34,7 +35,7 @@ namespace MatchFixer.Core.Services
 
 
 		public ProfileService(
-			UserManager<ApplicationUser> userManager, 
+			UserManager<ApplicationUser> userManager,
 			IEmailSender emailSender,
 			IUrlHelperFactory urlHelperFactory,
 			IHttpContextAccessor httpContextAccessor,
@@ -115,7 +116,7 @@ namespace MatchFixer.Core.Services
 		public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
 		{
 			var user = await _userManager.FindByIdAsync(model.Id);
-			
+
 			var changes = new List<string>();
 
 			// Check if user changed the email and if yes update it + send a confirmation email to the new address
@@ -125,12 +126,14 @@ namespace MatchFixer.Core.Services
 				var (wasSuccess, returnMessage) = await UpdateEmailAsync(user.Id.ToString(), model.Email, scheme);
 				changes.Add("Email");
 			}
+
 			// Check if user changed the date of birth and if yes update it
 			if (user.DateOfBirth != model.DateOfBirth)
 			{
 				user.DateOfBirth = model.DateOfBirth;
 				changes.Add("Date of Birth");
 			}
+
 			// Check if user changed the timezone and if yes update it 
 			if (user.TimeZone != model.TimeZone)
 			{
@@ -140,9 +143,11 @@ namespace MatchFixer.Core.Services
 					return (false, "Time Zone is missing or incorrect !");
 
 				}
+
 				user.TimeZone = model.TimeZone;
 				changes.Add("Time Zone");
 			}
+
 			// Check if user changed the country and if yes update it ( update the timezone as well to be safe ) 
 			if (user.Country != model.Country)
 			{
@@ -150,7 +155,7 @@ namespace MatchFixer.Core.Services
 				user.Country = model.Country;
 				changes.Add("Country");
 			}
-			
+
 
 			// If no changes were detected, return a message
 			if (changes.Count == 0)
@@ -167,7 +172,8 @@ namespace MatchFixer.Core.Services
 			}
 
 			// If changes were made, return a message with the updated properties
-			string message = "Your profile was updated successfully. You have made changes to: " + string.Join(", ", changes);
+			string message = "Your profile was updated successfully. You have made changes to: " +
+			                 string.Join(", ", changes);
 			return (true, message);
 		}
 
@@ -214,11 +220,12 @@ namespace MatchFixer.Core.Services
 				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
 				return (false, $"Failed to update user: {errors}");
 			}
-			
+
 			return (true, "Changes were successful !");
 		}
 
-		public async Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail, string scheme)
+		public async Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail,
+			string scheme)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
@@ -248,7 +255,8 @@ namespace MatchFixer.Core.Services
 					scheme
 				);
 
-				var logoUrl = "https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png";
+				var logoUrl =
+					"https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png";
 
 				var emailBody = $@"
 						<!DOCTYPE html>
@@ -305,7 +313,8 @@ namespace MatchFixer.Core.Services
 			return (false, "Email confirmation failed.");
 		}
 
-		public async Task<ImageResult> UploadProfilePictureAsync(string userId, ImageFileUploadModel imageFileUploadModel)
+		public async Task<ImageResult> UploadProfilePictureAsync(string userId,
+			ImageFileUploadModel imageFileUploadModel)
 		{
 			if (imageFileUploadModel.FormFile == null || imageFileUploadModel.FormFile.Length == 0)
 			{
@@ -321,7 +330,7 @@ namespace MatchFixer.Core.Services
 			if (uploadResult.StatusCode == HttpStatusCode.OK)
 			{
 				// Retrieve current user with their profile picture
-				
+
 				var user = await _dbContext.Users
 					.Include(u => u.ProfilePicture)
 					.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
@@ -369,7 +378,7 @@ namespace MatchFixer.Core.Services
 
 		public async Task<ImageResult> RemoveProfilePictureAsync(string userId)
 		{
-			
+
 			var user = await _dbContext.Users
 				.Include(u => u.ProfilePicture)
 				.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
@@ -382,7 +391,7 @@ namespace MatchFixer.Core.Services
 					Message = "Default profile picture already applied."
 				};
 			}
-			
+
 			if (string.IsNullOrEmpty(user.ProfilePicture.ImageUrl))
 			{
 				return new ImageResult
@@ -418,16 +427,10 @@ namespace MatchFixer.Core.Services
 			};
 		}
 
-
-		private async Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
-		{
-			return await _timezoneService.IsValidTimezoneAsync(countryCode, timezone);
-		}
-
-
 		public async Task<int?> GetUserRankAsync(string userId)
 		{
 			var users = await _dbContext.Users
+				.Where(u => u.IsActive == true)
 				.OrderByDescending(u => u.MatchFixScore)
 				.AsNoTracking()
 				.ToListAsync();
@@ -441,6 +444,77 @@ namespace MatchFixer.Core.Services
 			return userRank?.Rank;
 		}
 
+		public async Task<bool> DeactivateUserAsync(string userId)
+		{
+			var user = await _dbContext.Users.FindAsync(Guid.Parse(userId));
+			if (user != null)
+			{
+				user.IsActive = false;
+				user.WasDeactivatedByAdmin = false;
+				await _dbContext.SaveChangesAsync();
+				return true;
+			}
+
+			return false;
+		}
+
+		public async Task<bool> AnonymizeUserAsync(string userId)
+		{
+			var user = await _dbContext.Users
+				.Include(u => u.ProfilePicture)
+				.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+
+			if (user != null)
+			{
+				user.FirstName = "Deleted";
+				user.LastName = "User";
+				user.Email = $"deleted-{Guid.NewGuid()}@ex-matchfixer.com";
+				user.NormalizedEmail = user.Email.ToUpper();
+				user.UserName = user.Email;
+				user.NormalizedUserName = user.UserName.ToUpper();
+				user.PhoneNumber = null;
+				user.DateOfBirth = new DateTime(1900, 1, 1);
+				user.Country = "Unknown";
+				user.TimeZone = "Unknown";
+
+				if (user.ProfilePictureId != DefaultImageId)
+				{
+					var deleteResult = await _imageService.DeleteImageAsync(user.ProfilePicture.PublicId);
+
+					if (deleteResult.IsSuccess)
+					{
+						// Remove the picture from the Profile Pictures Table only if it is not the default profile picture
+
+						if (user.ProfilePicture.Id != DefaultImageId)
+						{
+							_dbContext.ProfilePictures.Remove(user.ProfilePicture);
+						}
+
+					}
+				}
+
+				user.ProfilePictureId = DeletedUserImageId; // assign the deleted user image if the user's image is the default user image 
+				user.IsActive = false;
+				user.IsDeleted = true;
+				user.WasDeactivatedByAdmin = false; // user decided to delete their account, it was not done by an administrator
+				user.PasswordHash = null;
+
+				await _dbContext.SaveChangesAsync();
+
+				return true;
+
+			}
+
+			return false;
+		}
+
+		private async Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
+		{
+			return await _timezoneService.IsValidTimezoneAsync(countryCode, timezone);
+		}
+
 
 	}
+
 }
+
