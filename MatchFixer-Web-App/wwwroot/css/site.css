@@ -10,6 +10,7 @@
 @import "/css/register.css";
 @import "/css/login.css";
 @import "/css/profile/profile.css";
+@import "/css/danger-zone.css";
 @import "/css/game/answerResult.css";
 
 * {
