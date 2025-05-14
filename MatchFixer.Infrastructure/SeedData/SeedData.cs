@@ -35,6 +35,29 @@ namespace MatchFixer.Infrastructure.SeedData
 			await dbContext.SaveChangesAsync();
 		}
 
+		public static async Task SeedDeletedUsersProfilePicture(UserManager<ApplicationUser> userManager, IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var deletedUserImage = await dbContext.ProfilePictures
+				.FirstOrDefaultAsync(img => img.Id == DeletedUserImageId); // check if it already exists in the DB
+
+			if (deletedUserImage == null) // if it does not exist create it 
+			{
+				deletedUserImage = new ProfilePicture
+				{
+					Id = DeletedUserImageId,
+					ImageUrl = DeletedUserImagePath,
+					PublicId = DeletedUserImagePublicId
+				};
+
+				dbContext.ProfilePictures.Add(deletedUserImage);
+				await dbContext.SaveChangesAsync();
+			}
+
+			await dbContext.SaveChangesAsync();
+		}
+
 		public static async Task SeedMatchResultsAsync(IServiceProvider serviceProvider)
 		{
 			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
