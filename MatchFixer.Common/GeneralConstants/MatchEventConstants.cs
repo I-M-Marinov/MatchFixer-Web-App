@@ -16,5 +16,10 @@
 		public const string TeamNotFoundInDatabase = "Team '{0}' not found in database. Seed teams first.";
 		public const string MatchNotFound = "Match not found."; 
 		public const string MatchHasBeenPostponed = "Match has been postponed.";
+
+		// Full Time Constants
+		public const string UnableToMarkMatchAsFullTime = "Unable to mark match as Full Time.";
+		public const string MatchMarkedAsFullTime = "Match successfully marked as Full Time.";
+
 	}
 }
