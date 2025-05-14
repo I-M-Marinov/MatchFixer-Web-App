@@ -1,5 +1,119 @@
 ﻿@{
-	ViewData["Title"] = $"Danger Zone!";
+    ViewData["Title"] = $"Danger Zone!";
 }
-	<div class="background-profile"></div>
+<div class="background-profile"></div>
+
+<div class="card shadow border-danger mt-5 p-4 d-flex flex-column justify-content-center align-items-center" id="danger-zone-card">
+	<h4 id="danger-zone-name" class="text-danger text-center mb-4 animate__animated animate__tada">⚠ Danger Zone</h4>
+
+	<!-- Delete Account Section -->
+	<div class="mb-4 d-flex flex-column justify-content-center align-items-center delete-account-section">
+		<h5 class="text-dark">Delete Account</h5>
+		<p class="text-muted">This will permanently remove your profile and all associated data.</p>
+		<p class="text-danger text-decoration-underline hover-animate"> This action cannot be undone.</p>
+
+		<!-- Button trigger modal -->
+		<button type="button" id="deleteAccountBtn" class="btn btn-outline-danger w-60" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+			Delete Account
+		</button>
+
+		<!-- Delete Confirmation Modal -->
+		<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content border-danger" style="border-width: 2px;">
+					<div class="modal-header bg-light d-flex flex-column">
+						<h5 class="modal-title text-danger fw-bold">
+							<i class="bi bi-exclamation-triangle-fill me-2"></i>
+							Confirm Permanent Deletion
+						</h5>
+						<button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body py-4">
+						<div class="modal-body py-4">
+							<div class="alert alert-danger">
+								<p class="mb-1">To delete your account, type this exact phrase:</p>
+								<div class="bg-dark text-light text-center p-2 rounded mb-2 font-monospace animate__animated animate__rubberBand">delete my account</div>
+								<input type="text" 
+								       class="form-control border-danger" 
+								       id="confirmationPhrase"
+								       placeholder="Type in the text above">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-circle me-1"></i> Cancel
+						</button>
+						<form asp-action="DeleteAccount" method="post" id="deleteAccountForm">
+							<button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+								<i class="bi bi-trash3-fill me-1"></i> Delete Permanently
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr />
+
+	<!-- Deactivate Account Section -->
+	<div class="mb-3 d-flex flex-column justify-content-center align-items-center deactivate-account-section">
+		<h5 class="text-dark">Deactivate Account</h5>
+		<p class="text-muted">Temporarily disable your account.</p>
+		<p class="text-muted">You can reactivate it by logging in later.</p>
+
+		<!-- Button trigger modal -->
+		<button type="button" class="btn btn-outline-warning w-60" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
+			Deactivate Account
+		</button>
+
+		<!-- Deactivate Confirmation Modal -->
+		<div class="modal fade" id="deactivateAccountModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title text-warning">Confirm Deactivation</h5>
+						<button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Your account will be temporarily disabled. You will be able to reactivate by logging in again.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						<form asp-action="DeactivateAccount" method="post">
+							<button type="submit" class="btn btn-warning">Confirm Deactivation</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+
+	const requiredPhrase = "delete my account";
+	const inputField = document.getElementById('confirmationPhrase');
+	const deleteBtn = document.getElementById('confirmDeleteBtn');
+
+	inputField.addEventListener('input', function() {
+		const isMatch = this.value.toLowerCase().trim() === requiredPhrase;
+		deleteBtn.disabled = !isMatch;
+
+		this.classList.toggle('is-valid', isMatch);
+		this.classList.toggle('is-invalid', !isMatch && this.value.length > 0);
+	});
+
+	document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
+		if (!confirm('This is your final warning. Are you absolutely sure?')) {
+			e.preventDefault();
+		}
+	});
+</script>
 
