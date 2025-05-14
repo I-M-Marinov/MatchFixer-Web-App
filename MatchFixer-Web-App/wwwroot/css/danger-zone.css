@@ -1,0 +1,78 @@
+﻿#danger-zone-card {
+    max-width: 800px;
+    background-color: #faf3dd;
+    margin: auto;
+    border-width: 3px;
+}
+
+#danger-zone-name{
+    background-color: #dc3545;
+    width: 100%;
+    font-size: 1.5em;
+    border-radius: 0.2em;
+    color: whitesmoke !important;
+}
+
+.delete-account-section {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    max-width: 85%;
+    border: 2px dotted #dc3545;
+    padding: 0.85rem;
+}
+
+.deactivate-account-section {
+    min-width: 70%;
+    border: 2px dashed #ffc107;
+    padding: 0.85rem;
+}
+
+.delete-account-section p,
+.deactivate-account-section p {
+    font-size: 0.85em;
+    line-height: 0.85rem;
+}
+
+.delete-account-section:hover p.hover-animate,
+#deleteAccountBtn:hover  p.hover-animate {
+    display: inline-block;
+    animation: heartBeat 2s infinite;
+}
+
+.btn-close-custom {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #6c757d;
+    padding: 0;
+}
+
+.btn-close-custom:hover {
+    opacity: 1;
+    color: #dc3545;
+    transform: scale(1.1);
+}
+
+/* Modal border animation */
+#deleteAccountModal .modal-content {
+    animation: pulse-border 2s infinite;
+}
+
+#confirmationPhrase.is-valid {
+    border-color: #198754 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+}
+
+#confirmationPhrase.is-invalid {
+    border-color: #dc3545 !important;
+}
