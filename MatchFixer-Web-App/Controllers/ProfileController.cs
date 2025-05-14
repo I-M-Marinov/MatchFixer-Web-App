@@ -3,19 +3,30 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MatchFixer.Core.ViewModels.Profile;
 using System.ComponentModel.DataAnnotations;
+using MatchFixer_Web_App.Areas.Identity.Pages.Account;
 using MatchFixer.Infrastructure.Models.Image;
 using Microsoft.AspNetCore.Authorization;
+using MatchFixer.Core.Services;
+using Microsoft.AspNetCore.Identity;
+using MatchFixer.Infrastructure.Entities;
 
 namespace MatchFixer_Web_App.Controllers
 {
 	public class ProfileController : Controller
 	{
+
 		private readonly IProfileService _profileService;
+		private readonly SignInManager<ApplicationUser> _signInManager;
+		private readonly ILogger<LogoutModel> _logger;
+		private readonly ISessionService _sessionService;
 
 
-		public ProfileController(IProfileService profileService)
+		public ProfileController(IProfileService profileService, SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger, ISessionService sessionService)
 		{
 			_profileService = profileService;
+			_signInManager = signInManager;
+			_logger = logger;
+			_sessionService = sessionService;
 		}
 
 		[Authorize]
@@ -211,7 +222,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (string.IsNullOrEmpty(userId))
 			{
-				return Unauthorized(new { message = "Session expired or user not authenticated." });
+				return Unauthorized(new { message = "Session expired or user is not authenticated." });
 			}
 
 			var userRank = await _profileService.GetUserRankAsync(userId);
@@ -231,6 +242,60 @@ namespace MatchFixer_Web_App.Controllers
 			return View("DangerZone");
 		}
 
+		[Authorize]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteAccount()
+		{
+			var userId = HttpContext.Session.GetString("UserId");
+
+			if (string.IsNullOrEmpty(userId))
+			{
+				return Unauthorized(new { message = "Session expired or user is not authenticated." });
+			}
+
+			var result = await _profileService.AnonymizeUserAsync(userId);
+
+			if (result)
+			{
+				LogoutUser();
+				TempData["SuccessMessage"] = "Your account has been successfully deleted. Sorry to see you go !";
+			}
+			else
+			{
+				TempData["ErrorMessage"] = "There was an error deleting your account. Try again later !";
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
+		[Authorize]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeactivateAccount()
+		{
+			var userId = HttpContext.Session.GetString("UserId");
+
+			if (string.IsNullOrEmpty(userId))
+			{
+				return Unauthorized(new { message = "Session expired or user is not authenticated." });
+			}
+
+			var result = await _profileService.DeactivateUserAsync(userId);
+
+			if (result)
+			{
+				LogoutUser();
+				TempData["SuccessMessage"] = "Your account has been deactivated successfully. Log in again to reactivated it !";
+			}
+			else
+			{
+				TempData["ErrorMessage"] = "There was an error deactivating your account. Try again later !";
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
 
 		private void ValidateModel(ProfileViewModel model)
 		{
@@ -247,6 +312,13 @@ namespace MatchFixer_Web_App.Controllers
 					ModelState.AddModelError(validationResult.MemberNames.First(), validationResult.ErrorMessage);
 				}
 			}
+		}
+
+		private void LogoutUser()
+		{
+			_signInManager.SignOutAsync();
+			_sessionService.ClearSession();
+			_logger.LogInformation("User logged out.");
 		}
 
 	}
