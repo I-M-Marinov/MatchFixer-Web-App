@@ -286,7 +286,7 @@ namespace MatchFixer_Web_App.Controllers
 			if (result)
 			{
 				LogoutUser();
-				TempData["SuccessMessage"] = "Your account has been deactivated successfully. Log in again to reactivated it !";
+				TempData["SuccessMessage"] = "Your account has been deactivated successfully. Log in again to reactivate it !";
 			}
 			else
 			{
