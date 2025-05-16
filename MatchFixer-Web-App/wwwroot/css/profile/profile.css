@@ -102,6 +102,13 @@
     text-shadow: 1px 1px 2px #000000;
 }
 
+#country-flag-icon {
+    width: 2em;
+    height: auto;
+    padding: 0.65rem 0.75em;
+    margin-left: 0.25em;
+}
+
 .fw-lighter {
     text-align: center !important;
 }

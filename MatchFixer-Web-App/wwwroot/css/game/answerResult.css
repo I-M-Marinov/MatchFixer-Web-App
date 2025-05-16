@@ -202,10 +202,6 @@ main {
     border-top-right-radius: 1rem;
 }
 
-.entry-score{
-    font-size: 0.9em;
-}
-
 .leaderboard-box {
     box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 0px 0px 0px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
 }
