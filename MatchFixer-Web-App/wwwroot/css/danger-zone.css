@@ -41,6 +41,27 @@
     animation: heartBeat 2s infinite;
 }
 
+#deleteAccountBtn,
+#deactivateAccountBtn {
+    border: 2px black solid;
+    transition: all 0.2s ease;
+}
+
+#deleteAccountBtn:hover {
+    border: 2px red solid;
+    color: red;
+    background-color: white;
+    transform: scale(1.1);
+}
+
+
+#deactivateAccountBtn:hover {
+    border: 2px #ffc107 solid;
+    color: #000000;
+    background-color: white;
+    transform: scale(1.1);
+}
+
 .btn-close-custom {
     position: absolute;
     top: 1rem;
@@ -63,9 +84,13 @@
     transform: scale(1.1);
 }
 
-/* Modal border animation */
+/* Delete Account border animation */
 #deleteAccountModal .modal-content {
     animation: pulse-border 2s infinite;
+}
+/* Deactivate Account border animation */
+#deactivateAccountModal .modal-content {
+    animation: pulse-border-yellow 2s infinite;
 }
 
 #confirmationPhrase.is-valid {
@@ -75,4 +100,13 @@
 
 #confirmationPhrase.is-invalid {
     border-color: #dc3545 !important;
+}
+
+#confirm-check{
+    font-size: 1.2em;
+}
+
+.modal-header h5 {
+    text-align: center;
+    text-shadow: 0px 1px 1px black;
 }
