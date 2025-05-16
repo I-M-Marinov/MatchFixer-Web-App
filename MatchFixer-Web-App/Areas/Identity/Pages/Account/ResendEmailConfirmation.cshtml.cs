@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
@@ -79,8 +81,8 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 protocol: Request.Scheme);
 
 
-            var logoUrl = "https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png";
-
+            var logoUrl = LogoUrl;
+            
             var emailBody = $@"
 					<!DOCTYPE html>
 					<html>
