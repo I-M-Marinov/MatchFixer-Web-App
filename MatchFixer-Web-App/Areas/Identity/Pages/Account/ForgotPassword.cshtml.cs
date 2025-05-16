@@ -2,18 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using MatchFixer.Infrastructure.Entities;
-using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using MatchFixer.Infrastructure.Entities;
+
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+
 
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
@@ -72,9 +73,9 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                     protocol: Request.Scheme);
 
 
-                var logoUrl = "https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png";
+                var logoUrl = LogoUrl;
 
-                var emailBody = $@"
+				var emailBody = $@"
 					<!DOCTYPE html>
 					<html>
 					<head>
