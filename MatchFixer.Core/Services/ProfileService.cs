@@ -437,7 +437,7 @@ namespace MatchFixer.Core.Services
 
 			var rankedUsers = users
 				.Select((user, index) => new { user.Id, Rank = index + 1 })
-				.Take(3)
+				.Take(10)
 				.ToList();
 
 			var userRank = rankedUsers.FirstOrDefault(u => u.Id == Guid.Parse(userId));
