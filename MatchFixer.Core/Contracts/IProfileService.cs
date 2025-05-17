@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.Image;
+using System.Security.Claims;
 
 
 namespace MatchFixer.Core.Contracts
@@ -18,5 +19,6 @@ namespace MatchFixer.Core.Contracts
 		Task<int?> GetUserRankAsync(string userId);
 		Task<bool> DeactivateUserAsync(string userId);
 		Task<bool> AnonymizeUserAsync(string userId);
+		Task ChangePasswordAsync(ClaimsPrincipal userPrincipal, string currentPassword, string newPassword);
 	}
 }

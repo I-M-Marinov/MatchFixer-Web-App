@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,8 @@ using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Models.Image;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using static MatchFixer.Common.ServiceConstants.PasswordRequirements;
+
 
 namespace MatchFixer.Core.Services
 {
@@ -31,6 +34,7 @@ namespace MatchFixer.Core.Services
 		private readonly ITimezoneService _timezoneService;
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IImageService _imageService;
+		private readonly SignInManager<ApplicationUser> _signInManager;
 
 
 
@@ -41,7 +45,8 @@ namespace MatchFixer.Core.Services
 			IHttpContextAccessor httpContextAccessor,
 			ITimezoneService timezoneService,
 			MatchFixerDbContext dbContext,
-			IImageService imageService)
+			IImageService imageService,
+			SignInManager<ApplicationUser> signInManager)
 		{
 			_userManager = userManager;
 			_emailSender = emailSender;
@@ -60,6 +65,7 @@ namespace MatchFixer.Core.Services
 			_timezoneService = timezoneService;
 			_dbContext = dbContext;
 			_imageService = imageService;
+			_signInManager = signInManager;
 		}
 
 		public async Task<ApplicationUser> GetCurrentUser(string userId)
@@ -511,6 +517,89 @@ namespace MatchFixer.Core.Services
 		private async Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
 		{
 			return await _timezoneService.IsValidTimezoneAsync(countryCode, timezone);
+		}
+
+		public async Task ChangePasswordAsync(ClaimsPrincipal userPrincipal, string currentPassword, string newPassword)
+		{
+			// check if the password complies to the application's password requirements 
+			var validationResult = await ValidatePasswordAsync(newPassword);
+
+			if (!validationResult.Succeeded)
+			{
+				var errors = validationResult.Errors.Select(e => e.Description);
+				throw new InvalidOperationException($"Invalid password: {string.Join(", ", errors)}");
+			}
+
+			var user = await _userManager.GetUserAsync(userPrincipal);
+			if (user == null)
+			{
+				throw new ArgumentException("User not found");
+			}
+
+			var result = await _userManager.ChangePasswordAsync(
+				user,
+				currentPassword,
+				newPassword);
+
+			if (!result.Succeeded)
+			{
+				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+				throw new InvalidOperationException($"Password change failed: {errors}");
+			}
+
+			await _signInManager.RefreshSignInAsync(user);
+			await SendPasswordChangedEmailAsync(user);
+		}
+
+		private async Task SendPasswordChangedEmailAsync(ApplicationUser user)
+		{
+			var emailSubject = "MatchFixer - Your account password was changed";
+
+			var logoUrl = LogoUrl;
+
+			var emailBody = $@"
+					<!DOCTYPE html>
+					<html>
+					<head>
+					    <meta charset='UTF-8'>
+					    <title>Reset Your Password</title>
+					</head>
+					<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
+					    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+					        <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
+					            <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
+					        </div>
+					        <div style='padding: 30px; text-align: center;'>
+					            <h2 style='color: #333;'>Your password was changed on {_timezoneService.ConvertToUserTime(DateTime.UtcNow, user.TimeZone):dd MMM yyyy HH:mm}</h2>
+					            
+					            <p style='margin-top: 30px; font-size: 13px; color: #e32b17;'>
+					                If you did not reset your password, please review your account and ensure it is not compromised.
+					            </p>
+								<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
+					               All Rights Reserved. MatchFixer ® 2025
+					            </p>
+					        </div>
+					    </div>
+					</body>
+					</html>
+					";
+
+			await _emailSender.SendEmailAsync(user.Email!, emailSubject, emailBody);
+		}
+
+		private async Task<IdentityResult> ValidatePasswordAsync(string password)
+		{
+			var options = new PasswordOptions
+			{
+				RequiredLength = MinLength,
+				RequireDigit = RequireDigit,
+				RequireLowercase = RequireLowercase,
+				RequireUppercase = RequireUppercase,
+				RequireNonAlphanumeric = RequireNonAlphanumeric
+			};
+
+			var validator = new PasswordValidator<ApplicationUser>();
+			return await validator.ValidateAsync(_userManager, null, password);
 		}
 
 
