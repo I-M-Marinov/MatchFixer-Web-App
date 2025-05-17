@@ -296,6 +296,39 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[Authorize]
+		public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				TempData["ErrorMessage"] = $"Please correct the form errors.";
+				return RedirectToAction("DangerZone");
+			}
+
+			try
+			{
+				await _profileService.ChangePasswordAsync(User, model.CurrentPassword, model.NewPassword);
+				TempData["SuccessMessage"] = "Password was changed successfully!";
+			}
+			catch (ArgumentException ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
+			catch (InvalidOperationException ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Password change error");
+				TempData["ErrorMessage"] = "An unexpected error occurred.";
+			}
+
+			return RedirectToAction("Profile"); // redirect to Profile when the password change is successful
+		}
+
 
 		private void ValidateModel(ProfileViewModel model)
 		{
