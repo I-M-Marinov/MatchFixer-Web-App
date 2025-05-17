@@ -13,7 +13,19 @@ using MatchFixer.Infrastructure.Services;
 
 using static MatchFixer.Infrastructure.SeedData.SeedData;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Configuration for the password of the application 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.Password.RequireDigit = true;
+	options.Password.RequireLowercase = true;
+	options.Password.RequireUppercase = true;
+	options.Password.RequireNonAlphanumeric = true;
+	options.Password.RequiredLength = 8;
+	options.Password.RequiredUniqueChars = 1;
+});
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
