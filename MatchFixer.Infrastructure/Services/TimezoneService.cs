@@ -1,5 +1,6 @@
 ﻿using MatchFixer.Infrastructure.Contracts;
 using NodaTime.TimeZones;
+using System.Globalization;
 using System.Text.Json;
 
 namespace MatchFixer.Infrastructure.Services
@@ -50,6 +51,25 @@ namespace MatchFixer.Infrastructure.Services
 			{
 				return false;
 			}
+		}
+
+		public DateTime ConvertToUserTime(DateTime utcTime, string timeZoneId)
+		{
+			try
+			{
+				var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+				return TimeZoneInfo.ConvertTimeFromUtc(utcTime, timeZone);
+			}
+			catch (TimeZoneNotFoundException)
+			{
+				return utcTime;
+			}
+		}
+
+		public string FormatForUser(DateTime utcTime, string timeZoneId, string culture = "en-US")
+		{
+			var localTime = ConvertToUserTime(utcTime, timeZoneId);
+			return localTime.ToString("g", CultureInfo.GetCultureInfo(culture));
 		}
 
 	}

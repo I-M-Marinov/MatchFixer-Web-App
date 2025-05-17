@@ -5,6 +5,8 @@ namespace MatchFixer.Infrastructure.Contracts
 	{
 		IEnumerable<string> GetTimezonesForCountry(string countryCode);
 		Task<bool> IsValidTimezoneAsync(string countryCode, string timezone);
+		DateTime ConvertToUserTime(DateTime utcTime, string timeZoneId);
+		string FormatForUser(DateTime utcTime, string timeZoneId, string culture);
 	}
 }
 
