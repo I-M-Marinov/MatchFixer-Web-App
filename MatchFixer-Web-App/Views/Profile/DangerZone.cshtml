@@ -1,10 +1,147 @@
-﻿@{
+﻿@using MatchFixer.Core.ViewModels.Profile
+@model ChangePasswordViewModel
+
+@{
     ViewData["Title"] = $"Danger Zone!";
 }
 <div class="background-profile"></div>
 
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
+
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
+
+</div>
+
 <div class="card shadow border-danger mt-5 p-4 d-flex flex-column justify-content-center align-items-center" id="danger-zone-card">
 	<h4 id="danger-zone-name" class="text-danger text-center mb-4 animate__animated animate__tada">⚠ Danger Zone</h4>
+
+	<!-- Change password section -->
+	<div class="mb-4 d-flex flex-column justify-content-center align-items-center change-password-section">
+		<h5 class="text-dark">Change Password</h5>
+		<p class="text-muted">Update your account password securely.</p>
+
+		<!-- Button trigger modal -->
+		<button type="button" id="changePasswordBtn" class="btn btn-change-password w-60" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+			Change Password
+		</button>
+
+		<!-- Change Password Modal -->
+		<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content border-primary">
+					<div id="change-password-header" class="modal-header bg-light d-flex justify-content-center">
+						<h5 class="modal-title text-primary">
+							<i class="bi bi-shield-lock me-2"></i>
+							Change Password
+						</h5>
+						<button type="button" class="btn-close-custom2" data-bs-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form asp-action="ChangePassword" method="post" id="changePasswordForm">
+						<div class="modal-body">
+							@Html.AntiForgeryToken()
+							<div class="mb-3 text-center w-100 overflow-hidden">
+								<label asp-for="CurrentPassword" class="form-label">Your current password</label>
+								<div class="password-container">
+									<input asp-for="CurrentPassword" type="password" class="form-control" 
+									       required aria-required="true">
+									<button class="btn btn-outline-secondary toggle-password" type="button">
+										<i class="bi bi-eye"></i>
+									</button>
+								</div>
+								<span asp-validation-for="CurrentPassword" class="text-danger danger-info text-wrap d-inline-block w-100 field-validation-valid"></span>
+							</div>
+
+							<div class="mb-3 text-center w-100 overflow-hidden">
+								<label asp-for="NewPassword" class="form-label">Your new password</label>
+								<div class="password-container">
+									<input asp-for="NewPassword" type="password" class="form-control"
+									       required aria-required="true"
+									       data-val-length-min="8"
+									       data-val-length="Password must be at least 8 characters">
+									<button class="btn btn-outline-secondary toggle-password" type="button">
+										<i class="bi bi-eye"></i>
+									</button>
+								</div>
+								<span asp-validation-for="NewPassword" class="text-danger danger-info text-wrap d-inline-block w-100 field-validation-valid"></span>
+							</div>
+
+							<div class="mb-3 text-center w-100 overflow-hidden">
+								<label asp-for="ConfirmPassword" class="form-label">Re-type the new password</label>
+								<div class="password-container">
+									<input asp-for="ConfirmPassword" type="password" class="form-control"
+									       required aria-required="true">
+									<button class="btn btn-outline-secondary toggle-password" type="button">
+										<i class="bi bi-eye"></i>
+									</button>
+								</div>
+								<span asp-validation-for="ConfirmPassword" class="text-danger danger-info text-wrap d-inline-block w-100 field-validation-valid"></span>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+								<i class="bi bi-x-circle me-1"></i> Cancel
+							</button>
+							<button type="submit" class="btn btn-change-password2">
+								<i class="bi bi-check-circle me-1"></i> Update Password
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Deactivate Account Section -->
+	<div class="mb-3 d-flex flex-column justify-content-center align-items-center deactivate-account-section">
+		<h5 class="text-dark">Deactivate Account</h5>
+		<p class="text-muted">Temporarily disable your account.</p>
+		<p class="text-muted">You can reactivate it by logging in later.</p>
+
+		<!-- Button trigger modal -->
+		<button id="deactivateAccountBtn" type="button" class="btn btn-warning w-60" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
+			Deactivate Account
+		</button>
+
+		<!-- Deactivate Confirmation Modal -->
+		<div class="modal fade" id="deactivateAccountModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content border-warning">
+					<div class="modal-header d-flex flex-column">
+						<h5 class="modal-title text-warning">Confirm Deactivation</h5>
+						<button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Your account will be temporarily disabled. You will be able to reactivate by logging in again.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-circle me-1"></i> Cancel
+						</button>
+						<form asp-action="DeactivateAccount" method="post">
+							@Html.AntiForgeryToken()
+							<button type="submit" class="btn btn-warning">
+								<i id="confirm-check" class="bx bx-check"></i> Confirm Deactivation
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- Delete Account Section -->
 	<div class="mb-4 d-flex flex-column justify-content-center align-items-center delete-account-section">
@@ -57,48 +194,10 @@
 			</div>
 		</div>
 	</div>
+	
 
 	<hr />
 
-	<!-- Deactivate Account Section -->
-	<div class="mb-3 d-flex flex-column justify-content-center align-items-center deactivate-account-section">
-		<h5 class="text-dark">Deactivate Account</h5>
-		<p class="text-muted">Temporarily disable your account.</p>
-		<p class="text-muted">You can reactivate it by logging in later.</p>
-
-		<!-- Button trigger modal -->
-		<button id="deactivateAccountBtn" type="button" class="btn btn-warning w-60" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
-			Deactivate Account
-		</button>
-
-		<!-- Deactivate Confirmation Modal -->
-		<div class="modal fade" id="deactivateAccountModal" tabindex="-1" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content border-warning">
-					<div class="modal-header d-flex flex-column">
-						<h5 class="modal-title text-warning">Confirm Deactivation</h5>
-						<button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p>Your account will be temporarily disabled. You will be able to reactivate by logging in again.</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-							<i class="bi bi-x-circle me-1"></i> Cancel
-						</button>
-						<form asp-action="DeactivateAccount" method="post">
-							@Html.AntiForgeryToken()
-							<button type="submit" class="btn btn-warning">
-								<i id="confirm-check" class="bx bx-check"></i> Confirm Deactivation
-							</button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 
 
@@ -121,5 +220,29 @@
 			e.preventDefault();
 		}
 	});
-</script>
 
+		
+	document.querySelectorAll('.toggle-password').forEach(button => {
+		button.addEventListener('click', () => {
+			const input = button.previousElementSibling;
+			const icon = button.querySelector('i');
+			if (input.type === 'password') {
+				input.type = 'text';
+				icon.classList.replace('bi-eye', 'bi-eye-slash');
+			} else {
+				input.type = 'password';
+				icon.classList.replace('bi-eye-slash', 'bi-eye');
+			}
+		});
+	});
+
+		$(document).ready(function() {
+		// Clear form when modal hides
+		$('#changePasswordModal').on('hidden.bs.modal', function () {
+			$(this).find('form')[0].reset(); // Reset form
+			$(this).find('.is-invalid').removeClass('is-invalid'); // Clear validation states
+			$(this).find('.field-validation-error').removeClass('field-validation-error').addClass('field-validation-valid'); // Reset validation messages
+		});
+	});
+
+</script>
