@@ -29,8 +29,70 @@
     padding: 0.85rem;
 }
 
+.change-password-section {
+    min-width: 70%;
+    border: 5px double #3370a8; 
+    padding: 0.85rem;
+}
+
+#changePasswordForm{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-change-password,
+.btn-change-password2 {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-change-password:hover,
+.btn-change-password:focus {
+    text-shadow: 0px 1px 1px black;
+    border: 2px #0b5ed7 solid;
+    color: #0b5ed7;
+    background-color: white;
+    transform: scale(1.1);
+}
+
+.btn-change-password2:hover,
+.btn-change-password2:focus {
+    color: white;
+    background-color: #0a58ca;
+    opacity: 1;
+}
+
+.btn-change-password:active,
+.btn-change-password.active,
+.btn-change-password2:active,
+.btn-change-password2.active {
+    background-color: #0a58ca;
+    border-color: #0a53be;
+}
+
+.btn-change-password:disabled,
+.btn-change-password2:disabled {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    opacity: 0.65;
+}
+
+.btn-change-password:focus,
+.btn-change-password2:focus {
+    text-shadow: 0px 1px 1px black;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5);
+}
+
+.btn-change-password2 .bi-check-circle {
+    color: #0d6efd !important;
+}
+
 .delete-account-section p,
-.deactivate-account-section p {
+.deactivate-account-section p,
+.change-password-section p {
     font-size: 0.85em;
     line-height: 0.85rem;
 }
@@ -42,27 +104,49 @@
 }
 
 #deleteAccountBtn,
-#deactivateAccountBtn {
+#deactivateAccountBtn,
+.btn-change-password {
     border: 2px black solid;
     transition: all 0.2s ease;
 }
 
-#deleteAccountBtn:hover {
+#deleteAccountBtn:hover,
+#deleteAccountBtn:focus {
+    text-shadow: 0px 1px 1px black;
     border: 2px red solid;
-    color: red;
+    color: #dc3545;
     background-color: white;
     transform: scale(1.1);
 }
 
+#deleteAccountBtn:active,
+#deleteAccountBtn.active {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
 
-#deactivateAccountBtn:hover {
+
+#deactivateAccountBtn:hover,
+#deactivateAccountBtn:focus {
+    text-shadow: 0px 1px 1px #ffc107;
     border: 2px #ffc107 solid;
-    color: #000000;
+    color: black;
     background-color: white;
     transform: scale(1.1);
 }
 
-.btn-close-custom {
+#deleteAccountBtn:focus {
+    text-shadow: 0px 1px 1px black;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+#deactivateAccountBtn:focus {
+    text-shadow: 0px 1px 1px black;
+    box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+.btn-close-custom,
+.btn-close-custom2{
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -78,7 +162,12 @@
     padding: 0;
 }
 
-.btn-close-custom:hover {
+.btn-close-custom2 {
+    color: whitesmoke;
+}
+
+.btn-close-custom:hover,
+.btn-close-custom2:hover{
     opacity: 1;
     color: #dc3545;
     transform: scale(1.1);
@@ -86,11 +175,16 @@
 
 /* Delete Account border animation */
 #deleteAccountModal .modal-content {
-    animation: pulse-border 2s infinite;
+    animation: pulse-border-red 2s infinite;
 }
 /* Deactivate Account border animation */
 #deactivateAccountModal .modal-content {
     animation: pulse-border-yellow 2s infinite;
+}
+
+/* Change Password border animation */
+#changePasswordModal .modal-content {
+    animation: pulse-border-blue 2s infinite;
 }
 
 #confirmationPhrase.is-valid {
@@ -109,4 +203,63 @@
 .modal-header h5 {
     text-align: center;
     text-shadow: 0px 1px 1px black;
+}
+
+.modal-body div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.password-container {
+    position: relative;
+    max-width: 100%;
+
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: #0d6efd;
+    padding: 0 8px;
+    cursor: pointer;
+}
+
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    padding-right: 40px;
+}
+
+
+#change-password-header {
+    background-color: #0d6efd !important;
+}
+
+#change-password-header h5,
+#change-password-header.btn-close-custom {
+    color: white !important;
+}
+
+
+/* Validation messages */
+.danger-info.field-validation-valid {
+    display: none !important;
+}
+
+.danger-info.field-validation-error {
+    display: inline-block !important; 
+    max-width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+    margin-top: 0.25rem;
+    padding: 0.25em 0.4em;
+    background-color: #10b981;
+    color: black !important;
+    font-size: 12px;
+    border-radius: 0.5em;
 }
