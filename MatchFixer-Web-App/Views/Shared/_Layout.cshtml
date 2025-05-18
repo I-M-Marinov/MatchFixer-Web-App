@@ -51,18 +51,46 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-	
-    <div id="cookieConsent" class="modal fade" tabindex="-1" aria-labelledby="cookieConsentLabel" aria-hidden="true">
-	    <div class="modal-dialog modal-dialog-bottom fixed-bottom mb-3">
-		    <div class="modal-content bg-light border">
-			    <div class="modal-body d-flex flex-column flex-md-row justify-content-between align-items-center">
-				    <div class="mb-2 mb-md-0">
-					    <strong>We use cookies</strong> to enhance your experience and keep your game session active. 
-					    By continuing, you agree to our use of cookies.
-				    </div>
+
+    <!-- Cookie Consent Modal -->
+    <div class="modal fade" id="cookieConsentModal" tabindex="-1" aria-labelledby="cookieConsentLabel" data-bs-backdrop="static">
+	    <div class="modal-dialog modal-dialog">
+		    <div class="modal-content">
+                <div id="cookie-header" class="modal-header d-flex justify-content-lg-center align-items-center gap-3">
+				    <h5 class="modal-title" id="cookieConsentLabel">
+                        <i class="bi bi-cookie"></i> Cookie Consent <i class="bi bi-cookie"></i>
+				    </h5>
+			    </div>
+			    <div class="modal-body">
+                    <p class="d-flex justify-content-lg-center align-items-center">We use cookies to:</p>
+                    <ul>
+	                    <div class="d-flex flex-column justify-content-between align-items-lg-start">
+		                    <li class="d-flex justify-content-lg-center align-items-center"><i class="ri-gamepad-line game-icon"></i>Keep your game session active</li>
+		                    <li class="d-flex justify-content-lg-center align-items-center"><i class="bx bx-select-multiple remember-icon"></i>Remember your preferences</li>
+		                    <li class="d-flex justify-content-lg-center align-items-center"><i class="bi bi-emoji-sunglasses smile-icon"></i>Improve your experience</li>
+	                    </div>
+                    </ul>
+                    <div class="d-flex justify-content-center gap-1 flex-row">
+	                    <div class="form-check form-switch mb-3 p-0">
+		                    <input class="form-check-input" type="checkbox" id="essentialCookies" checked disabled>
+                        <label class="form-check-label cookiesLabel" for="essentialCookies">
+			                    Essential Cookies (Always On)
+		                    </label>
+	                    </div>
+                    <div class="form-check form-switch mb-3">
+		                    <input class="form-check-input ms-lg-3" type="checkbox" id="analyticsCookies" checked>
+                        <label class="form-check-label cookiesLabel" for="analyticsCookies">
+			                    Analytics Cookies
+		                    </label>
+	                    </div>
+                    </div>
+			    </div>
+			    <div class="modal-footer d-flex justify-content-between">
+				    <a href="@Url.Action("Privacy", "Home")" class="btn btn-link btn-sm">Learn More</a>
+
 				    <div>
-					    <button class="btn btn-primary btn-sm me-2" id="acceptCookies">Accept</button>
-                        <a href="@Url.Action("Privacy", "Home")" class="btn btn-outline-secondary btn-sm">Learn More</a>
+                    <button type="button" class="btn btn-outline-success me-2" id="rejectCookiesBtn"><i class="bi bi-check me-2"></i>Only Essential</button>
+                    <button type="button" class="btn btn-outline-primary" id="acceptCookiesBtn"><i class="bi bi-check2-all me-2"></i>Accept All</button>
 				    </div>
 			    </div>
 		    </div>
@@ -70,21 +98,60 @@
     </div>
 	
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        if (!localStorage.getItem("cookiesAccepted")) {
-            const cookieModal = new bootstrap.Modal(document.getElementById('cookieConsent'));
-            cookieModal.show();
 
-            document.getElementById("acceptCookies").addEventListener("click", function () {
-                localStorage.setItem("cookiesAccepted", "true");
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById('cookieConsentModal');
+
+            let cookieModal = bootstrap.Modal.getInstance(modalElement);
+            if (!cookieModal) {
+                cookieModal = new bootstrap.Modal(modalElement);
+            }
+
+            if (!document.cookie.includes('cookie_consent=')) {
+                cookieModal.show();
+            }
+
+            document.getElementById('acceptCookiesBtn').addEventListener('click', function () {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30); // 30 days consent for the cookies
+                document.cookie = `cookie_consent=all; expires=${expiryDate.toUTCString()}; path=/`;
                 cookieModal.hide();
             });
-        }
-    });
 
-    $(document).ready(function() {
-        console.log("jQuery is Loaded!")
-    });
+            document.getElementById('rejectCookiesBtn').addEventListener('click', function () {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30); // 30 days consent for the cookies
+                document.cookie = `cookie_consent=essential; expires=${expiryDate.toUTCString()}; path=/`;
+                cookieModal.hide();
+            });
+        });
+
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+         const modalElement = document.getElementById('cookieConsentModal');
+         const cookie = getCookie('cookie_consent');
+
+        if (!document.cookie.includes('cookie_consent=')) {
+            console.log("Cookie not found. Showing modal.");
+            const cookieModal = new bootstrap.Modal(modalElement);
+            cookieModal.show();
+        } else {
+            if (cookie === 'essential') {
+                console.log("Essential cookies only");
+            } else if (cookie === 'all') {
+                console.log("All cookies accepted");
+            }
+        }
+
+        $(document).ready(function() {
+            console.log("jQuery is Loaded!")
+        });
+
 </script>
 
     </body>
