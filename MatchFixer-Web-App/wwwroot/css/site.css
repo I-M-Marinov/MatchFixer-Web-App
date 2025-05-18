@@ -21,6 +21,7 @@
 }
 html {
     font-size: 14px;
+    scroll-behavior: smooth;
 }
 
 html, body {
@@ -28,6 +29,26 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #3370a8;
+    border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #0DAB76;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #086b4a;
+}
+
 
 @media (min-width: 768px) {
   html {
