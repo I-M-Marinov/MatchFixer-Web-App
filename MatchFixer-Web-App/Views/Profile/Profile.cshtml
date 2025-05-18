@@ -52,7 +52,9 @@
 				<div class="card shadow border-0 rounded-4 p-2 profile-matchfix-score" style="width: 135px; height: 135px;">
 					@if (Model.UserRank != null)
 					{
-						if (Model.UserRank >= 1 && Model.UserRank <= 3)
+						<a href="@Url.Action("Leaderboard", "Game")" style="text-decoration: none;">
+
+						@if (Model.UserRank >= 1 && Model.UserRank <= 3)
 						{
 							<div class="user-rank-icon d-flex justify-content-center align-items-center">
 								<span class="d-flex justify-content-center align-items-center fs-5 text-muted rank-medal badge p-0 m-0">@Html.Raw(GetMedal(Model.UserRank))</span>
@@ -64,7 +66,7 @@
 								<span class="d-flex justify-content-center align-items-center fs-5 badge bg-primary mb-2 mt-2">@Html.Raw(GetMedal(Model.UserRank))</span>
 							</div>
 						}
-						
+						</a>
 					}
 
 					<div class="d-flex flex-column justify-content-center align-items-center badge">
