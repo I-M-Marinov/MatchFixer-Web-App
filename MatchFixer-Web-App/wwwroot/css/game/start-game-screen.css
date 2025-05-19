@@ -1,4 +1,6 @@
-﻿#answer-result {
+﻿@import "./start-game-screen-responsive.css";
+
+#answer-result {
     position: relative;
     max-width: 45vw;
     align-self:center;
@@ -261,25 +263,27 @@ main {
         color: aliceblue;
     }
 
-
 .football-pitch {
-    position: absolute;
+    position: fixed; 
     top: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1200px;
-    z-index: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: -1; 
     opacity: 0.65;
     pointer-events: none;
-   
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .football-pitch img {
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100%;
+    min-width: 1200px; 
     object-fit: cover;
-
 }
+
 
 
 .game-background {
@@ -307,4 +311,32 @@ main {
 
 .medal-icon {
     font-size: 1.75rem !important; /* Adjust as needed */
+}
+
+/* Container to control maximum width */
+.football-pitch-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px; /* Same as your original width */
+    margin: 0 auto; /* Center the container */
+    overflow: hidden; /* Hide any overflow */
+    z-index: -1;
+}
+
+/* Responsive image styling */
+.football-pitch-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    z-index: -1;
+    position: relative;
+    aspect-ratio: 1200 / auto; /* Maintain original aspect ratio */
+}
+
+/* Optional: Add different behavior on mobile */
+@media (max-width: 768px) {
+    .football-pitch-img {
+        object-fit: contain; /* Show full image on small screens */
+    }
 }
