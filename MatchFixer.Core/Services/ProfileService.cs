@@ -21,6 +21,8 @@ using MatchFixer.Infrastructure.Models.Image;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 using static MatchFixer.Common.ServiceConstants.PasswordRequirements;
+using static MatchFixer.Common.GeneralConstants.ProfileConstants;
+using static MatchFixer.Common.GeneralConstants.AnonymizationConstants;
 
 
 namespace MatchFixer.Core.Services
@@ -146,7 +148,7 @@ namespace MatchFixer.Core.Services
 				var isValid = await IsValidTimezoneAsync(model.Country, model.TimeZone); // validate time zone
 				if (!isValid)
 				{
-					return (false, "Time Zone is missing or incorrect !");
+					return (false, TimeZoneMissingOrIncorrect);
 
 				}
 
@@ -166,7 +168,7 @@ namespace MatchFixer.Core.Services
 			// If no changes were detected, return a message
 			if (changes.Count == 0)
 			{
-				return (false, "No changes were made to the profile.");
+				return (false, NoChangesMadeToProfile);
 			}
 
 			// Save the changes to the database
@@ -174,12 +176,12 @@ namespace MatchFixer.Core.Services
 
 			if (!result.Succeeded)
 			{
-				return (false, "Failed to update profile.");
+				return (false, FailedToUpdateProfile);
 			}
 
 			// If changes were made, return a message with the updated properties
-			string message = "Your profile was updated successfully. You have made changes to: " +
-			                 string.Join(", ", changes);
+			string message = ProfileUpdatedSuccessfully +
+							 string.Join(", ", changes);
 			return (true, message);
 		}
 
@@ -188,14 +190,14 @@ namespace MatchFixer.Core.Services
 
 			if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName))
 			{
-				return (false, "First Name and Last Name are required.");
+				return (false, FirstAndLastNameAreRequired);
 			}
 
 			var user = await _userManager.FindByIdAsync(model.Id);
 
 			if (user == null)
 			{
-				return (false, "User not found.");
+				return (false, UserNotFound);
 			}
 
 			var trimmedFirstName = model.FirstName?.Trim();
@@ -206,7 +208,7 @@ namespace MatchFixer.Core.Services
 
 			if (!isFirstNameChanged && !isLastNameChanged)
 			{
-				return (false, "No changes were made to your profile.");
+				return (false, NoChangesMadeToProfile);
 			}
 
 			if (isFirstNameChanged)
@@ -227,7 +229,7 @@ namespace MatchFixer.Core.Services
 				return (false, $"Failed to update user: {errors}");
 			}
 
-			return (true, "Changes were successful !");
+			return (true, NameUpdatedSuccessfully);
 		}
 
 		public async Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail,
@@ -237,7 +239,7 @@ namespace MatchFixer.Core.Services
 
 			if (user == null)
 			{
-				return (false, "User not found.");
+				return (false, UserNotFound);
 			}
 
 			if (user.Email != newEmail)
@@ -250,7 +252,7 @@ namespace MatchFixer.Core.Services
 				var result = await _userManager.UpdateAsync(user);
 				if (!result.Succeeded)
 				{
-					return (false, "Failed to update user email.");
+					return (false, FailedToUpdateUsersEmail);
 				}
 
 				var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -261,9 +263,8 @@ namespace MatchFixer.Core.Services
 					scheme
 				);
 
-				var logoUrl =
-					"https://res.cloudinary.com/doorb7d6i/image/upload/v1744732462/matchFixer-logo_kj93zj.png";
-
+				var logoUrl = LogoUrl;
+				
 				var emailBody = $@"
 						<!DOCTYPE html>
 						<html>
@@ -296,10 +297,10 @@ namespace MatchFixer.Core.Services
 
 				await _emailSender.SendEmailAsync(newEmail, "MatchFixer - Replace your email address", emailBody);
 
-				return (true, "Email updated and confirmation sent.");
+				return (true, EmailUpdatedSuccessfully);
 			}
 
-			return (false, "The email is the same as the current one.");
+			return (false, NewAndCurrentEmailAreTheSame);
 		}
 
 		public async Task<(bool Success, string Message)> ConfirmEmailAsync(string userId, string code)
@@ -307,16 +308,16 @@ namespace MatchFixer.Core.Services
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
 			{
-				return (false, "User not found.");
+				return (false, UserNotFound);
 			}
 
 			var result = await _userManager.ConfirmEmailAsync(user, code);
 			if (result.Succeeded)
 			{
-				return (true, "Your email has been confirmed.");
+				return (true, EmailConfirmedSuccessfully);
 			}
 
-			return (false, "Email confirmation failed.");
+			return (false, EmailConfirmationFailed);
 		}
 
 		public async Task<ImageResult> UploadProfilePictureAsync(string userId,
@@ -327,7 +328,7 @@ namespace MatchFixer.Core.Services
 				return new ImageResult
 				{
 					IsSuccess = false,
-					Message = "No file uploaded."
+					Message = NoFileUploaded
 				};
 			}
 
@@ -371,14 +372,14 @@ namespace MatchFixer.Core.Services
 				return new ImageResult
 				{
 					IsSuccess = true,
-					Message = "Profile picture uploaded successfully."
+					Message = ProfilePictureUploadedSuccessfully
 				};
 			}
 
 			return new ImageResult
 			{
 				IsSuccess = false,
-				Message = "Failed to upload profile picture."
+				Message = ProfilePictureUploadFailed
 			};
 		}
 
@@ -394,7 +395,7 @@ namespace MatchFixer.Core.Services
 				return new ImageResult
 				{
 					IsSuccess = false,
-					Message = "Default profile picture already applied."
+					Message = DefaultPictureApplied
 				};
 			}
 
@@ -403,7 +404,7 @@ namespace MatchFixer.Core.Services
 				return new ImageResult
 				{
 					IsSuccess = false,
-					Message = "No profile picture to remove."
+					Message = NoProfilePictureToRemove
 				};
 			}
 
@@ -422,7 +423,7 @@ namespace MatchFixer.Core.Services
 				return new ImageResult
 				{
 					IsSuccess = true,
-					Message = "Profile picture set to default successfully."
+					Message = ProfilePictureSetToDefaultSuccessfully
 				};
 			}
 
@@ -472,16 +473,16 @@ namespace MatchFixer.Core.Services
 
 			if (user != null)
 			{
-				user.FirstName = "Deleted";
-				user.LastName = "User";
+				user.FirstName = AnonymizedFirstName;
+				user.LastName = AnonymizedLastName;
 				user.Email = $"deleted-{Guid.NewGuid()}@ex-matchfixer.com";
 				user.NormalizedEmail = user.Email.ToUpper();
 				user.UserName = user.Email;
 				user.NormalizedUserName = user.UserName.ToUpper();
 				user.PhoneNumber = null;
 				user.DateOfBirth = new DateTime(1900, 1, 1);
-				user.Country = "Unknown";
-				user.TimeZone = "Unknown";
+				user.Country = AnonymizedCountry;
+				user.TimeZone = AnonymizedTimeZone;
 
 				if (user.ProfilePictureId != DefaultImageId)
 				{
@@ -533,7 +534,7 @@ namespace MatchFixer.Core.Services
 			var user = await _userManager.GetUserAsync(userPrincipal);
 			if (user == null)
 			{
-				throw new ArgumentException("User not found");
+				throw new ArgumentException(UserNotFound);
 			}
 
 			var result = await _userManager.ChangePasswordAsync(
