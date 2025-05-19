@@ -258,9 +258,11 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
-            return Page();
-        }
+            await OnGetAsync(returnUrl);
+
+			// If we got this far, something failed, redisplay form
+			return Page();
+		}
 
         private ApplicationUser CreateUser()
         {
