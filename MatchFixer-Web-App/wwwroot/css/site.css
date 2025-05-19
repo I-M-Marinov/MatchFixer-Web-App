@@ -12,7 +12,7 @@
 @import "/css/login.css";
 @import "/css/profile/profile.css";
 @import "/css/danger-zone.css";
-@import "/css/game/answerResult.css";
+@import "/css/game/start-game-screen.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
