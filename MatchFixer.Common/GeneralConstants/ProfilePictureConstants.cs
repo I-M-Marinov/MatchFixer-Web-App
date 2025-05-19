@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MatchFixer.Common.GeneralConstants
 {
-	public static  class ProfilePictureConstants
+	public static class ProfilePictureConstants
 	{
 		public const string DefaultImagePath = "/images/default-user-image.png";
 		public const string DefaultPublicId = "default-public-id";
@@ -20,5 +20,13 @@ namespace MatchFixer.Common.GeneralConstants
 
 		public const string LogoUrl =
 			"https://res.cloudinary.com/doorb7d6i/image/upload/v1747399160/matchFixer-logo_yfzk57.png";
+
+		public const string NoFileUploaded = "No file was uploaded.";
+		public const string ProfilePictureUploadedSuccessfully = "Profile picture uploaded successfully.";
+		public const string ProfilePictureUploadFailed = "Failed to upload profile picture.";
+
+		public const string DefaultPictureApplied = "Default profile picture already applied.";
+		public const string NoProfilePictureToRemove = "No profile picture to remove.";
+		public const string ProfilePictureSetToDefaultSuccessfully = "Profile picture set to default successfully.";
 	}
 }
