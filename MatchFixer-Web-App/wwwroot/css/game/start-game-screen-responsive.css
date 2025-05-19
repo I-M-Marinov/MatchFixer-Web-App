@@ -1,0 +1,7 @@
+﻿@media (max-width: 768px) {
+    .football-pitch img {
+        width: 100%;
+        height: auto;
+        min-width: unset;
+    }
+}
