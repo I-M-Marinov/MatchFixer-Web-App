@@ -97,6 +97,12 @@
         }
     }
 
+    @media (max-width: 650px) {
+        .navbar-collapse {
+            font-size: 0.45em;
+        }
+    }
+
 
     @media (max-width: 578px) {
 
@@ -104,6 +110,10 @@
         .name-image-container {
             width: 100%;
             max-width: 50%;
+        }
+
+        .navbar-collapse {
+            font-size: 0.90em;
         }
 
         .profile-card {
