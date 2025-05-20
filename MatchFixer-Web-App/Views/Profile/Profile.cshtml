@@ -42,10 +42,8 @@
 
 <section class="profile-wrapper d-flex justify-content-start mx-auto py-5">
 	<div class="profile-container d-flex gap-3 w-100">
-		
-		
 
-		<!-- Left: Side-by-side Profile Cards -->
+	<!-- Left: Side-by-side Profile Cards -->
 		<div class="profile-card d-flex gap-4 flex-wrap">
 			<!-- MatchFix Score Card -->
 			<div class="d-flex gap-4 flex-wrap flex-column">
@@ -183,6 +181,8 @@
 
 				<!-- Profile Info Card -->
 				<div class="card shadow border-0 rounded-4 p-4 flex-fill profile-info-container" style="min-width: 550px;">
+					<div id="live-clock"></div>
+
 					<div class="profile-info">
 						<!-- Email Row -->
 						<div class="row mb-3 profile-detail">
@@ -477,5 +477,29 @@
             }
         }
     });
+
+	// Get the user's timezone from the model
+	const userTimeZone = "@Model.TimeZone"; 
+
+	function updateClock() {
+		// Create a time formatter for the user's locale and timezone
+		const formatter = new Intl.DateTimeFormat([], {
+			timeZone: userTimeZone,
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			weekday: 'short',
+			month: 'short',
+			day: 'numeric'
+		});
+
+		// Update the clock element every second
+		const now = new Date();
+		document.getElementById("live-clock").textContent = formatter.format(now);
+	}
+
+	// Update clock immediately and every second
+	updateClock();
+	setInterval(updateClock, 1000);
 
 </script>
