@@ -1,14 +1,10 @@
-﻿
-namespace MatchFixer.Common.GeneralConstants
+﻿namespace MatchFixer.Common.GeneralConstants
 {
 	public static class ProfileConstants
 	{
 		// VALIDATIONS
 		public const string TimeZoneMissingOrIncorrect = "Time Zone is missing or incorrect !";
 		public const string FirstAndLastNameAreRequired = "First name and Last name are required.";
-
-
-
 
 		// MESSAGES
 		public const string NoChangesMadeToProfile = "No changes were made to the profile.";

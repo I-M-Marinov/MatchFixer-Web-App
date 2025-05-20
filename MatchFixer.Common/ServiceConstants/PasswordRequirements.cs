@@ -1,6 +1,4 @@
-﻿
-
-namespace MatchFixer.Common.ServiceConstants
+﻿namespace MatchFixer.Common.ServiceConstants
 {
 	public static class PasswordRequirements
 	{

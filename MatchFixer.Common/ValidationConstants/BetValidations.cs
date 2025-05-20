@@ -1,6 +1,4 @@
-﻿
-
-namespace MatchFixer.Common.ValidationConstants
+﻿namespace MatchFixer.Common.ValidationConstants
 {
 	public static class BetValidations
 	{

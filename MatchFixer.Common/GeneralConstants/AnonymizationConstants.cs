@@ -1,6 +1,4 @@
-﻿
-
-namespace MatchFixer.Common.GeneralConstants
+﻿namespace MatchFixer.Common.GeneralConstants
 {
 	public static class AnonymizationConstants
 	{
