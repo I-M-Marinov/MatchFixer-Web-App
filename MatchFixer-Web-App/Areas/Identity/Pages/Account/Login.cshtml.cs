@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using MatchFixer.Infrastructure.Entities;
 
-using static MatchFixer.Common.GeneralConstants.SessionConstants;
+using static MatchFixer.Common.GeneralConstants.LoginConstants;
 
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
@@ -66,7 +66,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = EmailIsRequired)]
             [EmailAddress]
             public string Email { get; set; }
 
@@ -74,7 +74,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = PasswordIsRequired)]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
@@ -136,21 +136,22 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 				// Verify if the email the user is trying to get logged in actually exists and if not show him an error message
 				if (user == null)
 	            {
-		            ModelState.AddModelError(string.Empty, "An account with that email does not exist.");
-		            _logger.LogInformation($"An attempt to login with email: {Input.Email} was made.");
+		            ModelState.AddModelError(string.Empty, AccountWithThatEmailExists);
+
+					_logger.LogInformation($"An attempt to login with email: {Input.Email} was made.");
 					return Page();
 	            }
 
                 // Verify if the user's email is confirmed and if not do not log him in, but instead show him an error message
                 if (!user.EmailConfirmed)
                 {
-                    ModelState.AddModelError(string.Empty, "Your email is not confirmed. Please confirm your email before logging in.");
+                    ModelState.AddModelError(string.Empty, EmailIsNotConfirmed);
                     return Page();
                 }
 
                 if (!user.IsActive && user.WasDeactivatedByAdmin)
                 {
-	                TempData["ErrorMessage"] = "Account deactivated by an administrator. Contact support.";
+	                TempData["ErrorMessage"] = AccountDeactivatedByAdmin;
 	                return Page();
                 }
 
@@ -161,7 +162,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 	                var userUpdated = await _userManager.UpdateAsync(user);
 	                if (!userUpdated.Succeeded)
 	                {
-		                TempData["ErrorMessage"] = "Failed to reactivate account.";
+		                TempData["ErrorMessage"] = FailedToReactivateAccount;
 		                return RedirectToAction("Index", "Home");
 	                }
 
@@ -190,7 +191,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Login failed. Please check your email and password.");
+                    ModelState.AddModelError(string.Empty, LoginFailed);
                     return Page();
                 }
 
