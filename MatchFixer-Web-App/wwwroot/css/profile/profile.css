@@ -467,3 +467,14 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     font-size: 1em !important;
 }
 
+
+
+#live-clock {
+    color: #00c2a8;
+    text-shadow: 1px 2px 4px #000000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.65em;
+    margin: 0.65em 0.65em 0em 0em;
+}
