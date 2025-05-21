@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+
+using static MatchFixer.Common.GeneralConstants.MatchResultValidation;
 
 namespace MatchFixer.Infrastructure.Entities
 {
@@ -19,33 +16,33 @@ namespace MatchFixer.Infrastructure.Entities
 		public DateTime Date { get; set; }
 
 		[Required]
-		[StringLength(100, ErrorMessage = "League name cannot exceed 100 characters.")]
-		public string LeagueName { get; set; }
+		[StringLength(LeagueNameMaxLength, ErrorMessage = LeagueNameCannotExceed100Characters)]
+		public string LeagueName { get; set; } = null!;
 
 		[Required]
-		[Range(1900, 2100, ErrorMessage = "Season must be a valid year.")]
+		[Range(YearMinValue, YearMaxValue, ErrorMessage = YearMustBeValid)]
 		public int Season { get; set; }
 
 		[Required]
-		[StringLength(100, ErrorMessage = "Home team name cannot exceed 100 characters.")]
-		public string HomeTeam { get; set; }
+		[StringLength(HomeTeamMaxLength, ErrorMessage = HomeTeamCannotExceed100Characters)]
+		public string HomeTeam { get; set; } = null!;
 
 		[Url]
-		[StringLength(300, ErrorMessage = "Home team logo URL cannot exceed 300 characters.")]
-		public string HomeTeamLogo { get; set; }
+		[StringLength(HomeTeamLogoUrlMaxLength, ErrorMessage = HomeTeamLogoUrlCannotExceed300Characters)]
+		public string HomeTeamLogo { get; set; } = null!;
 
 		[Required]
-		[StringLength(100, ErrorMessage = "Away team name cannot exceed 100 characters.")]
-		public string AwayTeam { get; set; }
+		[StringLength(AwayTeamMaxLength, ErrorMessage = AwayTeamCannotExceed100Characters)]
+		public string AwayTeam { get; set; } = null!;
 
 		[Url]
-		[StringLength(300, ErrorMessage = "Away team logo URL cannot exceed 300 characters.")]
-		public string AwayTeamLogo { get; set; }
+		[StringLength(AwayTeamLogoUrlMaxLength, ErrorMessage = AwayTeamLogoUrlCannotExceed300Characters)]
+		public string AwayTeamLogo { get; set; } = null!;
 
-		[Range(0, 99, ErrorMessage = "Score must be between 0 and 99.")]
+		[Range(ScoreMinValue, ScoreMaxValue, ErrorMessage = ScoreMustBeValid)]
 		public int? HomeScore { get; set; }
 
-		[Range(0, 99, ErrorMessage = "Score must be between 0 and 99.")]
+		[Range(ScoreMinValue, ScoreMaxValue, ErrorMessage = ScoreMustBeValid)]
 		public int? AwayScore { get; set; }
 	}
 }
