@@ -74,7 +74,7 @@ namespace MatchFixer.Core.Services
 				return (new MatchGuessGameViewModel
 				{
 					Score = sessionState.Score
-				}, true); // game over
+				}, true); // Game over
 			}
 
 			// Build the ViewModel
