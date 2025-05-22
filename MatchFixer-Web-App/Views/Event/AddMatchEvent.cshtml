@@ -1,0 +1,46 @@
+﻿@model MatchFixer.Core.ViewModels.LiveEvents.MatchEventFormModel
+
+<div class="container mt-4">
+    <h2>Add Match Event</h2>
+    <form asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
+        <div class="row mb-3">
+            <div class="col">
+                <label asp-for="HomeTeam" class="form-label"></label>
+                <input asp-for="HomeTeam" class="form-control" />
+                <span asp-validation-for="HomeTeam" class="text-danger"></span>
+            </div>
+            <div class="col">
+                <label asp-for="AwayTeam" class="form-label"></label>
+                <input asp-for="AwayTeam" class="form-control" />
+                <span asp-validation-for="AwayTeam" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MatchDate" class="form-label"></label>
+            <input asp-for="MatchDate" class="form-control" type="datetime-local" />
+            <span asp-validation-for="MatchDate" class="text-danger"></span>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label asp-for="HomeOdds" class="form-label"></label>
+                <input asp-for="HomeOdds" class="form-control" />
+            </div>
+            <div class="col">
+                <label asp-for="DrawOdds" class="form-label"></label>
+                <input asp-for="DrawOdds" class="form-control" />
+            </div>
+            <div class="col">
+                <label asp-for="AwayOdds" class="form-label"></label>
+                <input asp-for="AwayOdds" class="form-control" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
