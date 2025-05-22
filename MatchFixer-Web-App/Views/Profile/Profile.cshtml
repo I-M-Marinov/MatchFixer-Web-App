@@ -41,239 +41,239 @@
 <div class="background-profile"></div>
 
 <section class="profile-wrapper d-flex justify-content-start mx-auto py-5">
-	<div class="profile-container d-flex gap-3 w-100">
+<div class="profile-container d-flex gap-3 w-100">
 
-	<!-- Left: Side-by-side Profile Cards -->
-		<div class="profile-card d-flex gap-4 flex-wrap">
-			<!-- MatchFix Score Card -->
-			<div class="d-flex gap-4 flex-wrap flex-column">
-				<div class="card shadow border-0 rounded-4 p-2 profile-matchfix-score" style="width: 135px; height: 135px;">
-					@if (Model.UserRank != null)
-					{
-						<a href="@Url.Action("Leaderboard", "Game")" style="text-decoration: none;">
+<!-- Left: Side-by-side Profile Cards -->
+<div class="profile-card d-flex gap-4 flex-wrap">
+<!-- MatchFix Score Card -->
+<div class="d-flex gap-4 flex-wrap flex-column">
+	<div class="card shadow border-0 rounded-4 p-2 profile-matchfix-score" style="width: 135px; height: 135px;">
+		@if (Model.UserRank != null)
+		{
+			<a href="@Url.Action("Leaderboard", "Game")" style="text-decoration: none;">
 
-						@if (Model.UserRank >= 1 && Model.UserRank <= 3)
-						{
-							<div class="user-rank-icon d-flex justify-content-center align-items-center">
-								<span class="d-flex justify-content-center align-items-center fs-5 text-muted rank-medal badge p-0 m-0">@Html.Raw(GetMedal(Model.UserRank))</span>
-							</div>
-						}
-						else
-						{
-							<div class="d-flex justify-content-center align-items-center">
-								<span class="d-flex justify-content-center align-items-center fs-5 badge bg-primary mb-2 mt-2">@Html.Raw(GetMedal(Model.UserRank))</span>
-							</div>
-						}
-						</a>
-					}
-
-					<div class="d-flex flex-column justify-content-center align-items-center badge">
-						<span class="pb-1">MatchFix Score:</span>
-						<div class="score-digits">
-							@foreach (var digit in Model.MatchFixScore.ToString())
-							{
-								<span class="animate-digit">@digit</span>
-							}
-						</div>
+				@if (Model.UserRank >= 1 && Model.UserRank <= 3)
+				{
+					<div class="user-rank-icon d-flex justify-content-center align-items-center">
+						<span class="d-flex justify-content-center align-items-center fs-5 text-muted rank-medal badge p-0 m-0">@Html.Raw(GetMedal(Model.UserRank))</span>
 					</div>
-				</div>
-				<!-- Danger Zone Card -->
-				<div class="card shadow p-2 profile-danger-zone" style="width: 135px; height: 135px;">
-					<p id="dangerZone-text" style="font-size: 0.65em; text-align: center; margin-bottom: 0.1rem;">Danger Zone</p>
-					<a href="@Url.Action("DangerZone", "Profile")"
-					   id="dangerZone-btn" style="display: block; width: 100%; height: 100%;">
-						<img class=" animate__animated animate__tada" src="/images/danger-zone/dangerZone.png" style="width: 100%; height: 100%; object-fit: contain;" />
-					</a>
-				</div>
+				}
+				else
+				{
+					<div class="d-flex justify-content-center align-items-center">
+						<span class="d-flex justify-content-center align-items-center fs-5 badge bg-primary mb-2 mt-2">@Html.Raw(GetMedal(Model.UserRank))</span>
+					</div>
+				}
+			</a>
+		}
+
+		<div class="d-flex flex-column justify-content-center align-items-center badge">
+			<span class="pb-1">MatchFix Score:</span>
+			<div class="score-digits">
+				@foreach (var digit in Model.MatchFixScore.ToString())
+				{
+					<span class="animate-digit">@digit</span>
+				}
 			</div>
+		</div>
+	</div>
+	<!-- Danger Zone Card -->
+	<div class="card shadow p-2 profile-danger-zone" style="width: 135px; height: 135px;">
+		<p id="dangerZone-text" style="font-size: 0.65em; text-align: center; margin-bottom: 0.1rem;">Danger Zone</p>
+		<a href="@Url.Action("DangerZone", "Profile")"
+		   id="dangerZone-btn" style="display: block; width: 100%; height: 100%;">
+			<img class=" animate__animated animate__tada" src="/images/danger-zone/dangerZone.png" style="width: 100%; height: 100%; object-fit: contain;" />
+		</a>
+	</div>
+</div>
 			
 
-			<div class="card shadow border-0 rounded-4 p-2 flex-fill name-image-container" style="min-width: 250px; max-width: 300px;">
-				<div class="text-center">
-					<div>
-						<form asp-action="UploadProfilePicture" asp-controller="Profile" enctype="multipart/form-data" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
-							<small id="fileError" class="alert error-message d-none">Please select an image before uploading.</small>
-							@Html.AntiForgeryToken()
-							<div class="profile-image-container position-relative">
+<div class="card shadow border-0 rounded-4 p-2 flex-fill name-image-container" style="min-width: 250px; max-width: 300px;">
+	<div class="text-center">
+		<div>
+			<form asp-action="UploadProfilePicture" asp-controller="Profile" enctype="multipart/form-data" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
+				<small id="fileError" class="alert error-message d-none">Please select an image before uploading.</small>
+				@Html.AntiForgeryToken()
+				<div class="profile-image-container position-relative">
 
 
-								<div class="spinner-wrapper">
-									<div class="spinner-ring" id="spinnerRing" style="display: none;"></div>
-									<img src="@Model.ProfileImageUrl"
-									     class="rounded-circle border border-3 border-primary shadow-sm profile-image"
-									     alt="Profile Picture"
-									     id="profileImage"/>
-								</div>
-
-								<!-- Invisible file input -->
-								<input type="file" name="FormFile" accept="image/*" required id="fileInput" class="d-none"/>
-
-								<!-- Overlay label that triggers file input -->
-								<label for="fileInput" class="overlay-label d-flex flex-row align-items-center justify-content-center">
-									<i class="bi bi-cloud-arrow-up fs-4 text-white"></i>
-									<span class="fs-6 text-white ms-2">Upload new</span>
-								</label>
-
-							</div>
-							<button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn" id="uploadBtn">
-								<span class="custom-tooltip-wrapper">
-									<i class="ri-save-line"></i>
-									<span class="custom-tooltip">Upload the picture</span>
-								</span>
-							</button>
-						</form>
-
-
-						<div class="d-flex gap-2 remove-image-container">
-							<form id="removeForm" asp-action="RemoveProfilePicture" asp-controller="Profile" method="post">
-								@Html.AntiForgeryToken()
-								<button type="submit" class="btn btn-sm btn-outline-danger shadow-sm remove-picture-btn" id="removePictureBtn">
-									<span class="custom-tooltip-wrapper">
-										<i class="bi bi-trash"></i>
-										<span class="custom-tooltip">Remove profile picture</span>
-									</span>
-								</button>
-							</form>
-						</div>
+					<div class="spinner-wrapper">
+						<div class="spinner-ring" id="spinnerRing" style="display: none;"></div>
+						<img src="@Model.ProfileImageUrl"
+						     class="rounded-circle border border-3 border-primary shadow-sm profile-image"
+						     alt="Profile Picture"
+						     id="profileImage"/>
 					</div>
 
-					<form id="profile-names-form" method="post" action="@Url.Action("UpdateNames", "Profile")">
-						<input type="hidden" name="Id" value="@Model.Id"/>
-						@Html.AntiForgeryToken()
+					<!-- Invisible file input -->
+					<input type="file" name="FormFile" accept="image/*" required id="fileInput" class="d-none"/>
 
-						<!-- Display Full Name -->
-						<h4 class="mt-3 fw-bold text-shadow profile-name-text">@Model.FullName</h4>
+					<!-- Overlay label that triggers file input -->
+					<label for="fileInput" class="overlay-label d-flex flex-row align-items-center justify-content-center">
+						<i class="bi bi-cloud-arrow-up fs-4 text-white"></i>
+						<span class="fs-6 text-white ms-2">Upload new</span>
+					</label>
 
-						<!-- Editable First Name and Last Name Inputs (hidden initially) -->
-						<div class="d-none name-edit-inputs">
-							<input type="text" class="form-control mb-2" id="first-name" name="FirstName" value="@Model.FirstName" placeholder="First Name"/>
-							<input type="text" class="form-control mb-2" id="last-name" name="LastName" value="@Model.LastName" placeholder="Last Name"/>
-						</div>
+				</div>
+				<button type="submit" class="btn btn-primary btn-sm mt-2 upload-picture-btn" id="uploadBtn">
+					<span class="custom-tooltip-wrapper">
+						<i class="ri-save-line"></i>
+						<span class="custom-tooltip">Upload the picture</span>
+					</span>
+				</button>
+			</form>
 
-						<!-- Edit button -->
-						<div class="button-names-container">
-							<button type="button" class="btn btn-sm btn-outline-primary edit-names-btn">
-								<span class="custom-tooltip-wrapper">
-									<i class="ri-edit-2-line"></i>
-									<span class="custom-tooltip">Edit your name</span>
-								</span>
-							</button>
 
-							<button type="submit" class="btn btn-sm btn-primary d-none save-names-btn mt-2">
-								<span class="custom-tooltip-wrapper">
-									<i class="ri-save-line"></i>
-									<span class="custom-tooltip">Save</span>
-								</span>
-							</button>
-						</div>
+			<div class="d-flex gap-2 remove-image-container">
+				<form id="removeForm" asp-action="RemoveProfilePicture" asp-controller="Profile" method="post">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="btn btn-sm btn-outline-danger shadow-sm remove-picture-btn" id="removePictureBtn">
+						<span class="custom-tooltip-wrapper">
+							<i class="bi bi-trash"></i>
+							<span class="custom-tooltip">Remove profile picture</span>
+						</span>
+					</button>
+				</form>
+			</div>
+		</div>
 
-					</form>
+		<form id="profile-names-form" method="post" action="@Url.Action("UpdateNames", "Profile")">
+			<input type="hidden" name="Id" value="@Model.Id"/>
+			@Html.AntiForgeryToken()
+
+			<!-- Display Full Name -->
+			<h4 class="mt-3 fw-bold text-shadow profile-name-text">@Model.FullName</h4>
+
+			<!-- Editable First Name and Last Name Inputs (hidden initially) -->
+			<div class="d-none name-edit-inputs">
+				<input type="text" class="form-control mb-2" id="first-name" name="FirstName" value="@Model.FirstName" placeholder="First Name"/>
+				<input type="text" class="form-control mb-2" id="last-name" name="LastName" value="@Model.LastName" placeholder="Last Name"/>
+			</div>
+
+			<!-- Edit button -->
+			<div class="button-names-container">
+				<button type="button" class="btn btn-sm btn-outline-primary edit-names-btn">
+					<span class="custom-tooltip-wrapper">
+						<i class="ri-edit-2-line"></i>
+						<span class="custom-tooltip">Edit your name</span>
+					</span>
+				</button>
+
+				<button type="submit" class="btn btn-sm btn-primary d-none save-names-btn mt-2">
+					<span class="custom-tooltip-wrapper">
+						<i class="ri-save-line"></i>
+						<span class="custom-tooltip">Save</span>
+					</span>
+				</button>
+			</div>
+
+		</form>
+	</div>
+</div>
+
+<form id="profile-form" method="post" action="@Url.Action("UpdateProfile", "Profile")" id="update-profile-form">
+	@Html.AntiForgeryToken()
+
+	<input type="hidden" name="Id" value="@Model.Id"/>
+	<input type="hidden" name="FirstName" value="@Model.FirstName"/>
+	<input type="hidden" name="LastName" value="@Model.LastName"/>
+	<input type="hidden" name="CreatedOn" value="@Model.CreatedOn"/>
+
+	<!-- Profile Info Card -->
+	<div class="card shadow border-0 rounded-4 p-4 flex-fill profile-info-container" style="min-width: 550px;">
+		<div id="live-clock"></div>
+
+		<div class="profile-info">
+			<!-- Email Row -->
+			<div class="row mb-3 profile-detail">
+				<div class="row text-center">
+					<div class="col-sm-4 fw-lighter">Email:</div>
+					<div class="col-sm-8">
+						<span class="profile-value">@Model.Email</span>
+						<input type="email" class="d-none form-control" value="@Model.Email" name="Email" id="email-input"/>
+						<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+							<span class="custom-tooltip-wrapper">
+								<i class="ri-edit-2-line"></i>
+								<span class="custom-tooltip">Edit your email</span>
+							</span>
+						</button>
+					</div>
 				</div>
 			</div>
 
-			<form id="profile-form" method="post" action="@Url.Action("UpdateProfile", "Profile")" id="update-profile-form">
-				@Html.AntiForgeryToken()
-
-				<input type="hidden" name="Id" value="@Model.Id"/>
-				<input type="hidden" name="FirstName" value="@Model.FirstName"/>
-				<input type="hidden" name="LastName" value="@Model.LastName"/>
-				<input type="hidden" name="CreatedOn" value="@Model.CreatedOn"/>
-
-				<!-- Profile Info Card -->
-				<div class="card shadow border-0 rounded-4 p-4 flex-fill profile-info-container" style="min-width: 550px;">
-					<div id="live-clock"></div>
-
-					<div class="profile-info">
-						<!-- Email Row -->
-						<div class="row mb-3 profile-detail">
-							<div class="row text-center">
-								<div class="col-sm-4 fw-lighter">Email:</div>
-								<div class="col-sm-8">
-									<span class="profile-value">@Model.Email</span>
-									<input type="email" class="d-none form-control" value="@Model.Email" name="Email" id="email-input"/>
-									<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-										<span class="custom-tooltip-wrapper">
-											<i class="ri-edit-2-line"></i>
-											<span class="custom-tooltip">Edit your email</span>
-										</span>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						<!-- Date of Birth Row -->
-						<div class="row mb-3 profile-detail">
-							<div class="row text-center">
-								<div class="col-sm-4 fw-lighter">Date of Birth:</div>
-								<div class="col-sm-8">
-									<span class="profile-value">@Model.DateOfBirth.ToString("dd MMMM yyyy")</span>
-									<input type="date" class="d-none form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" id="dateOfBirth-input"/>
-									<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-										<span class="custom-tooltip-wrapper">
-											<i class="ri-edit-2-line"></i>
-											<span class="custom-tooltip">Edit date of birth</span>
-										</span>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						<!-- Country Dropdown -->
-						<div class="row mb-3 profile-detail">
-							<div class="row text-center">
-								<div class="col-sm-4 fw-lighter">Country:</div>
-								<div class="col-sm-8">
-									<span class="profile-value">@countryName</span>
-									<span id="country-flag-icon" class="fi fi-@(Model.Country?.ToLower())"></span> <!-- Country Flag using the Free Country Flags library  -->
-									<select asp-for="Country" asp-items="Model.CountryOptions" id="Input_Country" class="d-none form-control text-center">
-										<option value="">Select your country</option>
-									</select>
-
-									<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-										<span class="custom-tooltip-wrapper">
-											<i class="ri-edit-2-line"></i>
-											<span class="custom-tooltip">Edit Country</span>
-										</span>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						<!-- Timezone Dropdown Wrapper -->
-
-						<input type="hidden" id="existingTimezone" value="@Model.TimeZone"/>
-
-						<div class="mb-3 profile-detail" id="timezoneWrapper" style="display: none;">
-							<div class="row text-center">
-								<div class="col-sm-4 fw-lighter">Time Zone:</div>
-								<div class="col-sm-8">
-									<select id="timezoneDropdown" class="form-control text-center"></select>
-									<input type="hidden" id="timezoneHiddenInput" name="TimeZone" value="@Model.TimeZone"/>
-								</div>
-
-							</div>
-						</div>
-
-						<!-- Member Since Row -->
-						<div class="row mb-3 profile-detail">
-							<div class="row text-center">
-								<div class="col-sm-4 fw-lighter">Member since:</div>
-								<div class="col-sm-7">@Model.CreatedOn.ToString("dd MMMM yyyy")</div>
-							</div>
-						</div>
+			<!-- Date of Birth Row -->
+			<div class="row mb-3 profile-detail">
+				<div class="row text-center">
+					<div class="col-sm-4 fw-lighter">Date of Birth:</div>
+					<div class="col-sm-8">
+						<span class="profile-value">@Model.DateOfBirth.ToString("dd MMMM yyyy")</span>
+						<input type="date" class="d-none form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" id="dateOfBirth-input"/>
+						<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+							<span class="custom-tooltip-wrapper">
+								<i class="ri-edit-2-line"></i>
+								<span class="custom-tooltip">Edit date of birth</span>
+							</span>
+						</button>
 					</div>
 				</div>
+			</div>
 
-				<!-- Submit Button -->
-				<div class="text-center mt-3">
-					<button type="submit" class="btn btn-primary d-none" id="save-btn">Save</button>
+			<!-- Country Dropdown -->
+			<div class="row mb-3 profile-detail">
+				<div class="row text-center">
+					<div class="col-sm-4 fw-lighter">Country:</div>
+					<div class="col-sm-8">
+						<span class="profile-value">@countryName</span>
+						<span id="country-flag-icon" class="fi fi-@(Model.Country?.ToLower())"></span> <!-- Country Flag using the Free Country Flags library  -->
+						<select asp-for="Country" asp-items="Model.CountryOptions" id="Input_Country" class="d-none form-control text-center">
+							<option value="">Select your country</option>
+						</select>
+
+						<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+							<span class="custom-tooltip-wrapper">
+								<i class="ri-edit-2-line"></i>
+								<span class="custom-tooltip">Edit Country</span>
+							</span>
+						</button>
+					</div>
 				</div>
-			</form>
+			</div>
+
+			<!-- Timezone Dropdown Wrapper -->
+
+			<input type="hidden" id="existingTimezone" value="@Model.TimeZone"/>
+
+			<div class="mb-3 profile-detail" id="timezoneWrapper" style="display: none;">
+				<div class="row text-center">
+					<div class="col-sm-4 fw-lighter">Time Zone:</div>
+					<div class="col-sm-8">
+						<select id="timezoneDropdown" class="form-control text-center"></select>
+						<input type="hidden" id="timezoneHiddenInput" name="TimeZone" value="@Model.TimeZone"/>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Member Since Row -->
+			<div class="row mb-3 profile-detail">
+				<div class="row text-center">
+					<div class="col-sm-4 fw-lighter">Member since:</div>
+					<div class="col-sm-7">@Model.CreatedOn.ToString("dd MMMM yyyy")</div>
+				</div>
+			</div>
 		</div>
-
-
-
 	</div>
+
+	<!-- Submit Button -->
+	<div class="text-center mt-3">
+		<button type="submit" class="btn btn-primary d-none" id="save-btn">Save</button>
+	</div>
+</form>
+</div>
+
+
+
+</div>
 </section>
 
 @functions {
