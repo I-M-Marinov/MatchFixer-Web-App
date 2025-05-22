@@ -1,0 +1,53 @@
+﻿@model IEnumerable<MatchFixer.Core.ViewModels.LiveEvents.LiveEventViewModel>
+
+@{
+    ViewData["Title"] = "Live Match Events";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Live Match Events</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            No live match events available at the moment.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var match in Model)
+            {
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title text-center">@match.HomeTeam vs @match.AwayTeam</h5>
+                            <p class="card-text text-center text-muted">
+                                Kickoff: @match.KickoffTime.ToString("f")
+                            </p>
+
+                            <div class="d-flex justify-content-around mb-3">
+                                <div>
+                                    <strong>Home:</strong><br />
+                                    <span class="badge bg-success">@match.HomeWinOdds</span>
+                                </div>
+                                <div>
+                                    <strong>Draw:</strong><br />
+                                    <span class="badge bg-secondary">@match.DrawOdds</span>
+                                </div>
+                                <div>
+                                    <strong>Away:</strong><br />
+                                    <span class="badge bg-danger">@match.AwayWinOdds</span>
+                                </div>
+                            </div>
+
+                     @*        <a href="@Url.Action("Details", "Event", new { id = match.Id })" class="btn btn-outline-primary w-100 mt-auto">
+                                View & Bet
+                            </a> *@
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
