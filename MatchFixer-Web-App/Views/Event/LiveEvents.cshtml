@@ -4,8 +4,29 @@
     ViewData["Title"] = "Live Match Events";
 }
 
+<div class="border-0 rounded-4 p-4 flex-fill">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert success-message" id="success-message">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert error-message" id="error-message">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+</div>
+
+
 <div class="container mt-4">
     <h2 class="mb-4">Live Match Events</h2>
+	
+    <div class="game-background"></div>
+
 
     @if (!Model.Any())
     {
@@ -21,8 +42,18 @@
                 <div class="col">
                     <div class="card shadow-sm h-100">
                         <div class="card-body d-flex flex-column justify-content-between">
-                            <h5 class="card-title text-center">@match.HomeTeam vs @match.AwayTeam</h5>
-                            <p class="card-text text-center text-muted">
+	                        <div class="d-flex justify-content-around align-items-center mb-3">
+		                        <div class="text-center">
+                                    <img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="img-fluid mb-2" />
+			                        <div>@match.HomeTeam</div>
+		                        </div>
+		                        <strong>VS</strong>
+		                        <div class="text-center">
+                                    <img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="img-fluid mb-2" />
+			                        <div>@match.AwayTeam</div>
+		                        </div>
+	                        </div>                            
+	                        <p class="card-text text-center text-muted">
                                 Kickoff: @match.KickoffTime.ToString("f")
                             </p>
 
