@@ -25,12 +25,13 @@ namespace MatchFixer.Infrastructure.Services
 
 		public async Task FetchAndSaveFixturesAsync()
 		{
-			var leagueIds = new[] {
-			PremierLeagueId,
-			LaLigaId,
-			BundesligaId,
-			SeriaAId
-		};
+			var leagueIds = new[]
+			{
+				PremierLeagueId, 
+				LaLigaId, 
+				BundesligaId, 
+				SeriaAId
+			};
 
 			foreach (var leagueId in leagueIds)
 			{
@@ -51,27 +52,117 @@ namespace MatchFixer.Infrastructure.Services
 				foreach (var match in fixtures.Response)
 				{
 					if (await _dbContext.MatchResults.AnyAsync(m => m.ApiFixtureId == match.Fixture.Id))
-						continue; // Avoid duplicates
+						continue;
 
+					// Get or create Home Team
+					var homeTeam = await _dbContext.Teams
+						.FirstOrDefaultAsync(t => t.Name == match.Teams.Home.Name);
+
+					if (homeTeam == null)
+					{
+						homeTeam = new Team
+						{
+							Id = Guid.NewGuid(),
+							Name = match.Teams.Home.Name,
+							LogoUrl = match.Teams.Home.Logo
+						};
+
+						await _dbContext.Teams.AddAsync(homeTeam);
+						await _dbContext.SaveChangesAsync(); // Save to get ID for FK
+					}
+
+					// Get or create Away Team
+					var awayTeam = await _dbContext.Teams
+						.FirstOrDefaultAsync(t => t.Name == match.Teams.Away.Name);
+
+					if (awayTeam == null)
+					{
+						awayTeam = new Team
+						{
+							Id = Guid.NewGuid(),
+							Name = match.Teams.Away.Name,
+							LogoUrl = match.Teams.Away.Logo
+						};
+
+						await _dbContext.Teams.AddAsync(awayTeam);
+						await _dbContext.SaveChangesAsync();
+					}
+
+					// Create MatchResult
 					var entity = new MatchResult
 					{
 						ApiFixtureId = match.Fixture.Id,
 						Date = match.Fixture.Date,
 						LeagueName = match.League.Name,
 						Season = match.League.Season,
-						HomeTeam = match.Teams.Home.Name,
-						HomeTeamLogo = match.Teams.Home.Logo,
-						AwayTeam = match.Teams.Away.Name,
-						AwayTeamLogo = match.Teams.Away.Logo,
+
+						HomeTeamId = homeTeam.Id,
+						AwayTeamId = awayTeam.Id,
+
 						HomeScore = match.Goals.Home,
 						AwayScore = match.Goals.Away
 					};
 
-					_dbContext.MatchResults.Add(entity);
+					await _dbContext.MatchResults.AddAsync(entity);
 				}
 
 				await _dbContext.SaveChangesAsync();
 			}
 		}
+
+
+		public async Task FetchAndSaveTeamsAsync()
+		{
+			var leagueIds = new[]
+			{
+				PremierLeagueId,
+				LaLigaId,
+				BundesligaId,
+				SeriaAId,
+				Ligue1Id,
+				EredivisieId,
+				LigaPortugalId,
+				CroatianLeagueId,
+				SwissLeagueId
+			};
+
+			foreach (var leagueId in leagueIds)
+			{
+				var url = $"https://v3.football.api-sports.io/teams?league={leagueId}&season={Season}";
+
+				var request = new HttpRequestMessage(HttpMethod.Get, url);
+				request.Headers.Add("x-apisports-key", _apiKey);
+
+				var response = await _httpClient.SendAsync(request);
+				response.EnsureSuccessStatusCode();
+
+				var json = await response.Content.ReadAsStringAsync();
+				var apiResponse = JsonSerializer.Deserialize<TeamListApiResponse>(json, new JsonSerializerOptions
+				{
+					PropertyNameCaseInsensitive = true
+				});
+
+				foreach (var teamInfo in apiResponse.Response)
+				{
+					// Avoid duplicates by name 
+					bool exists = await _dbContext.Teams.AnyAsync(t => t.Name == teamInfo.Team.Name);
+
+					if (!exists)
+					{
+						var team = new Team
+						{
+							Id = Guid.NewGuid(),
+							Name = teamInfo.Team.Name,
+							LogoUrl = teamInfo.Team.Logo
+						};
+
+						await _dbContext.Teams.AddAsync(team);
+					}
+				}
+			}
+
+			await _dbContext.SaveChangesAsync();
+		}
+
 	}
 }
