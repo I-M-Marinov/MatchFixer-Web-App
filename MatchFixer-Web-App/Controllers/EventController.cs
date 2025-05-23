@@ -1,19 +1,20 @@
-﻿using MatchFixer.Core.ViewModels.LiveEvents;
+﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
-using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace MatchFixer_Web_App.Controllers
 {
 	public class EventController : Controller
 	{
 		private readonly MatchFixerDbContext _dbContext;
+		private readonly IMatchEventService _matchEventService;
 
-		public EventController(MatchFixerDbContext dbContext)
+		public EventController(MatchFixerDbContext dbContext, IMatchEventService matchEventService)
 		{
 			_dbContext = dbContext;
+			_matchEventService = matchEventService;
 		}
 
 		[HttpGet]
@@ -25,6 +26,7 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpPost]
 		[Authorize]
+
 		public async Task<IActionResult> AddMatchEvent(MatchEventFormModel model)
 		{
 			if (!ModelState.IsValid)
@@ -32,40 +34,33 @@ namespace MatchFixer_Web_App.Controllers
 				return View(model);
 			}
 
-			var matchEvent = new MatchEvent
+			try
 			{
-				Id = Guid.NewGuid(),
-				HomeTeam = model.HomeTeam,
-				AwayTeam = model.AwayTeam,
-				MatchDate = model.MatchDate,
-				HomeOdds = model.HomeOdds,
-				DrawOdds = model.DrawOdds,
-				AwayOdds = model.AwayOdds
-			};
-
-			_dbContext.MatchEvents.Add(matchEvent);
-			await _dbContext.SaveChangesAsync();
+				await _matchEventService.AddEventAsync(model);
+			}
+			catch (Exception e)
+			{
+				TempData["ErrorMessage"] = e.Message;
+			}
 
 			return RedirectToAction(nameof(LiveEvents));
 		}
+
 
 		[HttpGet]
 		[Authorize]
 		public async Task<IActionResult> LiveEvents()
 		{
-			var events =  await _dbContext.MatchEvents
-				.OrderBy(e => e.MatchDate)
-				.Select(e => new LiveEventViewModel
-				{
-					Id = e.Id,
-					HomeTeam = e.HomeTeam,
-					AwayTeam = e.AwayTeam,
-					KickoffTime = e.MatchDate,
-					HomeWinOdds = e.HomeOdds ?? 0,
-					DrawOdds = e.DrawOdds ?? 0,
-					AwayWinOdds = e.AwayOdds ?? 0
-				})
-				.ToListAsync();
+			var events = new List<LiveEventViewModel>();
+
+			try
+			{
+				events = await _matchEventService.GetLiveEventsAsync();
+			}
+			catch (Exception e)
+			{
+				TempData["ErrorMessage"] = "Failed to get the live events!"; 
+			}
 
 			return View(events);
 		}
