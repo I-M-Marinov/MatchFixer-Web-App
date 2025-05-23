@@ -11,6 +11,8 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public decimal HomeWinOdds { get; set; }
 		public decimal DrawOdds { get; set; }
 		public decimal AwayWinOdds { get; set; }
+		public string? HomeTeamLogoUrl { get; set; }
+		public string? AwayTeamLogoUrl { get; set; }
 	}
 
 }
