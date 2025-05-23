@@ -25,11 +25,23 @@ namespace MatchFixer.Core.Services
 
 		public async Task<MatchResult?> GetRandomMatchAsync()
 		{
-			var ids = await _context.MatchResults.Select(m => m.Id).ToListAsync();
+			var ids = await _context.MatchResults
+				.Include(e => e.HomeTeam)
+				.Include(e => e.AwayTeam)
+				.AsNoTracking()
+				.Select(m => m.Id).ToListAsync();
+
 			if (!ids.Any()) return null;
 
 			int randomId = ids[_random.Next(ids.Count)];
-			return await _context.MatchResults.FirstOrDefaultAsync(m => m.Id == randomId);
+
+			var randomGame = await _context.MatchResults
+				.Include(e => e.HomeTeam)
+				.Include(e => e.AwayTeam)
+				.AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == randomId);
+
+			return randomGame;
 		}
 
 		public bool CheckAnswer(MatchResult match, int userHomeScore, int userAwayScore)
@@ -38,7 +50,12 @@ namespace MatchFixer.Core.Services
 		}
 		public async Task<MatchResult?> GetMatchByIdAsync(int id)
 		{
-			return await _context.MatchResults.FindAsync(id);
+			return await _context.MatchResults
+				.Include(e => e.HomeTeam)
+				.Include(e => e.AwayTeam)
+				.Where(m => m.Id == id)
+				.AsNoTracking()
+				.FirstOrDefaultAsync();
 		}
 
 		public async Task<(MatchGuessGameViewModel ViewModel, bool IsGameOver)> PrepareNextQuestionAsync(ISession session)
@@ -87,10 +104,10 @@ namespace MatchFixer.Core.Services
 				League = match.LeagueName,
 				ActualHomeScore = match.HomeScore,
 				ActualAwayScore = match.AwayScore,
-				HomeTeam = match.HomeTeam,
-				AwayTeam = match.AwayTeam,
-				HomeTeamLogo = match.HomeTeamLogo,
-				AwayTeamLogo = match.AwayTeamLogo
+				HomeTeam = match.HomeTeam.Name,
+				AwayTeam = match.AwayTeam.Name,
+				HomeTeamLogo = match.HomeTeam.LogoUrl,
+				AwayTeamLogo = match.AwayTeam.LogoUrl
 			};
 
 			return (viewModel, false); // Game continues
@@ -162,10 +179,10 @@ namespace MatchFixer.Core.Services
 				ActualHomeScore = match.HomeScore,
 				ActualAwayScore = match.AwayScore,
 				IsAnswered = true,
-				HomeTeam = match.HomeTeam,
-				AwayTeam = match.AwayTeam,
-				HomeTeamLogo = match.HomeTeamLogo,
-				AwayTeamLogo = match.AwayTeamLogo
+				HomeTeam = match.HomeTeam.Name,
+				AwayTeam = match.AwayTeam.Name,
+				HomeTeamLogo = match.HomeTeam.LogoUrl,
+				AwayTeamLogo = match.AwayTeam.LogoUrl
 			};
 
 			return (resultViewModel, isGameOver);
