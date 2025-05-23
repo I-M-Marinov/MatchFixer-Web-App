@@ -17,6 +17,7 @@ namespace MatchFixer.Infrastructure
  		public virtual DbSet<ProfilePicture> ProfilePictures { get; set; }
 		public virtual DbSet<MatchEvent> MatchEvents { get; set; }
 		public virtual DbSet<Bet> Bets { get; set; }
+		public virtual DbSet<Team> Teams { get; set; }
 		public virtual DbSet<MatchResult> MatchResults { get; set; }
 
 
@@ -41,6 +42,22 @@ namespace MatchFixer.Infrastructure
 				entity.Property(e => e.Amount).HasPrecision(10, 2); 
 				entity.Property(e => e.WinAmount).HasPrecision(10, 2); 
 			});
+
+			builder.Entity<Team>()
+				.HasIndex(t => t.Name)
+				.IsUnique();
+
+			builder.Entity<MatchResult>()
+				.HasOne(m => m.HomeTeam)
+				.WithMany(t => t.HomeMatches)
+				.HasForeignKey(m => m.HomeTeamId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.Entity<MatchResult>()
+				.HasOne(m => m.AwayTeam)
+				.WithMany(t => t.AwayMatches)
+				.HasForeignKey(m => m.AwayTeamId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }
