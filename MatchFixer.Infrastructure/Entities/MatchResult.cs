@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 using static MatchFixer.Common.GeneralConstants.MatchResultValidation;
 
 namespace MatchFixer.Infrastructure.Entities
@@ -23,21 +23,14 @@ namespace MatchFixer.Infrastructure.Entities
 		[Range(YearMinValue, YearMaxValue, ErrorMessage = YearMustBeValid)]
 		public int Season { get; set; }
 
-		[Required]
-		[StringLength(HomeTeamMaxLength, ErrorMessage = HomeTeamCannotExceed100Characters)]
-		public string HomeTeam { get; set; } = null!;
+		public Guid HomeTeamId { get; set; }
+		public Guid AwayTeamId { get; set; }
 
-		[Url]
-		[StringLength(HomeTeamLogoUrlMaxLength, ErrorMessage = HomeTeamLogoUrlCannotExceed300Characters)]
-		public string HomeTeamLogo { get; set; } = null!;
+		[ForeignKey(nameof(HomeTeamId))]
+		public Team HomeTeam { get; set; }
 
-		[Required]
-		[StringLength(AwayTeamMaxLength, ErrorMessage = AwayTeamCannotExceed100Characters)]
-		public string AwayTeam { get; set; } = null!;
-
-		[Url]
-		[StringLength(AwayTeamLogoUrlMaxLength, ErrorMessage = AwayTeamLogoUrlCannotExceed300Characters)]
-		public string AwayTeamLogo { get; set; } = null!;
+		[ForeignKey(nameof(AwayTeamId))]
+		public Team AwayTeam { get; set; }
 
 		[Range(ScoreMinValue, ScoreMaxValue, ErrorMessage = ScoreMustBeValid)]
 		public int? HomeScore { get; set; }
