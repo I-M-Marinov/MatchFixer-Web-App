@@ -47,6 +47,7 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();						// Register Ema
 builder.Services.AddScoped<IUserService, UserService>();						// Add the User Service 
 builder.Services.AddScoped<IImageService, ImageService>();						// Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Profile Service 
+builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
 builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
@@ -83,7 +84,7 @@ using (var scope = app.Services.CreateScope())
 	await SeedDefaultProfilePicture(userManager, services);           // Seed the Default User Image
 	await SeedDeletedUsersProfilePicture(userManager, services);     // Seed the Deleted User Image ( when user deletes their profile ) 
 	await SeedMatchResultsAsync(services);							// Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga
-
+	await SeedTeams(services);                                     // Seed the Teams in the Teams Table
 }
 
 
