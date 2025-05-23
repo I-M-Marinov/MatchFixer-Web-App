@@ -71,5 +71,19 @@ namespace MatchFixer.Infrastructure.SeedData
 
 			await footballApiService.FetchAndSaveFixturesAsync();
 		}
+
+		public static async Task SeedTeams(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+			var footballApiService = serviceProvider.GetRequiredService<FootballApiService>();
+
+			// Safeguard: If there's already teams data, skip seeding
+			if (await dbContext.Teams.AnyAsync())
+			{
+				return;
+			}
+
+			await footballApiService.FetchAndSaveTeamsAsync();
+		}
 	}
 }
