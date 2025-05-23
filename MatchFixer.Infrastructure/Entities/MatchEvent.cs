@@ -1,6 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 using static MatchFixer.Common.GeneralConstants.MatchEventValidation;
 
 namespace MatchFixer.Infrastructure.Entities
@@ -10,13 +10,15 @@ namespace MatchFixer.Infrastructure.Entities
 		[Key]
 		public Guid Id { get; set; }
 
-		[Required]
-		[StringLength(HomeTeamMaxLength, ErrorMessage = HomeTeamCannotExceed100Characters)]
-		public string HomeTeam { get; set; } = null!;
+		public Guid HomeTeamId { get; set; }
+		public Guid AwayTeamId { get; set; }
 
-		[Required]
-		[StringLength(AwayTeamMaxLength, ErrorMessage = AwayTeamCannotExceed100Characters)]
-		public string AwayTeam { get; set; } = null!;
+		[ForeignKey(nameof(HomeTeamId))]
+		public Team HomeTeam { get; set; }
+
+		[ForeignKey(nameof(AwayTeamId))]
+		public Team AwayTeam { get; set; }
+
 		[Required]
 		public DateTime MatchDate { get; set; }
 
