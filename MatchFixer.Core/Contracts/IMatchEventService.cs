@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Core.ViewModels.LiveEvents;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace MatchFixer.Core.Contracts
 		Task<List<LiveEventViewModel>> GetLiveEventsAsync();
 		Task AddEventAsync(MatchEventFormModel model);
 		Task<string> GetTeamLogo(string name);
+		Task<List<SelectListItem>> GetAllTeamsAsSelectListAsync();
 	}
 }
