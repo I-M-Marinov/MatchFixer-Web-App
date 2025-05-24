@@ -1,29 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
+using static MatchFixer.Common.ValidationConstants.MatchEventFormValidations;
+
 namespace MatchFixer.Core.ViewModels.LiveEvents
 {
 	public class MatchEventFormModel
 	{
 
-		[Required]
+		[Required(ErrorMessage = ChooseAValidTeam)]
 		public Guid HomeTeamId { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = ChooseAValidTeam)]
 		public Guid AwayTeamId { get; set; }
 
 		public IEnumerable<SelectListItem> Teams { get; set; } = new List<SelectListItem>();
 
-		[Required]
+		[Required(ErrorMessage = ChooseAValidDateAndTime)]
 		[DataType(DataType.DateTime)]
-		public DateTime MatchDate { get; set; }
+		public DateTime MatchDate { get; set; } = DateTime.UtcNow;
 
+		[Required(ErrorMessage = ChooseValidHomeTeamOdds)]
 		[Range(1.01, 100)]
 		public decimal? HomeOdds { get; set; }
 
+		[Required(ErrorMessage = ChooseValidDrawOdds)]
 		[Range(1.01, 100)]
 		public decimal? DrawOdds { get; set; }
 
+		[Required(ErrorMessage = ChooseValidAwayTeamOdds)]
 		[Range(1.01, 100)]
 		public decimal? AwayOdds { get; set; }
 	}
