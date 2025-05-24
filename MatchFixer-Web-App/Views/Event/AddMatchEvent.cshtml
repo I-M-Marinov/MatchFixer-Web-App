@@ -9,14 +9,16 @@
     <form asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
         <div class="row mb-3">
             <div class="col">
-                <label asp-for="HomeTeam" class="form-label"></label>
-                <input asp-for="HomeTeam" class="form-control" />
-                <span asp-validation-for="HomeTeam" class="text-danger"></span>
+	            <select asp-for="HomeTeamId" class="form-control" asp-items="Model.Teams">
+		            <option value="">-- Select Home Team --</option>
+	            </select>
+	            <span asp-validation-for="HomeTeamId" class="text-danger"></span>
             </div>
             <div class="col">
-                <label asp-for="AwayTeam" class="form-label"></label>
-                <input asp-for="AwayTeam" class="form-control" />
-                <span asp-validation-for="AwayTeam" class="text-danger"></span>
+	            <select asp-for="AwayTeamId" class="form-control" asp-items="Model.Teams">
+		            <option value="">-- Select Away Team --</option>
+	            </select>
+	            <span asp-validation-for="AwayTeamId" class="text-danger"></span>
             </div>
         </div>
 
