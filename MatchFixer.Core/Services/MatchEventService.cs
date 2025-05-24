@@ -4,6 +4,7 @@ using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 namespace MatchFixer.Core.Services
@@ -43,11 +44,8 @@ namespace MatchFixer.Core.Services
 
 		public async Task AddEventAsync(MatchEventFormModel model)
 		{
-			var homeTeam = await _dbContext.Teams
-				.FirstOrDefaultAsync(t => t.Name == model.HomeTeam);
-
-			var awayTeam = await _dbContext.Teams
-				.FirstOrDefaultAsync(t => t.Name == model.AwayTeam);
+			var homeTeam = await _dbContext.Teams.FindAsync(model.HomeTeamId);
+			var awayTeam = await _dbContext.Teams.FindAsync(model.AwayTeamId);
 
 			if (homeTeam == null || awayTeam == null)
 			{
@@ -57,8 +55,8 @@ namespace MatchFixer.Core.Services
 			var matchEvent = new MatchEvent
 			{
 				Id = Guid.NewGuid(),
-				HomeTeamId = homeTeam!.Id,
-				AwayTeamId = awayTeam!.Id,
+				HomeTeamId = model.HomeTeamId,
+				AwayTeamId = model.AwayTeamId,
 				MatchDate = model.MatchDate,
 				HomeOdds = model.HomeOdds,
 				DrawOdds = model.DrawOdds,
@@ -80,7 +78,18 @@ namespace MatchFixer.Core.Services
 			return logo;
 		}
 
-
+		public async Task<List<SelectListItem>> GetAllTeamsAsSelectListAsync()
+		{
+			return await _dbContext.Teams
+				.OrderBy(t => t.Name)
+				.Select(t => new SelectListItem
+				{
+					Value = t.Id.ToString(),
+					Text = t.Name
+				})
+				.AsNoTracking()
+				.ToListAsync();
+		}
 
 	}
 }
