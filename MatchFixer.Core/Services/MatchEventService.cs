@@ -5,6 +5,7 @@ using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Globalization;
 
 
 namespace MatchFixer.Core.Services
@@ -52,12 +53,15 @@ namespace MatchFixer.Core.Services
 				throw new Exception("Home or Away team does not exist!");
 			}
 
+			var formattedDateAndTime = model.MatchDate.ToString("f", CultureInfo.InvariantCulture);
+
+
 			var matchEvent = new MatchEvent
 			{
 				Id = Guid.NewGuid(),
 				HomeTeamId = model.HomeTeamId,
 				AwayTeamId = model.AwayTeamId,
-				MatchDate = model.MatchDate,
+				MatchDate = DateTime.Parse(formattedDateAndTime),
 				HomeOdds = model.HomeOdds,
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds
@@ -85,7 +89,7 @@ namespace MatchFixer.Core.Services
 				.Select(t => new SelectListItem
 				{
 					Value = t.Id.ToString(),
-					Text = t.Name
+					Text = $"{t.Name}|{t.LogoUrl}"
 				})
 				.AsNoTracking()
 				.ToListAsync();
