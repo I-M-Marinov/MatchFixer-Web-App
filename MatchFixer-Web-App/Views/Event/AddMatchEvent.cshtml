@@ -4,49 +4,107 @@
 <div class="game-background"></div>
 
 
-<div class="container mt-4">
+<div class="add-match-event-container mt-4">
     <h2>Add Match Event</h2>
-    <form asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
-        <div class="row mb-3">
-            <div class="col">
-	            <select asp-for="HomeTeamId" class="form-control" asp-items="Model.Teams">
-		            <option value="">-- Select Home Team --</option>
-	            </select>
-	            <span asp-validation-for="HomeTeamId" class="text-danger"></span>
-            </div>
-            <div class="col">
-	            <select asp-for="AwayTeamId" class="form-control" asp-items="Model.Teams">
-		            <option value="">-- Select Away Team --</option>
-	            </select>
-	            <span asp-validation-for="AwayTeamId" class="text-danger"></span>
-            </div>
-        </div>
+	<form id="team-selection-form" asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
+	    @Html.AntiForgeryToken()
+	    <div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
+		    <div class="col">
+			    <div class="text-center my-2">
+				    <img id="home-team-logo"
+						 src="/images/add-match/question-mark.png"
+						 alt="Home Team Logo"
+						 class="team-logo" 
+						 style="max-height: 75px; margin-bottom:1em;" />			    
+				</div>
+			    <select asp-for="HomeTeamId" id="home-team-select" class="form-control">
+				    <option value="">-- Select Home Team --</option>
+				    @foreach (var team in Model.Teams)
+				    {
+					    var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+					    var teamName = team.Text.Split('|').FirstOrDefault();
+					    <option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+				    }
+			    </select>
+			    <span asp-validation-for="HomeTeamId" class="text-danger"></span>
+		    </div>
+		   
+		    <div class="col">
+			    <div class="text-center my-2">
+				    <img id="away-team-logo" 
+				         src="/images/add-match/question-mark.png" 
+				         alt="Away Team Logo" 
+				         class="team-logo"
+						 style="max-height: 75px; margin-bottom:1em;"  />
+				</div>
+			    <select asp-for="AwayTeamId" id="away-team-select" class="form-control">
+				    <option value="">-- Select Away Team --</option>
+				    @foreach (var team in Model.Teams)
+				    {
+					    var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+					    var teamName = team.Text.Split('|').FirstOrDefault();
+					    <option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+				    }
+			    </select>
+			    <span asp-validation-for="AwayTeamId" class="text-danger"></span>
+		    </div>
+	    </div>
 
-        <div class="mb-3">
-            <label asp-for="MatchDate" class="form-label"></label>
-            <input asp-for="MatchDate" class="form-control" type="datetime-local" />
-            <span asp-validation-for="MatchDate" class="text-danger"></span>
-        </div>
+	    <div id="dateAndTime" class="mb-3">
+		    <label asp-for="MatchDate" class="form-label">Date and Time</label>
+		    <input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
+		    <span asp-validation-for="MatchDate" class="text-danger"></span>
+	    </div>
 
-        <div class="row mb-3">
-            <div class="col">
-                <label asp-for="HomeOdds" class="form-label"></label>
-                <input asp-for="HomeOdds" class="form-control" />
-            </div>
-            <div class="col">
-                <label asp-for="DrawOdds" class="form-label"></label>
-                <input asp-for="DrawOdds" class="form-control" />
-            </div>
-            <div class="col">
-                <label asp-for="AwayOdds" class="form-label"></label>
-                <input asp-for="AwayOdds" class="form-control" />
-            </div>
-        </div>
+		<div class="d-flex justify-content-center align-items-center row mb-3">
+		    <div class="home-odds col">
+			    <label asp-for="HomeOdds" class="form-label">Home Team Win</label>
+			    <input asp-for="HomeOdds" class="form-control"/>
+			    <span asp-validation-for="HomeOdds" class="text-danger"></span>
+		    </div>
+			<div class="draw-odds col">
+			    <label asp-for="DrawOdds" class="form-label">Draw</label>
+			    <input asp-for="DrawOdds" class="form-control"/>
+			    <span asp-validation-for="DrawOdds" class="text-danger"></span>
 
-        <button type="submit" class="btn btn-success">Save</button>
+		    </div>
+			<div class="away-odds col">
+			    <label asp-for="AwayOdds" class="form-label">Away Team Win</label>
+			    <input asp-for="AwayOdds" class="form-control"/>
+			    <span asp-validation-for="AwayOdds" class="text-danger"></span>
+
+		    </div>
+	    </div>
+
+	    <button type="submit" class="btn btn-success">Save</button>
     </form>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+	<partial name="_ValidationScriptsPartial" />
+
+	<script>
+
+		function logoChange(selectId, logoImgId, placeholder) {
+			const select = document.getElementById(selectId);
+			const logoImg = document.getElementById(logoImgId);
+
+			select.addEventListener('change', function () {
+				const selectedOption = select.options[select.selectedIndex];
+				const logoUrl = selectedOption.getAttribute('data-logo');
+
+				if (selectedOption.value === "" || !logoUrl) {
+					logoImg.src = placeholder;
+				} else {
+					logoImg.src = logoUrl;
+				}
+			});
+		}
+
+		const placeholderImage = '/images/add-match/question-mark.png';
+
+		logoChange('home-team-select', 'home-team-logo', placeholderImage);
+		logoChange('away-team-select', 'away-team-logo', placeholderImage);
+
+	</script>
 }
