@@ -1,14 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace MatchFixer.Core.ViewModels.LiveEvents
 {
 	public class MatchEventFormModel
 	{
-		[Required] 
-		public string HomeTeam { get; set; } = null!;
 
 		[Required]
-		public string AwayTeam { get; set; } = null!;
+		public Guid HomeTeamId { get; set; }
+
+		[Required]
+		public Guid AwayTeamId { get; set; }
+
+		public IEnumerable<SelectListItem> Teams { get; set; } = new List<SelectListItem>();
 
 		[Required]
 		[DataType(DataType.DateTime)]
