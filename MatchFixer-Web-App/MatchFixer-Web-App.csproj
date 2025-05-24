@@ -33,6 +33,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\football-pitch\" />
     <Folder Include="wwwroot\images\danger-zone\" />
+    <Folder Include="wwwroot\images\add-match\" />
   </ItemGroup>
 
 </Project>

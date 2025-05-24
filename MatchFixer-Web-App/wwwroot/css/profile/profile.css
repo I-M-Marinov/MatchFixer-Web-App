@@ -290,7 +290,10 @@
     max-width: 19em !important;
 }
     
-#timezoneDropdown, #timezoneDropdownInRegister, #Input_Country, #Input_CountryInRegister{
+#timezoneDropdown, 
+#timezoneDropdownInRegister, 
+#Input_Country, 
+#Input_CountryInRegister{
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
