@@ -1,0 +1,80 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&display=swap');
+
+
+.add-match-event-container {
+    max-width: 60%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.teams-information{
+    max-width: 66.6%;
+    min-width: 25em;
+}
+
+#team-selection-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #3370a8;
+    box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 25px 20px -20px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
+    padding: 1em;
+    background: #2A7B9B;
+    background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+}
+
+#home-team-select,
+#away-team-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%2308ac93" class="bi bi-caret-down-fill" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592c.86 0 1.319 1.013.753 1.658l-4.796 5.482a1 1 0 0 1-1.506 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5em center;
+    background-size: 0.85em;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    display: inline-block;
+    overflow-y: auto;
+}
+
+
+#dateAndTime {
+    max-width: 30%;
+    margin: 0 auto;
+}
+
+#dateAndTime .form-label {
+    font-family: 'Inclusive Sans', sans-serif !important;
+    font-weight: 550 !important;
+    color: #124e86;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 0px 1px 1px #ffffff;
+}
+
+
+.home-odds,
+.away-odds,
+.draw-odds {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 25%;
+}
+
+.home-odds label,
+.away-odds label,
+.draw-odds label {
+    font-family: 'Inclusive Sans', sans-serif !important;
+    font-weight: 550 !important;
+    color: #124e86;
+    text-shadow: 0px 1px 1px #ffffff;
+}
