@@ -19,18 +19,23 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public IActionResult AddMatchEvent()
+		public async Task<IActionResult> AddMatchEvent()
 		{
-			return View();
+			var model = new MatchEventFormModel
+			{
+				Teams = await _matchEventService.GetAllTeamsAsSelectListAsync()
+			};
+
+			return View(model);
 		}
 
 		[HttpPost]
 		[Authorize]
-
 		public async Task<IActionResult> AddMatchEvent(MatchEventFormModel model)
 		{
 			if (!ModelState.IsValid)
 			{
+				model.Teams = await _matchEventService.GetAllTeamsAsSelectListAsync();
 				return View(model);
 			}
 
@@ -41,6 +46,9 @@ namespace MatchFixer_Web_App.Controllers
 			catch (Exception e)
 			{
 				TempData["ErrorMessage"] = e.Message;
+
+				model.Teams = await _matchEventService.GetAllTeamsAsSelectListAsync();
+				return View(model);
 			}
 
 			return RedirectToAction(nameof(LiveEvents));
