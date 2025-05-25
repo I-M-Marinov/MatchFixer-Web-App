@@ -31,4 +31,26 @@ document.addEventListener("DOMContentLoaded", function () {
             successMessage.style.display = 'none';
         }, 4500);
     }
+
+    /*--------------------------------------------------------------------------------
+    |      FADE OUT MODEL ERROR MESSAGE AND RESET THE HOME AND AWAY DROPDOWNS         |
+    ---------------------------------------------------------------------------------*/
+
+
+    var homeTeamSelect = document.getElementById('home-team-select');
+    var awayTeamSelect = document.getElementById('away-team-select');
+    var homeTeamLogo = document.getElementById('home-team-logo');
+    var awayTeamLogo = document.getElementById('away-team-logo');
+
+    var modelErrorMessage = document.getElementById('model-error-add-event');
+    if (modelErrorMessage) {
+        setTimeout(function () {
+            if (homeTeamSelect) homeTeamSelect.selectedIndex = 0;
+            if (awayTeamSelect) awayTeamSelect.selectedIndex = 0;
+            modelErrorMessage.classList.add('fade-out');
+        }, 1000);
+        setTimeout(function () {       
+            modelErrorMessage.style.display = 'none';
+        }, 4500);
+    }
 });
