@@ -34,6 +34,7 @@
     <Folder Include="wwwroot\images\football-pitch\" />
     <Folder Include="wwwroot\images\danger-zone\" />
     <Folder Include="wwwroot\images\add-match\" />
+    <Folder Include="wwwroot\images\leaderboard\" />
   </ItemGroup>
 
 </Project>

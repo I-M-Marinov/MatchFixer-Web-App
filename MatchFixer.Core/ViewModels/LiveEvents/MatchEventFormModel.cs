@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using MatchFixer.Infrastructure.ValidationAttributes;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-
+using MatchFixer.Core.ValidationAttributes;
 using static MatchFixer.Common.ValidationConstants.MatchEventFormValidations;
 
 namespace MatchFixer.Core.ViewModels.LiveEvents
 {
+	[DifferentTeams]
 	public class MatchEventFormModel
 	{
 
