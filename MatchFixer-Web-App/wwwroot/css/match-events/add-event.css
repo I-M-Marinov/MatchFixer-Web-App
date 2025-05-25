@@ -4,6 +4,7 @@
 .add-match-event-container {
     max-width: 60%;
     margin: 0 auto;
+    margin-top: 5rem !important;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -77,4 +78,54 @@
     font-weight: 550 !important;
     color: #124e86;
     text-shadow: 0px 1px 1px #ffffff;
+}
+
+/*----------------------------------------------------------------
+|             MODEL ERRORS SPAN + VALIDATION ERRORS              |
+-----------------------------------------------------------------*/
+
+#model-error-add-event {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #3370a8;
+    margin: 0em !important;
+    padding: 0.5em !important;
+    color: #ffffff !important;
+    border-radius: 0.5em;
+    border: 1px solid #2A7B9B;
+}
+
+.validation-add-event {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #3370a8;
+    margin-top: 0.30em;
+    padding: 0.5em !important;
+    color: #000000 !important;
+    border-radius: 0.5em;
+    font-size: 0.65em;
+    display: none; /* Hide by default */
+}
+
+.validation-add-event.field-validation-error {
+    display: block; /* Show only when there's an error */
+}
+
+.centered-validation.field-validation-error {
+    display: block; /* Show only when there's an error */
+}
+
+#model-error-add-event ul {
+    margin: 0em !important;
+    padding: 0em !important;
+}
+
+#model-error-add-event ul li{
+    font-size: 0.85em;
+}
+
+#model-error-add-event.field-validation-error {
+    display: block !important;
 }
