@@ -15,6 +15,7 @@
 @import "/css/game/start-game-screen.css";
 @import "/css/match-events/add-event.css";
 @import "/css/leaderboard/leaderboard.css";
+@import "/css/match-events/live-events.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
