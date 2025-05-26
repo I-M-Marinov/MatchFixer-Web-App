@@ -1,0 +1,160 @@
+﻿@* _WikipediaTooltipPartial.cshtml *@
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debounce function to prevent rapid API calls
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        const showTooltip = async (element, teamName) => {
+            const position = element.getBoundingClientRect();
+
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'wiki-tooltip';
+            tooltip.style.top = `${position.bottom + window.scrollY + 5}px`;
+            tooltip.style.left = `${position.left + window.scrollX}px`;
+            tooltip.innerHTML = `
+                <div class="d-flex justify-content-center py-3">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(tooltip);
+
+            // Remove tooltip function
+            const removeTooltip = () => {
+                tooltip.classList.add('fade-out');
+                setTimeout(() => tooltip.remove(), 200);
+            };
+
+            try {
+                const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to load team info');
+                }
+
+                const data = await response.json();
+
+                tooltip.innerHTML = `
+                    <div class="wiki-tooltip-content">
+                        <h5 class="mb-2">${data.name}</h5>
+                        ${data.imageUrl ? `
+                            <img src="${data.imageUrl}"
+                                 class="wiki-tooltip-img rounded"
+                                 alt="${data.name} logo">` : ''}
+                        <p class="mb-2">${data.summary.split('. ').slice(0, 2).join('. ')}...</p>
+                        <div class="d-flex justify-content-end">
+                            <a href="${data.wikipediaUrl}"
+                               target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                                Full Article
+                            </a>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                tooltip.innerHTML = `
+                    <div class="alert alert-warning m-0 p-2">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${error.message}
+                    </div>
+                `;
+            }
+
+            function handleClickOutside(event) {
+                if (!element.contains(event.target) && !tooltip.contains(event.target)) {
+                removeTooltip();
+                document.removeEventListener('click', handleClickOutside);
+                }
+            }
+
+            document.addEventListener('click', handleClickOutside);
+
+        };
+
+        
+
+        // Attach debounced event listeners
+        document.querySelectorAll('[data-team-name]').forEach(element => {
+            const debouncedShow = debounce(() => {
+                showTooltip(element, element.getAttribute('data-team-name'));
+            }, 300);
+
+            element.addEventListener('click', debouncedShow);
+        });
+    });
+
+        const wikiCache = {};
+
+    async function fetchTeamInfo(teamName) {
+        if (wikiCache[teamName]) {
+            return wikiCache[teamName];
+        }
+
+        const response = await fetch(`/api/teaminfo/${teamName}`);
+        const data = await response.json();
+        wikiCache[teamName] = data;
+        return data;
+    }
+</script>
+
+<style>
+    .wiki-tooltip {
+        position: absolute;
+        z-index: 1050;
+        width: 320px;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        padding: 1rem;
+        animation: fadeIn 0.2s ease-out;
+        transition: opacity 0.2s;
+    }
+
+    .wiki-tooltip.fade-out {
+        opacity: 0;
+    }
+
+    .wiki-tooltip-img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+        float: right;
+        margin-left: 0.75rem;
+        margin-bottom: 0.75rem;
+        border-radius: 0.25rem;
+    }
+
+    .wiki-tooltip-content h5 {
+        font-size: 1.1rem;
+        color: #212529;
+        margin-bottom: 0.75rem;
+    }
+
+    .wiki-tooltip-content p {
+        font-size: 0.9rem;
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
