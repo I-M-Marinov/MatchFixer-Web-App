@@ -12,6 +12,8 @@ namespace MatchFixer.Infrastructure.Entities
 		[Key]
 		public Guid Id { get; set; }
 
+		public int? TeamId { get; set; }
+
 		[Required]
 		[StringLength(100)]
 		public string Name { get; set; }
