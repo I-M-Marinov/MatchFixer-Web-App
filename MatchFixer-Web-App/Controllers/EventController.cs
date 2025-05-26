@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +9,10 @@ namespace MatchFixer_Web_App.Controllers
 {
 	public class EventController : Controller
 	{
-		private readonly MatchFixerDbContext _dbContext;
 		private readonly IMatchEventService _matchEventService;
 
-		public EventController(MatchFixerDbContext dbContext, IMatchEventService matchEventService)
+		public EventController(IMatchEventService matchEventService)
 		{
-			_dbContext = dbContext;
 			_matchEventService = matchEventService;
 		}
 
