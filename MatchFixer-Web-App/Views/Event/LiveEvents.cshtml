@@ -21,6 +21,8 @@
 
 </div>
 
+@await Html.PartialAsync("_WikipediaTooltipPartial")
+
 
 <div class="container mt-4">
     <h2 class="mb-4">Live Match Events</h2>
@@ -44,12 +46,12 @@
                         <div class="card-body d-flex flex-column justify-content-between">
 	                        <div class="d-flex justify-content-around align-items-center mb-3">
 		                        <div class="text-center">
-                                    <img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="img-fluid mb-2" />
+                                    <img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="img-fluid mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam" />
 			                        <div>@match.HomeTeam</div>
 		                        </div>
 		                        <strong>VS</strong>
 		                        <div class="text-center">
-                                    <img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="img-fluid mb-2" />
+                                    <img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="img-fluid mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam" />
 			                        <div>@match.AwayTeam</div>
 		                        </div>
 	                        </div>                            
