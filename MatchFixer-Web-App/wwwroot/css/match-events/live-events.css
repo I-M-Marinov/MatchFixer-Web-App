@@ -1,0 +1,10 @@
+﻿
+.team-logo.hoverable-logo {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+    .team-logo.hoverable-logo:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+    }
