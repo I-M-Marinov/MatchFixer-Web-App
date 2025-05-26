@@ -24,19 +24,19 @@
 					<div class="d-flex align-items-center gap-1">
 						@if (entry.Score > 500)
 						{
-							<span class="badge bg-success bg-gradient px-3 py-2 fs-6">
+							<span class="badge bg-success bg-gradient px-3 py-2 fs-6 matchfix-score">
 								@entry.Score
 							</span>
 						}
 						else if (entry.Score is < 500 and not 0)
 						{
-							<span class="badge bg-warning bg-gradient px-3 py-2 fs-6">
+							<span class="badge bg-warning bg-gradient px-3 py-2 fs-6 matchfix-score">
 								@entry.Score
 							</span>
 						}
 						else
 						{
-							<span class="badge bg-danger bg-gradient px-3 py-2 fs-6">
+							<span class="badge bg-danger bg-gradient px-3 py-2 fs-6 matchfix-score">
 								@entry.Score
 							</span>
 						}
