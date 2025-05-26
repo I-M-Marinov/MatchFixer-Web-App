@@ -37,7 +37,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
 builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
-builder.Services.AddHttpClient();												// Add HTTP Client
+builder.Services.AddHttpClient();                                               // Add HTTP Client
+builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service 
+builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
 builder.Services.AddHostedService<UserCleanupService>();						// Add User Cleanup Service ( background service ) 
 builder.Services.AddScoped<ITimezoneService, TimezoneService>();				// Add the Timezone Service ( NodaTime )
 builder.Services.AddHttpContextAccessor();                                      // Add HTTP Context Accessor
@@ -75,6 +77,8 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+app.UseResponseCaching();
+
 using (var scope = app.Services.CreateScope())
 {
 
@@ -83,8 +87,8 @@ using (var scope = app.Services.CreateScope())
 
 	await SeedDefaultProfilePicture(userManager, services);           // Seed the Default User Image
 	await SeedDeletedUsersProfilePicture(userManager, services);     // Seed the Deleted User Image ( when user deletes their profile ) 
-	await SeedMatchResultsAsync(services);							// Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga
-	await SeedTeams(services);                                     // Seed the Teams in the Teams Table
+	await SeedTeams(services);                                      // Seed the Teams in the Teams Table
+	await SeedMatchResultsAsync(services);						   // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 }
 
 
