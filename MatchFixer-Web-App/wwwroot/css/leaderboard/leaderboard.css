@@ -2,3 +2,11 @@
     width: 35px;
     height: auto;
 }
+
+.matchfix-score {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+    color: #000000;
+}
