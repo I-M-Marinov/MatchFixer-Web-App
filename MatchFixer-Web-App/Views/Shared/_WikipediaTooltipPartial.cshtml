@@ -21,10 +21,13 @@
 
             tooltip.innerHTML = `
                 <div class="d-flex justify-content-center py-3">
-                    <div class="spinner-grow text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+                        <div class="spinner-sequence">
+                          <div class="spinner-grow text-brand-blue" style="animation-delay: 0s"></div>
+                          <div class="spinner-grow text-brand-green" style="animation-delay: 0.3s"></div>
+                          <div class="spinner-grow text-brand-blue" style="animation-delay: 0.6s"></div>
+                          <div class="spinner-grow text-brand-green" style="animation-delay: 0.9s"></div>
+                        </div>
+                 </div>
             `;
             document.body.appendChild(tooltip);
 
@@ -84,7 +87,7 @@
         
 
         // Attach debounced event listeners
-        document.querySelectorAll('[data-team-name]').forEach(element => {
+    document.querySelectorAll('[data-team-name]').forEach(element => {
             const debouncedShow = debounce(() => {
                 showTooltip(element, element.getAttribute('data-team-name'));
             }, 300);
@@ -93,7 +96,7 @@
         });
     });
 
-        const wikiCache = {};
+    var wikiCache = window.wikiCache || {};
 
     async function fetchTeamInfo(teamName) {
         if (wikiCache[teamName]) {
@@ -105,4 +108,24 @@
         wikiCache[teamName] = data;
         return data;
     }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+      const spinners = document.querySelectorAll('.spinner-grow');
+
+      spinners.forEach(spinner => {
+        const delay = parseInt(spinner.getAttribute('data-delay'));
+
+        setTimeout(() => {
+          spinner.classList.add('show');
+
+          setTimeout(() => {
+            spinner.classList.remove('show');
+          }, 2000); 
+
+        }, delay);
+      });
+    });
+
+
 </script>
