@@ -1,0 +1,58 @@
+﻿.wiki-tooltip {
+    position: absolute;
+    z-index: 1050;
+    width: 320px;
+    background: white;
+    border: 1px solid #3370a8;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    padding: 1rem;
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.3s;
+}
+
+.wiki-tooltip.fade-out {
+    opacity: 0;
+}
+
+.wiki-tooltip-img {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+    float: right;
+    margin-left: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.wiki-tooltip-content h5 {
+    font-size: 1.1rem;
+    color: #212529;
+    margin-bottom: 0.85rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0dab76;
+    color: #000000;
+    border-radius: 0.5rem;
+    padding: 0.2rem;
+    text-shadow: 0px 1px 1px #3370a8;
+}
+
+.wiki-tooltip-content p {
+    font-size: 0.8rem;
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
