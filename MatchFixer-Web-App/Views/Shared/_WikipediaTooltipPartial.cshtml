@@ -16,8 +16,9 @@
             // Create tooltip
             const tooltip = document.createElement('div');
             tooltip.className = 'wiki-tooltip';
-            tooltip.style.top = `${position.bottom + window.scrollY + 5}px`;
+            tooltip.style.top = `${position.bottom + window.scrollY + 15}px`;
             tooltip.style.left = `${position.left + window.scrollX}px`;
+
             tooltip.innerHTML = `
                 <div class="d-flex justify-content-center py-3">
                     <div class="spinner-grow text-primary" role="status">
@@ -105,56 +106,3 @@
         return data;
     }
 </script>
-
-<style>
-    .wiki-tooltip {
-        position: absolute;
-        z-index: 1050;
-        width: 320px;
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        padding: 1rem;
-        animation: fadeIn 0.2s ease-out;
-        transition: opacity 0.2s;
-    }
-
-    .wiki-tooltip.fade-out {
-        opacity: 0;
-    }
-
-    .wiki-tooltip-img {
-        max-width: 100px;
-        max-height: 100px;
-        object-fit: contain;
-        float: right;
-        margin-left: 0.75rem;
-        margin-bottom: 0.75rem;
-        border-radius: 0.25rem;
-    }
-
-    .wiki-tooltip-content h5 {
-        font-size: 1.1rem;
-        color: #212529;
-        margin-bottom: 0.75rem;
-    }
-
-    .wiki-tooltip-content p {
-        font-size: 0.9rem;
-        color: #495057;
-        margin-bottom: 1rem;
-    }
-
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
