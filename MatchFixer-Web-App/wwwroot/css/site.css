@@ -16,6 +16,7 @@
 @import "/css/match-events/add-event.css";
 @import "/css/leaderboard/leaderboard.css";
 @import "/css/match-events/live-events.css";
+@import "/css/wiki-tooltip/wiki-tooltip.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
