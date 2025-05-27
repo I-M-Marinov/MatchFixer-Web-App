@@ -20,6 +20,8 @@
 			["Vizela"] = "F.C. Vizela",
 			["Guimaraes"] = "Vitória S.C.",
 			["Estrela"] = "C.F. Estrela da Amadora",
+			["AVS"] = "AVS Futebol SAD",
+
 
 			// German clubs
 
