@@ -5,9 +5,10 @@
 		public static readonly Dictionary<string, string> ClubNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
 			// Portuguese clubs
+
 			["Moreirense"] = "Moreirense F.C.",
 			["Chaves"] = "G.D. Chaves",
-			["Famalicao"] = "FC Famalicão",
+			["Famalicao"] = "F.C. Famalicão",
 			["SC Braga"] = "S.C. Braga",
 			["Sporting CP"] = "Sporting CP",
 			["Benfica"] = "S.L. Benfica",
@@ -18,8 +19,10 @@
 			["Casa Pia"] = "Casa Pia A.C.",
 			["Vizela"] = "F.C. Vizela",
 			["Guimaraes"] = "Vitória S.C.",
+			["Estrela"] = "C.F. Estrela da Amadora",
 
 			// German clubs
+
 			["VfL Wolfsburg"] = "VfL Wolfsburg",
 			["Bayer Leverkusen"] = "Bayer 04 Leverkusen",
 			["1.FC Köln"] = "1. FC Köln",
@@ -41,6 +44,7 @@
 			["Vfl Bochum"] = "VfL Bochum",
 
 			// English clubs
+
 			["Crystal Palace"] = "Crystal Palace F.C.",
 			["Brentford"] = "Brentford F.C.",
 			["Nottingham Forest"] = "Nottingham Forest F.C.",
@@ -63,6 +67,7 @@
 			["Bournemouth"] = "A.F.C. Bournemouth",
 
 			// Italian clubs
+
 			["AC Milan"] = "AC Milan",
 			["AS Roma"] = "AS Roma",
 			["Inter"] = "Inter Milan",
@@ -84,6 +89,7 @@
 			["Empoli"] = "Empoli F.C.",
 
 			// Spanish clubs
+
 			["Real Betis"] = "Real Betis Balompié",
 			["Granada CF"] = "Granada CF",
 			["Almeria"] = "UD Almería",
@@ -106,6 +112,7 @@
 			["Real Sociedad"] = "Real Sociedad",
 
 			// French clubs
+
 			["Lorient"] = "FC Lorient",
 			["Lens"] = "RC Lens",
 			["Monaco"] = "AS Monaco FC",
@@ -117,7 +124,7 @@
 			["Reims"] = "Stade de Reims",
 			["Montpellier"] = "Montpellier HSC",
 			["Toulouse"] = "Toulouse FC",
-			["Rennes"] = "Stade Rennais F.C.",
+			["Rennes"] = "Stade Rennais FC",
 			["Strasbourg"] = "RC Strasbourg Alsace",
 			["Nantes"] = "FC Nantes",
 			["Metz"] = "FC Metz",
@@ -127,6 +134,7 @@
 			["Stade Brestois 29"] = "Stade Brestois 29",
 
 			// Dutch clubs
+
 			["Fortuna Sittard"] = "Fortuna Sittard",
 			["Vitesse"] = "Vitesse Arnhem",
 			["Sparta Rotterdam"] = "Sparta Rotterdam",
@@ -151,6 +159,7 @@
 			["FC Volendam"] = "FC Volendam",
 
 			// Swiss clubs
+
 			["FC Zurich"] = "FC Zürich",
 			["FC Basel 1893"] = "FC Basel",
 			["FC Lugano"] = "FC Lugano",
@@ -166,6 +175,7 @@
 			["Stade Lausanne-Ouchy"] = "Stade Lausanne-Ouchy",
 
 			// Polish clubs
+
 			["Pogon Szczecin"] = "Pogoń Szczecin",
 			["Piast Gliwice"] = "Piast Gliwice",
 			["Raków Częstochowa"] = "Raków Częstochowa",
