@@ -4,7 +4,89 @@
     cursor: pointer;
 }
 
-    .team-logo.hoverable-logo:hover {
-        transform: scale(1.05);
-        filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
-    }
+.team-logo.hoverable-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+}
+
+.live-event-card {
+    font-size: 0.75em;
+    background-color: #CAE9FF;
+}
+
+.event-team-name {
+    font-size: 1.2em;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+}
+
+
+/* Custom pill classes */
+.pill-brand-green {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 800;
+    line-height: 1.5;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 50rem;
+    background-color: #0DAB76;
+    text-shadow: 0px 1px 1px black;
+}
+
+.pill-brand-blue {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 800;
+    line-height: 1.5;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 50rem;
+    background-color: #0d6efd;
+    text-shadow: 0px 1px 1px black;
+}
+
+.pill-brand-yellow {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 800;
+    line-height: 1.5;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 50rem;
+    background-color: #f1d302;
+    color: #000000;
+    text-shadow: 0px 1px 1px white;
+}
+
+.pill-brand-green:hover {
+    background-color: #0b8a5e;
+}
+
+.pill-brand-blue:hover {
+    background-color: #0a58ca;
+}
+
+.pill-brand-yellow:hover {
+    background-color: #d9bb00;
+}
+
+.pill-brand-green,
+.pill-brand-blue,
+.pill-brand-yellow {
+    font-family: 'Inclusive Sans', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 0.85rem;
+}
+
+.text-brand-oxford-blue {
+    color: #0d6efd !important;
+}
