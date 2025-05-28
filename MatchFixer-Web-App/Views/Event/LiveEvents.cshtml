@@ -21,67 +21,95 @@
 
 </div>
 
-
-
 <div class="container mt-4">
-    <h2 class="mb-4">Live Match Events</h2>
-	
-    <div class="game-background">
-    </div>
+
+	<div class="game-background">
+	</div>
 
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info text-center">
-            No live match events available at the moment.
-        </div>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach (var match in Model)
-            {
-                <div class="col">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body d-flex flex-column justify-content-between" style="postion: relative; object-fit: contain;">
-		                    @await Html.PartialAsync("_WikipediaTooltipPartial")
-		                    <div class="d-flex justify-content-around align-items-center mb-3">
-			                    <div class="text-center">
-				                    <img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="img-fluid mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam"/>
-				                    <div>@match.HomeTeam</div>
-			                    </div>
-			                    <strong>VS</strong>
-			                    <div class="text-center">
-				                    <img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="img-fluid mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam"/>
-				                    <div>@match.AwayTeam</div>
-			                    </div>
-		                    </div>
-		                    <p class="card-text text-center text-muted">
-			                    Kickoff: @match.KickoffTime.ToString("f")
-		                    </p>
+	@if (!Model.Any())
+	{
+		<div class="alert alert-info text-center">
+			No live match events available at the moment.
+		</div>
+	}
+	else
+	{
+		<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+			@foreach (var match in Model)
+			{
+				<div class="col">
+					<div class="live-event-card card shadow-sm h-100">
+						<div class="card-body d-flex flex-column justify-content-around" style="postion: relative; object-fit: contain;">
+							@await Html.PartialAsync("_WikipediaTooltipPartial")
+							<div class="d-flex justify-content-around align-items-center mb-3">
 
-		                    <div class="d-flex justify-content-around mb-3">
-			                    <div>
-				                    <strong>Home:</strong><br/>
-				                    <span class="badge bg-success">@match.HomeWinOdds</span>
-			                    </div>
-			                    <div>
-				                    <strong>Draw:</strong><br/>
-				                    <span class="badge bg-secondary">@match.DrawOdds</span>
-			                    </div>
-			                    <div>
-				                    <strong>Away:</strong><br/>
-				                    <span class="badge bg-danger">@match.AwayWinOdds</span>
-			                    </div>
-		                    </div>
+								<div class="flex justify-around items-center mb-3 gap-5">
+									<div class="text-center">
+										<div class="flex flex-col items-center justify-center">
+											<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam"/>
+											<div class="event-team-name text-lg font-semibold text-gray-700">@match.HomeTeam</div>
+										</div>
+									</div>
 
-		                    @*        <a href="@Url.Action("Details", "Event", new { id = match.Id })" class="btn btn-outline-primary w-100 mt-auto">
-                                View & Bet
-                            </a> *@
-	                    </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
+									<img src="/images/live-events/versus.png" alt="@match.HomeTeam" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
+
+									<div class="text-center">
+										<div class="flex flex-col items-center justify-center">
+											<img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam"/>
+											<div class="event-team-name text-lg font-semibold text-gray-700">@match.AwayTeam</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<p class="card-text text-brand-oxford-blue text-center text-muted mb-2">
+								@match.KickoffTime.ToString("f")
+							</p>
+
+							<div class="d-flex justify-content-around mb-3">
+
+								<div class="overflow-x-auto">
+									<table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+										<thead class="bg-gray-50">
+										<tr>
+											<th class="px-4 py-3 text-center text-xs font-medium text-gray-500">
+												Home
+											</th>
+											<th class="px-4 py-3 text-center text-xs font-medium text-gray-500">
+												Draw
+											</th>
+											<th class="px-4 py-3 text-center text-xs font-medium text-gray-500">
+												Away
+											</th>
+										</tr>
+										</thead>
+										<tbody class="divide-y divide-gray-200">
+										<tr>
+											<td class="px-4 py-4 whitespace-nowrap text-center">
+												<span class="badge pill-brand-blue inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+													@match.HomeWinOdds
+												</span>
+											</td>
+											<td class="px-4 py-4 whitespace-nowrap text-center">
+												<span class="badge pill-brand-yellow inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+													@match.DrawOdds
+												</span>
+											</td>
+											<td class="px-4 py-4 whitespace-nowrap text-center">
+												<span class="badge pill-brand-green inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+													@match.AwayWinOdds
+												</span>
+											</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	}
 </div>
