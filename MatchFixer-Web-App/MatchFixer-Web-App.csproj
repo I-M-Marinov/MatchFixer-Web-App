@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="postcss.config.js" />
+    <Content Include="src\input.css" />
+    <Content Include="tailwind.config.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="animate.css" Version="3.3.0" />
     <PackageReference Include="ISO3166" Version="1.0.4" />
     <PackageReference Include="jQuery" Version="3.7.1" />
