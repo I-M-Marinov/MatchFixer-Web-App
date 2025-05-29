@@ -35,20 +35,20 @@
 	}
 	else
 	{
-		<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+		<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 d-flex align-items-stretch">
 			@foreach (var match in Model)
 			{
 				<div class="col">
-					<div class="live-event-card card shadow-sm h-100">
+					<div class="live-event-card tw-card tw-shadow-sm tw-h-100">
 						<div class="card-body d-flex flex-column justify-content-around" style="postion: relative; object-fit: contain;">
 							@await Html.PartialAsync("_WikipediaTooltipPartial")
 							<div class="d-flex justify-content-around align-items-center mb-3">
 
-								<div class="flex justify-around items-center mb-3 gap-5">
+								<div class="tw-flex tw-justify-around tw-items-center mb-3 gap-5">
 									<div class="text-center">
-										<div class="flex flex-col items-center justify-center">
+										<div class="tw-flex  tw-flex-col  tw-items-center  tw-justify-center">
 											<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam"/>
-											<div class="event-team-name text-lg font-semibold text-gray-700">@match.HomeTeam</div>
+											<div class="event-team-name">@match.HomeTeam</div>
 										</div>
 									</div>
 
@@ -57,46 +57,46 @@
 									<div class="text-center">
 										<div class="flex flex-col items-center justify-center">
 											<img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam"/>
-											<div class="event-team-name text-lg font-semibold text-gray-700">@match.AwayTeam</div>
+											<div class="event-team-name">@match.AwayTeam</div>
 										</div>
 									</div>
 								</div>
 							</div>
-							<p class="card-text text-brand-oxford-blue text-center text-muted mb-2">
+							<p class="tw-card-text text-brand-oxford-blue text-center text-muted mb-2">
 								@match.KickoffTime.ToString("f")
 							</p>
 
 							<div class="d-flex justify-content-around mb-3">
 
-								<div class="overflow-x-auto">
-									<table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-										<thead class="bg-gray-50">
+								<div class="tw-overflow-x-auto">
+									<table class="odds-table tw-min-w-full tw-bg-white tw-border tw-border-gray-200 tw-rounded-lg tw-overflow-hidden">
+										<thead class="tw-bg-gray-50 tw-shadow">
 										<tr>
-											<th class="px-4 py-3 text-center text-xs font-medium text-gray-500">
+											<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="0">
 												Home
 											</th>
-											<th class="px-4 py-3 text-center text-xs font-medium text-gray-500">
+											<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="1">
 												Draw
 											</th>
-											<th class="px-4 py-3 text-center text-xs font-medium text-gray-500">
+											<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="2">
 												Away
 											</th>
 										</tr>
 										</thead>
-										<tbody class="divide-y divide-gray-200">
+										<tbody class="tw-divide-y tw-divide-gray-200">
 										<tr>
-											<td class="px-4 py-4 whitespace-nowrap text-center">
-												<span class="badge pill-brand-blue inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+											<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
+												<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
 													@match.HomeWinOdds
 												</span>
 											</td>
-											<td class="px-4 py-4 whitespace-nowrap text-center">
-												<span class="badge pill-brand-yellow inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+											<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
+												<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
 													@match.DrawOdds
 												</span>
 											</td>
-											<td class="px-4 py-4 whitespace-nowrap text-center">
-												<span class="badge pill-brand-green inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+											<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
+												<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
 													@match.AwayWinOdds
 												</span>
 											</td>
@@ -113,3 +113,59 @@
 		</div>
 	}
 </div>
+
+<script>
+		
+	document.addEventListener('DOMContentLoaded', function() {
+
+		// Select all table headers from all odds-tables
+		const allTableHeaders = document.querySelectorAll('.odds-table th');
+
+		allTableHeaders.forEach(header => {
+			header.addEventListener('mouseover', function() {
+
+				// Get the parent table of the hovered header
+				const parentTable = this.closest('.odds-table');
+				if (!parentTable) return; 
+
+				const headersInThisTable = parentTable.querySelectorAll('th');
+				const columnIndex = Array.from(headersInThisTable).indexOf(this);
+
+				if (columnIndex === -1) return;
+
+				this.classList.add('highlighted-column');
+
+				const rowsInThisTable = parentTable.querySelectorAll('tbody tr');
+
+				rowsInThisTable.forEach(row => {
+					const cells = row.querySelectorAll('td');
+					if (cells[columnIndex]) {
+						cells[columnIndex].classList.add('highlighted-column');
+					}
+				});
+			});
+
+			header.addEventListener('mouseout', function() {
+
+				const parentTable = this.closest('.odds-table');
+				if (!parentTable) return;
+
+				const headersInThisTable = parentTable.querySelectorAll('th');
+				const columnIndex = Array.from(headersInThisTable).indexOf(this);
+
+				if (columnIndex === -1) return;
+
+				this.classList.remove('highlighted-column');
+
+				const rowsInThisTable = parentTable.querySelectorAll('tbody tr');
+
+				rowsInThisTable.forEach(row => {
+					const cells = row.querySelectorAll('td');
+					if (cells[columnIndex]) {
+						cells[columnIndex].classList.remove('highlighted-column');
+					}
+				});
+			});
+		});
+	});
+</script>
