@@ -12,6 +12,7 @@
 .live-event-card {
     font-size: 0.75em;
     background-color: #CAE9FF;
+    border-radius: 5% 10%;
 }
 
 .event-team-name {
@@ -87,7 +88,13 @@
 }
 
 .text-brand-oxford-blue {
-    color: #0d6efd !important;
+    background-color: #0a58ca;
+    width: 60%;
+    padding: 0 0.1rem;
+    align-self: center;
+    color: white !important;
+    border-radius: 0.5em;
+    text-shadow: 0px 1px 1px black;
 }
 
 .highlighted-column {
