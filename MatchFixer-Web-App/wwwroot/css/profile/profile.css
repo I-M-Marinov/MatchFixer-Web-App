@@ -28,7 +28,18 @@
 .profile-container {
     display: flex;
     justify-content: flex-start;
+    align-items: flex-start;
     width: 100%;
+    gap: 1rem;
+}
+
+.responsive-profile-container{
+    display: flex;
+    gap: 1rem;
+}
+
+.profile-name-text{
+    text-align: center;
 }
 
 #profileImage {
@@ -56,6 +67,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
+    max-width: 1200px !important; 
 }
 
 .profile-info-container {
@@ -64,7 +76,7 @@
     min-width: 600px;
     max-width: 700px !important;
     height: auto;
-
+    min-height: 300px;
 }
 
 .profile-info {
@@ -114,12 +126,14 @@
 }
 
 .name-image-container {
+    display: flex;
     background-color: var(--primary-color);
-}
-
-.name-image-container {
     -webkit-box-shadow: 6px 9px 18px 5px #000000;
     box-shadow: 6px 9px 18px 5px #000000;
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: fit-content;
+    min-height: 300px;
 }
 
 
