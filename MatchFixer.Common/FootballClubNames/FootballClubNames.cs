@@ -159,7 +159,7 @@
 			["De Graafschap"] = "De Graafschap",
 			["NAC Breda"] = "NAC Breda",
 			["FC Volendam"] = "FC Volendam",
-
+			
 			// Swiss clubs
 
 			["FC Zurich"] = "FC Zürich",
