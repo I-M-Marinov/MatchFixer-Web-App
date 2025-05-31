@@ -22,6 +22,8 @@
 		}
 
 	</div>
+	
+	@await Html.PartialAsync("_WikipediaTooltipPartial")
 
 	<div class="container mt-4">
 
@@ -43,7 +45,6 @@
 					<div class="col">
 						<div class="live-event-card tw-card tw-shadow-sm tw-h-100">
 							<div class="card-body d-flex flex-column justify-content-around" style="postion: relative; object-fit: contain;">
-								@await Html.PartialAsync("_WikipediaTooltipPartial")
 								<div class="d-flex justify-content-around align-items-center mb-3">
 
 									<div class="tw-flex tw-justify-around tw-items-center mb-3 gap-5">
