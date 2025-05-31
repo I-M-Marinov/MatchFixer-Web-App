@@ -14,24 +14,37 @@
 
 		@if (SignInManager.IsSignedIn(User))
 		{
-			<a class="navbar-brand" asp-area="" asp-controller="Profile" asp-action="Profile">
-				<img src="~/images/matchFixer-logo.png" alt="MatchFixer Logo" style="height: 40px; width: auto;"/>
+			<div id="logo-abreviated-svg">
+				<a class="navbar-brand" asp-area="" asp-controller="Profile" asp-action="Profile">
+					@* <img src="~/images/matchFixer-logo.png" alt="MatchFixer Logo" style="height: 40px; width: auto;"/> *@
+					
+						<svg width="200" height="70" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+							<style>
+
+							@@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&family=Special+Gothic+Expanded+One&display=swap');
+							text {
+								font-family: "Special Gothic Expanded One", sans-serif !important;
+								font-weight: 400 !important; 
+								font-style: normal !important;
+								font-size: 60px !important; 
+								letter-spacing: 20px !important; 
+							}
+							
+						</style>
+							<text x="10" y="60" fill="#10b981" filter="url(#shadow)" style="font-family: 'Special Gothic Expanded One', sans-serif;">M</text>
+							<text x="65" y="65" fill="#1e3a8a" filter="url(#shadow)" style="font-family: 'Special Gothic Expanded One', sans-serif;">F</text>
+							<text x="100" y="60" fill="#10b981" filter="url(#shadow)" style="font-family: 'Special Gothic Expanded One', sans-serif;">X</text>
+							<text x="145" y="65" fill="#1e3a8a" filter="url(#shadow)" style="font-family: 'Special Gothic Expanded One', sans-serif;">R</text>
+							<defs>
+								<filter id="shadow" x="-5%" y="-5%" width="120%" height="100%">
+									<feDropShadow dx="5" dy="5" stdDeviation="1.5" flood-color="#000"/>
+								</filter>
+							</defs>
+						</svg>
 
 			</a>
-
-			<div id="logo-abreviated-svg">
-				<svg  width="200" height="80" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
-					<text x="10" y="60" fill="#10b981" filter="url(#shadow)">M</text>
-					<text x="65" y="65" fill="#1e3a8a" filter="url(#shadow)">F</text>
-					<text x="100" y="60" fill="#10b981" filter="url(#shadow)">X</text>
-					<text x="145" y="65" fill="#1e3a8a" filter="url(#shadow)">R</text>
-					<defs>
-						<filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-							<feDropShadow dx="5" dy="5" stdDeviation="1.5" flood-color="#000"/>
-						</filter>
-					</defs>
-				</svg>
 			</div>
+			
 		}
 		else
 		{
