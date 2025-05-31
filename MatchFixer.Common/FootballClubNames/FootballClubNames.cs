@@ -44,6 +44,8 @@
 			["FC Heidenheim"] = "1. FC Heidenheim",
 			["SV Darmstadt 98"] = "SV Darmstadt 98",
 			["Vfl Bochum"] = "VfL Bochum",
+			["Union Berlin"] = "1. FC Union Berlin",
+
 
 			// English clubs
 
@@ -140,7 +142,7 @@
 			["Fortuna Sittard"] = "Fortuna Sittard",
 			["Vitesse"] = "Vitesse Arnhem",
 			["Sparta Rotterdam"] = "Sparta Rotterdam",
-			["NEC Nijmegen"] = "N.E.C. Nijmegen",
+			["NEC Nijmegen"] = "NEC Nijmegen",
 			["ADO Den Haag"] = "ADO Den Haag",
 			["Twente"] = "FC Twente",
 			["Ajax"] = "AFC Ajax",
