@@ -85,11 +85,11 @@
 
 
 .ball-wrapper {
-    position: absolute; 
-    top: 3em;
+    position: relative;
+    top: 0.1em;
     left: 0;
     width: 100vw;
-    height: 9em;
+    height: 7em;
     overflow: hidden;
     pointer-events: none;
 }
@@ -97,7 +97,7 @@
 .animated-ball {
     position: absolute;
     animation: bounceAndRoll 12s linear;
-    width: 80px;
+    width: 60px;
     will-change: transform;
     pointer-events: none;
     object-fit: contain;
@@ -106,7 +106,7 @@
 }
 
 .soccer-hero{
-    margin-top: 7em;
+    margin-top: 1em;
     z-index: 20;
 }
 
