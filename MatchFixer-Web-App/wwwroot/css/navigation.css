@@ -75,7 +75,7 @@
 }
 
 .rounded-circle {
-    width: 50px !important;
+    width: 60px !important;
     height: auto !important;
     justify-self: center !important;
 }
@@ -87,7 +87,7 @@
 
 .profile-dropdown-menu{
     position: absolute;
-    top: 0.005em;
+    top: 0.1em;
     right: 0.5em;
 }
 
@@ -141,7 +141,7 @@
 
 .hover-dropdown:hover .dropdown-menu {
     display: block;
-    top: 4.5em;
+    top: 5em;
     right: 0.1em;
 }
 
