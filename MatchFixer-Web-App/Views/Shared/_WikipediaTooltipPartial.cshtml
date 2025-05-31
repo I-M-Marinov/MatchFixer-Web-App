@@ -1,7 +1,7 @@
-﻿@* _WikipediaTooltipPartial.cshtml *@
-<script>
+﻿<script>
+    var wikiCache = window.wikiCache || {};
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Debounce function to prevent rapid API calls
         const debounce = (func, delay) => {
             let timeoutId;
             return (...args) => {
@@ -11,43 +11,11 @@
         };
 
         const showTooltip = async (element, teamName) => {
-            const position = element.getBoundingClientRect();
-
-            // Create tooltip
             const tooltip = document.createElement('div');
             tooltip.className = 'wiki-tooltip';
-            tooltip.style.top = `${position.bottom + window.scrollY + 15}px`;
-            tooltip.style.left = `${position.left + window.scrollX}px`;
 
-            tooltip.innerHTML = `
-                <div class="d-flex justify-content-center py-3">
-                        <div class="spinner-sequence">
-                          <div class="spinner-grow text-brand-blue" style="animation-delay: 0s"></div>
-                          <div class="spinner-grow text-brand-green" style="animation-delay: 0.3s"></div>
-                          <div class="spinner-grow text-brand-blue" style="animation-delay: 0.6s"></div>
-                          <div class="spinner-grow text-brand-green" style="animation-delay: 0.9s"></div>
-                        </div>
-                 </div>
-            `;
-            document.body.appendChild(tooltip);
-
-            // Remove tooltip function
-            const removeTooltip = () => {
-                tooltip.classList.add('fade-out');
-                setTimeout(() => tooltip.remove(), 200);
-            };
-
-            try {
-                const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to load team info');
-                }
-
-                const data = await response.json();
-
-                tooltip.innerHTML = `
+            const getTeamInfoHtml = (data) => `
+                <div class="animate__animated animate__flipInX">
                     <div class="wiki-tooltip-content">
                         <h5 class="mb-2">${data.name}</h5>
                         ${data.imageUrl ? `
@@ -58,59 +26,88 @@
                         <div class="d-flex justify-content-end">
                             <a href="${data.wikipediaUrl}"
                                target="_blank"
-                               class="btn btn-sm btn-outline-primary">  
-                                   More Info
+                               class="btn btn-sm btn-outline-primary">
+                                    More Info
                             </a>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
+
+            const getSpinnerHtml = () => `
+                <div class="wiki-tooltip-inner animate__animated animate__slideInDown">
+                    <div class="d-flex justify-content-center py-3">
+                        <div class="spinner-sequence">
+                            <div class="spinner-grow text-brand-blue" style="animation-delay: 0s"></div>
+                            <div class="spinner-grow text-brand-green" style="animation-delay: 0.3s"></div>
+                            <div class="spinner-grow text-brand-blue" style="animation-delay: 0.6s"></div>
+                            <div class="spinner-grow text-brand-green" style="animation-delay: 0.9s"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const removeTooltip = () => {
+                tooltip.classList.add('fade-out');
+                setTimeout(() => tooltip.remove(), 200);
+            };
+
+            tooltip.innerHTML = getSpinnerHtml();
+            document.body.appendChild(tooltip);
+
+            // Always wait at least 1.5 seconds before showing content
+            const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
+
+            try {
+                let dataToUse;
+
+                if (wikiCache[teamName]) {
+                    dataToUse = wikiCache[teamName];
+                } else {
+                    const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to load team info');
+                    }
+
+                    dataToUse = await response.json();
+                    wikiCache[teamName] = dataToUse;
+                }
+
+                // Wait for minimum delay regardless of cache status
+                await minDelay;
+                tooltip.innerHTML = getTeamInfoHtml(dataToUse);
+
             } catch (error) {
                 tooltip.innerHTML = `
-                    <div class="alert alert-warning m-0 p-2">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        ${error.message}
+                    <div class="wiki-tooltip-inner">
+                        <div class="alert alert-warning m-0 p-2">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${error.message}
+                        </div>
                     </div>
                 `;
             }
 
             function handleClickOutside(event) {
                 if (!element.contains(event.target) && !tooltip.contains(event.target)) {
-                removeTooltip();
-                document.removeEventListener('click', handleClickOutside);
+                    removeTooltip();
+                    document.removeEventListener('click', handleClickOutside);
                 }
             }
-
             document.addEventListener('click', handleClickOutside);
-
         };
 
-        
-
-        // Attach debounced event listeners
-    document.querySelectorAll('[data-team-name]').forEach(element => {
+        document.querySelectorAll('[data-team-name]').forEach(element => {
             const debouncedShow = debounce(() => {
                 showTooltip(element, element.getAttribute('data-team-name'));
             }, 300);
-
             element.addEventListener('click', debouncedShow);
         });
     });
 
-    var wikiCache = window.wikiCache || {};
-
-    async function fetchTeamInfo(teamName) {
-        if (wikiCache[teamName]) {
-            return wikiCache[teamName];
-        }
-
-        const response = await fetch(`/api/teaminfo/${teamName}`);
-        const data = await response.json();
-        wikiCache[teamName] = data;
-        return data;
-    }
-
-
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
       const spinners = document.querySelectorAll('.spinner-grow');
 
       spinners.forEach(spinner => {
@@ -121,11 +118,9 @@
 
           setTimeout(() => {
             spinner.classList.remove('show');
-          }, 2000); 
+          }, 2000);
 
         }, delay);
       });
     });
-
-
 </script>
