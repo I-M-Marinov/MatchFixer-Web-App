@@ -1,6 +1,5 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Orbitron:wght@400..900&family=Special+Gothic+Expanded+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&family=Special+Gothic+Expanded+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&display=swap');
 
 
@@ -83,18 +82,8 @@ body {
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: flex-start !important;
-    height: 100vh;
+    flex-grow: 1; 
 }
-
-#logo-abreviated-svg {  
-    font-family: "Special Gothic Expanded One", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 60px;
-    letter-spacing: -3px;
-
-}
-
 footer {
     border: 2px #0DAB76 solid;
     max-width: 1200px;
@@ -151,4 +140,3 @@ h1 {
 .navbar-nav {
     gap: 1em;
 }
-
