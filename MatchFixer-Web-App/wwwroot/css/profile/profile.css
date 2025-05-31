@@ -253,8 +253,10 @@
 .success-message,
 .error-message {
     position: fixed;
-    top: 5rem;
+    top: 8rem;
     left: 50%;
+    font-size: 1rem;
+    color: black !important;
     transform: translateX(-50%);
     z-index: 1050;
     padding: 0.5rem 0.75rem;
