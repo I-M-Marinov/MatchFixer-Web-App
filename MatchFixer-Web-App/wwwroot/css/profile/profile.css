@@ -282,6 +282,16 @@
     transition: opacity 4s ease-out; /* Transition effect */
 }
 
+/*-------------------------------------------------------------------------------------
+# STYLING FOR THE CONTAINER THAT HOLDS THE DANGER ZONE AND MATCHFIX SCORE CARD 
+--------------------------------------------------------------------------------------*/
+
+#scoreAndDangerContainer {
+    height: fit-content;
+    min-height: 300px;
+    padding: 0;
+}
+
 
 #timezoneDropdown,
 #Input_Country,
