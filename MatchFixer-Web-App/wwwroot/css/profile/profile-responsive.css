@@ -46,6 +46,7 @@
         .nav-link {
             font-size: 0.75em;
         }
+
     }
 
 
@@ -122,6 +123,7 @@
             width: 100%;
             max-width: 50%;
             height: 100%;
+            order: 1;
         }
 
         .navbar-collapse {
@@ -136,16 +138,28 @@
         }
 
         .profile-info-container {
-            min-width: 30% !important;
+            min-width: 50% !important;
         }
 
-        .profile-matchfix-score,
-        .profile-danger-zone {
-            min-width: 200px;
+        .responsive-profile-container{
+            flex-direction: column;
         }
 
-        .profile-danger-zone {
-            min-height: 180px;
+        #scoreAndDangerContainer,
+        .name-image-container {
+            max-width: 400px !important;
+            flex-wrap: wrap;
+            align-content: center !important;
         }
+
+        #profile-info-container {
+            order: 2;
+        }
+
+        #scoreAndDangerContainer {
+            order: 3;
+        }
+      
+
     }
 }
