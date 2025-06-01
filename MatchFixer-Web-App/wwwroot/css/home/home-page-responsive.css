@@ -21,6 +21,18 @@
 		max-width: 100vw;
 		max-height: 100vh;
 	}
+
+	#leftDrawer {
+		height: 55%;
+	}
+
+	#leftDrawer2 {
+		height: 32%;
+	}
+
+	.contact-us-container{
+		margin-top: -1.5em;
+	}
 }
 
 @media (max-width: 1000px) {
@@ -68,6 +80,19 @@
 
 	#ballWrapper {
 		display: none;
+	}
+
+	#leftDrawer2 {
+		width: 65%;
+		max-height: 29%;
+	}
+
+	#leftDrawer {
+		max-height: 48%;
+	}
+
+	.contact-us-container {
+		margin-top: -1.5em;
 	}
 
 }
@@ -126,5 +151,9 @@
 		height: 36% !important;
 	}
 
-	
+	#leftDrawer2 {
+		width: 90%;
+		max-height: 29%;
+	}
+
 }
