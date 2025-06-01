@@ -21,6 +21,7 @@
 			["Guimaraes"] = "Vitória S.C.",
 			["Estrela"] = "C.F. Estrela da Amadora",
 			["AVS"] = "AVS Futebol SAD",
+			["Gil Vicente"] = "Gil Vicente F.C.",
 
 
 			// German clubs
