@@ -96,6 +96,10 @@
     padding: 0.2em 0.5em;
 }
 
+.profile-dropdown-menu li a img{
+    border: 2px dotted #0DAB76;
+}
+
 .dropdown-menu {
     font-family: "Orbitron", sans-serif !important;
     font-optical-sizing: auto !important;
