@@ -22,7 +22,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			var model = new MatchEventFormModel
 			{
-				Teams = await _matchEventService.GetAllTeamsAsSelectListAsync()
+				TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync()
 			};
 
 			return View(model);
@@ -34,7 +34,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				model.Teams = await _matchEventService.GetAllTeamsAsSelectListAsync();
+				model.TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync();
 				return View(model);
 			}
 
@@ -46,7 +46,7 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				TempData["ErrorMessage"] = e.Message;
 
-				model.Teams = await _matchEventService.GetAllTeamsAsSelectListAsync();
+				model.TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync();
 				return View(model);
 			}
 
