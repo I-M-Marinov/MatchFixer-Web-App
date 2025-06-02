@@ -24,11 +24,16 @@
 					</div>
 					<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
 						<option value="">-- Select Home Team --</option>
-						@foreach (var team in Model.Teams)
+						@foreach (var league in Model.TeamsByLeague)
 						{
-							var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-							var teamName = team.Text.Split('|').FirstOrDefault();
-							<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+							<optgroup class="add-team-league-label" label="@league.Key">
+								@foreach (var team in league.Value)
+								{
+									var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+									var teamName = team.Text.Split('|').FirstOrDefault();
+									<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+								}
+							</optgroup>
 						}
 					</select>
 					<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
@@ -44,11 +49,16 @@
 					</div>
 					<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
 						<option value="">-- Select Away Team --</option>
-						@foreach (var team in Model.Teams)
+						@foreach (var league in Model.TeamsByLeague)
 						{
-							var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-							var teamName = team.Text.Split('|').FirstOrDefault();
-							<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+							<optgroup class="add-team-league-label" label="@league.Key">
+								@foreach (var team in league.Value)
+								{
+									var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+									var teamName = team.Text.Split('|').FirstOrDefault();
+									<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+								}
+							</optgroup>
 						}
 					</select>
 					<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
