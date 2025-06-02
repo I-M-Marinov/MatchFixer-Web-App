@@ -87,8 +87,8 @@ using (var scope = app.Services.CreateScope())
 
 	await SeedDefaultProfilePicture(userManager, services);           // Seed the Default User Image
 	await SeedDeletedUsersProfilePicture(userManager, services);     // Seed the Deleted User Image ( when user deletes their profile ) 
-	await SeedTeams(services);                                      // Seed the Teams in the Teams Table
-	await SeedMatchResultsAsync(services);						   // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
+	SeedTeams(services).GetAwaiter().GetResult();                   // Seed the Teams in the Teams Table
+	SeedMatchResultsAsync(services).GetAwaiter().GetResult();	   // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 }
 
 
