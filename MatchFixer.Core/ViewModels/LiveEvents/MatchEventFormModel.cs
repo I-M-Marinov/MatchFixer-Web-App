@@ -1,5 +1,4 @@
-﻿using MatchFixer.Infrastructure.ValidationAttributes;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using MatchFixer.Core.ValidationAttributes;
 using static MatchFixer.Common.ValidationConstants.MatchEventFormValidations;
@@ -16,7 +15,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		[Required(ErrorMessage = ChooseAValidTeam)]
 		public Guid AwayTeamId { get; set; }
 
-		public IEnumerable<SelectListItem> Teams { get; set; } = new List<SelectListItem>();
+		public Dictionary<string, List<SelectListItem>> TeamsByLeague { get; set; } = new Dictionary<string, List<SelectListItem>>();
 
 		[Required(ErrorMessage = ChooseAValidDateAndTime)]
 		[DataType(DataType.DateTime)]
