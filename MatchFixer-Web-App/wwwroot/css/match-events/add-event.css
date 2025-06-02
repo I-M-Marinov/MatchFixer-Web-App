@@ -14,6 +14,14 @@
     min-width: 25em;
 }
 
+.add-team-league-label {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: oblique !important;
+    color: #333;
+}
+
 #team-selection-form {
     display: flex;
     flex-direction: column;
