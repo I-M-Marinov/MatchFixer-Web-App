@@ -13,6 +13,6 @@ namespace MatchFixer.Core.Contracts
 		Task<List<LiveEventViewModel>> GetLiveEventsAsync();
 		Task AddEventAsync(MatchEventFormModel model);
 		Task<string> GetTeamLogo(string name);
-		Task<List<SelectListItem>> GetAllTeamsAsSelectListAsync();
+		Task<Dictionary<string, List<SelectListItem>>> GetTeamsGroupedByLeagueAsync();
 	}
 }
