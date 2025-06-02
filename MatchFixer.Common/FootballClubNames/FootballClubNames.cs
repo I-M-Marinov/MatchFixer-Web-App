@@ -83,15 +83,17 @@
 			["Lazio"] = "S.S. Lazio",
 			["Napoli"] = "S.S.C. Napoli",
 			["Fiorentina"] = "ACF Fiorentina",
-			["Sassuolo"] = "U.S. Sassuolo",
+			["Sassuolo"] = "US Sassuolo Calcio",
 			["Torino"] = "Torino F.C.",
 			["Udinese"] = "Udinese Calcio",
 			["Verona"] = "Hellas Verona F.C.",
-			["Salernitana"] = "Salernitana Calcio 1919",
+			["Salernitana"] = "US Salernitana 1919",
 			["Frosinone"] = "Frosinone Calcio",
 			["Lecce"] = "U.S. Lecce",
 			["Cagliari"] = "Cagliari Calcio",
 			["Empoli"] = "Empoli F.C.",
+			["Monza"] = "AC Monza",
+
 
 			// Spanish clubs
 
