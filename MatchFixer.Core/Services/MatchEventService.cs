@@ -82,18 +82,28 @@ namespace MatchFixer.Core.Services
 			return logo;
 		}
 
-		public async Task<List<SelectListItem>> GetAllTeamsAsSelectListAsync()
+		public async Task<Dictionary<string, List<SelectListItem>>> GetTeamsGroupedByLeagueAsync()
 		{
-			return await _dbContext.Teams
-				.OrderBy(t => t.Name)
-				.Select(t => new SelectListItem
-				{
-					Value = t.Id.ToString(),
-					Text = $"{t.Name}|{t.LogoUrl}"
-				})
+			var teams = await _dbContext.Teams
+				.OrderBy(t => t.LeagueName)
+				.ThenBy(t => t.Name)
 				.AsNoTracking()
 				.ToListAsync();
+
+			var teamsByLeague = teams
+				.GroupBy(t => t.LeagueName)
+				.ToDictionary(
+					group => group.Key,
+					group => group.Select(t => new SelectListItem
+					{
+						Value = t.Id.ToString(),
+						Text = $"{t.Name}|{t.LogoUrl}"
+					}).ToList()
+				);
+
+			return teamsByLeague;
 		}
+
 
 	}
 }
