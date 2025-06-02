@@ -37,9 +37,21 @@ html, body {
     overflow-x: hidden;
 }
 
+html {
+    scrollbar-gutter: stable;
+}
+
+nav {
+    position: fixed !important;
+    top: 0 !important;
+    width: 100% !important;
+    z-index: 2000 !important;
+}
+
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
+    background-color: transparent;
 }
 
 ::-webkit-scrollbar-track {
@@ -55,7 +67,6 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
     background: #086b4a;
 }
-
 
 @media (min-width: 768px) {
   html {
@@ -83,6 +94,7 @@ body {
     align-items: flex-start !important;
     justify-content: flex-start !important;
     flex-grow: 1; 
+    margin-top: 5.5em;
 }
 footer {
     border: 2px #0DAB76 solid;
