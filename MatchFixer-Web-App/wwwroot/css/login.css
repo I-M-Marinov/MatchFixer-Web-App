@@ -3,7 +3,7 @@
 
 .login-container {
     min-height: 70vh;
-    width: 40vw;
+    max-width: 700px;
     margin: 0 auto;
     margin-top: 2.44em;
     display: flex;
@@ -29,7 +29,7 @@
     padding: 2rem 2.5rem;
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    width: 60%;
+    max-width: 500px;
     max-width: 25em;
     animation: fadeInUp 0.8s ease-in;
     box-shadow: 5px 6px 20px rgba(0, 0, 0, 0.5);
