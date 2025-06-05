@@ -23,6 +23,8 @@
 }
 
 .wiki-tooltip-content {
+    max-width: 500px;
+    max-height: 500px;
     background: white;
     border: 1px solid #3370a8;
     border-radius: 0.5rem; 
@@ -36,7 +38,7 @@
     object-fit: contain;
     float: right;
     margin-left: 0.75rem;
-    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
     border-radius: 0.25rem;
 }
 
@@ -53,6 +55,7 @@
     padding: 0.2rem;
     text-shadow: 0px 1px 1px #3370a8;
 }
+
 
 .wiki-tooltip-content p {
     font-size: 0.8rem;
