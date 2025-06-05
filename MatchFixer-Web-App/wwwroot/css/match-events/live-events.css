@@ -10,9 +10,11 @@
 }
 
 .live-event-card {
+    display: flex;
     font-size: 0.75em;
     background-color: #CAE9FF;
     border-radius: 5% 10%;
+    min-height: 23em;
 }
 
 .event-team-name {
