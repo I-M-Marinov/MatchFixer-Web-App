@@ -7,10 +7,16 @@
 
 #danger-zone-name{
     background-color: #dc3545;
-    width: 100%;
+    width: 75%;
     font-size: 1.5em;
     border-radius: 0.2em;
     color: whitesmoke !important;
+}
+
+
+#danger-zone-name p{
+    margin: 0;
+    padding: 0.2em;
 }
 
 .delete-account-section {
