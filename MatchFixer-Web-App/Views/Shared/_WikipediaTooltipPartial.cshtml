@@ -1,111 +1,122 @@
 ﻿<script>
     var wikiCache = window.wikiCache || {};
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const debounce = (func, delay) => {
-            let timeoutId;
-            return (...args) => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => func.apply(this, args), delay);
-            };
-        };
+    var wikiCache = window.wikiCache || {};
 
-        const showTooltip = async (element, teamName) => {
-            const tooltip = document.createElement('div');
-            tooltip.className = 'wiki-tooltip';
+     document.addEventListener('DOMContentLoaded', function () {
+         const debounce = (func, delay) => {
+             let timeoutId;
+             return (...args) => {
+                 clearTimeout(timeoutId);
+                 timeoutId = setTimeout(() => func.apply(this, args), delay);
+             };
+         };
 
-            const getTeamInfoHtml = (data) => `
-                <div class="animate__animated animate__flipInX">
-                    <div class="wiki-tooltip-content">
-                        <h5 class="mb-2">${data.name}</h5>
-                        ${data.imageUrl ? `
-                            <img src="${data.imageUrl}"
-                                 class="wiki-tooltip-img rounded"
-                                 alt="${data.name} logo">` : ''}
-                        <p class="mb-2">${data.summary.split('. ').slice(0, 2).join('. ')}...</p>
-                        <div class="d-flex justify-content-end">
-                            <a href="${data.wikipediaUrl}"
-                               target="_blank"
-                               class="btn btn-sm btn-outline-primary">
-                                    More Info
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `;
+         const showTooltip = async (element, teamName) => {
+             const tooltip = document.createElement('div');
+             tooltip.className = 'wiki-tooltip';
 
-            const getSpinnerHtml = () => `
-                <div class="wiki-tooltip-inner animate__animated animate__slideInDown">
-                    <div class="d-flex justify-content-center py-3">
-                        <div class="spinner-sequence">
-                            <div class="spinner-grow text-brand-blue" style="animation-delay: 0s"></div>
-                            <div class="spinner-grow text-brand-green" style="animation-delay: 0.3s"></div>
-                            <div class="spinner-grow text-brand-blue" style="animation-delay: 0.6s"></div>
-                            <div class="spinner-grow text-brand-green" style="animation-delay: 0.9s"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
+             const getTeamInfoHtml = (data) => {
+                 const summaryText = data.summary || "";
+                 const fallback = summaryText.length > 300 ? summaryText.slice(0, 300) + '...' : summaryText;
+                 const displayText = summaryText.includes('. ')
+                     ? summaryText.split('. ').slice(0, 2).join('. ') + '...'
+                     : fallback;
 
-            const removeTooltip = () => {
-                tooltip.classList.add('fade-out');
-                setTimeout(() => tooltip.remove(), 200);
-            };
+                 return `
+                     <div class="animate__animated animate__flipInX">
+                         <div class="wiki-tooltip-content">
+                             <h5 class="mb-2">${data.name}</h5>
+                             ${data.imageUrl ? `
+                                 <img src="${data.imageUrl}"
+                                      class="wiki-tooltip-img rounded"
+                                      alt="${data.name} logo">` : ''}
+                             <p class="mb-2">${displayText}</p>
+                             <div class="d-flex justify-content-end">
+                                 <a href="${data.wikipediaUrl}"
+                                    target="_blank"
+                                    class="btn btn-sm btn-outline-primary">
+                                         More Info
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 `;
+             };
 
-            tooltip.innerHTML = getSpinnerHtml();
-            document.body.appendChild(tooltip);
+             const getSpinnerHtml = () => `
+                 <div class="wiki-tooltip-inner animate__animated animate__slideInDown">
+                     <div class="d-flex justify-content-center py-3">
+                         <div class="spinner-sequence">
+                             <div class="spinner-grow text-brand-blue" style="animation-delay: 0s"></div>
+                             <div class="spinner-grow text-brand-green" style="animation-delay: 0.3s"></div>
+                             <div class="spinner-grow text-brand-blue" style="animation-delay: 0.6s"></div>
+                             <div class="spinner-grow text-brand-green" style="animation-delay: 0.9s"></div>
+                         </div>
+                     </div>
+                 </div>
+             `;
 
-            // Always wait at least 1.5 seconds before showing content
-            const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
+             const removeTooltip = () => {
+                 tooltip.classList.add('fade-out');
+                 setTimeout(() => tooltip.remove(), 200);
+             };
 
-            try {
-                let dataToUse;
+             tooltip.innerHTML = getSpinnerHtml();
+             document.body.appendChild(tooltip);
 
-                if (wikiCache[teamName]) {
-                    dataToUse = wikiCache[teamName];
-                } else {
-                    const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
+             // Always wait at least 1.5 seconds before showing content
+             const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
 
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Failed to load team info');
-                    }
+             try {
+                 let dataToUse;
 
-                    dataToUse = await response.json();
-                    wikiCache[teamName] = dataToUse;
-                }
+                 if (wikiCache[teamName]) {
+                     dataToUse = wikiCache[teamName];
+                 } else {
+                     const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
 
-                // Wait for minimum delay regardless of cache status
-                await minDelay;
-                tooltip.innerHTML = getTeamInfoHtml(dataToUse);
+                     if (!response.ok) {
+                         const error = await response.json();
+                         throw new Error(error.error || 'Failed to load team info');
+                     }
 
-            } catch (error) {
-                tooltip.innerHTML = `
-                    <div class="wiki-tooltip-inner">
-                        <div class="alert alert-warning m-0 p-2">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            ${error.message}
-                        </div>
-                    </div>
-                `;
-            }
+                     dataToUse = await response.json();
+                     wikiCache[teamName] = dataToUse;
+                 }
 
-            function handleClickOutside(event) {
-                if (!element.contains(event.target) && !tooltip.contains(event.target)) {
-                    removeTooltip();
-                    document.removeEventListener('click', handleClickOutside);
-                }
-            }
-            document.addEventListener('click', handleClickOutside);
-        };
+                 // Wait for minimum delay regardless of cache status
+                 await minDelay;
+                 tooltip.innerHTML = getTeamInfoHtml(dataToUse);
 
-        document.querySelectorAll('[data-team-name]').forEach(element => {
-            const debouncedShow = debounce(() => {
-                showTooltip(element, element.getAttribute('data-team-name'));
-            }, 300);
-            element.addEventListener('click', debouncedShow);
-        });
-    });
+             } catch (error) {
+                 tooltip.innerHTML = `
+                     <div class="wiki-tooltip-inner">
+                         <div class="alert alert-warning m-0 p-2">
+                             <i class="fas fa-exclamation-circle me-2"></i>
+                             ${error.message}
+                         </div>
+                     </div>
+                 `;
+             }
+
+             function handleClickOutside(event) {
+                 if (!element.contains(event.target) && !tooltip.contains(event.target)) {
+                     removeTooltip();
+                     document.removeEventListener('click', handleClickOutside);
+                 }
+             }
+
+             document.addEventListener('click', handleClickOutside);
+         };
+
+         document.querySelectorAll('[data-team-name]').forEach(element => {
+             const debouncedShow = debounce(() => {
+                 showTooltip(element, element.getAttribute('data-team-name'));
+             }, 300);
+             element.addEventListener('click', debouncedShow);
+         });
+     });
 
     document.addEventListener('DOMContentLoaded', function() {
       const spinners = document.querySelectorAll('.spinner-grow');
