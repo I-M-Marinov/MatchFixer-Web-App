@@ -9,157 +9,157 @@
     .navbar-nav {
         gap: 0.4rem;
     }
+}
 
 
-
-    @media only screen and (max-width: 1024px) and (max-height: 768px) {
-        .name-image-container {
-            width: 100%;
-            max-width: 80%;
-        }
-
-        .profile-container {
-            justify-content: center;
-            align-items: center;
-        }
-        .navbar-collapse {
-            font-size: 0.75em;
-        }
-
-        .navbar-nav {
-            gap: 0.2rem;
-        }
-
-        .nav-link {
-            font-size: 2.2em;
-        }
+@media only screen and (max-width: 1024px) and (max-height: 768px) {
+    .name-image-container {
+        width: 100%;
+        max-width: 80%;
     }
 
-    @media only screen and (max-width: 1024px) {
-        .profile-card {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        .nav-link {
-            font-size: 0.75em;
-        }
-
+    .profile-container {
+        justify-content: center;
+        align-items: center;
+    }
+    .navbar-collapse {
+        font-size: 0.75em;
     }
 
-
-    @media only screen and (max-width: 768px) {
-
-
-        .name-image-container {
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .profile-card {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        .profile-matchfix-score,
-        .profile-danger-zone {
-            min-width: 250px;
-        }
-
-        .profile-danger-zone {
-            min-height: 143px;
-        }
-
-        .profile-matchfix-score {
-            font-size: 1.5em;
-        }
-
-        #dangerZone-text {
-            font-size: 0.9em !important;
-        }
-
-        .profile-danger-zone a img {
-            height: 100px !important;
-        }
-
-        .profile-info-container {
-            max-width: 30%;
-            min-height: 200px !important;
-        }
-
-        .navbar-brand img {
-            height: 20px;
-            width: auto;
-        }
-
-        .navbar-collapse {
-            font-size: 0.60em;
-        }
-
-        .navbar-nav {
-            gap: 0.2rem;
-        }
-
-        .nav-link {
-            font-size: 1em;
-        }
+    .navbar-nav {
+        gap: 0.2rem;
     }
 
-    @media (max-width: 650px) {
-        .navbar-collapse {
-            font-size: 0.45em;
-        }
-    }
-
-
-    @media (max-width: 578px) {
-
-
-        .name-image-container {
-            width: 100%;
-            max-width: 50%;
-            height: 100%;
-            order: 1;
-        }
-
-        .navbar-collapse {
-            font-size: 0.90em;
-        }
-
-        .profile-card {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        .profile-info-container {
-            min-width: 50% !important;
-        }
-
-        .responsive-profile-container{
-            flex-direction: column;
-        }
-
-        #scoreAndDangerContainer,
-        .name-image-container {
-            max-width: 400px !important;
-            flex-wrap: wrap;
-            align-content: center !important;
-        }
-
-        #profile-info-container {
-            order: 2;
-        }
-
-        #scoreAndDangerContainer {
-            order: 3;
-        }
-      
-
+    .nav-link {
+        font-size: 2.2em;
     }
 }
+
+@media only screen and (max-width: 1024px) {
+    .profile-card {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .nav-link {
+        font-size: 0.75em;
+    }
+
+}
+
+
+@media only screen and (max-width: 768px) {
+
+
+    .name-image-container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .profile-card {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .profile-matchfix-score,
+    .profile-danger-zone {
+        min-width: 250px;
+    }
+
+    .profile-danger-zone {
+        min-height: 143px;
+    }
+
+    .profile-matchfix-score {
+        font-size: 1.5em;
+    }
+
+    #dangerZone-text {
+        font-size: 0.9em !important;
+    }
+
+    .profile-danger-zone a img {
+        height: 100px !important;
+    }
+
+    .profile-info-container {
+        max-width: 30%;
+        min-height: 200px !important;
+    }
+
+    .navbar-brand img {
+        height: 20px;
+        width: auto;
+    }
+
+    .navbar-collapse {
+        font-size: 0.60em;
+    }
+
+    .navbar-nav {
+        gap: 0.2rem;
+    }
+
+    .nav-link {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 650px) {
+    .navbar-collapse {
+        font-size: 0.45em;
+    }
+}
+
+
+@media (max-width: 578px) {
+
+
+    .name-image-container {
+        width: 100%;
+        max-width: 50%;
+        height: 100%;
+        order: 1;
+    }
+
+    .navbar-collapse {
+        font-size: 0.90em;
+    }
+
+    .profile-card {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .profile-info-container {
+        min-width: 50% !important;
+    }
+
+    .responsive-profile-container{
+        flex-direction: column;
+    }
+
+    #scoreAndDangerContainer,
+    .name-image-container {
+        max-width: 400px !important;
+        flex-wrap: wrap;
+        align-content: center !important;
+    }
+
+    #profile-info-container {
+        order: 2;
+    }
+
+    #scoreAndDangerContainer {
+        order: 3;
+    }
+      
+
+}
+
