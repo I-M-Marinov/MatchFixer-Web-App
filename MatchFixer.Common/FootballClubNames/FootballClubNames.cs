@@ -91,7 +91,7 @@
 			["Frosinone"] = "Frosinone Calcio",
 			["Lecce"] = "U.S. Lecce",
 			["Cagliari"] = "Cagliari Calcio",
-			["Empoli"] = "Empoli F.C.",
+			["Empoli"] = "Empoli FC",
 			["Monza"] = "AC Monza",
 
 
