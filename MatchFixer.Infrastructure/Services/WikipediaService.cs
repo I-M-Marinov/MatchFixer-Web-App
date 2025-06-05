@@ -29,10 +29,17 @@ namespace MatchFixer.Infrastructure.Services
 				// Clean the team name before querying
 				var encodedTeamName = HttpUtility.UrlEncode(cleanedName);
 
-				// Get basic info with better image properties
-				var url = $"api.php?action=query&prop=extracts|pageimages|images&exintro=true" +
-						 $"&explaintext=true&piprop=thumbnail|original&pithumbsize=300" +
-						 $"&imlimit=50&format=json&titles={encodedTeamName}";
+				// Get basic info with better image properties.
+
+				//var url = $"api.php?action=query&prop=extracts|pageimages|images&exintro=true" +
+				//		 $"&explaintext=true&piprop=thumbnail|original&pithumbsize=300" +
+				//		 $"&imlimit=50&format=json&titles={encodedTeamName}";
+
+				var url = $"api.php?action=query&prop=extracts|pageimages|images" +
+				          $"&exchars=800" +
+				          $"&piprop=thumbnail|original&pithumbsize=300" +
+				          $"&imlimit=50&format=json&titles={encodedTeamName}";
+
 
 				var response = await _httpClient.GetAsync(url);
 				response.EnsureSuccessStatusCode();
