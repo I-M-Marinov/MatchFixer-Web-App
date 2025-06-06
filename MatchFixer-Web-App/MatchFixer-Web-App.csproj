@@ -44,4 +44,11 @@
     <Folder Include="wwwroot\images\live-events\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Shared\_PrivacyLayout.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
