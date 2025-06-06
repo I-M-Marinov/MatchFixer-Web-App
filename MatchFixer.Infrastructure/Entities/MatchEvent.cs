@@ -31,6 +31,8 @@ namespace MatchFixer.Infrastructure.Entities
 		[Range(OddsMinValue, OddsMaxValue)]
 		public decimal? AwayOdds { get; set; }
 
+		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
+
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 	}
 }
