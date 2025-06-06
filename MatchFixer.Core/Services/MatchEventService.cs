@@ -7,6 +7,9 @@ using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
 
+using static MatchFixer.Common.DerbyLookup.DerbyLookup;
+
+#nullable disable
 
 namespace MatchFixer.Core.Services
 {
@@ -35,7 +38,8 @@ namespace MatchFixer.Core.Services
 					DrawOdds = e.DrawOdds ?? 0,
 					AwayWinOdds = e.AwayOdds ?? 0,
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
-					AwayTeamLogoUrl = e.AwayTeam.LogoUrl
+					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
+					IsDerby = e.IsDerby
 				})
 				.AsNoTracking()
 				.ToListAsync();
@@ -55,6 +59,8 @@ namespace MatchFixer.Core.Services
 
 			var formattedDateAndTime = model.MatchDate.ToString("f", CultureInfo.InvariantCulture);
 
+			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
+
 
 			var matchEvent = new MatchEvent
 			{
@@ -64,7 +70,8 @@ namespace MatchFixer.Core.Services
 				MatchDate = DateTime.Parse(formattedDateAndTime),
 				HomeOdds = model.HomeOdds,
 				DrawOdds = model.DrawOdds,
-				AwayOdds = model.AwayOdds
+				AwayOdds = model.AwayOdds,
+				IsDerby = isDerby
 			};
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
