@@ -13,6 +13,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public decimal AwayWinOdds { get; set; }
 		public string? HomeTeamLogoUrl { get; set; }
 		public string? AwayTeamLogoUrl { get; set; }
+		public bool IsDerby { get; set; }
 	}
 
 }
