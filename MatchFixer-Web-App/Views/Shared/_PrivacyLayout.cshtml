@@ -1,0 +1,156 @@
+﻿@using MatchFixer.Infrastructure.Entities
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - MatchFixer</title>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icons/6.6.6/css/flag-icons.min.css" />
+	<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />  	@* Tailwind CSS *@
+
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
+</head>
+<body>
+    <header>
+        @if (SignInManager.IsSignedIn(User))
+	    {
+		    @await Html.PartialAsync("_LoggedInUser")
+	    }
+	    else
+	    {
+		    @await Html.PartialAsync("_GuestPartial")
+        }
+    </header>
+    <div class="privacy-layout-container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+  
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Cookie Consent Modal -->
+    <div class="modal fade" id="cookieConsentModal" tabindex="-1" aria-labelledby="cookieConsentLabel" data-bs-backdrop="static">
+	    <div class="modal-dialog modal-dialog">
+		    <div class="modal-content">
+                <div id="cookie-header" class="modal-header d-flex justify-content-lg-center align-items-center gap-3">
+				    <h5 class="modal-title" id="cookieConsentLabel">
+                        <i class="bi bi-cookie"></i> Cookie Consent <i class="bi bi-cookie"></i>
+				    </h5>
+			    </div>
+			    <div class="modal-body">
+                    <p class="d-flex justify-content-lg-center align-items-center">We use cookies to:</p>
+                    <ul>
+	                    <div class="d-flex flex-column justify-content-between align-items-lg-start">
+		                    <li class="d-flex justify-content-lg-center align-items-center"><i class="ri-gamepad-line game-icon"></i>Keep your game session active</li>
+		                    <li class="d-flex justify-content-lg-center align-items-center"><i class="bx bx-select-multiple remember-icon"></i>Remember your preferences</li>
+		                    <li class="d-flex justify-content-lg-center align-items-center"><i class="bi bi-emoji-sunglasses smile-icon"></i>Improve your experience</li>
+	                    </div>
+                    </ul>
+                    <div class="d-flex justify-content-center gap-1 flex-row">
+	                    <div class="form-check form-switch mb-3 p-0">
+		                    <input class="form-check-input" type="checkbox" id="essentialCookies" checked disabled>
+                        <label class="form-check-label cookiesLabel" for="essentialCookies">
+			                    Essential Cookies (Always On)
+		                    </label>
+	                    </div>
+                    <div class="form-check form-switch mb-3">
+		                    <input class="form-check-input ms-lg-3" type="checkbox" id="analyticsCookies" checked>
+                        <label class="form-check-label cookiesLabel" for="analyticsCookies">
+			                    Analytics Cookies
+		                    </label>
+	                    </div>
+                    </div>
+			    </div>
+			    <div class="modal-footer d-flex justify-content-between">
+				    <a href="@Url.Action("Privacy", "Home")" class="btn btn-link btn-sm">Learn More</a>
+
+				    <div>
+                    <button type="button" class="btn btn-outline-success me-2" id="rejectCookiesBtn"><i class="bi bi-check me-2"></i>Only Essential</button>
+                    <button type="button" class="btn btn-outline-primary" id="acceptCookiesBtn"><i class="bi bi-check2-all me-2"></i>Accept All</button>
+				    </div>
+			    </div>
+		    </div>
+	    </div>
+    </div>
+	
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById('cookieConsentModal');
+
+            let cookieModal = bootstrap.Modal.getInstance(modalElement);
+            if (!cookieModal) {
+                cookieModal = new bootstrap.Modal(modalElement);
+            }
+
+            if (!document.cookie.includes('cookie_consent=')) {
+                cookieModal.show();
+            }
+
+            document.getElementById('acceptCookiesBtn').addEventListener('click', function () {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30); // 30 days consent for the cookies
+                document.cookie = `cookie_consent=all; expires=${expiryDate.toUTCString()}; path=/`;
+                cookieModal.hide();
+            });
+
+            document.getElementById('rejectCookiesBtn').addEventListener('click', function () {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30); // 30 days consent for the cookies
+                document.cookie = `cookie_consent=essential; expires=${expiryDate.toUTCString()}; path=/`;
+                cookieModal.hide();
+            });
+        });
+
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+         const modalElement = document.getElementById('cookieConsentModal');
+         const cookie = getCookie('cookie_consent');
+
+        if (!document.cookie.includes('cookie_consent=')) {
+            console.log("Cookie not found. Showing modal.");
+            const cookieModal = new bootstrap.Modal(modalElement);
+            cookieModal.show();
+        } else {
+            if (cookie === 'essential') {
+                console.log("Essential cookies only");
+            } else if (cookie === 'all') {
+                console.log("All cookies accepted");
+            }
+        }
+
+        $(document).ready(function() {
+            console.log("jQuery is Loaded!")
+        });
+
+        
+</script>
+
+    </body>
+</html>
