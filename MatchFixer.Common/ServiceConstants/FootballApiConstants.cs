@@ -12,7 +12,7 @@
 		public const int Ligue1Id = 61;
 		public const int EredivisieId = 88;
 		public const int LigaPortugalId = 94;
-		public const int CroatianLeagueId = 106;
+		public const int PolishLeagueId = 106;
 		public const int SwissLeagueId = 207;
 
 
@@ -23,7 +23,7 @@
 		public const string Ligue1Name = "Ligue 1";
 		public const string EredivisieName = "Eredivisie";
 		public const string LigaPortugalName = "Liga Portugal";
-		public const string CroatianLeagueName = "Croatian League";
+		public const string PolishLeagueName = "Polish League Ekstraklasa";
 		public const string SwissLeagueName = "Swiss League";
 
 		public const string PremierLeagueLogoUrl = "https://media.api-sports.io/football/leagues/39.png";

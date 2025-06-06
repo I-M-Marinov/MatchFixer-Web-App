@@ -126,7 +126,7 @@ namespace MatchFixer.Infrastructure.Services
 				{ Ligue1Id, Ligue1Name },
 				{ EredivisieId, EredivisieName },
 				{ LigaPortugalId, LigaPortugalName },
-				{ CroatianLeagueId, CroatianLeagueName },
+				{ PolishLeagueId, PolishLeagueName },
 				{ SwissLeagueId, SwissLeagueName }
 			};
 
