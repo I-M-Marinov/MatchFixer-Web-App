@@ -45,21 +45,31 @@
 					<div class="col">
 						<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
 							<div class="card-body d-flex flex-column justify-content-around" style="postion: relative; object-fit: contain;">
+								<div id="oneVsOneContainer">
+									@if (match.IsDerby)
+									{
+										<img id="derby-match-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 50px;" class="img-fluid mb-2" />
+
+									}
+								</div>
 								<div class="d-flex justify-content-around align-items-center mb-3 mt-4">
+
+
 
 									<div class="tw-flex tw-justify-around tw-items-center mb-3 gap-5">
 										<div class="text-center">
 											<div class="tw-flex  tw-flex-col  tw-items-center  tw-justify-center">
-												<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam" />
+												<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam"/>
 												<div class="event-team-name">@match.HomeTeam</div>
 											</div>
 										</div>
 
-										<img src="/images/live-events/versus.png" alt="@match.HomeTeam" style="width: auto; height: 40px;" class="img-fluid mb-2" />
+
+										<img src="/images/live-events/versus.png" alt="@match.HomeTeam" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
 
 										<div class="text-center">
 											<div class="flex flex-col items-center justify-center object-fit-contain">
-												<img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam" />
+												<img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam"/>
 												<div class="event-team-name">@match.AwayTeam</div>
 											</div>
 										</div>
@@ -74,36 +84,36 @@
 									<div class="tw-overflow-x-auto">
 										<table class="odds-table tw-min-w-full tw-bg-white tw-border tw-border-gray-200 tw-rounded-lg tw-overflow-hidden">
 											<thead class="tw-bg-gray-50 tw-shadow">
-												<tr>
-													<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="0">
-														Home
-													</th>
-													<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="1">
-														Draw
-													</th>
-													<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="2">
-														Away
-													</th>
-												</tr>
+											<tr>
+												<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="0">
+													Home
+												</th>
+												<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="1">
+													Draw
+												</th>
+												<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="2">
+													Away
+												</th>
+											</tr>
 											</thead>
 											<tbody class="tw-divide-y tw-divide-gray-200">
-												<tr>
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
-														<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-															@match.HomeWinOdds
-														</span>
-													</td>
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
-														<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-															@match.DrawOdds
-														</span>
-													</td>
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
-														<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-															@match.AwayWinOdds
-														</span>
-													</td>
-												</tr>
+											<tr>
+												<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
+													<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+														@match.HomeWinOdds
+													</span>
+												</td>
+												<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
+													<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+														@match.DrawOdds
+													</span>
+												</td>
+												<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
+													<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+														@match.AwayWinOdds
+													</span>
+												</td>
+											</tr>
 											</tbody>
 										</table>
 									</div>
