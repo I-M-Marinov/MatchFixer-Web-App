@@ -86,7 +86,7 @@
 			["Sassuolo"] = "US Sassuolo Calcio",
 			["Torino"] = "Torino F.C.",
 			["Udinese"] = "Udinese Calcio",
-			["Verona"] = "Hellas Verona F.C.",
+			["Verona"] = "Hellas Verona FC",
 			["Salernitana"] = "US Salernitana 1919",
 			["Frosinone"] = "Frosinone Calcio",
 			["Lecce"] = "U.S. Lecce",
@@ -179,7 +179,7 @@
 			["Lausanne"] = "FC Lausanne-Sport",
 			["Yverdon Sport"] = "Yverdon-Sport FC",
 			["FC Thun"] = "FC Thun",
-			["Stade Lausanne-Ouchy"] = "Stade Lausanne-Ouchy",
+			["Stade Lausanne-Ouchy"] = "FC Stade Lausanne Ouchy",
 
 			// Polish clubs
 
