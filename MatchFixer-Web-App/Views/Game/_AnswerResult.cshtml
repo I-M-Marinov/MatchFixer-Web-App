@@ -1,6 +1,14 @@
 ﻿@using MatchFixer.Core.ViewModels.MatchGuessGame
 @model MatchGuessGameViewModel
 
+@{
+	var isDerby = Model.IsDerby;
+	var currentPointsPerAnswer = Model.Score >= 100 ? 20 : 10;
+	var earnedPoints = (bool)isDerby ? currentPointsPerAnswer * 2 : currentPointsPerAnswer;
+	var isAtMilestone = Model.Score == 40; // will become 50 after this question, then doubled to 100
+}
+
+
 @if (Model.IsAnswered)
 {
 
@@ -13,19 +21,29 @@
 				<div id="correctGuess" class="d-flex justify-content-center mt-2 bg-success w-50">
 					<strong>Correct!</strong>
 				</div>
-				@if (Model.Score > 100)
+
+				<p class="mt-3">
+					You earned @earnedPoints points.
+				</p>
+
+				@if (isAtMilestone)
 				{
-					
-					<p class="mt-3">You've already doubled your points ! Let's keep going !</p>
-					<p class="mt-2">You earned 20 points.</p>
+					<p class="mt-2">
+						One more correct answer to double your points!
+					</p>
 				}
-				else
+				else if (Model.Score == 100)
 				{
-					<p class="mt-3">You earned 10 points.</p>
-					if (Model.Score == 40)
-					{
-						<p class="mt-2">One more correct answer to double your points !</p>
-					}
+					<p class="mt-2">
+						You've doubled your points! Let's keep going!
+					</p>
+				}
+
+				@if (isDerby == true)
+				{
+					<p class="mt-2">
+						Good job guessing that derby match!
+					</p>
 				}
 			}
 			else
