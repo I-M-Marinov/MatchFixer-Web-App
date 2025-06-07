@@ -22,6 +22,7 @@ namespace MatchFixer.Core.ViewModels.MatchGuessGame
 		public int? UserAwayGuess { get; set; }
 
 		public bool? IsCorrect { get; set; }
+		public bool? IsDerby { get; set; }
 	}
 
 }
