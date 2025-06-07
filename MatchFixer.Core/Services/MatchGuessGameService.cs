@@ -6,7 +6,7 @@ using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Core.ViewModels.MatchGuessGame;
 using MatchFixer.Infrastructure;
 
-
+using static MatchFixer.Common.DerbyLookup.DerbyLookup;
 
 namespace MatchFixer.Core.Services
 {
@@ -15,7 +15,6 @@ namespace MatchFixer.Core.Services
 		private readonly MatchFixerDbContext _context;
 		private readonly Random _random = new();
 		private readonly ISessionService _sessionService;
-
 
 		public MatchGuessGameService(MatchFixerDbContext context, ISessionService sessionService)
 		{
@@ -84,6 +83,15 @@ namespace MatchFixer.Core.Services
 
 			var match = await GetRandomMatchAsync();
 
+			//---------------TESTING PURPOSES ONLY -----------------//
+
+			//var match = await _context.MatchResults
+			//	.Include(e => e.HomeTeam)
+			//	.Include(e => e.AwayTeam)
+			//	.AsNoTracking()
+			//	.Where(m => m.AwayTeam.Name == "Manchester City" && m.HomeTeam.Name == "Manchester United" || m.AwayTeam.Name == "Manchester United" && m.HomeTeam.Name == "Manchester City")
+			//	.FirstOrDefaultAsync();
+
 			if (match == null)
 			{
 				_sessionService.ClearSession();
@@ -107,7 +115,8 @@ namespace MatchFixer.Core.Services
 				HomeTeam = match.HomeTeam.Name,
 				AwayTeam = match.AwayTeam.Name,
 				HomeTeamLogo = match.HomeTeam.LogoUrl,
-				AwayTeamLogo = match.AwayTeam.LogoUrl
+				AwayTeamLogo = match.AwayTeam.LogoUrl,
+				IsDerby = await IsADerbyMatch(match)
 			};
 
 			return (viewModel, false); // Game continues
@@ -141,6 +150,11 @@ namespace MatchFixer.Core.Services
 				// Base points: 10 or 20
 				pointsToAdd = sessionState.Score >= 50 ? 20 : 10;
 
+				if (await IsADerbyMatch(match))
+				{
+					pointsToAdd *= 2; // double the points to be added if it is a derby match 
+				}
+
 				// Add base points to session
 				sessionState.Score += pointsToAdd;
 
@@ -167,7 +181,6 @@ namespace MatchFixer.Core.Services
 			{
 				_sessionService.ClearSession();
 			}
-
 			var resultViewModel = new MatchGuessGameViewModel
 			{
 				IsCorrect = isCorrect,
@@ -182,7 +195,9 @@ namespace MatchFixer.Core.Services
 				HomeTeam = match.HomeTeam.Name,
 				AwayTeam = match.AwayTeam.Name,
 				HomeTeamLogo = match.HomeTeam.LogoUrl,
-				AwayTeamLogo = match.AwayTeam.LogoUrl
+				AwayTeamLogo = match.AwayTeam.LogoUrl,
+				IsDerby = await IsADerbyMatch(match)
+
 			};
 
 			return (resultViewModel, isGameOver);
@@ -198,5 +213,36 @@ namespace MatchFixer.Core.Services
 			}
 		}
 
+		private async Task<bool> IsADerbyMatch(MatchResult match)
+		{
+			var homeTeamId = ExtractTeamIdFromLogoUrl(match.HomeTeam.LogoUrl);
+			var awayTeamId = ExtractTeamIdFromLogoUrl(match.AwayTeam.LogoUrl);
+
+			var isDerby = IsDerby((int)homeTeamId, (int)awayTeamId);
+
+			return isDerby;
+		}
+		private int? ExtractTeamIdFromLogoUrl(string logoUrl)
+		{
+			if (string.IsNullOrEmpty(logoUrl))
+				return null;
+
+			try
+			{
+				var uri = new Uri(logoUrl);
+				var fileName = Path.GetFileNameWithoutExtension(uri.AbsolutePath); // Gets the team id from the uri
+
+				if (int.TryParse(fileName, out int teamId))
+				{
+					return teamId;
+				}
+
+				return null;
+			}
+			catch
+			{
+				return null;
+			}
+		}
 	}
 }
