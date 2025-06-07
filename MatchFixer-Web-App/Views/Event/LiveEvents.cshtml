@@ -48,15 +48,14 @@
 								<div id="oneVsOneContainer">
 									@if (match.IsDerby)
 									{
-										<img id="derby-match-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 50px;" class="img-fluid mb-2" />
-
+										<img class="animate__animated animate__heartBeat animate__slower animate__infinite" id="derby-match-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 40px;" class="img-fluid mb-2" />
 									}
 								</div>
 								<div class="d-flex justify-content-around align-items-center mb-3 mt-4">
 
 
 
-									<div class="tw-flex tw-justify-around tw-items-center mb-3 gap-5">
+									<div class="tw-flex tw-justify-around tw-items-center mb-2 gap-5">
 										<div class="text-center">
 											<div class="tw-flex  tw-flex-col  tw-items-center  tw-justify-center">
 												<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam"/>
