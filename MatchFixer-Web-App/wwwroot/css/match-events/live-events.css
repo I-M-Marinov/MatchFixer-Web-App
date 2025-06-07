@@ -19,7 +19,9 @@
 
 .event-team-name {
     font-size: 1em;
+    word-wrap: break-word;
     filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+    text-shadow: 0px 1px 1px white;
 }
 
 /* Custom pill classes */
@@ -111,10 +113,13 @@
 }
 
 #derby-match-icon {
-    position: absolute;
+    position: relative;
     top: 0.6em;
-    left: 46%;
+    left: 0.6em;
+}
 
+.derby-negative-margin {
+    margin-top: -2.2em !important; 
 }
 
 /*----------------------------------------------------------------
