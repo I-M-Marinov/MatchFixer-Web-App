@@ -7,7 +7,6 @@ using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.FootballAPI;
 
 using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
-using System.Globalization;
 
 namespace MatchFixer.Infrastructure.Services
 {
