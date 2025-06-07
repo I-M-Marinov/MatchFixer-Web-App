@@ -108,14 +108,15 @@
 
 #oneVsOneContainer {
     position: relative;
-    margin-bottom: -2em;
 }
 
 #derby-match-icon {
-    position: relative;
-    top: 0.2em;
+    position: absolute;
+    top: 0.6em;
     left: 46%;
+
 }
+
 /*----------------------------------------------------------------
 |        RESPONSIVE FOR THE TEAM NAMES ON SMALLER SCREENS         |
 -----------------------------------------------------------------*/
