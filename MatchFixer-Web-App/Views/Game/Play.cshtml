@@ -1,7 +1,8 @@
 ﻿@using MatchFixer.Core.ViewModels.MatchGuessGame
 @model MatchGuessGameViewModel
 
-@using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
+@using static MatchFixer.Common.ServiceConstants.FootballApiConstants
+
 @{
 	ViewData["Title"] = "MatchFix Guess Game";
 
@@ -69,8 +70,14 @@
 				</div>
 
 				<div class="col-1 text-center">
-					<span class="fs-4 fw-bold">vs</span>
+					<img src="/images/live-events/versus.png" alt="@Model.HomeTeam" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
+					@if ((bool)Model.IsDerby)
+					{
+						<img class="animate__animated animate__heartBeat animate__slower animate__infinite" id="derby-match-game-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 50px;" class="img-fluid mb-2" />
+					}
 				</div>
+				
+				
 
 				<div class="col-4 text-center">
 					<div class="team-logo-wrapper mx-auto mb-3">
