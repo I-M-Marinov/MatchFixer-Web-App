@@ -2,10 +2,21 @@
 @model UserDropdownViewModel
 
 
-<ul class="profile-dropdown-menu hover-dropdown d-none d-lg-flex">
-	<li class="nav-item dropdown pe-3">
+<ul class="profile-dropdown-menu d-none d-lg-flex">
+	@if (User.Identity.IsAuthenticated)
+	{
+        <li id="betSlipButtonContainer" class="nav-item position-relative">
+			<button id="betSlipToggle" class="btn position-relative">
+				<img src="/images/bet-slip/bets.png" alt="Bet Slip" style="height: 40px;">
+				<span id="betCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+					0
+				</span>
+			</button>
+		</li>
+	}
+	<li class="nav-item dropdown pe-3 position-relative hover-dropdown-container">
 
-		<a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+		<a class="nav-link nav-profile d-flex align-items-center pe-0 hover-dropdown" href="#">
 			<img src="@Model.ProfileImageUrl" alt="User Image" class="rounded-circle">
 			<span class="d-none d-md-block dropdown ps-2"></span>
 		</a>
@@ -42,21 +53,185 @@
 			<li>
 				<hr class="dropdown-divider">
 			</li>
-		
+
 			<li>
 				<form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
 					<button type="submit" class="dropdown-item d-flex align-items-center justify-content-center">
 
-						<span><i class="bi bi-box-arrow-right"></i>  Sign Out</span>
+						<span><i class="bi bi-box-arrow-right"></i> Sign Out</span>
 					</button>
 				</form>
 			</li>
-			
+
 
 
 		</ul><!-- End Profile Dropdown Items -->
 	</li><!-- End Profile Nav -->
 </ul>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const toggleBtn = document.getElementById('betSlipToggle');
+		const closeBtn = document.getElementById('closeBetSlip');
+		const panel = document.getElementById('betSlipPanel');
+
+		toggleBtn?.addEventListener('click', function () {
+			panel.classList.toggle('open');
+			this.blur();
+		});
+
+		closeBtn?.addEventListener('click', function () {
+			panel.classList.remove('open');
+		});
+
+		document.querySelectorAll('.bet-option').forEach(button => {
+			button.addEventListener('click', () => {
+				const matchId = button.dataset.matchId;
+				const home = button.dataset.home;
+				const away = button.dataset.away;
+				const option = button.dataset.option;
+				const odds = parseFloat(button.dataset.odds);
+				addToBetSlip(matchId, home, away, option, odds);
+			});
+		});
+	});
+
+	const betSlip = {
+		bets: [],
+		amount: 0
+	};
+
+	function openBetSlip() {
+		const panel = document.getElementById("betSlipPanel");
+		panel?.classList.add("open");
+		panel?.classList.remove("d-none");
+	}
+
+	function closeBetSlip() {
+		const panel = document.getElementById("betSlipPanel");
+		panel?.classList.remove("open");
+		panel?.classList.add("d-none");
+	}
+
+	function addToBetSlip(matchId, homeTeam, awayTeam, option, odds) {
+		const existing = betSlip.bets.find(b => b.matchId === matchId);
+		if (existing) {
+			existing.selectedOption = option;
+			existing.odds = odds;
+		} else {
+			betSlip.bets.push({ matchId, homeTeam, awayTeam, selectedOption: option, odds });
+		}
+		renderBetSlip();
+		openBetSlip();
+	}
+
+	function renderBetSlip() {
+		const container = document.getElementById("betSlipContent");
+		container.innerHTML = "";
+
+		if (betSlip.bets.length === 0) {
+			const p = document.createElement("p");
+			p.classList.add("text-muted");
+			p.textContent = "No bets placed yet.";
+			container.appendChild(p);
+
+			document.getElementById("totalOdds").innerText = "0.00";
+			document.getElementById("potentialReturn").innerText = "0.00";
+			return;
+		}
+
+		let totalOdds = 1;
+
+		betSlip.bets.forEach((bet, index) => {
+			totalOdds *= bet.odds;
+
+			const item = document.createElement("div");
+			item.classList.add("border", "rounded", "p-2", "mb-2");
+
+			const wrapper = document.createElement("div");
+			wrapper.classList.add("d-flex", "justify-content-between");
+
+			const left = document.createElement("div");
+			const title = document.createElement("strong");
+			title.textContent = `${bet.homeTeam} vs ${bet.awayTeam}`;
+			const br = document.createElement("br");
+			const pick = document.createElement("span");
+			pick.classList.add("text-primary");
+			pick.textContent = bet.selectedOption;
+
+			const pickText = document.createTextNode("Pick: ");
+			left.appendChild(title);
+			left.appendChild(br);
+			left.appendChild(pickText);
+			left.appendChild(pick);
+
+			const right = document.createElement("div");
+			right.classList.add("text-end");
+
+			const oddsLabel = document.createElement("strong");
+			oddsLabel.textContent = bet.odds.toFixed(2);
+
+			const removeBtn = document.createElement("button");
+			removeBtn.type = "button";
+			removeBtn.classList.add("btn", "btn-sm", "btn-outline-danger", "mt-1");
+			removeBtn.textContent = "Remove";
+			removeBtn.addEventListener("click", () => removeBet(bet.matchId));
+
+			right.appendChild(document.createTextNode("Odds: "));
+			right.appendChild(oddsLabel);
+			right.appendChild(document.createElement("br"));
+			right.appendChild(removeBtn);
+
+			wrapper.appendChild(left);
+			wrapper.appendChild(right);
+			item.appendChild(wrapper);
+
+			const hiddenInputs = document.createElement("div");
+
+			const input1 = document.createElement("input");
+			input1.type = "hidden";
+			input1.name = `Bets[${index}].MatchId`;
+			input1.value = bet.matchId;
+
+			const input2 = document.createElement("input");
+			input2.type = "hidden";
+			input2.name = `Bets[${index}].SelectedOption`;
+			input2.value = bet.selectedOption;
+
+			const input3 = document.createElement("input");
+			input3.type = "hidden";
+			input3.name = `Bets[${index}].Odds`;
+			input3.value = bet.odds;
+
+			hiddenInputs.appendChild(input1);
+			hiddenInputs.appendChild(input2);
+			hiddenInputs.appendChild(input3);
+			item.appendChild(hiddenInputs);
+
+			container.appendChild(item);
+		});
+
+		document.getElementById("totalOdds").innerText = totalOdds.toFixed(2);
+		updatePotentialReturn();
+	}
+
+	function removeBet(matchId) {
+		betSlip.bets = betSlip.bets.filter(b => b.matchId !== matchId);
+		renderBetSlip();
+	}
+
+	function updatePotentialReturn() {
+		const amount = parseFloat(document.getElementById("betAmount").value || "0");
+		const totalOdds = parseFloat(document.getElementById("totalOdds").innerText || "0");
+		const potential = (amount * totalOdds).toFixed(2);
+		document.getElementById("potentialReturn").innerText = potential;
+	}
+
+	document.getElementById("closeBetSlip")?.addEventListener("click", closeBetSlip);
+</script>
+
+
+
 
 
 
