@@ -30,7 +30,7 @@ namespace MatchFixer.Core.Services
 				.OrderBy(e => e.MatchDate)
 				.Select(e => new LiveEventViewModel
 				{
-					Id = Guid.NewGuid(),
+					Id = e.Id,
 					HomeTeam = e.HomeTeam.Name,
 					AwayTeam = e.AwayTeam.Name,
 					KickoffTime = e.MatchDate,
