@@ -53,6 +53,7 @@ builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add th
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
 builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
+builder.Services.AddScoped<IBettingService, BettingService>();					// Add the Betting Service 
 
 
 
