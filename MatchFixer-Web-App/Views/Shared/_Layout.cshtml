@@ -151,6 +151,32 @@
 
         
 </script>
+
+    <form asp-controller="Bet" asp-action="PlaceBet" method="post" id="betSlipForm">
+	    @Html.AntiForgeryToken()
+	    <div id="betSlipPanel" class="bet-slip-panel shadow-lg">
+		    <div class="bet-slip-header d-flex justify-content-between align-items-center p-3">
+			    <h5 class="mb-0">Your Bet Slip</h5>
+			    <button id="closeBetSlip" type="button" class="btn-close" aria-label="Close"></button>
+		    </div>
+
+		    <div id="betSlipContent" class="p-3">
+			    <p class="text-muted">No bets placed yet.</p>
+		    </div>
+
+		    <div class="p-3 border-top">
+			    <div class="mb-2">
+				    <label for="betAmount" class="form-label">Amount to Bet</label>
+				    <input type="number" id="betAmount" name="Amount" class="form-control" min="1" value="0" oninput="updatePotentialReturn()">
+			    </div>
+			    <div class="mb-1">Total Odds: <strong id="totalOdds">0.00</strong></div>
+			    <div class="mb-3">Potential Return: <strong id="potentialReturn">0.00</strong></div>
+			    <button type="submit" class="btn btn-success w-100">Place Bet</button>
+		    </div>
+	    </div>
+    </form>
+
+
 	
     <footer class="footer text-muted">
 	    <div>
