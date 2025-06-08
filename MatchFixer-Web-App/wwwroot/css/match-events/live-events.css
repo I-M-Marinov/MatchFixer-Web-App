@@ -24,6 +24,15 @@
     text-shadow: 0px 1px 1px white;
 }
 
+.odds-table button{
+    border: none;
+    background-color: #ffffff;
+}
+
+.odds-table:hover button {
+    border-radius: 0.75em;
+    background-color: #65feb3;
+}
 /* Custom pill classes */
 .pill-brand-green {
     display: inline-block;
