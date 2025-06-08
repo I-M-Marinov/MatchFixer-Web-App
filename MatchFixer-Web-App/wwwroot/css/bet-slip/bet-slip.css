@@ -1,0 +1,34 @@
+﻿#betSlipButtonContainer{
+    margin-top: 0.4em;
+    margin-right: 0.5em;
+}
+
+#betSlipPanel {
+    background-color: #3370a8;
+}
+
+#betSlipContent {
+    margin-top: 1.5em;
+    background-color: #57c785;
+    border-radius: 1em;
+    text-align: center;
+}
+
+#betCountBadge {
+    color: whitesmoke;
+    background-color: #53be7f !important;
+    margin: 0;
+}
+
+#betSlipToggle {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0;
+    background: transparent; 
+}
+
+#betSlipToggle:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
