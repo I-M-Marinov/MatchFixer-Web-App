@@ -85,13 +85,34 @@
 											<thead class="tw-bg-gray-50 tw-shadow">
 											<tr>
 												<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="0">
-													Home
+													<button class="bet-option"
+													        data-match-id="@match.Id"
+													        data-home="@match.HomeTeam"
+													        data-away="@match.AwayTeam"
+													        data-option="Home"
+													        data-odds="@match.HomeWinOdds">
+														Home
+													</button>
 												</th>
 												<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="1">
-													Draw
+													<button class="bet-option"
+													        data-match-id="@match.Id"
+													        data-home="@match.HomeTeam"
+													        data-away="@match.AwayTeam"
+													        data-option="Home"
+													        data-odds="@match.HomeWinOdds">
+														Draw
+													</button>	
 												</th>
 												<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="2">
-													Away
+													<button class="bet-option"
+															data-match-id="@match.Id"
+															data-home="@match.HomeTeam"
+															data-away="@match.AwayTeam"
+															data-option="Home"
+															data-odds="@match.HomeWinOdds">
+														Away
+													</button>
 												</th>
 											</tr>
 											</thead>
