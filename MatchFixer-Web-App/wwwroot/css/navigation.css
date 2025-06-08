@@ -162,10 +162,21 @@
     text-align: center;
 }
 
-.hover-dropdown:hover .dropdown-menu {
+.hover-dropdown-container:hover .dropdown-menu {
     display: block;
-    top: 4.5em;
+    opacity: 1;
+    visibility: visible;
     right: 0.1em;
+    top: 4.5em;
+}
+
+.dropdown-menu.profile {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 999;
 }
 
 .dropdown-menu h6 {
@@ -181,5 +192,35 @@
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+/*----------------------------------------------------------------------
+|                   Betting Slip specific css                           |
+-----------------------------------------------------------------------*/
+
+.bet-slip-panel {
+    position: fixed;
+    top: 0;
+    right: -400px; /* hidden by default */
+    width: 350px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    z-index: 1050;
+    transition: right 0.3s ease-in-out;
+    padding: 1rem;
+}
+
+.bet-slip-panel.open {
+    right: 0;
+}
+
+.bet-slip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
