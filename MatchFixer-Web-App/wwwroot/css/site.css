@@ -20,6 +20,7 @@
 @import "/css/leaderboard/leaderboard.css";
 @import "/css/match-events/live-events.css";
 @import "/css/wiki-tooltip/wiki-tooltip.css";
+@import "/css/bet-slip/bet-slip.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
