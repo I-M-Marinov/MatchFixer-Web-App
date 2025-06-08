@@ -42,6 +42,7 @@
     <Folder Include="wwwroot\images\add-match\" />
     <Folder Include="wwwroot\images\leaderboard\" />
     <Folder Include="wwwroot\images\live-events\" />
+    <Folder Include="wwwroot\images\bet-slip\" />
   </ItemGroup>
 
   <ItemGroup>
