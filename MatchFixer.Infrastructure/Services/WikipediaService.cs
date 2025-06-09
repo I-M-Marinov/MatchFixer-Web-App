@@ -36,7 +36,7 @@ namespace MatchFixer.Infrastructure.Services
 				//		 $"&imlimit=50&format=json&titles={encodedTeamName}";
 
 				var url = $"api.php?action=query&prop=extracts|pageimages|images" +
-				          $"&exchars=800" +
+				          $"&exchars=400" +
 				          $"&piprop=thumbnail|original&pithumbsize=300" +
 				          $"&imlimit=50&format=json&titles={encodedTeamName}";
 
@@ -220,7 +220,8 @@ namespace MatchFixer.Infrastructure.Services
 				@"\|\s*crest\s*=\s*([^\|\r\n]+)",
 				@"\|\s*badge\s*=\s*([^\|\r\n]+)",
 				@"\|\s*image\s*=\s*([^\|\r\n]+)",
-				@"\|\s*logo_image\s*=\s*([^\|\r\n]+)"
+				@"\|\s*logo_image\s*=\s*([^\|\r\n]+)",
+				@"\|\s*logo_black\s*=\s*([^\|\r\n]+)"
 			};
 
 			foreach (var pattern in logoPatterns)
