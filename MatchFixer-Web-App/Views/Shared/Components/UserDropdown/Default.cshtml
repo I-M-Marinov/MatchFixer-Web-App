@@ -8,7 +8,7 @@
         <li id="betSlipButtonContainer" class="nav-item position-relative">
 			<button id="betSlipToggle" class="btn position-relative">
 				<img src="/images/bet-slip/bets.png" alt="Bet Slip" style="height: 40px;">
-				<span id="betCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+				<span id="betCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
 					0
 				</span>
 			</button>
@@ -70,6 +70,8 @@
 </ul>
 
 <script>
+	const betSlipBadge = document.getElementById('betCountBadge');
+
 	document.addEventListener('DOMContentLoaded', function () {
 		const toggleBtn = document.getElementById('betSlipToggle');
 		const closeBtn = document.getElementById('closeBetSlip');
@@ -84,16 +86,26 @@
 			panel.classList.remove('open');
 		});
 
-		document.querySelectorAll('.bet-option').forEach(button => {
-			button.addEventListener('click', () => {
-				const matchId = button.dataset.matchId;
-				const home = button.dataset.home;
-				const away = button.dataset.away;
-				const option = button.dataset.option;
-				const odds = parseFloat(button.dataset.odds);
-				addToBetSlip(matchId, home, away, option, odds);
+		document.querySelectorAll(".bet-trigger").forEach(el => {
+			el.addEventListener("click", () => {
+				const matchId = el.dataset.matchId;
+				const home = el.dataset.home;
+				const away = el.dataset.away;
+				const option = el.dataset.option;
+				const odds = parseFloat(el.dataset.odds);
+
+				if (matchId && home && away && option && !isNaN(odds)) {
+					addToBetSlip(matchId, home, away, option, odds);
+
+					if (betSlipBadge) {
+						betSlipBadge.textContent = betSlip.bets.length.toString();
+						betSlipBadge.style.display = betSlip.bets.length > 0 ? "inline-block" : "none";
+					}
+
+				}
 			});
 		});
+
 	});
 
 	const betSlip = {
@@ -217,6 +229,12 @@
 
 	function removeBet(matchId) {
 		betSlip.bets = betSlip.bets.filter(b => b.matchId !== matchId);
+
+		if (betSlipBadge) {
+			betSlipBadge.textContent = betSlip.bets.length.toString();
+			betSlipBadge.style.display = betSlip.bets.length > 0 ? "inline-block" : "none";
+		}
+		
 		renderBetSlip();
 	}
 
