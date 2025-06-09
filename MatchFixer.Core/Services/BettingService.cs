@@ -1,10 +1,8 @@
-﻿using MatchFixer.Core.DTOs;
-using MatchFixer.Infrastructure.Entities;
+﻿using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 
 public class BettingService : IBettingService
 {
@@ -51,6 +49,6 @@ public class BettingService : IBettingService
 		}
 
 		await _dbContext.SaveChangesAsync();
-		return ("Bet(s) successfully placed.", true);
+		return ("Your betting slip was successfully submitted! Good Luck !", true);
 	}
 }
