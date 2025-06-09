@@ -81,36 +81,37 @@
 								<div class="d-flex justify-content-around mb-3">
 
 									<div class="tw-overflow-x-auto">
-										<table class="odds-table tw-min-w-full tw-bg-white tw-border tw-border-gray-200 tw-rounded-lg tw-overflow-hidden">
+										<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden">
 											<thead class="tw-bg-gray-50 tw-shadow">
 											<tr>
-												<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="0">
-													<button class="bet-option"
-													        data-match-id="@match.Id"
-													        data-home="@match.HomeTeam"
-													        data-away="@match.AwayTeam"
-													        data-option="Home"
-													        data-odds="@match.HomeWinOdds">
+													<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger" data-column-index="0"
+												    data-match-id="@match.Id"
+												    data-home="@match.HomeTeam"
+												    data-away="@match.AwayTeam"
+												    data-option="Home"
+												    data-odds="@match.HomeWinOdds">
+
+													<button class="bet-option">
 														Home
 													</button>
 												</th>
-												<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="1">
-													<button class="bet-option"
-													        data-match-id="@match.Id"
-													        data-home="@match.HomeTeam"
-													        data-away="@match.AwayTeam"
-													        data-option="Draw"
-													        data-odds="@match.DrawOdds">
+													<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger" data-column-index="1"
+												    data-match-id="@match.Id"
+												    data-home="@match.HomeTeam"
+												    data-away="@match.AwayTeam"
+												    data-option="Draw"
+												    data-odds="@match.DrawOdds">
+													<button class="bet-option">
 														Draw
 													</button>	
 												</th>
-												<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600" data-column-index="2">
-													<button class="bet-option"
-															data-match-id="@match.Id"
-															data-home="@match.HomeTeam"
-															data-away="@match.AwayTeam"
-															data-option="Away"
-															data-odds="@match.AwayWinOdds">
+													<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger" data-column-index="2"
+												    data-match-id="@match.Id"
+												    data-home="@match.HomeTeam"
+												    data-away="@match.AwayTeam"
+												    data-option="Away"
+												    data-odds="@match.AwayWinOdds">
+													<button class="bet-option">
 														Away
 													</button>
 												</th>
@@ -118,18 +119,33 @@
 											</thead>
 											<tbody class="tw-divide-y tw-divide-gray-200">
 											<tr>
-												<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
-													<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+													<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold"
+													      data-match-id="@match.Id" 
+													      data-home="@match.HomeTeam" 
+													      data-away="@match.AwayTeam" 
+													      data-option="Home" 
+													      data-odds="@match.HomeWinOdds">
 														@match.HomeWinOdds
 													</span>
 												</td>
-												<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
-													<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+													<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold"
+													      data-match-id="@match.Id" 
+													      data-home="@match.HomeTeam" 
+													      data-away="@match.AwayTeam" 
+													      data-option="Draw" 
+													      data-odds="@match.DrawOdds">
 														@match.DrawOdds
 													</span>
 												</td>
-												<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center">
-													<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+													<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold"
+													      data-match-id="@match.Id" 
+													      data-home="@match.HomeTeam" 
+													      data-away="@match.AwayTeam" 
+													      data-option="Away" 
+													      data-odds="@match.AwayWinOdds">
 														@match.AwayWinOdds
 													</span>
 												</td>
