@@ -7,11 +7,26 @@
     background-color: #3370a8;
 }
 
+
+
+.bet-slip-panel {
+    width: 400px;
+    max-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    overflow: hidden;
+    z-index: 1050; 
+    border-left: 1px solid #ddd;
+}
+
 #betSlipContent {
     margin-top: 1.5em;
     background-color: #57c785;
     border-radius: 1em;
     text-align: center;
+    flex: 1;
+    overflow-y: auto;
 }
 
 #betCountBadge {
