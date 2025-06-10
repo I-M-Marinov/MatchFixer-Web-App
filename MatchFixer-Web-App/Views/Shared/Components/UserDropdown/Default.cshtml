@@ -165,11 +165,13 @@
 			item.classList.add("border", "rounded", "p-2", "mb-2");
 
 			const wrapper = document.createElement("div");
-			wrapper.classList.add("d-flex", "justify-content-between");
+			wrapper.classList.add("d-flex", "justify-content-between", "align-items-center");
+			wrapper.style.marginTop = "0.2em";
+
 
 			const left = document.createElement("div");
 
-			left.classList.add("flex-grow"); // Allow left content to grow
+			left.classList.add("flex-grow", "align-items-center"); // Allow left content to grow
 
 			// Team Logos 
 			const teamsDiv = document.createElement("div");
@@ -208,11 +210,18 @@
 			pick.classList.add("text-primary");
 			pick.textContent = bet.selectedOption;
 
-			const pickText = document.createTextNode("Pick: ");
+			const pickText = document.createElement('p');
+			pickText.textContent = "Pick:";
+			pickText.classList.add("text-center");
+			pickText.style.marginBottom = "0em";
 			left.appendChild(teamsDiv);
 			left.appendChild(br);
-			left.appendChild(pickText);
-			left.appendChild(pick);
+
+			const pickContainer = document.createElement("div");
+			pickContainer.classList.add("flex", "items-center");
+			pickContainer.appendChild(pickText);
+			pickContainer.appendChild(pick);
+			pickContainer.style.marginTop = "-1.2em";
 
 			const right = document.createElement("div");
 			right.classList.add("text-end");
@@ -234,6 +243,7 @@
 			wrapper.appendChild(left);
 			wrapper.appendChild(right);
 			item.appendChild(wrapper);
+			item.appendChild(pickContainer);
 
 			const hiddenInputs = document.createElement("div");
 
