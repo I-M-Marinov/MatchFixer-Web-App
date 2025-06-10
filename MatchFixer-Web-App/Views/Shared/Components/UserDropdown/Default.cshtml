@@ -91,11 +91,13 @@
 				const matchId = el.dataset.matchId;
 				const home = el.dataset.home;
 				const away = el.dataset.away;
+				const homeLogoUrl = el.dataset.homeLogoUrl; // Get home logo URL
+				const awayLogoUrl = el.dataset.awayLogoUrl; // Get away logo URL
 				const option = el.dataset.option;
 				const odds = parseFloat(el.dataset.odds);
 
-				if (matchId && home && away && option && !isNaN(odds)) {
-					addToBetSlip(matchId, home, away, option, odds);
+				if (matchId && home && away && homeLogoUrl && awayLogoUrl && option && !isNaN(odds)) {
+					addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, option, odds);
 
 					if (betSlipBadge) {
 						betSlipBadge.textContent = betSlip.bets.length.toString();
@@ -125,13 +127,15 @@
 		panel?.classList.add("d-none");
 	}
 
-	function addToBetSlip(matchId, homeTeam, awayTeam, option, odds) {
+	function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds) {
 		const existing = betSlip.bets.find(b => b.matchId === matchId);
 		if (existing) {
 			existing.selectedOption = option;
 			existing.odds = odds;
+			existing.homeLogoUrl = homeLogoUrl; 
+			existing.awayLogoUrl = awayLogoUrl; 
 		} else {
-			betSlip.bets.push({ matchId, homeTeam, awayTeam, selectedOption: option, odds });
+			betSlip.bets.push({ matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, selectedOption: option, odds });
 		}
 		renderBetSlip();
 		openBetSlip();
@@ -164,15 +168,48 @@
 			wrapper.classList.add("d-flex", "justify-content-between");
 
 			const left = document.createElement("div");
-			const title = document.createElement("strong");
-			title.textContent = `${bet.homeTeam} vs ${bet.awayTeam}`;
+
+			left.classList.add("flex-grow"); // Allow left content to grow
+
+			// Team Logos 
+			const teamsDiv = document.createElement("div");
+			teamsDiv.classList.add("flex", "items-center", "mb-2", "text-white");
+
+			const homeLogo = document.createElement("img");
+			homeLogo.src = bet.homeLogoUrl;
+			homeLogo.alt = `${bet.homeTeam} Logo`;
+			homeLogo.classList.add("rounded-full", "mr-4", "object-cover"); // Team logo styling
+			homeLogo.style.width = "50px";
+			homeLogo.style.height = "auto";
+			homeLogo.style.marginLeft = "0.2em";
+
+
+			const versus = document.createElement("img");
+			versus.src = "/images/live-events/versus.png";
+			versus.alt = `VS`;
+			versus.style.width = "auto";
+			versus.style.height = "25px";
+			versus.style.margin = "1em";
+			versus.classList.add("img-fluid", "mb-2");
+
+			const awayLogo = document.createElement("img");
+			awayLogo.src = bet.awayLogoUrl;
+			awayLogo.alt = `${bet.awayTeam} Logo`;
+			awayLogo.classList.add("rounded-full", "ml-2", "object-cover"); // Team logo styling
+			awayLogo.style.width = "50px";
+			awayLogo.style.height = "auto";
+
+			teamsDiv.appendChild(homeLogo);
+			teamsDiv.appendChild(versus);
+			teamsDiv.appendChild(awayLogo);
+
 			const br = document.createElement("br");
 			const pick = document.createElement("span");
 			pick.classList.add("text-primary");
 			pick.textContent = bet.selectedOption;
 
 			const pickText = document.createTextNode("Pick: ");
-			left.appendChild(title);
+			left.appendChild(teamsDiv);
 			left.appendChild(br);
 			left.appendChild(pickText);
 			left.appendChild(pick);
