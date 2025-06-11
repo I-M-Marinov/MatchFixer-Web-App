@@ -131,6 +131,60 @@
     margin-top: -2.2em !important; 
 }
 
+/* --------------------------------------------------------------
+|  CUSTOM TOOPTIP ON HOVER FOR ALL REMOVE BUTTONS IN THE BETSLIP |
+--------------------------------------------------------------- */
+
+.custom-event-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-event-tooltip {
+    visibility: hidden;
+    background-color: #0a58ca;
+    color: ghostwhite;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 999;
+    bottom: 1%;
+    right: 0.1rem;
+    transform: translateX(-20%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
+.custom-event-tooltip-wrapper:hover .custom-event-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.custom-event-tooltip-wrapper i {
+    font-size: 1.3em;
+    position: absolute;
+    top: 0.1em;
+    right: 0.1em;
+}
+
+#remove-bet-button:hover .custom-event-tooltip-wrapper i {
+    color: #ce1f37;
+}
+
+#odds-multiplier {
+    margin: 1.2rem;
+    font-size: 1Rem;
+}
+
+#odds-multiplier strong {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 750 !important;
+    font-style: normal !important;
+}
 /*----------------------------------------------------------------
 |        RESPONSIVE FOR THE TEAM NAMES ON SMALLER SCREENS         |
 -----------------------------------------------------------------*/
