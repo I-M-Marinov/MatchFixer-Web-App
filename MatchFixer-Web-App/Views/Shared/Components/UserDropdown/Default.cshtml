@@ -165,7 +165,7 @@
 			item.classList.add("border", "rounded", "p-2", "mb-2");
 
 			const wrapper = document.createElement("div");
-			wrapper.classList.add("d-flex", "justify-content-between", "align-items-center");
+			wrapper.classList.add("d-flex", "justify-content-around", "align-items-center");
 			wrapper.style.marginTop = "0.2em";
 
 
@@ -180,8 +180,9 @@
 			const homeLogo = document.createElement("img");
 			homeLogo.src = bet.homeLogoUrl;
 			homeLogo.alt = `${bet.homeTeam} Logo`;
+			homeLogo.title = `${bet.homeTeam}`;
 			homeLogo.classList.add("rounded-full", "mr-4", "object-cover"); // Team logo styling
-			homeLogo.style.width = "50px";
+			homeLogo.style.width = "60px";
 			homeLogo.style.height = "auto";
 			homeLogo.style.marginLeft = "0.2em";
 
@@ -197,8 +198,9 @@
 			const awayLogo = document.createElement("img");
 			awayLogo.src = bet.awayLogoUrl;
 			awayLogo.alt = `${bet.awayTeam} Logo`;
+			awayLogo.title = `${bet.awayTeam}`;
 			awayLogo.classList.add("rounded-full", "ml-2", "object-cover"); // Team logo styling
-			awayLogo.style.width = "50px";
+			awayLogo.style.width = "60px";
 			awayLogo.style.height = "auto";
 
 			teamsDiv.appendChild(homeLogo);
@@ -207,13 +209,21 @@
 
 			const br = document.createElement("br");
 			const pick = document.createElement("span");
-			pick.classList.add("text-primary");
 			pick.textContent = bet.selectedOption;
 
+			if(bet.selectedOption === "Home"){
+				pick.classList.add("pill-brand-blue");
+			}else if( bet.selectedOption === "Draw"){
+				pick.classList.add("pill-brand-yellow");
+			}else{
+				pick.classList.add("pill-brand-green");
+			}
+
 			const pickText = document.createElement('p');
-			pickText.textContent = "Pick:";
+			pickText.textContent = "Your pick:";
 			pickText.classList.add("text-center");
 			pickText.style.marginBottom = "0em";
+			pickText.style.fontSize = "0.85em";
 			left.appendChild(teamsDiv);
 			left.appendChild(br);
 
@@ -225,17 +235,42 @@
 
 			const right = document.createElement("div");
 			right.classList.add("text-end");
+			right.id = 'odds-multiplier';
 
 			const oddsLabel = document.createElement("strong");
-			oddsLabel.textContent = bet.odds.toFixed(2);
+			oddsLabel.textContent = `${bet.odds.toFixed(2)}x`;
+
+			const oddsLightning = document.createElement('i');
+			oddsLightning.classList.add('bi', 'bi-lightning-charge-fill');
+			oddsLightning.style.color = '#ffd300';
 
 			const removeBtn = document.createElement("button");
 			removeBtn.type = "button";
-			removeBtn.classList.add("btn", "btn-sm", "btn-outline-danger", "mt-1");
-			removeBtn.textContent = "Remove";
+			removeBtn.classList.add("btn", "btn-sm", "mt-1");
+			removeBtn.id = 'remove-bet-button';
+
+
+			// Tooltip wrapper
+			const removeBtnSpan = document.createElement('span');
+			removeBtnSpan.classList.add('custom-event-tooltip-wrapper');
+
+			// Trash icon
+			const removeIconElement = document.createElement('i');
+			removeIconElement.classList.add('bi', 'bi-x-circle-fill');
+
+			// Tooltip text
+			const customTooltipSpan = document.createElement('span');
+			customTooltipSpan.classList.add('custom-event-tooltip');
+			customTooltipSpan.textContent = "Remove this pick";
+
+			removeBtnSpan.appendChild(removeIconElement);  
+			removeBtnSpan.appendChild(customTooltipSpan); 
+			removeBtn.appendChild(removeBtnSpan);
+
 			removeBtn.addEventListener("click", () => removeBet(bet.matchId));
 
-			right.appendChild(document.createTextNode("Odds: "));
+			// right.appendChild(document.createTextNode("Odds: "));
+			right.appendChild(oddsLightning);
 			right.appendChild(oddsLabel);
 			right.appendChild(document.createElement("br"));
 			right.appendChild(removeBtn);
