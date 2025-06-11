@@ -89,7 +89,7 @@
 			["Verona"] = "Hellas Verona FC",
 			["Salernitana"] = "US Salernitana 1919",
 			["Frosinone"] = "Frosinone Calcio",
-			["Lecce"] = "U.S. Lecce",
+			["Lecce"] = "US Lecce",
 			["Cagliari"] = "Cagliari Calcio",
 			["Empoli"] = "Empoli FC",
 			["Monza"] = "AC Monza",
