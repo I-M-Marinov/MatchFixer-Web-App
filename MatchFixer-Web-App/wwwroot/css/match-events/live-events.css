@@ -179,12 +179,30 @@
     font-size: 1Rem;
 }
 
-#odds-multiplier strong {
+#odds-multiplier strong,
+#totalOdds,
+#betAmount,
+#potentialReturnContainer,
+#potentialReturnContainer strong {
     font-family: "Orbitron", sans-serif !important;
     font-optical-sizing: auto !important;
     font-weight: 750 !important;
     font-style: normal !important;
 }
+
+#betAmount::-webkit-outer-spin-button,
+#betAmount::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#betAmount {
+    max-width: 30%;
+    background-color: #65feb3;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
 /*----------------------------------------------------------------
 |        RESPONSIVE FOR THE TEAM NAMES ON SMALLER SCREENS         |
 -----------------------------------------------------------------*/
