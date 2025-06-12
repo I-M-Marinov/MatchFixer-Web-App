@@ -156,26 +156,37 @@
 	    @Html.AntiForgeryToken()
 	    <div id="betSlipPanel" class="bet-slip-panel shadow-lg">
 		    <div class="bet-slip-header d-flex justify-content-between align-items-center p-3">
-			    <h5 class="mb-0">Your Bet Slip</h5>
-			    <button id="closeBetSlip" type="button" class="btn-close" aria-label="Close"></button>
+			    
 		    </div>
 
 		    <div id="betSlipContent" class="p-3">
-			    <p class="text-muted">No bets placed yet.</p>
+			    <p class="mt-5">Bet slip is empty.</p>
+			    <p>Please bet on an event to see your bets here.</p>
 		    </div>
 
-		    <div class="p-3">
-			    <div class="mb-2">
-				    <label for="betAmount" class="form-label">Amount to Bet</label>
-				    <input type="number" id="betAmount" name="Amount" class="form-control" min="1" value="0" oninput="updatePotentialReturn()">
+		    <div class="p-3 d-flex flex-column justify-content-center align-items-center">
+			    <div>
+				    @* <label class="mb-2" for="betAmount">Choose your bet amount:</label>
+                    <input style="background-color: #57c785;" type="number" id="betAmount" name="Amount" class="form-control" min="1" value="0" oninput="updatePotentialReturn()"> *@
+
+                    <label class="mb-2 d-flex justify-content-center align-items-center" for="betAmount">Choose your bet amount:</label>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+	                    <button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeBetAmount(this, -1)">−</button>
+	                    <input type="number" id="betAmount" name="Amount" class="form-control" min="1" value="0" required oninput="updatePotentialReturn()"/>
+	                    <button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeBetAmount(this, 1)">+</button>
+                    </div>
+                    
 			    </div>
-			    <div class="mb-1">Multiplier: <strong id="totalOdds">0.00</strong>x</div>
-			    <div class="mb-3">To Win: $<strong id="potentialReturn">0.00</strong></div>
-			    <button type="submit" class="btn btn-success w-100">Place Bet</button>
+
+                <div class="d-flex justify-content-center align-items-center mb-3 mt-2">
+				    <div class="me-5"> <i class="bi bi-lightning-charge-fill" style="color:#ffd300;"></i><strong id="totalOdds">0.00</strong>x</div>
+				    <div id="potentialReturnContainer">To Win: $<strong id="potentialReturn">0.00</strong></div>
+			    </div>
+
+			    <button type="submit" class="btn btn-success w-100">Submit slip</button>
 		    </div>
 	    </div>
     </form>
-
 
 	
     <footer class="footer text-muted">
