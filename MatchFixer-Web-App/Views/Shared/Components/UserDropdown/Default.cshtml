@@ -146,10 +146,14 @@
 		container.innerHTML = "";
 
 		if (betSlip.bets.length === 0) {
-			const p = document.createElement("p");
-			p.classList.add("text-muted");
-			p.textContent = "No bets placed yet.";
-			container.appendChild(p);
+			const p1 = document.createElement("p");
+			const p2 = document.createElement("p");
+
+			p1.textContent = "Bet slip is empty.";
+			p2.textContent = "Please bet on an event to see your bets here.";
+
+			container.appendChild(p1);
+			container.appendChild(p2);
 
 			document.getElementById("totalOdds").innerText = "0.00";
 			document.getElementById("potentialReturn").innerText = "0.00";
@@ -220,7 +224,7 @@
 			}
 
 			const pickText = document.createElement('p');
-			pickText.textContent = "Your pick:";
+			pickText.textContent = "You bet on:";
 			pickText.classList.add("text-center");
 			pickText.style.marginBottom = "0em";
 			pickText.style.fontSize = "0.85em";
@@ -269,7 +273,6 @@
 
 			removeBtn.addEventListener("click", () => removeBet(bet.matchId));
 
-			// right.appendChild(document.createTextNode("Odds: "));
 			right.appendChild(oddsLightning);
 			right.appendChild(oddsLabel);
 			right.appendChild(document.createElement("br"));
@@ -328,6 +331,14 @@
 	}
 
 	document.getElementById("closeBetSlip")?.addEventListener("click", closeBetSlip);
+
+	function changeBetAmount(button, delta) {
+		const input = button.parentElement.querySelector('input');
+		const value = parseInt(input.value || '0', 10);
+		const newValue = Math.max(0, value + delta);
+		input.value = newValue;
+		updatePotentialReturn();
+	}
 </script>
 
 
