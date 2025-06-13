@@ -183,7 +183,9 @@
 #totalOdds,
 #betAmount,
 #potentialReturnContainer,
-#potentialReturnContainer strong {
+#potentialReturnContainer strong,
+#potentialReturnOddsContainer strong,
+#amountContainer span {
     font-family: "Orbitron", sans-serif !important;
     font-optical-sizing: auto !important;
     font-weight: 750 !important;
@@ -197,8 +199,8 @@
 }
 
 #betAmount {
-    max-width: 30%;
-    background-color: #65feb3;
+    font-size: 0.95em;
+    background-color: #57c785;
     text-align: center;
     -moz-appearance: textfield;
 }
