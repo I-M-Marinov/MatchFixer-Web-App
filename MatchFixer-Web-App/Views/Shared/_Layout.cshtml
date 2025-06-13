@@ -165,22 +165,24 @@
 		    </div>
 
 		    <div class="p-3 d-flex flex-column justify-content-center align-items-center">
-			    <div>
-				    @* <label class="mb-2" for="betAmount">Choose your bet amount:</label>
-                    <input style="background-color: #57c785;" type="number" id="betAmount" name="Amount" class="form-control" min="1" value="0" oninput="updatePotentialReturn()"> *@
+			    <div id="amountContainer">
+				    <div class="d-flex justify-content-center align-items-center gap-2">
+                        <button type="button" class="btn btn-primary btn-sm step-btn flex-shrink-0" style="color: #57c785;" onclick="changeBetAmount(this, -1)">−</button>
 
-                    <label class="mb-2 d-flex justify-content-center align-items-center" for="betAmount">Choose your bet amount:</label>
-                    <div class="d-flex justify-content-center align-items-center gap-1">
-	                    <button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeBetAmount(this, -1)">−</button>
-	                    <input type="number" id="betAmount" name="Amount" class="form-control" min="1" value="0" required oninput="updatePotentialReturn()"/>
-	                    <button type="button" class="btn btn-primary btn-sm step-btn" onclick="changeBetAmount(this, 1)">+</button>
-                    </div>
-                    
+					    <div class="position-relative" style="width: 90px;">
+						    <span class="position-absolute top-50 start-0 translate-middle-y ps-2">$</span>
+						    <input type="number" id="betAmount" name="Amount" class="form-control ps-4" min="1" value="0" required oninput="updatePotentialReturn()" />
+					    </div>
+
+                        <button type="button" class="btn btn-primary btn-sm step-btn flex-shrink-0" style="color: #57c785;" onclick="changeBetAmount(this, 1)">+</button>
+				    </div>
 			    </div>
 
-                <div class="d-flex justify-content-center align-items-center mb-3 mt-2">
-				    <div class="me-5"> <i class="bi bi-lightning-charge-fill" style="color:#ffd300;"></i><strong id="totalOdds">0.00</strong>x</div>
-				    <div id="potentialReturnContainer">To Win: $<strong id="potentialReturn">0.00</strong></div>
+                <div id="potentialReturnOddsContainer" class="d-flex justify-content-center align-items-center mb-3 mt-2">
+                    <div class="me-5">
+                        <i class="bi bi-lightning-charge-fill lightning-icon-all-odds"></i><strong id="totalOdds">0.00</strong><strong style="text-shadow: 0px 1px 1px white;">x</strong>
+                    </div>
+                    <div id="potentialReturnContainer">To Win: <strong>$</strong><strong id="potentialReturn">0.00</strong></div>
 			    </div>
 
 			    <button type="submit" class="btn btn-success w-100">Submit slip</button>
