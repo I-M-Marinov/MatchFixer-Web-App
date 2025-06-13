@@ -129,6 +129,7 @@
 
 	function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds) {
 		const existing = betSlip.bets.find(b => b.matchId === matchId);
+
 		if (existing) {
 			existing.selectedOption = option;
 			existing.odds = odds;
@@ -137,6 +138,8 @@
 		} else {
 			betSlip.bets.push({ matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, selectedOption: option, odds });
 		}
+
+		animateLightning("lightning-flash");
 		renderBetSlip();
 		openBetSlip();
 	}
@@ -245,8 +248,9 @@
 			oddsLabel.textContent = `${bet.odds.toFixed(2)}x`;
 
 			const oddsLightning = document.createElement('i');
-			oddsLightning.classList.add('bi', 'bi-lightning-charge-fill');
+			oddsLightning.classList.add('bi', 'bi-lightning-charge-fill', 'lightning-icon');
 			oddsLightning.style.color = '#ffd300';
+			oddsLightning.style.textShadow = '0px 2px 2px black';
 
 			const removeBtn = document.createElement("button");
 			removeBtn.type = "button";
@@ -319,7 +323,8 @@
 			betSlipBadge.textContent = betSlip.bets.length.toString();
 			betSlipBadge.style.display = betSlip.bets.length > 0 ? "inline-block" : "none";
 		}
-		
+
+		animateLightning("lightning-fade");   // when removing bets
 		renderBetSlip();
 	}
 
@@ -339,6 +344,18 @@
 		input.value = newValue;
 		updatePotentialReturn();
 	}
+
+	function animateLightning(effectClass) {
+		const lightningIcon = document.querySelector(".lightning-icon-all-odds");
+		if (lightningIcon) {
+			lightningIcon.classList.add(effectClass);
+			lightningIcon.addEventListener("animationend", function handler() {
+				lightningIcon.classList.remove(effectClass);
+				lightningIcon.removeEventListener("animationend", handler);
+			});
+		}
+	}
+
 </script>
 
 
