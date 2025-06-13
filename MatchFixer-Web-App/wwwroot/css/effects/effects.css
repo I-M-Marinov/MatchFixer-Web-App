@@ -33,3 +33,44 @@
         transform: rotate(360deg);
     }
 }
+
+
+/* Effects for the lightning icon in the all odds container in the bet slip */
+
+
+@keyframes flashLightning {
+    0% {
+        color: #f7d100;
+        text-shadow: 0 0 10px #fff700, 0 0 20px #fff700, 0 0 30px #fff700;
+        transform: scale(1.2);
+    }
+
+    100% {
+        color: #ffffff;
+        text-shadow: none;
+        transform: scale(1);
+    }
+}
+
+@keyframes flashfade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: none;
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+        color: rgba(255, 0, 0, 0.9);
+        text-shadow: 0 0 15px rgba(255, 0, 0, 1), 0 0 25px rgba(255, 0, 0, 0.9), 0 0 35px rgba(255, 0, 0, 0.8), 0 0 45px rgba(255, 0, 0, 0.7);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: none;
+    }
+}
+
+
