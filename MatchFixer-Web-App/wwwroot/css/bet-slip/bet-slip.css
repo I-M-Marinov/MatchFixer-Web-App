@@ -47,3 +47,33 @@
     outline: none !important;
     box-shadow: none !important;
 }
+
+#odds-multiplier,
+#totalOdds {
+    text-shadow: 0px 1px 1px white;
+}
+
+#potentialReturnContainer strong {
+    color: #57c785;
+    text-shadow: 0px 2px 2px black;
+}
+
+.lightning-icon {
+    color: #f7d100;
+    animation: electricShake 0.2s infinite;
+}
+
+.lightning-icon,
+.lightning-icon-all-odds {
+    color: #ffd300;
+    text-shadow: 0px 2px 2px black;
+}
+
+.lightning-flash {
+    animation: flashLightning 0.6s ease-in;
+}
+
+.lightning-fade {
+    animation: flashfade 0.6s ease-in-out;
+}
+
