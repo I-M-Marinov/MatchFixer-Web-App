@@ -126,7 +126,7 @@
 			["Marseille"] = "Olympique de Marseille",
 			["Lyon"] = "Olympique Lyonnais",
 			["Paris Saint Germain"] = "Paris Saint-Germain FC",
-			["Lille"] = "LOSC Lille",
+			["Lille"] = "Lille OSC",
 			["Nice"] = "OGC Nice",
 			["Reims"] = "Stade de Reims",
 			["Montpellier"] = "Montpellier HSC",
@@ -164,6 +164,8 @@
 			["De Graafschap"] = "De Graafschap",
 			["NAC Breda"] = "NAC Breda",
 			["FC Volendam"] = "FC Volendam",
+			["Emmen"] = "FC Emmen",
+
 			
 			// Swiss clubs
 
