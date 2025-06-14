@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
-using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -9,10 +10,13 @@ namespace MatchFixer_Web_App.Controllers
 	{
 
 		private readonly IBettingService _bettingService;
+		private readonly ISessionService _sessionService;
 
-		public BetController(IBettingService bettingService)
+		public BetController(IBettingService bettingService, ISessionService sessionService)
 		{
 			_bettingService = bettingService;
+			_sessionService = sessionService;
+
 		}
 
 		[HttpPost]
@@ -27,6 +31,8 @@ namespace MatchFixer_Web_App.Controllers
 				TempData["ErrorMessage"] = message;
 				return RedirectToAction("LiveEvents", "Event");
 			}
+
+			_sessionService.ClearBetSlip();
 
 			TempData["SuccessMessage"] = message;
 			return RedirectToAction("LiveEvents", "Event");
