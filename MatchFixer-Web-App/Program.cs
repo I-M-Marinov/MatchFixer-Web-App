@@ -53,7 +53,7 @@ builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add th
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
 builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
-builder.Services.AddScoped<IBettingService, BettingService>();					// Add the Betting Service 
+builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 
 
 
@@ -72,6 +72,10 @@ builder.Services.AddSession(options =>
 	options.IdleTimeout = TimeSpan.FromMinutes(30); // session timeout 
 });
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+	options.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
