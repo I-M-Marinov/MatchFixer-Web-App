@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.ViewModels.GameSessionState;
+﻿using MatchFixer.Core.DTOs.Bets;
+using MatchFixer.Core.ViewModels.GameSessionState;
 
 namespace MatchFixer.Core.Contracts
 {
@@ -8,5 +9,9 @@ namespace MatchFixer.Core.Contracts
 		void SetSessionState(GameSessionState state);
 		void InitializeSessionState(string userId);
 		void ClearSession();
+		void SetBetSlipState(BetSlipState state);
+		void ClearBetSlip();
+		BetSlipState? GetBetSlipState();
+		void AddBetToSlip(BetSlipItem item);
 	}
 }
