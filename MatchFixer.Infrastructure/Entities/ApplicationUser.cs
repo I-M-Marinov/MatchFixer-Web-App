@@ -54,7 +54,6 @@ namespace MatchFixer.Infrastructure.Entities
 
 		[Comment("Indicates if the user was deactivated by an admin (vs. self-deactivation)")]
 		public bool WasDeactivatedByAdmin { get; set; } = false;
-
-		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
+		public ICollection<BetSlip> BetSlips { get; set; } = new List<BetSlip>();
 	}
 }
