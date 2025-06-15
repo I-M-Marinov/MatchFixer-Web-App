@@ -214,7 +214,7 @@ function renderBetSlip() {
 
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";
-        removeBtn.classList.add("btn", "btn-sm", "mt-1");
+        removeBtn.classList.add("btn", "btn-sm", "mt-1", "no-feedback");
         removeBtn.id = 'remove-bet-button';
 
         // Tooltip wrapper
