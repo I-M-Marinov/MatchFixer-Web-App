@@ -45,64 +45,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds) {
-    // Find if bet for the same matchId & option exists
-    const existingExact = betSlip.bets.find(b => b.matchId === matchId && b.option === option);
+    // Find if any bet for same matchId exists
+    const existingBet = betSlip.bets.find(b => b.matchId === matchId);
 
-    if (existingExact) {
-        // Already in bet slip, do nothing (prevent duplicate)
-        return;
-    }
+    if (existingBet) {
+        // Update existing bet with new option & odds
+        const oldOption = existingBet.option;  // capture old option before change
 
-    // Check if bet with same matchId but different option exists
-    const existingDifferentOption = betSlip.bets.find(b => b.matchId === matchId && b.option !== option);
-    if (existingDifferentOption) {
-        // Capture old option BEFORE updating
-        const oldOption = existingDifferentOption.option;
+        existingBet.option = option;
+        existingBet.odds = odds;
+        existingBet.homeLogoUrl = homeLogoUrl;
+        existingBet.awayLogoUrl = awayLogoUrl;
 
-        // Update existing bet with new option and odds
-        existingDifferentOption.option = option;
-        existingDifferentOption.odds = odds;
-        existingDifferentOption.homeLogoUrl = homeLogoUrl;
-        existingDifferentOption.awayLogoUrl = awayLogoUrl;
-
-        // Update server session: remove old version, add updated version
+        // Update server session
         removeBetFromSession(matchId, oldOption);
-        addBetToSession(existingDifferentOption);
-
-        renderBetSlip();
-        openBetSlip();
-        animateLightning("lightning-flash");
-        return;
+        addBetToSession(existingBet);
     }
+    else {
+        // New bet - safe to add
+        const betItem = {
+            matchId: matchId,
+            homeTeam,
+            awayTeam,
+            homeLogoUrl,
+            awayLogoUrl,
+            option,
+            odds
+        };
 
-    // Otherwise add new bet
-    const betItem = {
-        matchId: matchId,
-        homeTeam,
-        awayTeam,
-        homeLogoUrl,
-        awayLogoUrl,
-        option,
-        odds
-    };
-
-    betSlip.bets.push(betItem);
-    addBetToSession(betItem);
-
-    console.log(JSON.stringify({
-        MatchId: betItem.matchId,
-        HomeTeam: betItem.homeTeam,
-        AwayTeam: betItem.awayTeam,
-        HomeLogoUrl: betItem.homeLogoUrl,
-        AwayLogoUrl: betItem.awayLogoUrl,
-        SelectedOption: betItem.option,
-        Odds: betItem.odds
-    }));
+        betSlip.bets.push(betItem);
+        addBetToSession(betItem);
+    }
 
     renderBetSlip();
     openBetSlip();
     animateLightning("lightning-flash");
 }
+
 
 function addBetToSession(betItem) {
     fetch('/BetSlip/Add', {
