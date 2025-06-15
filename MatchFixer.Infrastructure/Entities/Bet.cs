@@ -12,11 +12,6 @@ namespace MatchFixer.Infrastructure.Entities
 		[Comment("Unique identifier for a Bet")]
 		public Guid Id { get; set; }
 
-		[Required(ErrorMessage = AmountIsRequired)]
-		[Range(1.00, 50000, ErrorMessage = AmountMustBeBetweenOneAndFiftyThousand)]
-		[Comment("Amount of the Bet")]
-		public decimal Amount { get; set; }
-
 		[Required(ErrorMessage = PickIsRequired)]
 		[Comment("The chosen outcome the user will choose for the bet")]
 		public MatchPick Pick { get; set; }
@@ -26,13 +21,6 @@ namespace MatchFixer.Infrastructure.Entities
 		public DateTime BetTime { get; set; } = DateTime.UtcNow;
 
 		[Required]
-		[Comment("Id of the user that placed the bet")]
-		public Guid UserId { get; set; }
-
-		[ForeignKey(nameof(UserId))]
-		public ApplicationUser User { get; set; }
-
-		[Required]
 		[Comment("Id of match event user is placing a bet for")]
 
 		public Guid MatchEventId { get; set; }
@@ -40,10 +28,13 @@ namespace MatchFixer.Infrastructure.Entities
 		[ForeignKey(nameof(MatchEventId))]
 		public MatchEvent MatchEvent { get; set; }
 
-		[Comment("Amount that would be won on the bet")]
-		public decimal? WinAmount { get; set; }
+		[Required]
+		public Guid BetSlipId { get; set; }
 
-		[Comment("Signifies if the bet has been settled or not")]
-		public bool IsSettled { get; set; }
+		[ForeignKey(nameof(BetSlipId))]
+		public BetSlip BetSlip { get; set; }
+
+		[Comment("Odds for this particular pick")]
+		public decimal Odds { get; set; }
 	}
 }
