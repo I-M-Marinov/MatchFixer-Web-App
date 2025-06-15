@@ -21,12 +21,12 @@ namespace MatchFixer.Core.Services
 
 		public GameSessionState? GetSessionState()
 		{
-			return _httpContextAccessor.HttpContext?.Session.GetObject<GameSessionState>(SessionKey);
+			return _httpContextAccessor.HttpContext?.Session.Get<GameSessionState>(SessionKey);
 		}
 
 		public void SetSessionState(GameSessionState state)
 		{
-			_httpContextAccessor.HttpContext?.Session.SetObject(SessionKey, state);
+			_httpContextAccessor.HttpContext?.Session.Set(SessionKey, state);
 		}
 
 		public void InitializeSessionState(string userId)
@@ -50,7 +50,7 @@ namespace MatchFixer.Core.Services
 
 		public void SetBetSlipState(BetSlipState state)
 		{
-			_httpContextAccessor.HttpContext?.Session.SetObject(BetSlipSessionName, state);
+			_httpContextAccessor.HttpContext?.Session.Set(BetSlipSessionName, state);
 		}
 
 		public void ClearBetSlip()
@@ -68,18 +68,22 @@ namespace MatchFixer.Core.Services
 		{
 			var betSlip = GetBetSlipState() ?? new BetSlipState();
 
-			var existingBet = betSlip.Bets.FirstOrDefault(b =>
-				b.MatchId == item.MatchId &&
-				b.SelectedOption == item.SelectedOption);
+			// Check if there is any existing bet for that match
+			var existingBet = betSlip.Bets.FirstOrDefault(b => b.MatchId == item.MatchId);
 
 			if (existingBet != null)
 			{
-				existingBet.Odds = item.Odds;
+				// Update the option & odds
 				existingBet.SelectedOption = item.SelectedOption;
+				existingBet.Odds = item.Odds;
+				existingBet.HomeTeam = item.HomeTeam;
+				existingBet.AwayTeam = item.AwayTeam;
+				existingBet.HomeLogoUrl = item.HomeLogoUrl;
+				existingBet.AwayLogoUrl = item.AwayLogoUrl;
 			}
 			else
 			{
-				betSlip.Bets.Add(item);
+				betSlip.Bets.Add(item); // If bet does not exist, add it
 			}
 
 			SetBetSlipState(betSlip);
