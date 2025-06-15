@@ -2,6 +2,7 @@
 using MatchFixer.Core.DTOs.Bets;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace MatchFixer_Web_App.Controllers
 {
 	[ApiController]
@@ -54,10 +55,12 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-
-		public IActionResult Add([FromBody] BetSlipItem item)
+		public IActionResult Add([FromBody] BetSlipItem betDto)
 		{
-			_sessionService.AddBetToSlip(item);
+			if (betDto == null)
+				return BadRequest("Invalid bet data.");
+
+			_sessionService.AddBetToSlip(betDto);
 			return Ok();
 		}
 
