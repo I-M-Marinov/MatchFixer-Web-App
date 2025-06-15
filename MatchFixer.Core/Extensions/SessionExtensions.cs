@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+using System.Text.Json;
+
 
 namespace MatchFixer.Core.Extensions
 {
 	public static class SessionExtensions
 	{
-		public static void SetObject(this ISession session, string key, object value)
+		public static void Set<T>(this ISession session, string key, T value)
 		{
-			var json = JsonConvert.SerializeObject(value);
-			session.SetString(key, json);
+			session.SetString(key, JsonSerializer.Serialize(value));
 		}
 
-		public static T GetObject<T>(this ISession session, string key)
+		public static T? Get<T>(this ISession session, string key)
 		{
 			var value = session.GetString(key);
-			if (string.IsNullOrEmpty(value)) return default(T);
-			return JsonConvert.DeserializeObject<T>(value);
+			return value == null ? default : JsonSerializer.Deserialize<T>(value);
 		}
 
 	}
