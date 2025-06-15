@@ -135,7 +135,8 @@
 |  CUSTOM TOOPTIP ON HOVER FOR ALL REMOVE BUTTONS IN THE BETSLIP |
 --------------------------------------------------------------- */
 
-.custom-event-tooltip-wrapper {
+.custom-event-tooltip-wrapper,
+.derby-match-tooltip-wrapper {
     position: relative;
     display: inline-block;
 }
@@ -158,7 +159,29 @@
     font-size: 0.75rem;
 }
 
+.derby-match-tooltip {
+    visibility: hidden;
+    background-color: #f1d302;
+    color: black;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 9px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    right: -90%;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
 .custom-event-tooltip-wrapper:hover .custom-event-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.derby-match-tooltip-wrapper:hover .derby-match-tooltip {
     visibility: visible;
     opacity: 1;
 }
