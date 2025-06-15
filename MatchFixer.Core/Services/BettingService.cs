@@ -21,6 +21,16 @@ public class BettingService : IBettingService
 		if (betSlipDto.Amount <= 0)
 			return ("Bet amount must be greater than zero.", false);
 
+		// Create the BetSlip first
+		var betSlip = new BetSlip
+		{
+			Id = Guid.NewGuid(),
+			UserId = userId,
+			Amount = betSlipDto.Amount,
+			BetTime = DateTime.UtcNow,
+			IsSettled = false
+		};
+
 		foreach (var betDto in betSlipDto.Bets)
 		{
 			// Validate match event exists
@@ -32,23 +42,24 @@ public class BettingService : IBettingService
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
 				return ($"Invalid pick option '{betDto.SelectedOption}'.", false);
 
-			// Create the Bet entity
+			// Create the Bet entity (no amount per individual bet anymore)
 			var bet = new Bet
 			{
 				Id = Guid.NewGuid(),
-				UserId = userId,
-				MatchEventId = betDto.MatchId,
+				BetSlipId = betSlip.Id,
+				MatchEventId = matchEvent.Id,
 				Pick = parsedPick,
-				Amount = betSlipDto.Amount,
-				WinAmount = betSlipDto.Amount * betDto.Odds,
-				IsSettled = false,
+				Odds = betDto.Odds,
 				BetTime = DateTime.UtcNow
 			};
 
-			await _dbContext.Bets.AddAsync(bet);
+			betSlip.Bets.Add(bet);
 		}
 
+		await _dbContext.BetSlips.AddAsync(betSlip);
 		await _dbContext.SaveChangesAsync();
-		return ("Your betting slip was successfully submitted! Good Luck !", true);
+
+		return ("Your betting slip was successfully submitted! Good Luck!", true);
 	}
+
 }
