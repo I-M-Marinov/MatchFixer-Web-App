@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250615144845_AddBetSlipEntity")]
+    partial class AddBetSlipEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,6 +155,9 @@ namespace MatchFixer.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Unique identifier for a Bet");
 
+                    b.Property<Guid?>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("BetSlipId")
                         .HasColumnType("uniqueidentifier");
 
@@ -173,6 +179,8 @@ namespace MatchFixer.Infrastructure.Migrations
                         .HasComment("The chosen outcome the user will choose for the bet");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("BetSlipId");
 
@@ -214,7 +222,7 @@ namespace MatchFixer.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BetSlips");
+                    b.ToTable("BetSlip");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.MatchEvent", b =>
@@ -496,6 +504,10 @@ namespace MatchFixer.Infrastructure.Migrations
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Bet", b =>
                 {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", null)
+                        .WithMany("Bets")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("MatchFixer.Infrastructure.Entities.BetSlip", "BetSlip")
                         .WithMany("Bets")
                         .HasForeignKey("BetSlipId")
@@ -516,7 +528,7 @@ namespace MatchFixer.Infrastructure.Migrations
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.BetSlip", b =>
                 {
                     b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "User")
-                        .WithMany("BetSlips")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -615,7 +627,7 @@ namespace MatchFixer.Infrastructure.Migrations
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.ApplicationUser", b =>
                 {
-                    b.Navigation("BetSlips");
+                    b.Navigation("Bets");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.BetSlip", b =>
