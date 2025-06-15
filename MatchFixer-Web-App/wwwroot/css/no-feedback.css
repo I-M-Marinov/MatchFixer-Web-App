@@ -1,0 +1,20 @@
+﻿.no-feedback {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0;
+}
+
+.no-feedback:hover,
+.no-feedback:focus,
+.no-feedback:active {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0;
+    color: inherit !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
