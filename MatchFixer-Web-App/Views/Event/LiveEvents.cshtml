@@ -48,7 +48,12 @@
 								<div id="oneVsOneContainer">
 									@if (match.IsDerby)
 									{
-										<img class="animate__animated animate__heartBeat animate__slower animate__infinite" id="derby-match-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 40px;" class="img-fluid mb-2" />
+										<span class="derby-match-tooltip-wrapper">
+											<img class="animate__animated animate__heartBeat animate__slower animate__infinite" id="derby-match-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 40px;" class="img-fluid mb-2" />
+											<span class="derby-match-tooltip">Derby Match
+											</span>
+										</span>
+
 									}
 								</div>
 								<div class="d-flex justify-content-around align-items-center mb-2 mt-2 @(match.IsDerby ? "derby-negative-margin" : "")">
