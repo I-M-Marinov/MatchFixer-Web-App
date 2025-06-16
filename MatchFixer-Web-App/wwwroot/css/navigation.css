@@ -179,7 +179,7 @@
     z-index: 999;
 }
 
-.dropdown-menu h6 {
+.dropdown-menu h6{
     font-family: "Orbitron", sans-serif !important;
     font-optical-sizing: auto !important;
     font-weight: 700 !important;
@@ -224,3 +224,73 @@
     margin-bottom: 1rem;
 }
 
+
+.navbar-nav .nav-item .dropdown-text,
+.dropdown-item.dropdown-item .events-board-text,
+.dropdown-item.dropdown-item .add-event-text {
+    position: relative;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+}
+
+.navbar-nav .nav-item .dropdown-text::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -16px;
+    left: 0;
+    background-color: #f1d302;
+    transition: width 0.3s;
+}
+
+.navbar-nav .nav-item:hover .dropdown-text::after {
+    width: 100%;
+}
+
+.events-dropdown-menu .dropdown-item {
+    position: relative;
+    display: inline-block;
+}
+
+.events-dropdown-menu .dropdown-item::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #f1d302;
+    transition: width 0.3s;
+}
+
+.events-dropdown-menu .dropdown-item:hover::after {
+    width: 100%;
+}
+
+.no-caret::after {
+    display: none !important;
+}
+
+.rotate-icon {
+    font-size: 0.85em;
+    display: inline-block;
+    margin-top: -0.2em;
+    transition: transform 0.15s ease !important;
+}
+
+.rotate-icon.open {
+    transform: rotate(180deg) !important;
+}
+
+.events-dropdown-menu .dropdown-item {
+    font-size: 0.95em;
+    padding: 0.5em;
+    text-align: center
+}
+
+.events-dropdown-menu .dropdown-item:hover {
+    background-color: #3370A8 !important;
+}
