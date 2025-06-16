@@ -1,8 +1,9 @@
-﻿using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Common.Enums;
+﻿using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 
 public class BettingService : IBettingService
 {
@@ -60,6 +61,25 @@ public class BettingService : IBettingService
 		await _dbContext.SaveChangesAsync();
 
 		return ("Your betting slip was successfully submitted! Good Luck!", true);
+	}
+
+	public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
+	{
+		var betSlips = await _dbContext.BetSlips
+			.Include(bs => bs.Bets) 
+			.Where(bs => bs.UserId == userId)
+			.ToListAsync();
+
+		return betSlips.Select(bs => new UserBetSlipDTO
+		{
+			Id = bs.Id,
+			BetTime = bs.BetTime,
+			Amount = bs.Amount,
+			UserId = bs.UserId,
+			WinAmount = bs.WinAmount,
+			TotalOdds = bs.Bets.Any() ? bs.Bets.Select(b => b.Odds).Aggregate((acc, odd) => acc * odd) : 1,
+			Status = bs.IsSettled ? (bs.WinAmount > 0 ? "Won" : "Lost") : "Pending"
+		});
 	}
 
 }
