@@ -5,7 +5,7 @@
 <meta name="csrf-token" content="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
 
-<ul class="profile-dropdown-menu d-none d-lg-flex">
+<ul class="profile-dropdown-menu d-flex">
 	@if (User.Identity.IsAuthenticated)
 	{
 		<li id="betSlipButtonContainer" class="nav-item position-relative">
@@ -42,6 +42,20 @@
 					</button>
 				</form>
 			</li>
+			<li>
+				<hr class="dropdown-divider">
+			</li>
+			
+			<li>
+				
+				<form method="get" asp-area="" asp-controller="UserBets" asp-action="UserBets">
+					<input type="hidden" name="userId" value="@Model.Id" />
+					<button type="submit" class="dropdown-item d-flex  align-items-center justify-content-center">
+						<span><i class="ri-file-list-fill"></i> My BetSlips</span>
+					</button>
+				</form>
+			</li>
+			
 			<li>
 				<hr class="dropdown-divider">
 			</li>
