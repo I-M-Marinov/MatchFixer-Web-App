@@ -1,0 +1,29 @@
+﻿@model IEnumerable<MatchFixer.Core.DTOs.Bets.UserBetSlipDTO>
+
+<h2>My Betslips</h2>
+
+<table class="table table-striped">
+	<thead>
+	<tr>
+		<th>Placed Date</th>
+		<th>Bet Amount</th>
+		<th>Total Odds</th>
+		<th>Potential Win</th>
+		<th>Status</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var betSlip in Model)
+	{
+		<tr>
+			<td>@betSlip.BetTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+			<td>@betSlip.Amount.ToString("C")</td>
+			<td>@betSlip.TotalOdds.ToString("F2")</td>
+			<td>
+				@(betSlip.WinAmount.HasValue ? betSlip.WinAmount.Value.ToString("C") : (betSlip.Amount * betSlip.TotalOdds).ToString("C"))
+			</td>
+			<td>@betSlip.Status</td>
+		</tr>
+	}
+	</tbody>
+</table>
