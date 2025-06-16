@@ -66,12 +66,26 @@
 				<li class="nav-item">
 					<a class="nav-link text-dark" asp-area="" asp-controller="Game" asp-action="Landing">MatchFix</a>
 				</li>				
-				<li class="nav-item">
-					<a class="nav-link text-dark" asp-area="" asp-controller="Event" asp-action="AddMatchEvent">Add an Event</a>
-				</li>				
-				<li class="nav-item">
-					<a class="nav-link text-dark" asp-area="" asp-controller="Event" asp-action="LiveEvents">Events Board</a>
+				<!-- Events Dropdown -->
+				<li class="nav-item dropdown">
+					<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<span class="dropdown-text">Events</span>
+						<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
+					</a>
+					<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
+						<li>
+							<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="AddMatchEvent">
+								<span class="add-event-text">Add an Event</span>
+							</a>
+						</li>
+						<li>
+							<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="LiveEvents">
+								<span class="events-board-text">Events Board</span>
+							</a>
+						</li>
+					</ul>
 				</li>
+
 				<li class="nav-item d-lg-none">
 					<a class="nav-link" href="@Url.Action("Privacy", "Home")">
 						<i class="bi bi-info-circle"></i> Privacy
@@ -90,3 +104,25 @@
 		</div>
 	</div>
 </nav>
+
+					
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const dropdowns = document.querySelectorAll('.nav-item.dropdown');
+
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('shown.bs.dropdown', function () {
+            const icon = dropdown.querySelector('.rotate-icon');
+            if (icon) icon.classList.add('open');
+        });
+
+        dropdown.addEventListener('hidden.bs.dropdown', function () {
+            const icon = dropdown.querySelector('.rotate-icon');
+            if (icon) icon.classList.remove('open');
+        });
+    });
+});
+
+
+</script>
