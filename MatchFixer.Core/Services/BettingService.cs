@@ -66,7 +66,12 @@ public class BettingService : IBettingService
 	public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
 	{
 		var betSlips = await _dbContext.BetSlips
-			.Include(bs => bs.Bets) 
+			.Include(bs => bs.Bets)
+			.ThenInclude(b => b.MatchEvent)
+			.ThenInclude(me => me.HomeTeam)
+			.Include(bs => bs.Bets)
+			.ThenInclude(b => b.MatchEvent)
+			.ThenInclude(me => me.AwayTeam)
 			.Where(bs => bs.UserId == userId)
 			.ToListAsync();
 
@@ -77,8 +82,20 @@ public class BettingService : IBettingService
 			Amount = bs.Amount,
 			UserId = bs.UserId,
 			WinAmount = bs.WinAmount,
-			TotalOdds = bs.Bets.Any() ? bs.Bets.Select(b => b.Odds).Aggregate((acc, odd) => acc * odd) : 1,
-			Status = bs.IsSettled ? (bs.WinAmount > 0 ? "Won" : "Lost") : "Pending"
+			TotalOdds = bs.Bets.Any()
+				? bs.Bets.Select(b => b.Odds).Aggregate((acc, odd) => acc * odd)
+				: 1,
+			Status = bs.IsSettled
+				? (bs.WinAmount > 0 ? "Won" : "Lost")
+				: "Pending",
+
+			Bets = bs.Bets.Select(b => new SingleBetDto
+			{
+				MatchId = b.MatchEventId,
+				HomeTeam = b.MatchEvent.HomeTeam.Name,
+				AwayTeam = b.MatchEvent.AwayTeam.Name,
+				SelectedOption = b.Pick.ToString(),
+			}).ToList()
 		});
 	}
 
