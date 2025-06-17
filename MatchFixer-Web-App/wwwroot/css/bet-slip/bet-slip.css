@@ -1,4 +1,6 @@
-﻿#betSlipButtonContainer{
+﻿@import "/css/bet-slip/user-bets.css";
+
+#betSlipButtonContainer{
     margin-top: 0.4em;
     margin-right: 0.5em;
 }
