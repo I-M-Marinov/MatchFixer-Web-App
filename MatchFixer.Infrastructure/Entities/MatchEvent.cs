@@ -32,7 +32,7 @@ namespace MatchFixer.Infrastructure.Entities
 		public decimal? AwayOdds { get; set; }
 
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
-
+		public LiveMatchResult? LiveResult { get; set; }
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 	}
 }
