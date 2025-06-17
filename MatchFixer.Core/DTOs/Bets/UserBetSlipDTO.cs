@@ -9,5 +9,7 @@
 		public string Status { get; set; }
 		public decimal? WinAmount { get; set; }
 		public Guid UserId { get; set; }
+		public List<SingleBetDto> Bets { get; set; } = new();
+
 	}
 }
