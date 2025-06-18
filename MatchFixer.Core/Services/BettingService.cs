@@ -95,6 +95,7 @@ public class BettingService : IBettingService
 				HomeTeam = b.MatchEvent.HomeTeam.Name,
 				AwayTeam = b.MatchEvent.AwayTeam.Name,
 				SelectedOption = b.Pick.ToString(),
+				Odds = b.Odds
 			}).ToList()
 		});
 	}
