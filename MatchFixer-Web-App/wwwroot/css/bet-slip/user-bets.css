@@ -1,7 +1,29 @@
-﻿.custom-betslip-card{
-    margin-top: 2em;
+﻿@import "/css/bet-slip/user-slip-responsive.css";
+
+.card-betslip-body p {
+    font-size: 0.85em;
+    color: #ffffff;
+    text-shadow: 3px 5px 3px #000000 !important;
+}
+
+
+.custom-betslip-card {
+    margin-top: 2em !important;
+    margin: 0 auto;
+    max-width: 60vw;
+    width: 100%;
 }
 
 .user-bets-table{
-    font-size: 0.85rem;
+    font-size: 0.80rem;
+    max-width: 100% !important;
+}
+
+.fuzzy-points {
+    background-image: url('/images/bet-slip/noise.png');
+    background-size: contain;
+    background-color: #00ff21;
+    opacity: 90%;
+    padding: 0.15rem;
+    color: #ffffff;
 }
