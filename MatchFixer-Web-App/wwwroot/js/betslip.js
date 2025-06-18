@@ -112,13 +112,27 @@ function renderBetSlip() {
 
     if (betSlip.bets.length === 0) {
         const p1 = document.createElement("p");
-        const p2 = document.createElement("p");
+        p1.classList.add("mt-5");
+        p1.textContent = "Your bet slip is empty.";
 
-        p1.textContent = "Bet slip is empty.";
-        p2.textContent = "Please bet on an event to see your bets here.";
+        const pInline = document.createElement("p");
+
+        const textBefore = document.createTextNode("Go to the  ");
+
+        const link = document.createElement("a");
+        link.href = "/Event/LiveEvents";
+        link.className = "btn btn-link events-board-btn";
+        link.textContent = "Events Board";
+
+        const textAfter = document.createTextNode("   to bet on an event.");
+
+        pInline.appendChild(textBefore);
+        pInline.appendChild(link);
+        pInline.appendChild(textAfter);
 
         container.appendChild(p1);
-        container.appendChild(p2);
+        container.appendChild(pInline);
+
 
         document.getElementById("totalOdds").innerText = "0.00";
         document.getElementById("potentialReturn").innerText = "0.00";
