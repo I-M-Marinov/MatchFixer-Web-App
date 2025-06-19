@@ -24,7 +24,10 @@ namespace MatchFixer.Core.Services
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
 		{
+			var now = DateTime.UtcNow;
+
 			var events = await _dbContext.MatchEvents
+				.Where(e => e.MatchDate > now) // Only upcoming matches
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.OrderBy(e => e.MatchDate)
