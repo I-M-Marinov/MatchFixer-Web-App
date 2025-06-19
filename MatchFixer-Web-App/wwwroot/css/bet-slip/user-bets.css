@@ -1,17 +1,45 @@
 ﻿@import "/css/bet-slip/user-slip-responsive.css";
 
-.card-betslip-body p {
-    font-size: 0.85em;
-    color: #ffffff;
-    text-shadow: 3px 5px 3px #000000 !important;
+
+.slip-container {
+    border: 1px solid #000000 !important;
+    box-shadow: 0 0 0 0.11rem #3370a8, 0 0 0 0.22rem #0dab76 !important;
 }
 
+.card-betslip-body p {
+    font-size: 0.80em;
+    color: #000000;
+    text-shadow: 3px 4px 5px #0dab76 !important;
+}
+
+.card-betslip-body h5 {
+    font-size: 0.85em;
+    color: #ffffff;
+    text-shadow: 3px 4px 5px #000000 !important;
+}
+
+.card-betslip-body p:first-of-type {
+    margin-top: 1em;
+}
+
+.custom-card {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 200px;
+    border: 2px dotted #0dab76;
+    border-radius: 0.5em 1em;
+    margin-top: 0.5em;
+    margin: 0.5em auto;
+    padding: 0.2rem;
+    flex: auto;
+}
 
 .custom-betslip-card {
     margin-top: 2em !important;
     margin: 0 auto;
     max-width: 60vw;
     width: 100%;
+    border: none;
 }
 
 .user-bets-table{
