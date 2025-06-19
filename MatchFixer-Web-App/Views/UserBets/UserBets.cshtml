@@ -11,7 +11,7 @@
 		@foreach (var betSlip in Model)
 		{
 			<div class="col-md-6 mb-4">
-				<div class="card shadow-sm">
+				<div class="card shadow-sm slip-container">
 					
 					@{
 						var statusClass = betSlip.Status switch
@@ -47,17 +47,20 @@
 						</span>
 					</div>
 					<div class="card-body card-betslip-body d-flex flex-column justify-content-center align-items-center fuzzy-points">
-						<p><strong>Amount:</strong> $@betSlip.Amount.ToString("F2")</p>
-						<p><strong>Total Odds:</strong> @betSlip.TotalOdds.ToString("F2")x</p>
-						<p><strong>Potential Win:</strong>
-							@{
-								decimal displayedAmount = betSlip.WinAmount.HasValue
-									? Math.Floor(betSlip.WinAmount.Value * 100) / 100
-									: Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
-							}
+						
+						<div class="custom-card d-flex flex-column justify-content-center align-items-center">
+							<p><strong>Amount:</strong> $@betSlip.Amount.ToString("F2")</p>
+							<p><strong>Total Odds:</strong> <i style="text-shadow: 1px 2px 3px #0dab76;" class="bi bi-lightning-charge-fill lightning-icon-all-odds"></i>@betSlip.TotalOdds.ToString("F2")x</p>
+							<p><strong>Potential Win:</strong>
+								@{
+									decimal displayedAmount = betSlip.WinAmount.HasValue
+										? Math.Floor(betSlip.WinAmount.Value * 100) / 100
+										: Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
+								}
 
-							$@displayedAmount.ToString("0.00")
-						</p>
+								$@displayedAmount.ToString("0.00")
+							</p>
+						</div>
 
 						@if (betSlip.Bets != null && betSlip.Bets.Any())
 						{
@@ -66,7 +69,7 @@
 								<table class="table table-sm table-bordered text-center">
 									<thead class="table-light">
 									<tr>
-										<th>Match</th>
+										<th>Event</th>
 										<th>Pick</th>
 										<th>Odds</th>
 										<th>Outcome</th>
