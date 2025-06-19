@@ -1,12 +1,30 @@
 ﻿
+@media (max-width: 1470px) {
+    .custom-betslip-card {
+        max-width: 80vw;
+    }
+
+    .card-header-bet-totals {
+        font-size: 0.75em;
+    }
+}
+
 @media (max-width: 1250px) {
     .custom-betslip-card {
         max-width: 80vw;
+    }
+
+    .card-header-bet-totals{
+        font-size: 0.65em;
     }
 }
 
 @media (max-width: 1024px) {
     .custom-betslip-card {
         max-width: 80vw;
+    }
+
+    .card-header-bet-totals {
+        font-size: 0.5em;
     }
 }
