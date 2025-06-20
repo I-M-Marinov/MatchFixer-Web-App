@@ -43,7 +43,7 @@
 				@foreach (var match in Model)
 				{
 					<div class="col">
-						<div class="event-card position-relative" data-kickoff="@match.KickoffTime.ToString("o")">
+						<div class="event-card position-relative" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone">
 
 							<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
 								<div class="card-body d-flex flex-column justify-content-around" style="postion: relative; object-fit: contain;">
@@ -82,7 +82,7 @@
 										</div>
 									</div>
 									<p id="event-date-time" class="tw-card-text text-brand-oxford-blue text-center text-muted mb-2 animate__animated animate__heartBeat">
-										@match.KickoffTime.ToString("f")
+										@* @match.KickoffTime.ToString("f") *@
 									</p>
 
 									<div class="d-flex justify-content-around mb-3">
@@ -248,42 +248,60 @@
 	});
 
 
-	function updateEventClocks() {
-		const now = new Date();
+		document.querySelectorAll('.event-card').forEach(card => {
+		const userTimeZone = card.dataset.userTz;
 
-		document.querySelectorAll(".event-card").forEach(card => {
-			const kickoffTime = new Date(card.dataset.kickoff);
-			const countdownEl = card.querySelector(".countdown");
-			const mask = card.querySelector(".event-mask");
+		const kickoffDate = new Date(card.dataset.kickoff); // ******************** / UTC / ********************
 
-			const timeDiffMs = kickoffTime - now;
-			const timeDiffMins = Math.floor(timeDiffMs / 60000);
+		const formatter = new Intl.DateTimeFormat(undefined, {
+			weekday: 'short',
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: true,
+			timeZone: userTimeZone
+		});
+
+		const formattedDate = formatter.format(kickoffDate);
+		const dateEl = card.querySelector('#event-date-time');
+		if (dateEl) {
+			dateEl.textContent = formattedDate;
+		}
+	});
+
+		function updateEventClocks() {
+		document.querySelectorAll('.event-card').forEach(card => {
+			const kickoffStr = card.dataset.kickoff;
+			const kickoffTime = new Date(kickoffStr); // UTC datetime
+			const now = new Date(); // also in UTC (local browser time, but same reference)
+
+			const timeDiffMs = kickoffTime.getTime() - now.getTime();
+
+			const countdownEl = card.querySelector('.countdown');
+			const mask = card.querySelector('.event-mask');
+			const oddsTable = card.querySelector('.odds-table');
 
 			if (timeDiffMs <= 0) {
-			// Event started
-			countdownEl.textContent = "";
-			countdownEl.classList.add('d-none');
-			mask.classList.remove("d-none");
-
-			const oddsTable = card.querySelector(".odds-table");
-			if (oddsTable) oddsTable.classList.add("d-none");
-
-			} else if (timeDiffMins <= 60) {
-				// Less than 1 hour to start
-				const mins = Math.floor((timeDiffMs % (1000 * 60 * 60)) / (1000 * 60));
-				const secs = Math.floor((timeDiffMs % (1000 * 60)) / 1000);
+				countdownEl.classList.add('d-none');
+				countdownEl.textContent = '';
+				mask.classList.remove('d-none');
+				if (oddsTable) oddsTable.classList.add('d-none');
+			} else if (timeDiffMs <= 60 * 60 * 1000) {
+				const mins = Math.floor(timeDiffMs / 1000 / 60);
+				const secs = Math.floor((timeDiffMs / 1000) % 60);
 				countdownEl.classList.remove('d-none');
 				countdownEl.textContent = `Starts in ${mins}m ${secs}s`;
 			} else {
 				countdownEl.classList.add('d-none');
-				countdownEl.textContent = "";
+				countdownEl.textContent = '';
 			}
 		});
 	}
+
 	updateEventClocks();
 	setInterval(updateEventClocks, 1000);
-
-
 
 	document.querySelectorAll('.mask-content').forEach(el => {
 		el.addEventListener('animationend', () => {
