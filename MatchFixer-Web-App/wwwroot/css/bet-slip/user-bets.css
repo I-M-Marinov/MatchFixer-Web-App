@@ -22,7 +22,7 @@
     margin-top: 1em;
 }
 
-.custom-card {
+.custom-card-user-bets {
     background-color: #ffffff;
     width: 100%;
     max-width: 200px;
@@ -42,9 +42,53 @@
     border: none;
 }
 
-.user-bets-table{
+.user-bets-table {
     font-size: 0.80rem;
     max-width: 100% !important;
+    border-radius: 0.6em;
+    border-collapse: separate;
+    border-spacing: 0;
+
+}
+
+.user-bets-table td,
+.user-bets-table th {
+    border: 2px solid #3370a8;
+}
+
+.user-bets-table tbody tr {
+    border-width: 0;
+}
+
+/* Remove Outer borders of the user-bets-table */
+
+.user-bets-table tr:first-of-type td,
+.user-bets-table tr:first-of-type th {
+    border-top: none !important;
+}
+
+.user-bets-table td:first-child,
+.user-bets-table th:first-child {
+    border-left: none !important;
+}
+
+.user-bets-table td:last-child,
+.user-bets-table th:last-child {
+    border-right: none !important;
+}
+
+.user-bets-table tr:last-of-type td {
+    border-bottom: none !important;
+}
+
+/* Border radius for the bottom half of the user-bets-table */
+
+.user-bets-table tr:last-of-type td:first-child {
+    border-bottom-left-radius: 0.6em;
+}
+
+.user-bets-table tr:last-of-type td:last-child {
+    border-bottom-right-radius: 0.6em;
 }
 
 .fuzzy-points {
