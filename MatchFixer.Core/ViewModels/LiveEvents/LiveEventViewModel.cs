@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Identity.Client;
 
 namespace MatchFixer.Core.ViewModels.LiveEvents
 {
@@ -14,6 +15,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public string? HomeTeamLogoUrl { get; set; }
 		public string? AwayTeamLogoUrl { get; set; }
 		public bool IsDerby { get; set; }
+		public string UserTimeZone { get; set; }
 	}
 
 }
