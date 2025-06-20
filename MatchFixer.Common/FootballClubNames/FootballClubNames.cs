@@ -81,7 +81,7 @@
 			["Genoa"] = "Genoa CFC",
 			["Juventus"] = "Juventus FC",
 			["Lazio"] = "S.S. Lazio",
-			["Napoli"] = "S.S.C. Napoli",
+			["Napoli"] = "SSC Napoli",
 			["Fiorentina"] = "ACF Fiorentina",
 			["Sassuolo"] = "US Sassuolo Calcio",
 			["Torino"] = "Torino F.C.",
