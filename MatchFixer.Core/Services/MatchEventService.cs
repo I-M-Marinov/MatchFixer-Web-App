@@ -1,13 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-
 using static MatchFixer.Common.DerbyLookup.DerbyLookup;
+
 
 #nullable disable
 
@@ -15,16 +16,26 @@ namespace MatchFixer.Core.Services
 {
 	public class MatchEventService : IMatchEventService
 	{
-		private readonly MatchFixerDbContext _dbContext;
+		private readonly MatchFixerDbContext _dbContext; 
+		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly IUserContextService _userContextService;
 
-		public MatchEventService(MatchFixerDbContext dbContext)
+
+		public MatchEventService(
+			MatchFixerDbContext dbContext, 
+			UserManager<ApplicationUser> userManager,
+			 IUserContextService userContextService)
 		{
 			_dbContext = dbContext;
+			_userManager = userManager;
+			_userContextService = userContextService;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
 		{
 			var now = DateTime.UtcNow;
+
+			var user = await _userManager.FindByIdAsync(_userContextService.GetUserId().ToString());
 
 			var events = await _dbContext.MatchEvents
 				.Where(e => e.MatchDate > now) // Only upcoming matches
@@ -36,13 +47,14 @@ namespace MatchFixer.Core.Services
 					Id = e.Id,
 					HomeTeam = e.HomeTeam.Name,
 					AwayTeam = e.AwayTeam.Name,
-					KickoffTime = e.MatchDate,
+					KickoffTime = DateTime.SpecifyKind(e.MatchDate, DateTimeKind.Utc),
 					HomeWinOdds = e.HomeOdds ?? 0,
 					DrawOdds = e.DrawOdds ?? 0,
 					AwayWinOdds = e.AwayOdds ?? 0,
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
-					IsDerby = e.IsDerby
+					IsDerby = e.IsDerby,
+					UserTimeZone = user.TimeZone
 				})
 				.AsNoTracking()
 				.ToListAsync();
@@ -60,8 +72,7 @@ namespace MatchFixer.Core.Services
 				throw new Exception("Home or Away team does not exist!");
 			}
 
-			var formattedDateAndTime = model.MatchDate.ToString("f", CultureInfo.InvariantCulture);
-
+			var utcMatchDate = DateTime.SpecifyKind(model.MatchDate, DateTimeKind.Utc);
 			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
 
 
@@ -70,7 +81,7 @@ namespace MatchFixer.Core.Services
 				Id = Guid.NewGuid(),
 				HomeTeamId = model.HomeTeamId,
 				AwayTeamId = model.AwayTeamId,
-				MatchDate = DateTime.Parse(formattedDateAndTime),
+				MatchDate = utcMatchDate,
 				HomeOdds = model.HomeOdds,
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
