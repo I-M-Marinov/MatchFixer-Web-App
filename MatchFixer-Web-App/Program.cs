@@ -43,7 +43,8 @@ builder.Services.AddScoped<IWikipediaService, WikipediaService>();              
 builder.Services.AddHostedService<UserCleanupService>();						// Add User Cleanup Service ( background service ) 
 builder.Services.AddScoped<ITimezoneService, TimezoneService>();				// Add the Timezone Service ( NodaTime )
 builder.Services.AddHttpContextAccessor();                                      // Add HTTP Context Accessor
-builder.Services.AddScoped<ISessionService, SessionService>();					// Add the Session Service ( currently used mainly for the MatchFix Guessing Game ) 
+builder.Services.AddScoped<IUserContextService, UserContextService>();			// Add User Context Service 
+builder.Services.AddScoped<ISessionService, SessionService>();					// Add the Session Service 
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();			// Add URL Helper Factory
 builder.Services.AddTransient<IEmailSender, EmailSender>();						// Register Email Sender Service 
 builder.Services.AddScoped<IUserService, UserService>();						// Add the User Service 
