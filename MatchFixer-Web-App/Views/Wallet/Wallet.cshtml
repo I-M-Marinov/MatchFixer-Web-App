@@ -1,0 +1,79 @@
+﻿@using MatchFixer.Common.Enums
+@using MatchFixer.Core.ViewModels.Wallet
+@model WalletViewModel
+@{
+    ViewData["Title"] = "Wallet";
+}
+
+<div class="container mt-4">
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["Message"]
+        </div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body text-center">
+            <h4 class="card-title">Wallet Balance</h4>
+            <h2 class="text-success">@Model.Balance.ToString("0.00") @Model.Currency</h2>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Transaction History</h5>
+
+            @if (Model.Transactions != null && Model.Transactions.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var txn in Model.Transactions)
+                            {
+                                var badgeClass = txn.TransactionType switch
+                                {
+                                    WalletTransactionType.Deposit => "badge bg-success",
+                                    WalletTransactionType.Withdrawal => "badge bg-danger",
+                                    WalletTransactionType.BetPlaced => "badge bg-warning text-dark",
+                                    WalletTransactionType.Winnings => "badge bg-info text-dark",
+                                    WalletTransactionType.Refund => "badge bg-secondary",
+                                    _ => "badge bg-light text-dark"
+                                };
+
+                                <tr>
+                                    <td>@txn.CreatedAt.ToString("g")</td>
+                                    <td><span class="@badgeClass">@txn.TransactionType</span></td>
+                                    <td>@txn.Description</td>
+                                    <td class="text-end">
+                                        @if (txn.Amount < 0)
+                                        {
+                                            <span class="text-danger">-@Math.Abs(txn.Amount).ToString("0.00")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-success">+@txn.Amount.ToString("0.00")</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center">No transactions yet.</p>
+            }
+        </div>
+    </div>
+</div>
