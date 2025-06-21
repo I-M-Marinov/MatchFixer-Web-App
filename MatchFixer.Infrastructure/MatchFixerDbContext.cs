@@ -20,6 +20,8 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<BetSlip> BetSlips { get; set; }
 		public virtual DbSet<Team> Teams { get; set; }
 		public virtual DbSet<MatchResult> MatchResults { get; set; }
+		public virtual DbSet<Wallet> Wallets { get; set; }
+		public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
