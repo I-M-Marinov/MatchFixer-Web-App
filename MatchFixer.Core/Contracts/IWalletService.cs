@@ -4,8 +4,10 @@ namespace MatchFixer.Core.Contracts
 {
 	public interface IWalletService
 	{
-		Task<bool> HasWalletAsync(Guid userId);
-		Task<Wallet> GetWalletAsync(Guid userId);
-		Task<Wallet> CreateWalletAsync(Guid userId);
+		Task<bool> HasWalletAsync();
+		Task<Wallet> GetWalletAsync();
+		Task<Wallet> CreateWalletAsync();
+		Task DepositAsync(decimal amount, string description = null);
+		Task<bool> WithdrawAsync(decimal amount, string description = null);
 	}
 }
