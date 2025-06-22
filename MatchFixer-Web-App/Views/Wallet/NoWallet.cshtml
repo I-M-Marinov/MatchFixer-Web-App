@@ -2,6 +2,8 @@
 	ViewData["Title"] = "Wallet";
 }
 
+<div class="background-profile"></div>
+
 <div class="container mt-5">
 	<div class="alert alert-warning text-center">
 		<h4 class="alert-heading">You don't have a wallet yet.</h4>
@@ -10,6 +12,7 @@
 
 	<div class="text-center">
 		<form asp-action="CreateWallet" asp-controller="Wallet" method="post">
+			@Html.AntiForgeryToken()
 			<button type="submit" class="btn btn-primary btn-lg">Create Wallet</button>
 		</form>
 	</div>
