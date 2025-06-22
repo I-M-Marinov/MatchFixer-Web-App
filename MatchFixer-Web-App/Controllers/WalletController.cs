@@ -20,25 +20,19 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> CreateWallet()
 		{
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (!Guid.TryParse(userId, out var userGuid))
-				return Unauthorized();
+			var wallet = await _walletService.CreateWalletAsync();
 
-			var wallet = await _walletService.CreateWalletAsync(userGuid);
-
-			TempData["Message"] = "Wallet created successfully.";
+			TempData["SuccessMessage"] = "Wallet created successfully.";
 			return RedirectToAction("WalletDetails");
 		}
 
+		[HttpGet]
 		public async Task<IActionResult> WalletDetails()
 		{
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (!Guid.TryParse(userId, out var userGuid))
-				return Unauthorized();
-
-			var wallet = await _walletService.GetWalletAsync(userGuid);
+			var wallet = await _walletService.GetWalletAsync();
 
 			if (wallet == null)
 				return View("NoWallet");
@@ -60,6 +54,56 @@ namespace MatchFixer_Web_App.Controllers
 
 			return View("Wallet", model);
 		}
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Deposit(decimal amount)
+		{
+			try
+			{
+				await _walletService.DepositAsync(amount, "Manual deposit");
+				TempData["SuccessMessage"] = $"Successfully deposited {amount:0.00} EUR.";
+			}
+			catch (ArgumentException ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
+			catch (InvalidOperationException ex)
+			{
+				TempData["ErrorMessage"] = "Your wallet could not be found.";
+			}
+
+			return RedirectToAction("WalletDetails");
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Withdraw(decimal amount)
+		{
+			try
+			{
+				var success = await _walletService.WithdrawAsync(amount, "Manual withdrawal");
+
+				if (success)
+				{
+					TempData["SuccessMessage"] = $"Successfully withdrew {amount:0.00} EUR.";
+				}
+				else
+				{
+					TempData["ErrorMessage"] = "Insufficient balance for this withdrawal.";
+				}
+			}
+			catch (ArgumentException ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
+			catch (InvalidOperationException)
+			{
+				TempData["ErrorMessage"] = "Your wallet could not be found.";
+			}
+
+			return RedirectToAction("WalletDetails");
+		}
+
 
 	}
 }
