@@ -21,7 +21,7 @@ namespace MatchFixer.Infrastructure.Entities
 		[Required]
 		public WalletTransactionType TransactionType { get; set; }
 
-		[MaxLength(100)]
+		[MaxLength(255)]
 		public string Reference { get; set; }
 
 		[MaxLength(255)]
