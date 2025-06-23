@@ -2,7 +2,7 @@
     width: 280px;
     flex-shrink: 0;
     position: sticky;
-    top: 5.5rem;
+    top: 6.5rem;
     align-self: start;
     z-index: 10;
 }
@@ -12,8 +12,9 @@
     margin-top: -0.05em;
 }
 
-.transaction-euro-icon{
+.transaction-euro-icon {
     font-size: 1em !important;
+    margin-right: -0.33em;
 }
 
 #deposit-icon{
@@ -69,4 +70,45 @@
     transition: opacity 0.2s;
     white-space: nowrap;
     font-size: 0.75rem;
+}
+
+
+.transition-width {
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 24%; /* collapsed width */
+}
+
+.transition-width.expanded {
+    width: 100%; /* expanded width */
+}
+
+
+.smooth-collapse {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.6s ease, opacity 0.4s ease;
+}
+
+.smooth-collapse.show {
+    max-height: 1200px;
+    opacity: 1;
+}
+
+.transactions-table td,
+.transactions-table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+#transactionHeader.collapsed {
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1rem; 
+    height: 80px; 
+    text-align: center;
+}
+
+#transactionTitle{
+    font-size: 1em;
 }
