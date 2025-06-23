@@ -86,117 +86,200 @@
         </div>
     </div>
 
-        <!-- Right content -->
-        <div class="wallet-details flex-grow-1">
-
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Transaction History</h5>
-                    @if (Model.Transactions != null && Model.Transactions.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover transactions-table">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Type</th>
-                                        <th>Description</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var txn in Model.Transactions)
-                                    {
-                                        var badgeClass = txn.TransactionType switch
-                                        {
-                                            WalletTransactionType.Deposit => "badge bg-success",
-                                            WalletTransactionType.Withdrawal => "badge bg-danger",
-                                            WalletTransactionType.BetPlaced => "badge bg-warning text-dark",
-                                            WalletTransactionType.Winnings => "badge bg-info text-dark",
-                                            WalletTransactionType.Refund => "badge bg-secondary",
-                                            _ => "badge bg-light text-dark"
-                                        };
-
-                                        <tr>
-                                            <td>@txn.CreatedAt.ToString("g")</td>
-                                            <td><span class="@badgeClass">@txn.TransactionType</span></td>
-                                            <td>@txn.Description</td>
-                                            <td class="text-end">   
-                                                @if (txn.Amount < 0)
-                                                {
-                                                <span class="text-danger d-flex align-items-center justify-content-center">-  <i class="bx bx-euro transaction-euro-icon fs-1"></i> @Math.Abs(txn.Amount).ToString("0.00")</span>
-                                                }
-                                                else
-                                                {
-                                                <span class="text-success d-flex align-items-center justify-content-center">+ <i class="bx bx-euro transaction-euro-icon fs-1"></i> @txn.Amount.ToString("0.00")</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted text-center">No transactions yet.</p>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('.toggle-wallet-form-icon');
-        const forms = ['#deposit-form', '#withdraw-form'];
-
-        buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetId = btn.dataset.target;
-
-                forms.forEach(formId => {
-                    const el = document.querySelector(formId);
-                    if (formId === targetId) {
-                        el.classList.remove('d-none');
-                    } else {
-                        el.classList.add('d-none');
-                    }
-                });
-            });
-
-            btn.addEventListener('mouseenter', () => {
-	            const tooltip = btn.querySelector('.wallet-deposit-tooltip, .wallet-withdraw-tooltip');
-	            if (tooltip) {
-	                tooltip.style.visibility = 'visible';
-	                tooltip.style.opacity = 1;
-	            }
-			});
-
-	        btn.addEventListener('mouseleave', () => {
-	            const tooltip = btn.querySelector('.wallet-deposit-tooltip, .wallet-withdraw-tooltip');
-	            if (tooltip) {
-	                tooltip.style.visibility = 'hidden';
-	                tooltip.style.opacity = 0;
-	            }
-	        });
-        });
-    });
+	<!-- Right content -->
     
-     document.addEventListener('DOMContentLoaded', function () {
-        const cancelButtons = document.querySelectorAll('.wallet-cancel-button');
+    <div class="wallet-details card transition-width" id="walletDetails">
+	    <div class="card-body text-center align-middle">
+		    <h5 class="card-title mb-3">
+			    <div id="transactionHeader" class="d-flex justify-content-between align-items-center">
+				    <span id="transactionTitle">Transaction History</span>
+				    <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+				            type="button"
+				            id="toggleTransactionBtn">
+					    <span id="toggleTransactionText">Hide</span>
+					    <i class="bx bx-chevron-up" id="toggleTransactionIcon"></i>
+				    </button>
+			    </div>
+		    </h5>
 
-        cancelButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const targetId = this.dataset.target;
-                const form = document.querySelector(targetId);
-                if (form) {
-                    form.querySelector('input[name="amount"]').value = '';
-                    form.classList.add('d-none');
-                }
-            });
+		    <div class="smooth-collapse show" id="transactionTableCollapse">
+			    @if (Model.Transactions != null && Model.Transactions.Any())
+			    {
+				    <div class="table-responsive">
+					    <table class="table table-bordered table-hover transactions-table text-center align-middle">
+						    <thead class="table-light">
+						    <tr>
+							    <th>Date</th>
+							    <th>Type</th>
+							    <th>Description</th>
+							    <th>Amount</th>
+						    </tr>
+						    </thead>
+						    <tbody>
+						    @foreach (var txn in Model.Transactions)
+						    {
+							    var badgeClass = txn.TransactionType switch
+							    {
+								    WalletTransactionType.Deposit => "badge bg-success",
+								    WalletTransactionType.Withdrawal => "badge bg-danger",
+								    WalletTransactionType.BetPlaced => "badge bg-warning text-dark",
+								    WalletTransactionType.Winnings => "badge bg-info text-dark",
+								    WalletTransactionType.Refund => "badge bg-secondary",
+								    _ => "badge bg-light text-dark"
+								    };
+
+							    <tr>
+								    <td>@txn.CreatedAt.ToString("g")</td>
+								    <td><span class="@badgeClass">@txn.TransactionType</span></td>
+								    <td>@txn.Description</td>
+								    <td>
+									    @if (txn.Amount < 0)
+									    {
+										    <span class="text-danger d-flex justify-content-center align-items-center gap-1">
+											    - <i class="bx bx-euro transaction-euro-icon fs-1"></i>@Math.Abs(txn.Amount).ToString("0.00")
+										    </span>
+									    }
+									    else
+									    {
+										    <span class="text-success d-flex justify-content-center align-items-center gap-1">
+											    + <i class="bx bx-euro transaction-euro-icon fs-1"></i>@txn.Amount.ToString("0.00")
+										    </span>
+									    }
+								    </td>
+							    </tr>
+						    }
+						    </tbody>
+					    </table>
+				    </div>
+			    }
+			    else
+			    {
+				    <p class="text-muted text-center">No transactions yet.</p>
+			    }
+		    </div>
+	    </div>
+    </div>
+	
+    </div>
+    
+    <script>
+
+	    document.addEventListener('DOMContentLoaded', function () {
+	        const buttons = document.querySelectorAll('.toggle-wallet-form-icon');
+	        const forms = ['#deposit-form', '#withdraw-form'];
+
+	        buttons.forEach(btn => {
+	            btn.addEventListener('click', () => {
+	                const targetId = btn.dataset.target;
+
+	                forms.forEach(formId => {
+	                    const el = document.querySelector(formId);
+	                    if (formId === targetId) {
+	                        el.classList.remove('d-none');
+	                    } else {
+	                        el.classList.add('d-none');
+	                    }
+	                });
+	            });
+
+	            btn.addEventListener('mouseenter', () => {
+		            const tooltip = btn.querySelector('.wallet-deposit-tooltip, .wallet-withdraw-tooltip');
+		            if (tooltip) {
+		                tooltip.style.visibility = 'visible';
+		                tooltip.style.opacity = 1;
+		            }
+				});
+
+		        btn.addEventListener('mouseleave', () => {
+		            const tooltip = btn.querySelector('.wallet-deposit-tooltip, .wallet-withdraw-tooltip');
+		            if (tooltip) {
+		                tooltip.style.visibility = 'hidden';
+		                tooltip.style.opacity = 0;
+		            }
+		        });
+	        });
+	    });
+	    
+	    document.addEventListener('DOMContentLoaded', function () {
+	        const cancelButtons = document.querySelectorAll('.wallet-cancel-button');
+
+	        cancelButtons.forEach(button => {
+	            button.addEventListener('click', function () {
+	                const targetId = this.dataset.target;
+	                const form = document.querySelector(targetId);
+	                if (form) {
+	                    form.querySelector('input[name="amount"]').value = '';
+	                    form.classList.add('d-none');
+	                }
+	            });
+	        });
+	    });
+	    
+	    document.addEventListener('DOMContentLoaded', function () {
+	        const btn = document.getElementById('toggleTransactionBtn');
+	        const collapseEl = document.getElementById('transactionTableCollapse');
+	        const textEl = document.getElementById('toggleTransactionText');
+	        const iconEl = document.getElementById('toggleTransactionIcon');
+
+	        collapseEl.addEventListener('shown.bs.collapse', () => {
+	            textEl.textContent = 'Hide';
+	            iconEl.classList.remove('bx-chevron-down');
+	            iconEl.classList.add('bx-chevron-up');
+	        });
+
+	        collapseEl.addEventListener('hidden.bs.collapse', () => {
+	            textEl.textContent = 'Show';
+	            iconEl.classList.remove('bx-chevron-up');
+	            iconEl.classList.add('bx-chevron-down');
+	        });
+	    });
+
+	    document.addEventListener('DOMContentLoaded', function () {
+	        const walletDetails = document.getElementById('walletDetails');
+	        const collapseEl = document.getElementById('transactionTableCollapse');
+
+	        // If it's open on load, set expanded class
+	        if (collapseEl.classList.contains('show')) {
+	            walletDetails.classList.add('expanded');
+	        }
+	    });
+
+	    document.addEventListener('DOMContentLoaded', function () {
+        const walletDetails = document.getElementById('walletDetails');
+        const toggleBtn = document.getElementById('toggleTransactionBtn');
+        const collapseTarget = document.getElementById('transactionTableCollapse');
+        const textEl = document.getElementById('toggleTransactionText');
+        const iconEl = document.getElementById('toggleTransactionIcon');
+        const headerRow = document.getElementById('transactionHeader');
+
+
+        let isExpanded = true;
+
+        toggleBtn.addEventListener('click', function () {
+            if (isExpanded) {
+                // Start collapse
+                collapseTarget.classList.remove('show');
+                walletDetails.classList.remove('expanded');
+                textEl.textContent = 'Show';
+                iconEl.classList.remove('bx-chevron-up');
+                iconEl.classList.add('bx-chevron-down');
+                headerRow.classList.add('collapsed');
+
+            } else {
+                // First expand width, then show collapse
+                walletDetails.classList.add('expanded');
+                setTimeout(() => {
+					collapseTarget.classList.add('show');
+                }, 300);
+                textEl.textContent = 'Hide';
+                iconEl.classList.remove('bx-chevron-down');
+                iconEl.classList.add('bx-chevron-up');
+                headerRow.classList.remove('collapsed');
+
+            }
+
+            isExpanded = !isExpanded;
         });
     });
-</script>
 
+    </script>
