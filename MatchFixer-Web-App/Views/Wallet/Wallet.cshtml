@@ -32,85 +32,171 @@
             @TempData["Message"]
         </div>
     }
+</div>
 
-    <div class="card shadow-sm mb-4">
-	    <div class="card-body text-center">
-		    <h4 class="card-title">Wallet Balance</h4>
-		    <h2 class="text-success">@Model.Balance.ToString("0.00") @Model.Currency</h2>
-	    </div>
-    </div>
-    
-    <div class="row mb-4">
-	    <div class="col-md-6">
-		    <form asp-action="Deposit" method="post" class="d-flex gap-2">
-			    @Html.AntiForgeryToken()
-			    <input type="number" step="0.01" name="amount" class="form-control" placeholder="Deposit amount" required/>
-			    <button type="submit" class="btn btn-success">Deposit</button>
-		    </form>
-	    </div>
+    <div class="wallet-layout d-flex flex-column flex-md-row gap-4 mt-4 container">
+	<!-- Sidebar: Balance card + forms -->
+	<div class="balance-card sticky-top">
+        <div class="card shadow-sm">
+            <div class="card-body text-center position-relative">
 
-	    <div class="col-md-6">
-		    <form asp-action="Withdraw" method="post" class="d-flex gap-2">
-			    @Html.AntiForgeryToken()
-			    <input type="number" step="0.01" name="amount" class="form-control" placeholder="Withdraw amount" required/>
-			    <button type="submit" class="btn btn-danger">Withdraw</button>
-		    </form>
-	    </div>
-    </div>
+                <div class="d-flex justify-content-center gap-4 mb-3">
+                    <span id="deposit-icon" class="wallet-icons-tooltip-wrapper toggle-wallet-form-icon" data-target="#deposit-form">
+                        <img src="/images/wallet/deposit.png" alt="Deposit"
+                             style="width: 30px; height: 30px;" class="img-fluid clickable-icon" />
+                        <span class="wallet-deposit-tooltip">Deposit</span>
+                    </span>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title mb-3">Transaction History</h5>
-
-            @if (Model.Transactions != null && Model.Transactions.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                                <th class="text-end">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var txn in Model.Transactions)
-                            {
-                                var badgeClass = txn.TransactionType switch
-                                {
-                                    WalletTransactionType.Deposit => "badge bg-success",
-                                    WalletTransactionType.Withdrawal => "badge bg-danger",
-                                    WalletTransactionType.BetPlaced => "badge bg-warning text-dark",
-                                    WalletTransactionType.Winnings => "badge bg-info text-dark",
-                                    WalletTransactionType.Refund => "badge bg-secondary",
-                                    _ => "badge bg-light text-dark"
-                                };
-
-                                <tr>
-                                    <td>@txn.CreatedAt.ToString("g")</td>
-                                    <td><span class="@badgeClass">@txn.TransactionType</span></td>
-                                    <td>@txn.Description</td>
-                                    <td class="text-end">
-                                        @if (txn.Amount < 0)
-                                        {
-                                            <span class="text-danger">-@Math.Abs(txn.Amount).ToString("0.00")</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-success">+@txn.Amount.ToString("0.00")</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                    <span id="withdraw-icon" class="wallet-icons-tooltip-wrapper toggle-wallet-form-icon" data-target="#withdraw-form">
+                        <img src="/images/wallet/withdraw.png" alt="Withdraw"
+                             style="width: 30px; height: 30px;" class="img-fluid clickable-icon" />
+                        <span class="wallet-withdraw-tooltip">Withdraw</span>
+                    </span>
                 </div>
-            }
-            else
-            {
-                <p class="text-muted text-center">No transactions yet.</p>
-            }
+
+                <h4 class="card-title mb-2">Balance</h4>
+	            <h2 class="text-success d-flex align-items-center justify-content-center">
+		            <i class="bx bx-euro c fs-1"></i>@Model.Balance.ToString("0.00")
+	            </h2>
+                <!-- Deposit Form -->
+                <div id="deposit-form" class="mt-3 d-none">
+                    <form asp-action="Deposit" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
+                        @Html.AntiForgeryToken()
+                        <input type="number" step="0.01" name="amount" class="form-control w-75" placeholder="Deposit amount" required />
+                        <div class="d-flex gap-2 justify-content-center align-items-center">
+	                        <button type="submit" class="btn btn-success">Confirm</button>
+	                        <button type="button" class="btn btn-warning wallet-cancel-button" data-target="#deposit-form">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Withdraw Form -->
+                <div id="withdraw-form" class="mt-3 d-none">
+                    <form asp-action="Withdraw" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
+                        @Html.AntiForgeryToken()
+                        <input type="number" step="0.01" name="amount" class="form-control w-75" placeholder="Withdraw amount" required />
+                        <div class="d-flex gap-2 justify-content-center align-items-center">
+	                        <button type="submit" class="btn btn-danger">Confirm</button>
+	                        <button type="button" class="btn btn-warning wallet-cancel-button" data-target="#withdraw-form">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
+
+        <!-- Right content -->
+        <div class="wallet-details flex-grow-1">
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Transaction History</h5>
+                    @if (Model.Transactions != null && Model.Transactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover transactions-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var txn in Model.Transactions)
+                                    {
+                                        var badgeClass = txn.TransactionType switch
+                                        {
+                                            WalletTransactionType.Deposit => "badge bg-success",
+                                            WalletTransactionType.Withdrawal => "badge bg-danger",
+                                            WalletTransactionType.BetPlaced => "badge bg-warning text-dark",
+                                            WalletTransactionType.Winnings => "badge bg-info text-dark",
+                                            WalletTransactionType.Refund => "badge bg-secondary",
+                                            _ => "badge bg-light text-dark"
+                                        };
+
+                                        <tr>
+                                            <td>@txn.CreatedAt.ToString("g")</td>
+                                            <td><span class="@badgeClass">@txn.TransactionType</span></td>
+                                            <td>@txn.Description</td>
+                                            <td class="text-end">   
+                                                @if (txn.Amount < 0)
+                                                {
+                                                <span class="text-danger d-flex align-items-center justify-content-center">-  <i class="bx bx-euro transaction-euro-icon fs-1"></i> @Math.Abs(txn.Amount).ToString("0.00")</span>
+                                                }
+                                                else
+                                                {
+                                                <span class="text-success d-flex align-items-center justify-content-center">+ <i class="bx bx-euro transaction-euro-icon fs-1"></i> @txn.Amount.ToString("0.00")</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No transactions yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.toggle-wallet-form-icon');
+        const forms = ['#deposit-form', '#withdraw-form'];
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+
+                forms.forEach(formId => {
+                    const el = document.querySelector(formId);
+                    if (formId === targetId) {
+                        el.classList.remove('d-none');
+                    } else {
+                        el.classList.add('d-none');
+                    }
+                });
+            });
+
+            btn.addEventListener('mouseenter', () => {
+	            const tooltip = btn.querySelector('.wallet-deposit-tooltip, .wallet-withdraw-tooltip');
+	            if (tooltip) {
+	                tooltip.style.visibility = 'visible';
+	                tooltip.style.opacity = 1;
+	            }
+			});
+
+	        btn.addEventListener('mouseleave', () => {
+	            const tooltip = btn.querySelector('.wallet-deposit-tooltip, .wallet-withdraw-tooltip');
+	            if (tooltip) {
+	                tooltip.style.visibility = 'hidden';
+	                tooltip.style.opacity = 0;
+	            }
+	        });
+        });
+    });
+    
+     document.addEventListener('DOMContentLoaded', function () {
+        const cancelButtons = document.querySelectorAll('.wallet-cancel-button');
+
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const targetId = this.dataset.target;
+                const form = document.querySelector(targetId);
+                if (form) {
+                    form.querySelector('input[name="amount"]').value = '';
+                    form.classList.add('d-none');
+                }
+            });
+        });
+    });
+</script>
+
