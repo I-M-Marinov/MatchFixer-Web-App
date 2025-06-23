@@ -22,6 +22,7 @@
 @import "/css/wiki-tooltip/wiki-tooltip.css";
 @import "/css/bet-slip/bet-slip.css";
 @import "/css/no-feedback.css";
+@import "/css/wallet/wallet.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
