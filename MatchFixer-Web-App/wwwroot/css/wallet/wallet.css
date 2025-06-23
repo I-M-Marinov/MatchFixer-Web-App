@@ -1,0 +1,72 @@
+﻿.balance-card {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 5.5rem;
+    align-self: start;
+    z-index: 10;
+}
+
+.balance-euro-icon {
+    margin-right: -0.15em;
+    margin-top: -0.05em;
+}
+
+.transaction-euro-icon{
+    font-size: 1em !important;
+}
+
+#deposit-icon{
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+}
+
+#withdraw-icon {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+}
+
+.transactions-table thead{
+    margin: 0 auto !important;
+}
+
+.wallet-icons-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.wallet-deposit-tooltip {
+    visibility: hidden;
+    background-color: #028212;
+    color: #ffffff;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 9px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    right: -90%;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
+.wallet-withdraw-tooltip {
+    visibility: hidden;
+    background-color: #b60c0c;
+    color: #ffffff;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 9px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    right: -90%;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
