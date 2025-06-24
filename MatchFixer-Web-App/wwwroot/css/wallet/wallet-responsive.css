@@ -1,0 +1,182 @@
+﻿@media (max-width: 510px) {
+	.wallet-layout {
+		flex-direction: column;
+		justify-content: flex-start;
+	}
+
+	.balance-card {
+		position: static !important;
+		top: auto;
+		z-index: 1;
+		max-width: 280px !important;
+		margin: 0 auto;
+	}
+
+	.transition-width,
+	.transition-width.expanded {
+		width: 100% !important;
+	}
+
+	#walletDetails.expanded {
+		width: 100% !important;
+	}
+
+	#deposit-icon,
+	#withdraw-icon {
+		position: static;
+		display: inline-block;
+		margin: 0 0.5rem;
+	}
+
+	.wallet-deposit-tooltip,
+	.wallet-withdraw-tooltip {
+		right: auto;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	#transactionHeader {
+		flex-direction: column;
+		gap: 0.5rem;
+		height: auto;
+	}
+
+	.transactions-table {
+		font-size: 0.60rem !important;
+	}
+	
+	.transactions-table td,
+	.transactions-table th {
+		padding: 0.2rem !important;
+	}
+}
+
+@media (max-width: 768px) {
+	.wallet-layout {
+		flex-direction: column;
+		justify-content: flex-start;
+	}
+
+	.balance-card {
+		position: static !important;
+		top: auto;
+		z-index: 1;
+		max-width: 280px !important;
+		margin: 0 auto;
+	}
+
+	.transition-width,
+	.transition-width.expanded {
+		width: 100% !important;
+	}
+
+	#walletDetails.expanded {
+		width: 100% !important;
+	}
+
+	#deposit-icon,
+	#withdraw-icon {
+		position: static;
+		display: inline-block;
+		margin: 0 0.5rem;
+	}
+
+	.wallet-deposit-tooltip,
+	.wallet-withdraw-tooltip {
+		right: auto;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	#transactionHeader {
+		flex-direction: column;
+		gap: 0.5rem;
+		height: auto;
+	}
+
+	.transactions-table th,
+	.transactions-table td{
+		font-size: 0.65rem !important;
+	}
+
+	.transactions-table thead {
+		font-size: 0.8rem;
+	}
+
+	.transactions-table td,
+	.transactions-table th {
+		padding: 0.3rem;
+	}
+}
+
+
+@media (max-width: 992px) {
+
+	.balance-card {
+		max-width: 180px !important;
+		flex-shrink: 1;
+	}
+
+	.transition-width,
+	.transition-width.expanded {
+		width: 100% !important;
+	}
+
+	#walletDetails.expanded {
+		width: 100% !important;
+	}
+
+	.wallet-layout {
+		flex-direction: column;
+	}
+
+	.transactions-table {
+		font-size: 0.80rem;
+		width: 100%;
+	}
+
+	.transactions-table thead {
+		font-size: 0.9rem;
+	}
+
+	.transactions-table td,
+	.transactions-table th {
+		padding: 0.3rem;
+	}
+}
+
+
+@media (max-width: 1200px) {
+
+	.balance-card {
+		max-width: 180px !important;
+		flex-shrink: 1;
+	}
+
+	.transition-width,
+	.transition-width.expanded {
+		width: 100% !important;
+	}
+
+	#walletDetails.expanded {
+		width: 100% !important;
+	}
+
+	.wallet-layout {
+		flex-direction: column;
+	}
+
+	.transactions-table {
+		font-size: 0.80rem;
+		width: 100%;
+	}
+
+	.transactions-table thead {
+		font-size: 0.9rem;
+	}
+
+	.transactions-table td,
+	.transactions-table th {
+		padding: 0.3rem;
+	}
+}
