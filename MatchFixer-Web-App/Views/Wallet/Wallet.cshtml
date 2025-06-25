@@ -91,14 +91,29 @@
     <div class="wallet-details card transition-width" id="walletDetails">
 	    <div class="card-body text-center align-middle">
 		    <h5 class="card-title mb-3">
-			    <div id="transactionHeader" class="d-flex justify-content-between align-items-center">
+			    <div id="transactionHeader" class="d-flex justify-content-between align-items-center gap-2">
+
 				    <span id="transactionTitle">Transaction History</span>
+
+				    @if (Model.Transactions != null && Model.Transactions.Any())
+				    {
+					    <div class="wallet-clear-history-wrapper">
+						    <form method="post" asp-action="ClearHistory" id="clear-history-form" class="m-0">
+							    <button type="submit" class="btn btn-outline-purple btn-sm">
+								    Clear History
+							    </button>
+						    </form>
+						    <span class="wallet-clear-history-tooltip">Clear your transaction history</span>
+					    </div>
+				    }
+
 				    <button class="btn btn-sm btn-outline-gold d-flex align-items-center gap-1"
 				            type="button"
 				            id="toggleTransactionBtn">
 					    <span id="toggleTransactionText">Hide</span>
 					    <i class="bx bx-chevron-up" id="toggleTransactionIcon"></i>
 				    </button>
+
 			    </div>
 		    </h5>
 
@@ -154,7 +169,7 @@
 			    }
 			    else
 			    {
-				    <p class="text-muted text-center">No transactions yet.</p>
+				    <p class="text-white text-center">No transactions yet.</p>
 			    }
 		    </div>
 	    </div>
