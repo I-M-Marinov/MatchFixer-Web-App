@@ -8,5 +8,6 @@ namespace MatchFixer.Core.ViewModels.Wallet
 		public decimal Amount { get; set; }
 		public WalletTransactionType TransactionType { get; set; }
 		public string Description { get; set; }
+		public DateTime? ClearedHistoryTime { get; set; }
 	}
 }
