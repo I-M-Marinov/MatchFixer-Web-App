@@ -32,28 +32,14 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpGet]
 		public async Task<IActionResult> WalletDetails()
 		{
-			var wallet = await _walletService.GetWalletAsync();
+			var model = await _walletService.GetWalletViewModelAsync();
 
-			if (wallet == null)
+			if (model == null)
 				return View("NoWallet");
-
-			var model = new WalletViewModel
-			{
-				Balance = wallet.Balance,
-				Currency = wallet.Currency,
-				Transactions = wallet.Transactions
-					.OrderByDescending(t => t.CreatedAt)
-					.Select(t => new WalletTransactionViewModel
-					{
-						CreatedAt = t.CreatedAt,
-						Amount = t.Amount,
-						Description = t.Description,
-						TransactionType = t.TransactionType
-					}).ToList()
-			};
 
 			return View("Wallet", model);
 		}
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Deposit(decimal amount)
@@ -99,6 +85,24 @@ namespace MatchFixer_Web_App.Controllers
 			catch (InvalidOperationException)
 			{
 				TempData["ErrorMessage"] = "Your wallet could not be found.";
+			}
+
+			return RedirectToAction("WalletDetails");
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ClearHistory()
+		{
+			var result = await _walletService.ClearTransactionHistoryAsync();
+
+			if (!result.Success)
+			{
+				TempData["ErrorMessage"] = result.Message;
+			}
+			else
+			{
+				TempData["SuccessMessage"] = result.Message;
 			}
 
 			return RedirectToAction("WalletDetails");
