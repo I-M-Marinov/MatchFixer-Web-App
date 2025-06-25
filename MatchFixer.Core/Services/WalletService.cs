@@ -1,9 +1,9 @@
 ﻿using MatchFixer.Common.Enums;
-using Microsoft.EntityFrameworkCore;
-
 using MatchFixer.Core.Contracts;
-using MatchFixer.Infrastructure.Entities;
+using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace MatchFixer.Core.Services
 {
@@ -32,6 +32,43 @@ namespace MatchFixer.Core.Services
 			return await _dbContext.Wallets
 				.Include(w => w.Transactions)
 				.FirstOrDefaultAsync(w => w.UserId == userId);
+		}
+
+		public async Task<WalletViewModel> GetWalletViewModelAsync()
+		{
+			var userId = _userContextService.GetUserId();
+
+			var wallet = await _dbContext.Wallets
+				.Include(w => w.Transactions)
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return null;
+
+			var historyClearedAt = wallet.HistoryClearedAt;
+
+			var filteredTransactions = historyClearedAt.HasValue
+				? wallet.Transactions.Where(t => t.CreatedAt >= historyClearedAt.Value)
+				: wallet.Transactions;
+
+			var walletModel = new WalletViewModel
+			{
+				Balance = wallet.Balance,
+				Currency = wallet.Currency,
+				Transactions = filteredTransactions
+					.OrderByDescending(t => t.CreatedAt) // last transaction on top 
+					.Select(t => new WalletTransactionViewModel
+					{
+						CreatedAt = t.CreatedAt,
+						Amount = t.Amount,
+						Description = t.Description,
+						TransactionType = t.TransactionType,
+						ClearedHistoryTime = historyClearedAt,
+					})
+					.ToList()
+			};
+
+			return walletModel;
 		}
 
 		public async Task<Wallet> CreateWalletAsync()
@@ -116,6 +153,32 @@ namespace MatchFixer.Core.Services
 
 			await _dbContext.SaveChangesAsync();
 			return true;
+		}
+
+		public async Task<(bool Success, string Message)> ClearTransactionHistoryAsync()
+		{
+			var userId = _userContextService.GetUserId();
+
+			var wallet = await _dbContext.Wallets
+				.Include(w => w.Transactions)
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return (false, "Wallet not found.");
+
+			var historyClearedAt = wallet.HistoryClearedAt;
+
+			var visibleTransactions = historyClearedAt.HasValue
+				? wallet.Transactions.Where(t => t.CreatedAt >= historyClearedAt.Value).ToList()
+				: wallet.Transactions.ToList();
+
+			if (!visibleTransactions.Any())
+				return (false, "No transactions to clear.");
+
+			wallet.HistoryClearedAt = DateTime.UtcNow;
+			await _dbContext.SaveChangesAsync();
+
+			return (true, "Transaction history cleared.");
 		}
 	}
 }
