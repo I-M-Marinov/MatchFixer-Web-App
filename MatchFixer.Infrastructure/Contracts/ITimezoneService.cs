@@ -7,6 +7,7 @@ namespace MatchFixer.Infrastructure.Contracts
 		Task<bool> IsValidTimezoneAsync(string countryCode, string timezone);
 		DateTime ConvertToUserTime(DateTime utcTime, string timeZoneId);
 		string FormatForUser(DateTime utcTime, string timeZoneId, string culture);
+		string FormatForUserBets(DateTime utcTime, string timeZoneId, string culture = "en-US");
 	}
 }
 
