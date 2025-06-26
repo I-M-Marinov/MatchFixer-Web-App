@@ -37,6 +37,7 @@ namespace MatchFixer.Core.Services
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IImageService _imageService;
 		private readonly SignInManager<ApplicationUser> _signInManager;
+		private readonly ISessionService _sessionService;
 
 
 
@@ -48,7 +49,8 @@ namespace MatchFixer.Core.Services
 			ITimezoneService timezoneService,
 			MatchFixerDbContext dbContext,
 			IImageService imageService,
-			SignInManager<ApplicationUser> signInManager)
+			SignInManager<ApplicationUser> signInManager,
+			ISessionService sessionService)
 		{
 			_userManager = userManager;
 			_emailSender = emailSender;
@@ -68,6 +70,7 @@ namespace MatchFixer.Core.Services
 			_dbContext = dbContext;
 			_imageService = imageService;
 			_signInManager = signInManager;
+			_sessionService = sessionService;
 		}
 
 		public async Task<ApplicationUser> GetCurrentUser(string userId)
@@ -121,69 +124,72 @@ namespace MatchFixer.Core.Services
 			};
 		}
 
-		public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
-		{
-			var user = await _userManager.FindByIdAsync(model.Id);
-
-			var changes = new List<string>();
-
-			// Check if user changed the email and if yes update it + send a confirmation email to the new address
-			if (user.Email != model.Email)
+			public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
 			{
-				var scheme = _httpContextAccessor.HttpContext?.Request?.Scheme ?? "https";
-				var (wasSuccess, returnMessage) = await UpdateEmailAsync(user.Id.ToString(), model.Email, scheme);
-				changes.Add("Email");
-			}
+				var user = await _userManager.FindByIdAsync(model.Id);
 
-			// Check if user changed the date of birth and if yes update it
-			if (user.DateOfBirth != model.DateOfBirth)
-			{
-				user.DateOfBirth = model.DateOfBirth;
-				changes.Add("Date of Birth");
-			}
+				var changes = new List<string>();
 
-			// Check if user changed the timezone and if yes update it 
-			if (user.TimeZone != model.TimeZone)
-			{
-				var isValid = await IsValidTimezoneAsync(model.Country, model.TimeZone); // validate time zone
-				if (!isValid)
+				// Check if user changed the email and if yes update it + send a confirmation email to the new address
+				if (user.Email != model.Email)
 				{
-					return (false, TimeZoneMissingOrIncorrect);
+					var scheme = _httpContextAccessor.HttpContext?.Request?.Scheme ?? "https";
+					var (wasSuccess, returnMessage) = await UpdateEmailAsync(user.Id.ToString(), model.Email, scheme);
+					changes.Add("Email");
+				}
+
+				// Check if user changed the date of birth and if yes update it
+				if (user.DateOfBirth != model.DateOfBirth)
+				{
+					user.DateOfBirth = model.DateOfBirth;
+					changes.Add("Date of Birth");
+				}
+
+				// Check if user changed the timezone and if yes update it 
+				if (user.TimeZone != model.TimeZone)
+				{
+					var isValid = await IsValidTimezoneAsync(model.Country, model.TimeZone); // validate time zone
+					if (!isValid)
+					{
+						return (false, TimeZoneMissingOrIncorrect);
+
+					}
+
+					user.TimeZone = model.TimeZone;
+					changes.Add("Time Zone");
+
+					_sessionService.SetUserTimezone(model.TimeZone);
 
 				}
 
-				user.TimeZone = model.TimeZone;
-				changes.Add("Time Zone");
+				// Check if user changed the country and if yes update it ( update the timezone as well to be safe ) 
+				if (user.Country != model.Country)
+				{
+					user.TimeZone = model.TimeZone;
+					user.Country = model.Country;
+					changes.Add("Country");
+				}
+
+
+				// If no changes were detected, return a message
+				if (changes.Count == 0)
+				{
+					return (false, NoChangesMadeToProfile);
+				}
+
+				// Save the changes to the database
+				var result = await _userManager.UpdateAsync(user);
+
+				if (!result.Succeeded)
+				{
+					return (false, FailedToUpdateProfile);
+				}
+
+				// If changes were made, return a message with the updated properties
+				string message = ProfileUpdatedSuccessfully +
+								 string.Join(", ", changes);
+				return (true, message);
 			}
-
-			// Check if user changed the country and if yes update it ( update the timezone as well to be safe ) 
-			if (user.Country != model.Country)
-			{
-				user.TimeZone = model.TimeZone;
-				user.Country = model.Country;
-				changes.Add("Country");
-			}
-
-
-			// If no changes were detected, return a message
-			if (changes.Count == 0)
-			{
-				return (false, NoChangesMadeToProfile);
-			}
-
-			// Save the changes to the database
-			var result = await _userManager.UpdateAsync(user);
-
-			if (!result.Succeeded)
-			{
-				return (false, FailedToUpdateProfile);
-			}
-
-			// If changes were made, return a message with the updated properties
-			string message = ProfileUpdatedSuccessfully +
-							 string.Join(", ", changes);
-			return (true, message);
-		}
 
 		public async Task<(bool Success, string Message)> UpdateNamesAsync(ProfileViewModel model)
 		{
