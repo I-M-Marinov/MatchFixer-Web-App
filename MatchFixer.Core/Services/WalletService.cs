@@ -2,7 +2,9 @@
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
+using MatchFixer.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace MatchFixer.Core.Services
@@ -11,11 +13,15 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IUserContextService _userContextService;
+		private readonly ITimezoneService _timezoneService;
 
-		public WalletService(MatchFixerDbContext dbContext, IUserContextService userContextService)
+		public WalletService(MatchFixerDbContext dbContext, 
+			IUserContextService userContextService,
+			ITimezoneService timezoneService)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
+			_timezoneService = timezoneService;
 		}
 
 		public async Task<bool> HasWalletAsync()
@@ -34,7 +40,7 @@ namespace MatchFixer.Core.Services
 				.FirstOrDefaultAsync(w => w.UserId == userId);
 		}
 
-		public async Task<WalletViewModel> GetWalletViewModelAsync()
+		public async Task<WalletViewModel> GetWalletViewModelAsync(string timeZoneId)
 		{
 			var userId = _userContextService.GetUserId();
 
@@ -46,30 +52,29 @@ namespace MatchFixer.Core.Services
 				return null;
 
 			var historyClearedAt = wallet.HistoryClearedAt;
-
 			var filteredTransactions = historyClearedAt.HasValue
 				? wallet.Transactions.Where(t => t.CreatedAt >= historyClearedAt.Value)
 				: wallet.Transactions;
 
-			var walletModel = new WalletViewModel
+			var model = new WalletViewModel
 			{
 				Balance = wallet.Balance,
 				Currency = wallet.Currency,
 				Transactions = filteredTransactions
-					.OrderByDescending(t => t.CreatedAt) // last transaction on top 
+					.OrderByDescending(t => t.CreatedAt) // last transaction on top
 					.Select(t => new WalletTransactionViewModel
 					{
 						CreatedAt = t.CreatedAt,
+						DisplayTime = _timezoneService.FormatForUser(t.CreatedAt, timeZoneId, "en-US"),
 						Amount = t.Amount,
 						Description = t.Description,
-						TransactionType = t.TransactionType,
-						ClearedHistoryTime = historyClearedAt,
-					})
-					.ToList()
+						TransactionType = t.TransactionType
+					}).ToList()
 			};
 
-			return walletModel;
+			return model;
 		}
+
 
 		public async Task<Wallet> CreateWalletAsync()
 		{
@@ -161,7 +166,7 @@ namespace MatchFixer.Core.Services
 
 			var wallet = await _dbContext.Wallets
 				.Include(w => w.Transactions)
-				.FirstOrDefaultAsync(w => w.UserId == userId);
+				.FirstOrDefaultAsync(w => w.UserId == userId);		
 
 			if (wallet == null)
 				return (false, "Wallet not found.");
@@ -180,5 +185,35 @@ namespace MatchFixer.Core.Services
 
 			return (true, "Transaction history cleared.");
 		}
+
+		public async Task<(bool Success, string Message)> DeductForBetAsync(Guid userId, decimal amount)
+		{
+			var wallet = await _dbContext.Wallets
+				.Include(w => w.Transactions)
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return (false, "Wallet not found.");
+
+			if (wallet.Balance < amount)
+				return (false, "Insufficient balance to place the bet.");
+
+			wallet.Balance -= amount;
+
+			wallet.Transactions.Add(new WalletTransaction
+			{
+				Amount = -amount,
+				CreatedAt = DateTime.UtcNow,
+				Description = "Bet placed",
+				TransactionType = WalletTransactionType.BetPlaced,
+				Reference = $"User: {userId} - Wallet: {wallet.Id} - Bet Placed",
+				WalletId = wallet.Id
+			});
+
+			await _dbContext.SaveChangesAsync();
+
+			return (true, "Amount deducted for bet.");
+		}
+
 	}
 }
