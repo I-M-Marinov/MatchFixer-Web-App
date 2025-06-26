@@ -4,6 +4,7 @@
 	{
 		public Guid Id { get; set; }
 		public DateTime BetTime { get; set; }
+		public string DisplayTime { get; set; }
 		public decimal Amount { get; set; }
 		public decimal TotalOdds { get; set; }
 		public string Status { get; set; }
