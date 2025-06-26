@@ -13,5 +13,7 @@ namespace MatchFixer.Core.Contracts
 		void ClearBetSlip();
 		BetSlipState? GetBetSlipState();
 		void AddBetToSlip(BetSlipItem item);
+		void SetUserTimezone(string timezoneId);
+		string GetUserTimezone();
 	}
 }
