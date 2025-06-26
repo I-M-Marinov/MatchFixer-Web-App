@@ -3,7 +3,7 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
-
+using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +20,19 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ISessionService _sessionService;
 
-
-		public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
+        public LoginModel(
+	        SignInManager<ApplicationUser> signInManager,
+	        ILogger<LoginModel> logger,
+	        UserManager<ApplicationUser> userManager,
+	        ISessionService sessionService)
         {
-            _signInManager = signInManager;
-            _logger = logger;
-            _userManager = userManager;
-
-		}
+	        _signInManager = signInManager;
+	        _logger = logger;
+	        _userManager = userManager;
+            _sessionService = sessionService;
+        }
 
 		/// <summary>
 		///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -177,6 +181,12 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    if (!string.IsNullOrWhiteSpace(user.TimeZone))
+                    {
+	                    _sessionService.SetUserTimezone(user.TimeZone);
+                    }
+
 					return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
 					//return LocalRedirect(returnUrl);
 				}
