@@ -3,6 +3,5 @@
 	public interface IUserContextService
 	{
 		Guid GetUserId();
-		string GetUserTimeZone();
 	}
 }

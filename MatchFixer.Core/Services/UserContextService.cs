@@ -20,9 +20,5 @@ namespace MatchFixer.Core.Services
 			return Guid.TryParse(userId, out var guid) ? guid : Guid.Empty;
 		}
 
-		public string GetUserTimeZone()
-		{
-			return _httpContextAccessor.HttpContext?.User?.FindFirst("TimeZone")?.Value ?? "UTC";
-		}
 	}
 }
