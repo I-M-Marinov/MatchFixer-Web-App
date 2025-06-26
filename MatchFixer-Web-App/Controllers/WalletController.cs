@@ -1,10 +1,5 @@
-﻿using MatchFixer.Common.Enums;
-using MatchFixer.Core.Contracts;
-using MatchFixer.Core.ViewModels.Wallet;
-using MatchFixer.Infrastructure.Entities;
+﻿using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -13,10 +8,12 @@ namespace MatchFixer_Web_App.Controllers
 	public class WalletController : Controller
 	{
 		private readonly IWalletService _walletService;
+		private readonly ISessionService _sessionService;
 
-		public WalletController(IWalletService walletService)
+		public WalletController(IWalletService walletService, ISessionService sessionService)
 		{
 			_walletService = walletService;
+			_sessionService = sessionService;
 		}
 
 		[HttpPost]
@@ -32,7 +29,9 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpGet]
 		public async Task<IActionResult> WalletDetails()
 		{
-			var model = await _walletService.GetWalletViewModelAsync();
+			var timeZoneId = _sessionService.GetUserTimezone();
+
+			var model = await _walletService.GetWalletViewModelAsync(timeZoneId);
 
 			if (model == null)
 				return View("NoWallet");
