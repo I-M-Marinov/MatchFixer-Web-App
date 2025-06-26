@@ -72,6 +72,12 @@ namespace MatchFixer.Infrastructure.Services
 			return localTime.ToString("g", CultureInfo.GetCultureInfo(culture));
 		}
 
+		public string FormatForUserBets(DateTime utcTime, string timeZoneId, string culture = "en-US")
+		{
+			var localTime = ConvertToUserTime(utcTime, timeZoneId);
+			return localTime.ToString("ddd, MMM d, hh:mm tt", CultureInfo.GetCultureInfo(culture));
+		}
+
 	}
 
 }
