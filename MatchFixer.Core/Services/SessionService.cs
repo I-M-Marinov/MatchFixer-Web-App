@@ -88,6 +88,16 @@ namespace MatchFixer.Core.Services
 
 			SetBetSlipState(betSlip);
 		}
+
+		public void SetUserTimezone(string timezoneId)
+		{
+			_httpContextAccessor.HttpContext?.Session.SetString(UserTimezoneKey, timezoneId);
+		}
+
+		public string GetUserTimezone()
+		{
+			return _httpContextAccessor.HttpContext?.Session.GetString(UserTimezoneKey) ?? "UTC";
+		}
 	}
 
 }
