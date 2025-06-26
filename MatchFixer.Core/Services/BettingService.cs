@@ -4,14 +4,26 @@ using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using MatchFixer.Infrastructure.Contracts;
+
+namespace MatchFixer.Core.Services;
 
 public class BettingService : IBettingService
 {
 	private readonly MatchFixerDbContext _dbContext;
+	private readonly ISessionService _sessionService;
+	private readonly ITimezoneService _timezoneService;
+	private readonly IWalletService _walletService;
 
-	public BettingService(MatchFixerDbContext dbContext)
+	public BettingService(MatchFixerDbContext dbContext, 
+		ISessionService sessionService, 
+		ITimezoneService timezoneService,
+		IWalletService walletService)
 	{
 		_dbContext = dbContext;
+		_sessionService = sessionService;
+		_timezoneService = timezoneService;
+		_walletService = walletService;
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto)
@@ -31,6 +43,14 @@ public class BettingService : IBettingService
 			BetTime = DateTime.UtcNow,
 			IsSettled = false
 		};
+
+		// Deduct the amount from the user's wallet if has enough money to place the bet
+		var (success, message) = await _walletService.DeductForBetAsync(userId, betSlipDto.Amount);
+
+		if (!success)
+		{
+			return (message, false);
+		}
 
 		foreach (var betDto in betSlipDto.Bets)
 		{
@@ -75,10 +95,13 @@ public class BettingService : IBettingService
 			.Where(bs => bs.UserId == userId)
 			.ToListAsync();
 
+		var timeZoneId = _sessionService.GetUserTimezone();
+
 		return betSlips.Select(bs => new UserBetSlipDTO
 		{
 			Id = bs.Id,
 			BetTime = bs.BetTime,
+			DisplayTime = _timezoneService.FormatForUserBets(bs.BetTime, timeZoneId),
 			Amount = bs.Amount,
 			UserId = bs.UserId,
 			WinAmount = bs.WinAmount,
