@@ -53,6 +53,7 @@ builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Pr
 builder.Services.AddScoped<IWalletService, WalletService>();					// Add the Wallet Service
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
+builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();				// Add the Logo Quiz Service
 builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
