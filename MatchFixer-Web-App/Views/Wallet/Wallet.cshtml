@@ -1,5 +1,6 @@
 ﻿@using MatchFixer.Common.Enums
 @using MatchFixer.Core.ViewModels.Wallet
+@using static MatchFixer.Common.EnumExtensions.EnumExtensions 
 @model WalletViewModel
 @{
     ViewData["Title"] = "Wallet";
@@ -145,7 +146,7 @@
 
 							    <tr>
 									<td>@txn.DisplayTime</td>
-								    <td><span class="@badgeClass">@txn.TransactionType</span></td>
+								    <td><span class="@badgeClass">@txn.TransactionType.ToDisplayName()</span></td>
 								    <td>@txn.Description</td>
 								    <td>
 									    @if (txn.Amount < 0)
