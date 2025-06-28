@@ -1,5 +1,4 @@
 ﻿using MatchFixer.Core.Contracts;
-using MatchFixer.Core.ViewModels.LogoQuiz;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchFixer_Web_App.Controllers
@@ -22,10 +21,10 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> LogoQuiz(LogoQuizQuestionViewModel model)
+		public IActionResult LogoQuiz(string SelectedAnswer, string CorrectAnswer, string LogoUrl, List<string> OriginalOptions)
 		{
-			model.IsCorrect = model.SelectedAnswer == model.CorrectAnswer;
-			return View(model); // Show feedback
+			var model = _logoQuizService.BuildAnsweredModel(SelectedAnswer, CorrectAnswer, LogoUrl, OriginalOptions);
+			return View(model);
 		}
 	}
 }
