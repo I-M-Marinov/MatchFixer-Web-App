@@ -65,9 +65,28 @@ namespace MatchFixer.Core.Services
 			{
 				LogoUrl = correctTeam.LogoUrl,
 				CorrectAnswer = correctTeam.Name,
-				Options = allOptions
+				Options = allOptions,
+				OriginalOptions = allOptions 
 			};
 		}
+
+		public LogoQuizQuestionViewModel BuildAnsweredModel(
+			string selectedAnswer,
+			string correctAnswer,
+			string logoUrl,
+			List<string> originalOptions)
+		{
+			return new LogoQuizQuestionViewModel
+			{
+				CorrectAnswer = correctAnswer,
+				SelectedAnswer = selectedAnswer,
+				IsCorrect = selectedAnswer == correctAnswer,
+				LogoUrl = logoUrl,
+				Options = originalOptions,
+				OriginalOptions = originalOptions
+			};
+		}
+
 
 	}
 
