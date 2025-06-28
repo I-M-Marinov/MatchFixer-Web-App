@@ -47,7 +47,10 @@ namespace MatchFixer.Infrastructure.Entities
 		public bool IsDeleted { get; set; } = false;
 
 		[Comment("Indicates the number of points the user has in the MatchFix Game")]
-		public int MatchFixScore { get; set; } = 0;
+		public int MatchFixScore { get; set; } = 0;		
+		
+		[Comment("Indicates the number of points the user has from the Logo Quiz Game")]
+		public int LogoQuizScore { get; set; } = 0;
 
 		[Comment("Indicates if the user's account is deactivated or active")]
 		public bool IsActive { get; set; } = true;
