@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using System.Text;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LogoQuiz;
 using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace MatchFixer.Core.Services
 			_dbContext = dbContext;
 		}
 
-		public async Task<LogoQuizQuestionViewModel> GenerateQuestionAsync()
+		public async Task<LogoQuizQuestionViewModel> GenerateQuestionAsync(int currentScore)
 		{
 			var teams = await _dbContext.Teams.ToListAsync();
 
@@ -66,7 +67,8 @@ namespace MatchFixer.Core.Services
 				LogoUrl = correctTeam.LogoUrl,
 				CorrectAnswer = correctTeam.Name,
 				Options = allOptions,
-				OriginalOptions = allOptions 
+				OriginalOptions = allOptions,
+				CurrentScore = currentScore
 			};
 		}
 
@@ -86,6 +88,53 @@ namespace MatchFixer.Core.Services
 				OriginalOptions = originalOptions
 			};
 		}
+
+		public async Task<(string Message, int NewScore)> UpdateLogoQuizScoreAsync(Guid userId, bool isCorrect)
+		{
+			var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+			StringBuilder message = new StringBuilder();
+
+			if (user == null)
+			{
+				return ("User not found", 0);
+			}
+
+			var currentScore = user.LogoQuizScore;
+
+			if (isCorrect)
+			{
+				if (currentScore >= 500)
+				{
+					user.LogoQuizScore += 2;
+					message.AppendLine("You have earned 2 points!");
+				}
+				else
+				{
+					user.LogoQuizScore += 1;
+					message.AppendLine("You have earned 1 point!");
+				}
+			}
+			else
+			{
+				if (currentScore > 1)
+				{
+					if (currentScore >= 500)
+					{
+						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.7);
+						message.AppendLine("Incorrect. Your score was reduced by 30%!");
+					}
+					else
+					{
+						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.5);
+						message.AppendLine("Incorrect. Your score was reduced by 50%!");
+					}
+				}
+			}
+
+			await _dbContext.SaveChangesAsync();
+			return (message.ToString(), user.LogoQuizScore);
+		}
+
 
 
 	}
