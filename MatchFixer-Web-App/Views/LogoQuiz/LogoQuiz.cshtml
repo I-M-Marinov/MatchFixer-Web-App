@@ -4,45 +4,102 @@
 <div class="background-profile"></div>
 
 
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-	<div class="card shadow-lg p-4" style="width: 100%; max-width: 500px;">
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 75vh;">
+
+	<div class="quiz-card p-4" style="width: 100%; max-width: 600px;">
+
+		<div id="quiz-countdown">
+			Next question in <span id="countdown-value">5</span> seconds...
+		</div>
+
 		<div class="card-body text-center">
 
-			<h5 class="card-title mb-4">Guess the Team</h5>
+			<h5 class="card-title mb-4">Guess whose is the logo below ?</h5>
 
-			<img src="@Model.LogoUrl" alt="Team Logo" class="img-fluid mb-3" style="max-height: 150px;" />
+			<div class="team-image-container text-center">
+				<img src="@Model.LogoUrl" alt="Team Logo" class="img-fluid mb-4" style="max-height: 175px;"/>
+			</div>
 
 			<form method="post" asp-action="LogoQuiz">
 				@Html.AntiForgeryToken()
 
+				@foreach (var option in Model.OriginalOptions)
+				{
+					<input type="hidden" name="OriginalOptions" value="@option"/>
+				}
+
 				@foreach (var option in Model.Options)
 				{
+					string buttonClass = "btn mb-2 w-75 d-flex justify-content-center align-items-center";
+
+					if (Model.IsCorrect.HasValue)
+					{
+						if (option == Model.CorrectAnswer)
+							buttonClass += " btn-success w-75 mx-auto d-flex justify-content-center align-items-center";
+						else if (option == Model.SelectedAnswer && option != Model.CorrectAnswer)
+							buttonClass += " btn-danger w-75 mx-auto d-flex justify-content-center align-items-center";
+						else
+							buttonClass += " btn-gold w-75 mx-auto";
+					}
+					else
+					{
+						buttonClass += " btn-gold";
+					}
+
 					<button type="submit"
 					        name="SelectedAnswer"
 					        value="@option"
-					        class="btn btn-outline-primary mb-2 w-100">
-						@option
+					        class="@buttonClass"
+					        @(Model.IsCorrect.HasValue ? "disabled" : "")>
+						<span>@option</span>
+
 					</button>
 				}
 
-				<input type="hidden" name="CorrectAnswer" value="@Model.CorrectAnswer" />
-				<input type="hidden" name="LogoUrl" value="@Model.LogoUrl" />
+				<input type="hidden" name="CorrectAnswer" value="@Model.CorrectAnswer"/>
+				<input type="hidden" name="LogoUrl" value="@Model.LogoUrl"/>
+				<input type="hidden" name="SelectedAnswer" value="@Model.SelectedAnswer"/>
+
 			</form>
 
 			@if (Model.IsCorrect.HasValue)
 			{
-				<div class="mt-3 alert @(Model.IsCorrect.Value ? "alert-success" : "alert-danger")">
-					@((Model.IsCorrect.Value
-						? "✅ Correct!"
-						: $"❌ Wrong! The correct answer was {Model.CorrectAnswer}"))
-				</div>
+				<script>
 
-				<form method="get" asp-action="LogoQuiz">
-					<button type="submit" class="btn btn-outline-success mt-3">
-						Next Question
-					</button>
-				</form>
+					document.addEventListener("DOMContentLoaded", function () {
+						const countdownContainer = document.getElementById("quiz-countdown");
+						const countdownSpan = document.getElementById("countdown-value");
+
+						if (countdownContainer) {
+							countdownContainer.style.display = "block";
+						}
+
+						let secondsLeft = 5;
+						const interval = setInterval(function () {
+							secondsLeft--;
+							if (countdownSpan) countdownSpan.textContent = secondsLeft;
+
+							if (secondsLeft <= 0) {
+								clearInterval(interval);
+								document.getElementById('auto-next-form')?.submit();
+							}
+						}, 1000);
+					});
+
+				</script>
 			}
+			
+
+		</div>
+		
+		<div class="mt-2 d-flex justify-content-center align-items-center" style="height: 50px;">
+
+			<form method="get" asp-action="LogoQuiz" id="auto-next-form">
+				<button type="submit" class="btn btn-primary px-4 guess-next-btn">
+					<i class="bi bi-arrow-right-circle-fill"></i> Guess Next
+				</button>
+			</form>
+
 		</div>
 	</div>
 </div>
