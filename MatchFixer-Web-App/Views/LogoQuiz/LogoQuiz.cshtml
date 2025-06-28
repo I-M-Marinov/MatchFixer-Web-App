@@ -3,10 +3,32 @@
 
 <div class="background-profile"></div>
 
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
+
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
+
+</div>
+
+
 
 <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 75vh;">
 
 	<div class="quiz-card p-4" style="width: 100%; max-width: 600px;">
+		
+		<div class="logo-quiz-score d-flex flex-column justify-content-center align-items-center">
+			<p>Your score: <span class="score-number">@Model.CurrentScore</span></p>
+		</div>
 
 		<div id="quiz-countdown">
 			Next question in <span id="countdown-value">5</span> seconds...
@@ -88,13 +110,14 @@
 
 				</script>
 			}
-			
+
 
 		</div>
-		
+
 		<div class="mt-2 d-flex justify-content-center align-items-center" style="height: 50px;">
 
 			<form method="get" asp-action="LogoQuiz" id="auto-next-form">
+				<input type="hidden" name="currentScore" value="@Model.CurrentScore"/>
 				<button type="submit" class="btn btn-primary px-4 guess-next-btn">
 					<i class="bi bi-arrow-right-circle-fill"></i> Guess Next
 				</button>
