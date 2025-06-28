@@ -1,7 +1,7 @@
 ﻿.quiz-card {
     width: 300px;
     flex-shrink: 0;
-    top: 1.5rem;
+    top: 0.5rem;
     z-index: 10;
     position: relative;
 }
@@ -87,4 +87,29 @@
     font-size: 0.8rem;
     color: #333;
     text-shadow: 1px 1px 2px #ffffff;
+}
+
+.logo-quiz-score {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    background-color: #2cef77;
+    padding: 0.25rem 0.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #333;
+    text-shadow: 1px 1px 2px #ffffff;
+}
+
+.logo-quiz-score p{
+    margin: 0 !important;
+}
+
+.logo-quiz-score p .score-number {
+    margin: 0 !important;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
 }
