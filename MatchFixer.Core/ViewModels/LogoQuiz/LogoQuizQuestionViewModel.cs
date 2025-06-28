@@ -8,6 +8,7 @@
 		public List<string> Options { get; set; } = new();
 		public string? SelectedAnswer { get; set; } 
 		public bool? IsCorrect { get; set; }
+		public int? CurrentScore { get; set; }
 	}
 
 }
