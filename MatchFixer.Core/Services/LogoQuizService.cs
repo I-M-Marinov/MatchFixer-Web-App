@@ -18,6 +18,7 @@ namespace MatchFixer.Core.Services
 
 		public async Task<LogoQuizQuestionViewModel> GenerateQuestionAsync(int currentScore)
 		{
+
 			var teams = await _dbContext.Teams.ToListAsync();
 
 			// correct answer
@@ -103,30 +104,40 @@ namespace MatchFixer.Core.Services
 
 			if (isCorrect)
 			{
-				if (currentScore >= 500)
+				if (currentScore >= 750)
+				{
+					user.LogoQuizScore += 3;
+					message.AppendLine("Correct! You have earned 3 points!");
+				}
+				else if (currentScore >= 500)
 				{
 					user.LogoQuizScore += 2;
-					message.AppendLine("You have earned 2 points!");
+					message.AppendLine("Correct! You have earned 2 points!");
 				}
 				else
 				{
 					user.LogoQuizScore += 1;
-					message.AppendLine("You have earned 1 point!");
+					message.AppendLine("Correct! You have earned 1 point!");
 				}
 			}
 			else
 			{
 				if (currentScore > 1)
 				{
-					if (currentScore >= 500)
+					if (currentScore > 750)
+					{
+						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.85);
+						message.AppendLine("Incorrect! Your score was reduced by 15%!");
+					}
+					else if (currentScore >= 500)
 					{
 						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.7);
-						message.AppendLine("Incorrect. Your score was reduced by 30%!");
+						message.AppendLine("Incorrect! Your score was reduced by 30%!");
 					}
 					else
 					{
 						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.5);
-						message.AppendLine("Incorrect. Your score was reduced by 50%!");
+						message.AppendLine("Incorrect! Your score was reduced by 50%!");
 					}
 				}
 			}
