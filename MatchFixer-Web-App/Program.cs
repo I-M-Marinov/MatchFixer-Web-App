@@ -1,16 +1,16 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Identity.UI.Services;
-
 using MatchFixer.Core.Contracts;
-using MatchFixer.Core.Services;
 using MatchFixer.Core.Middlewares;
+using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
-using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Contracts;
+using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
-
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore;
 using static MatchFixer.Infrastructure.SeedData.SeedData;
 
 
@@ -123,16 +123,16 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// custom middleware for initializing the session 
+// custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapControllerRoute(
-	name: "default",
-	pattern: "{controller=Game}/{action=Landing}/{id?}");
+//app.MapControllerRoute(
+//	name: "default",
+//	pattern: "{controller=Game}/{action=Landing}/{id?}");
 
 app.MapRazorPages();
 
