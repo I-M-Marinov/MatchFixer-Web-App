@@ -90,7 +90,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null, bool sessionExpired = false)
         {
 	        Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
 	        Response.Headers["Pragma"] = "no-cache";
@@ -99,6 +99,11 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 	        if (User.Identity.IsAuthenticated) // if the user is already logged in redirect him to the profile page, not the login page 
 	        {
 		        return RedirectToAction("Profile", "Profile");
+	        }
+
+	        if (sessionExpired)
+	        {
+		        TempData["ErrorMessage"] = "Your session has expired. Please log in again.";
 	        }
 
 			if (!string.IsNullOrEmpty(ErrorMessage))
