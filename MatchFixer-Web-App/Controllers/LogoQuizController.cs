@@ -17,6 +17,9 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpGet]
 		public async Task<IActionResult> LogoQuiz(int currentScore = 0)
 		{
+			var user = await _userContextService.GetCurrentUserAsync();
+			currentScore = user.LogoQuizScore;
+
 			var question = await _logoQuizService.GenerateQuestionAsync(currentScore);
 			return View(question);
 		}
