@@ -57,6 +57,7 @@ builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();				// Add the L
 builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
+builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 
 
 
