@@ -1,0 +1,52 @@
+﻿@using MatchFixer.Core.ViewModels.MatchResults
+@model List<MatchResultInputViewModel>
+
+@{
+	ViewData["Title"] = "Add Results";
+}
+
+<h2>Unresolved Matches</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@foreach (var match in Model)
+{
+	<form asp-action="SubmitResult" asp-controller="Result" method="post" class="border p-3 mb-4 rounded">
+		@Html.AntiForgeryToken()
+
+		<input type="hidden" name="MatchId" value="@match.MatchId" />
+		<input type="hidden" name="HomeTeam" value="@match.HomeTeam" />
+		<input type="hidden" name="AwayTeam" value="@match.AwayTeam" />
+
+		<h5>@match.HomeTeam vs @match.AwayTeam</h5>
+		<p><strong>Date:</strong> @match.MatchDate.ToString("g")</p>
+
+		<div class="row">
+			<div class="col-md-3">
+				<label asp-for="@match.HomeScore">Home Score</label>
+				<input asp-for="@match.HomeScore" name="HomeScore" class="form-control"/>
+			</div>
+
+			<div class="col-md-3">
+				<label asp-for="@match.AwayScore">Away Score</label>
+				<input asp-for="@match.AwayScore" name="AwayScore" class="form-control"/>
+			</div>
+
+			<div class="col-md-6">
+				<label asp-for="@match.Notes">Notes (optional)</label>
+				<textarea asp-for="@match.Notes" name="Notes" class="form-control"></textarea>
+			</div>
+		</div>
+
+		<br/>
+		<button type="submit" class="btn btn-primary">Submit Result</button>
+	</form>
+}
