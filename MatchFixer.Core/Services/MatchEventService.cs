@@ -17,17 +17,14 @@ namespace MatchFixer.Core.Services
 	public class MatchEventService : IMatchEventService
 	{
 		private readonly MatchFixerDbContext _dbContext; 
-		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly IUserContextService _userContextService;
 
 
 		public MatchEventService(
 			MatchFixerDbContext dbContext, 
-			UserManager<ApplicationUser> userManager,
 			 IUserContextService userContextService)
 		{
 			_dbContext = dbContext;
-			_userManager = userManager;
 			_userContextService = userContextService;
 		}
 
@@ -35,10 +32,11 @@ namespace MatchFixer.Core.Services
 		{
 			var now = DateTime.UtcNow;
 
-			var user = await _userManager.FindByIdAsync(_userContextService.GetUserId().ToString());
+			var user = await _userContextService.GetCurrentUserAsync();
 
 			var events = await _dbContext.MatchEvents
 				.Where(e => e.MatchDate > now) // Only upcoming matches
+				.Where(e => e.LiveResult == null) // No result submitted yet
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.OrderBy(e => e.MatchDate)
