@@ -13,7 +13,7 @@ namespace MatchFixer.Core.Contracts
 		Task<bool> WithdrawAsync(decimal amount, string description = null);
 		Task<(bool Success, string Message)> ClearTransactionHistoryAsync();
 		Task<(bool Success, string Message)> DeductForBetAsync(Guid userId, decimal amount);
-
+		Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription);
 
 	}
 }
