@@ -77,7 +77,7 @@
 			["AS Roma"] = "AS Roma",
 			["Inter"] = "Inter Milan",
 			["Atalanta"] = "Atalanta BC",
-			["Bologna"] = "Bologna F.C. 1909",
+			["Bologna"] = "Bologna FC 1909",
 			["Genoa"] = "Genoa CFC",
 			["Juventus"] = "Juventus FC",
 			["Lazio"] = "S.S. Lazio",
