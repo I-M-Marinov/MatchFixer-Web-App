@@ -92,10 +92,15 @@ public class BettingService : IBettingService
 			.Include(bs => bs.Bets)
 			.ThenInclude(b => b.MatchEvent)
 			.ThenInclude(me => me.AwayTeam)
+			.Include(bs => bs.Bets)
+			.ThenInclude(b => b.MatchEvent)
+			.ThenInclude(me => me.LiveResult) 
 			.Where(bs => bs.UserId == userId)
 			.ToListAsync();
 
 		var timeZoneId = _sessionService.GetUserTimezone();
+
+
 
 		return betSlips.Select(bs => new UserBetSlipDTO
 		{
@@ -112,13 +117,29 @@ public class BettingService : IBettingService
 				? (bs.WinAmount > 0 ? "Won" : "Lost")
 				: "Pending",
 
-			Bets = bs.Bets.Select(b => new SingleBetDto
+			Bets = bs.Bets.Select(b =>
 			{
-				MatchId = b.MatchEventId,
-				HomeTeam = b.MatchEvent.HomeTeam.Name,
-				AwayTeam = b.MatchEvent.AwayTeam.Name,
-				SelectedOption = b.Pick.ToString(),
-				Odds = b.Odds
+				var result = b.MatchEvent.LiveResult;
+				string? outcome = null;
+
+				if (result != null)
+				{
+					outcome = result.HomeScore > result.AwayScore
+						? MatchPick.Home.ToString()
+						: result.HomeScore < result.AwayScore
+							? MatchPick.Away.ToString()
+							: MatchPick.Draw.ToString();
+				}
+
+				return new SingleBetDto
+				{
+					MatchId = b.MatchEventId,
+					HomeTeam = b.MatchEvent.HomeTeam.Name,
+					AwayTeam = b.MatchEvent.AwayTeam.Name,
+					SelectedOption = b.Pick.ToString(),
+					Odds = b.Odds,
+					Outcome = outcome
+				};
 			}).ToList()
 		});
 	}
