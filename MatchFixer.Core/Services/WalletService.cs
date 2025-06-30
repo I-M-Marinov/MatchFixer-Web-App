@@ -104,7 +104,6 @@ namespace MatchFixer.Core.Services
 
 		public async Task DepositAsync(decimal amount, string description = null)
 		{
-
 			var userId = _userContextService.GetUserId();
 
 			if (amount <= 0) throw new ArgumentException("Amount must be positive.");
@@ -214,6 +213,36 @@ namespace MatchFixer.Core.Services
 
 			return (true, "Amount deducted for bet.");
 		}
+
+		public async Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription)
+		{
+			if (amount <= 0)
+				throw new ArgumentException("Winning amount must be greater than zero.");
+
+			var wallet = await _dbContext.Wallets
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				throw new InvalidOperationException("Wallet not found for the user.");
+
+			wallet.Balance += amount;
+			wallet.UpdatedAt = DateTime.UtcNow;
+
+			var transaction = new WalletTransaction
+			{
+				Id = Guid.NewGuid(),
+				WalletId = wallet.Id,
+				Amount = amount,
+				TransactionType = WalletTransactionType.Winnings,
+				Reference = $"User: {userId} - Wallet: {wallet.Id} - Winnings",
+				Description = $"Winnings from {matchDescription}",
+				CreatedAt = DateTime.UtcNow
+			};
+
+			await _dbContext.WalletTransactions.AddAsync(transaction);
+			await _dbContext.SaveChangesAsync();
+		}
+
 
 	}
 }
