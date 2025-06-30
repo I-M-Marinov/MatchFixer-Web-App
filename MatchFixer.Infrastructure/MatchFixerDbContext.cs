@@ -22,6 +22,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<MatchResult> MatchResults { get; set; }
 		public virtual DbSet<Wallet> Wallets { get; set; }
 		public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
+		public virtual DbSet<LiveMatchResult> LiveMatchResults { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
