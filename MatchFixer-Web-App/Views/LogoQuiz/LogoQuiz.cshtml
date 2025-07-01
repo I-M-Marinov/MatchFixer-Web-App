@@ -31,7 +31,7 @@
 		</div>
 
 		<div id="quiz-countdown">
-			Next question in <span id="countdown-value">5</span> seconds...
+			Next question in <span id="countdown-value">3</span> seconds...
 		</div>
 
 		<div class="card-body text-center">
@@ -96,7 +96,7 @@
 							countdownContainer.style.display = "block";
 						}
 
-						let secondsLeft = 5;
+						let secondsLeft = 3;
 						const interval = setInterval(function () {
 							secondsLeft--;
 							if (countdownSpan) countdownSpan.textContent = secondsLeft;
