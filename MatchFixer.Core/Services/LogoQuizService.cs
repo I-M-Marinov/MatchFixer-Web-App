@@ -1,8 +1,9 @@
-﻿using System.Text;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LogoQuiz;
 using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+
+using static MatchFixer.Common.GeneralConstants.LogoQuizConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -93,58 +94,47 @@ namespace MatchFixer.Core.Services
 		public async Task<(string Message, int NewScore)> UpdateLogoQuizScoreAsync(Guid userId, bool isCorrect)
 		{
 			var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-			StringBuilder message = new StringBuilder();
-
 			if (user == null)
 			{
-				return ("User not found", 0);
+				return (UserNotFound, 0);
 			}
 
 			var currentScore = user.LogoQuizScore;
+			string message;
 
 			if (isCorrect)
 			{
-				if (currentScore >= 750)
-				{
-					user.LogoQuizScore += 3;
-					message.AppendLine("Correct! You have earned 3 points!");
-				}
-				else if (currentScore >= 500)
-				{
-					user.LogoQuizScore += 2;
-					message.AppendLine("Correct! You have earned 2 points!");
-				}
-				else
-				{
-					user.LogoQuizScore += 1;
-					message.AppendLine("Correct! You have earned 1 point!");
-				}
+				int earnedPoints = currentScore >= ThresholdHigh ? PointsHigh
+					: currentScore >= ThresholdMid ? PointsMid
+					: PointsLow;
+
+				user.LogoQuizScore += earnedPoints;
+				message = CorrectAnswer(earnedPoints);
 			}
 			else
 			{
-				if (currentScore > 1)
+				if (currentScore <= 1)
 				{
-					if (currentScore > 750)
-					{
-						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.85);
-						message.AppendLine("Incorrect! Your score was reduced by 15%!");
-					}
-					else if (currentScore >= 500)
-					{
-						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.7);
-						message.AppendLine("Incorrect! Your score was reduced by 30%!");
-					}
-					else
-					{
-						user.LogoQuizScore = (int)Math.Floor(currentScore * 0.5);
-						message.AppendLine("Incorrect! Your score was reduced by 50%!");
-					}
+					message = NoPenalty;
+				}
+				else
+				{
+					double penaltyFactor = currentScore > ThresholdHigh ? PenaltyHigh
+						: currentScore >= ThresholdMid ? PenaltyMid
+						: PenaltyLow;
+
+					int reducedScore = (int)Math.Floor(currentScore * penaltyFactor);
+					user.LogoQuizScore = reducedScore;
+
+					int penaltyPercent = 100 - (int)(penaltyFactor * 100);
+					message = IncorrectAnswer(penaltyPercent);
 				}
 			}
 
 			await _dbContext.SaveChangesAsync();
-			return (message.ToString(), user.LogoQuizScore);
+			return (message, user.LogoQuizScore);
 		}
+
 
 
 
