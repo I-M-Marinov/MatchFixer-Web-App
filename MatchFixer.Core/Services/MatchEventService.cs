@@ -1,13 +1,13 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
-using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System.Globalization;
+
 using static MatchFixer.Common.DerbyLookup.DerbyLookup;
+using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
 
 
 #nullable disable
@@ -67,7 +67,7 @@ namespace MatchFixer.Core.Services
 
 			if (homeTeam == null || awayTeam == null)
 			{
-				throw new Exception("Home or Away team does not exist!");
+				throw new Exception(TeamDoesNotExist);
 			}
 
 			var utcMatchDate = DateTime.SpecifyKind(model.MatchDate, DateTimeKind.Utc);
