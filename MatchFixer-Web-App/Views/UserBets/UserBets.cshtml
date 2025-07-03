@@ -99,13 +99,17 @@
 											</td>
 											<td>@bet.Odds.ToString("F2")x</td>
 											<td>
-												@if (bet.Outcome == bet.SelectedOption)
+												@if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome == bet.SelectedOption)
 												{
 													<i class="ri-checkbox-circle-fill" style="color: #056301;"></i>
 												}
-												else
+												else if(!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome != bet.SelectedOption)
 												{
 													<i class="ri-close-circle-fill" style="color:#dc3545;"></i>
+												}
+												else
+												{
+													<i class="bi bi-question-circle" title="N/A" style="color:#ff6a00;"></i>
 												}
 												@bet.Outcome
 											</td>
