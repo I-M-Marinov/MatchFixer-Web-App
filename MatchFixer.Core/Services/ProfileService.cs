@@ -269,38 +269,10 @@ namespace MatchFixer.Core.Services
 				);
 
 				var logoUrl = LogoUrl;
-				
-				var emailBody = $@"
-						<!DOCTYPE html>
-						<html>
-						<head>
-						    <meta charset='UTF-8'>
-						    <title>Confirm your email</title>
-						</head>
-						<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-						    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
-						        <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-						            <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
-						        </div>
-						        <div style='padding: 30px; text-align: center;'>
-						            <h2 style='color: #333;'>Please follow the link below to confirm your new Email Address</h2>
-						            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
-						               style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; color: black; text-decoration: none; border-radius: 6px; font-weight: bold;'>
-						                Confirm Your Email
-						            </a>
-						            <p style='margin-top: 30px; font-size: 13px; color: #888;'>
-						                If you did not request this email change, your account might be compromised.
-						            </p>
-									<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-						               All Rights Reserved. MatchFixer ® 2025
-						            </p>
-						        </div>
-						    </div>
-						</body>
-						</html>
-						";
 
-				await _emailSender.SendEmailAsync(newEmail, "MatchFixer - Replace your email address", emailBody);
+				var emailBody = EmailTemplates.EmailUpdateConfirmation(logoUrl, callbackUrl);
+
+				await _emailSender.SendEmailAsync(newEmail, "MatchFixer - Your email address was changed", emailBody);
 
 				return (true, EmailUpdatedSuccessfully);
 			}
