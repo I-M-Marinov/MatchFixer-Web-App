@@ -7,7 +7,7 @@
 		public const string FirstAndLastNameAreRequired = "First name and Last name are required.";
 
 		// MESSAGES
-		public const string NoChangesMadeToProfile = "No changes were made to the profile.";
+		public const string NoChangesMadeToProfile = "No changes were made to your profile.";
 		public const string FailedToUpdateProfile = "Failed to update profile.";
 		public const string ProfileUpdatedSuccessfully = "Your profile was updated successfully. You have made changes to:";
 		public const string NameUpdatedSuccessfully = "Your name was updated successfully !";
