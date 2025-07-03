@@ -1,0 +1,18 @@
+﻿#add-scores-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100% !important;
+}
+
+#add-scores-card input{
+    width: 25%;
+    margin: 0 auto;
+}
+
+#add-scores-card textarea {
+    width: 100% !important;
+    margin: 0 auto;
+}
+
