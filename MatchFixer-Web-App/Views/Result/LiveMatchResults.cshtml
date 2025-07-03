@@ -5,8 +5,6 @@
 	ViewData["Title"] = "Add Results";
 }
 
-<h2>Unresolved Matches</h2>
-
 @if (TempData["SuccessMessage"] != null)
 {
 	<div class="alert alert-success">@TempData["SuccessMessage"]</div>
@@ -17,36 +15,46 @@
 	<div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
-@foreach (var match in Model)
-{
-	<form asp-action="SubmitResult" asp-controller="Result" method="post" class="border p-3 mb-4 rounded">
-		@Html.AntiForgeryToken()
+<div class="background-profile"></div>
 
-		<input type="hidden" name="MatchId" value="@match.MatchId" />
-		<input type="hidden" name="HomeTeam" value="@match.HomeTeam" />
-		<input type="hidden" name="AwayTeam" value="@match.AwayTeam" />
 
-		<h5>@match.HomeTeam vs @match.AwayTeam</h5>
-		<p><strong>Date:</strong> @match.MatchDate.ToString("g")</p>
+<div class="container py-4">
+	<div class="row g-4">
+		@foreach (var match in Model)
+		{
+			<div class="col-12 col-md-6 col-lg-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<form asp-action="SubmitResult" asp-controller="Result" method="post" id="add-scores-card">
+							@Html.AntiForgeryToken()
 
-		<div class="row">
-			<div class="col-md-3">
-				<label asp-for="@match.HomeScore">Home Score</label>
-				<input asp-for="@match.HomeScore" name="HomeScore" class="form-control"/>
+							<input type="hidden" name="MatchId" value="@match.MatchId" />
+							<input type="hidden" name="HomeTeam" value="@match.HomeTeam" />
+							<input type="hidden" name="AwayTeam" value="@match.AwayTeam" />
+
+							<h5 class="card-title text-center">@match.HomeTeam vs @match.AwayTeam</h5>
+							<p class="card-subtitle mb-3 text-muted text-center"><strong>Date:</strong> @match.MatchDate.ToString("g")</p>
+
+							<div class="mb-3 text-center">
+								<label asp-for="@match.HomeScore" class="form-label text-center">Home Score</label>
+								<input asp-for="@match.HomeScore" name="HomeScore" class="form-control" />
+							</div>
+
+							<div class="mb-3 text-center">
+								<label asp-for="@match.AwayScore" class="form-label text-center">Away Score</label>
+								<input asp-for="@match.AwayScore" name="AwayScore" class="form-control" />
+							</div>
+
+							<div class="mb-3 text-center">
+								<label asp-for="@match.Notes" class="form-label text-center">Notes (optional)</label>
+								<textarea asp-for="@match.Notes" name="Notes" class="form-control" rows="2"></textarea>
+							</div>
+
+							<button type="submit" class="btn btn-primary">Submit Result</button>
+						</form>
+					</div>
+				</div>
 			</div>
-
-			<div class="col-md-3">
-				<label asp-for="@match.AwayScore">Away Score</label>
-				<input asp-for="@match.AwayScore" name="AwayScore" class="form-control"/>
-			</div>
-
-			<div class="col-md-6">
-				<label asp-for="@match.Notes">Notes (optional)</label>
-				<textarea asp-for="@match.Notes" name="Notes" class="form-control"></textarea>
-			</div>
-		</div>
-
-		<br/>
-		<button type="submit" class="btn btn-primary">Submit Result</button>
-	</form>
-}
+		}
+	</div>
+</div>
