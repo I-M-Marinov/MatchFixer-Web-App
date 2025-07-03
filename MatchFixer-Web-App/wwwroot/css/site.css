@@ -24,6 +24,7 @@
 @import "/css/no-feedback.css";
 @import "/css/wallet/wallet.css";
 @import "/css/logo-quiz/logo-quiz.css";
+@import "/css/results/match-results.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
