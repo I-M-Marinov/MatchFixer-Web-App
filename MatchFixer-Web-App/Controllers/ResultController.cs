@@ -29,8 +29,13 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				TempData["ErrorMessage"] = "Invalid input. Please correct the form.";
-				return RedirectToAction(nameof(LiveMatchResults));
+				var allMatches = await _resultService.GetUnresolvedMatchResultsAsync();
+
+				var updatedList = allMatches.Select(m =>
+					m.MatchId == input.MatchId ? input : m
+				).ToList();
+
+				return View("LiveMatchResults", updatedList); // Make sure view name matches
 			}
 
 			var success = await _resultService.AddMatchResultAsync(input.MatchId, input.HomeScore, input.AwayScore, input.Notes);
@@ -42,6 +47,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			return RedirectToAction(nameof(LiveMatchResults));
 		}
-		
+
+
 	}
 }
