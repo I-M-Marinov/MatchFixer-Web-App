@@ -18,9 +18,11 @@
 <div class="background-profile"></div>
 
 
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
 <div class="container py-4">
 	<div class="row g-4">
-		@foreach (var match in Model)
+		@for (int i = 0; i < Model.Count; i++)
 		{
 			<div class="col-12 col-md-6 col-lg-4">
 				<div class="card shadow-sm h-100">
@@ -28,26 +30,33 @@
 						<form asp-action="SubmitResult" asp-controller="Result" method="post" id="add-scores-card">
 							@Html.AntiForgeryToken()
 
-							<input type="hidden" name="MatchId" value="@match.MatchId" />
-							<input type="hidden" name="HomeTeam" value="@match.HomeTeam" />
-							<input type="hidden" name="AwayTeam" value="@match.AwayTeam" />
+							<input type="hidden" asp-for="@Model[i].MatchId" />
+							<input type="hidden" asp-for="@Model[i].HomeTeam" />
+							<input type="hidden" asp-for="@Model[i].AwayTeam" />
 
-							<h5 class="card-title text-center">@match.HomeTeam vs @match.AwayTeam</h5>
-							<p class="card-subtitle mb-3 text-muted text-center"><strong>Date:</strong> @match.MatchDate.ToString("g")</p>
+							<h5 class="card-title text-center badge bg-primary">@Model[i].HomeTeam vs @Model[i].AwayTeam</h5>
+							<p class="card-subtitle mb-3 text-white text-center badge bg-secondary">
+								<strong>@Model[i].DisplayTime</strong>
+							</p>
 
-							<div class="mb-3 text-center">
-								<label asp-for="@match.HomeScore" class="form-label text-center">Home Score</label>
-								<input asp-for="@match.HomeScore" name="HomeScore" class="form-control" />
+							<div class="d-flex justify-content-center align-items-center">
+								<div class="mb-3 text-center">
+									<label asp-for="@Model[i].HomeScore" class="form-label text-center">Home Score</label>
+									<input asp-for="@Model[i].HomeScore" class="form-control" min="0" />
+									<span asp-validation-for="@Model[i].HomeScore" class="text-danger"></span>
+								</div>
+
+								<div class="mb-3 text-center">
+									<label asp-for="@Model[i].AwayScore" class="form-label text-center">Away Score</label>
+									<input asp-for="@Model[i].AwayScore" class="form-control" min="0" />
+									<span asp-validation-for="@Model[i].AwayScore" class="text-danger"></span>
+								</div>
 							</div>
 
 							<div class="mb-3 text-center">
-								<label asp-for="@match.AwayScore" class="form-label text-center">Away Score</label>
-								<input asp-for="@match.AwayScore" name="AwayScore" class="form-control" />
-							</div>
-
-							<div class="mb-3 text-center">
-								<label asp-for="@match.Notes" class="form-label text-center">Notes (optional)</label>
-								<textarea asp-for="@match.Notes" name="Notes" class="form-control" rows="2"></textarea>
+								<label asp-for="@Model[i].Notes" class="form-label text-center">Notes (optional)</label>
+								<textarea asp-for="@Model[i].Notes" class="form-control" rows="2"></textarea>
+								<span asp-validation-for="@Model[i].Notes" class="text-danger"></span>
 							</div>
 
 							<button type="submit" class="btn btn-primary">Submit Result</button>
