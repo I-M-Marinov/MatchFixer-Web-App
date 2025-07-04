@@ -6,13 +6,44 @@
     width: 100% !important;
 }
 
+#add-scores-card input[type="number"]::-webkit-outer-spin-button,
+#add-scores-card input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#add-scores-card input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+#add-scores-card p {
+    font-size: 0.65em;
+}
+
+#add-scores-card h5 {
+    font-size: 0.95em;
+}
+
 #add-scores-card input{
     width: 25%;
     margin: 0 auto;
+    border: 1px #0077d4 solid;
+}
+
+#add-scores-card input[type="number"] {
+    text-align: center;
+
 }
 
 #add-scores-card textarea {
     width: 100% !important;
-    margin: 0 auto;
+    display: block;
+    border: 1px #0077d4 solid;
+    resize: none;
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
 }
+
+
 
