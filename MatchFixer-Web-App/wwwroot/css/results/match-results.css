@@ -1,4 +1,10 @@
-﻿#add-scores-card {
+﻿.match-result-container {
+    background: #3370a8 !important;
+    border-radius: 0.75em;
+    box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.add-scores-card {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -6,36 +12,39 @@
     width: 100% !important;
 }
 
-#add-scores-card input[type="number"]::-webkit-outer-spin-button,
-#add-scores-card input[type="number"]::-webkit-inner-spin-button {
+.add-scores-card input[type="number"]::-webkit-outer-spin-button,
+.add-scores-card input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-#add-scores-card input[type="number"] {
+.add-scores-card input[type="number"] {
     -moz-appearance: textfield;
 }
 
-#add-scores-card p {
+.add-scores-card p {
     font-size: 0.65em;
+    text-shadow: 1px 1px 2px #000000;
 }
 
-#add-scores-card h5 {
+.add-scores-card h5 {
     font-size: 0.95em;
+    text-shadow: 1px 1px 2px #000000;
 }
 
-#add-scores-card input{
-    width: 25%;
-    margin: 0 auto;
+.add-scores-card label {
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.add-scores-card input {
     border: 1px #0077d4 solid;
 }
 
-#add-scores-card input[type="number"] {
-    text-align: center;
+    .add-scores-card input[type="number"] {
+        text-align: center;
+    }
 
-}
-
-#add-scores-card textarea {
+.add-scores-card textarea {
     width: 100% !important;
     display: block;
     border: 1px #0077d4 solid;
