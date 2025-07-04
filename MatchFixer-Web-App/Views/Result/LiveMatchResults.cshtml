@@ -25,9 +25,9 @@
 		@for (int i = 0; i < Model.Count; i++)
 		{
 			<div class="col-12 col-md-6 col-lg-4">
-				<div class="card shadow-sm h-100">
+				<div class="card shadow-sm h-100 match-result-container">
 					<div class="card-body">
-						<form asp-action="SubmitResult" asp-controller="Result" method="post" id="add-scores-card">
+						<form asp-action="SubmitResult" asp-controller="Result" method="post" class="add-scores-card">
 							@Html.AntiForgeryToken()
 
 							<input type="hidden" asp-for="@Model[i].MatchId" />
@@ -39,22 +39,21 @@
 								<strong>@Model[i].DisplayTime</strong>
 							</p>
 
-							<div class="d-flex justify-content-center align-items-center">
-								<div class="mb-3 text-center">
-									<label asp-for="@Model[i].HomeScore" class="form-label text-center">Home Score</label>
-									<input asp-for="@Model[i].HomeScore" class="form-control" min="0" />
-									<span asp-validation-for="@Model[i].HomeScore" class="text-danger"></span>
+							<div class="d-flex justify-content-center gap-3">
+								<div style="width: 100px;">
+									<label asp-for="@Model[i].HomeScore" class="form-label text-white text-center w-100">Home</label>
+									<input asp-for="@Model[i].HomeScore" class="form-control text-center" min="0" />
+									<span asp-validation-for="@Model[i].HomeScore" class="text-danger small d-block text-center"></span>
 								</div>
-
-								<div class="mb-3 text-center">
-									<label asp-for="@Model[i].AwayScore" class="form-label text-center">Away Score</label>
-									<input asp-for="@Model[i].AwayScore" class="form-control" min="0" />
-									<span asp-validation-for="@Model[i].AwayScore" class="text-danger"></span>
+								<div style="width: 100px;">
+									<label asp-for="@Model[i].AwayScore" class="form-label text-white text-center w-100">Away</label>
+									<input asp-for="@Model[i].AwayScore" class="form-control text-center" min="0" />
+									<span asp-validation-for="@Model[i].AwayScore" class="text-danger small d-block text-center"></span>
 								</div>
 							</div>
 
 							<div class="mb-3 text-center">
-								<label asp-for="@Model[i].Notes" class="form-label text-center">Notes (optional)</label>
+								<label asp-for="@Model[i].Notes" class="form-label text-center text-white">Notes (optional)</label>
 								<textarea asp-for="@Model[i].Notes" class="form-control" rows="2"></textarea>
 								<span asp-validation-for="@Model[i].Notes" class="text-danger"></span>
 							</div>
