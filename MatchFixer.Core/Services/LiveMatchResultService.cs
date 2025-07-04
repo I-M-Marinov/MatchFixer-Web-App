@@ -2,8 +2,10 @@
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.MatchResults;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace MatchFixer.Core.Services
 {
@@ -11,11 +13,19 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IWalletService _walletService;
+		private readonly ITimezoneService _timezoneService;
+		private readonly ISessionService _sessionService;
 
-		public LiveMatchResultService(MatchFixerDbContext dbContext, IWalletService walletService)
+		public LiveMatchResultService(
+			MatchFixerDbContext dbContext, 
+			IWalletService walletService,
+			ITimezoneService timezoneService,
+			ISessionService sessionService)
 		{
 			_dbContext = dbContext;
 			_walletService = walletService;
+			_timezoneService = timezoneService;
+			_sessionService = sessionService;
 		}
 
 		public async Task<bool> AddMatchResultAsync(Guid matchEventId, int homeScore, int awayScore, string? notes = null)
@@ -109,6 +119,8 @@ namespace MatchFixer.Core.Services
 
 		public async Task<List<MatchResultInputViewModel>> GetUnresolvedMatchResultsAsync()
 		{
+			var timeZoneId = _sessionService.GetUserTimezone();
+
 			var matches = await _dbContext.MatchEvents
 				.Include(m => m.HomeTeam)
 				.Include(m => m.AwayTeam)
@@ -122,7 +134,8 @@ namespace MatchFixer.Core.Services
 				MatchId = m.Id,
 				HomeTeam = m.HomeTeam.Name,
 				AwayTeam = m.AwayTeam.Name,
-				MatchDate = m.MatchDate
+				MatchDate = m.MatchDate,
+				DisplayTime = _timezoneService.FormatForUserBets(m.MatchDate, timeZoneId)
 			}).ToList();
 		}
 	}
