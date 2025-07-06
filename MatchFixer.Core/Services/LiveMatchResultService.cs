@@ -5,7 +5,6 @@ using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace MatchFixer.Core.Services
 {

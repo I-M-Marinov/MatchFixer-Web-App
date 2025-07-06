@@ -1,6 +1,4 @@
-﻿using MatchFixer.Infrastructure.Entities;
-
-namespace MatchFixer.Core.ViewModels.MatchGuessGame
+﻿namespace MatchFixer.Core.ViewModels.MatchGuessGame
 {
 	public class LeaderboardEntryViewModel
 	{

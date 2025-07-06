@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Security.Claims;
-using System.Text.Encodings.Web;
 using static MatchFixer.Common.GeneralConstants.AnonymizationConstants;
 using static MatchFixer.Common.GeneralConstants.ProfileConstants;
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;

@@ -4,7 +4,6 @@ using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace MatchFixer.Core.Services

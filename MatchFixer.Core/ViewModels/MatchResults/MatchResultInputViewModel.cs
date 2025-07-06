@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.Identity.Client;
 
 namespace MatchFixer.Core.ViewModels.MatchResults
 {
