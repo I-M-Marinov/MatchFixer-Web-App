@@ -54,5 +54,9 @@
     max-height: 80px;
 }
 
+.no-result-entries {
+    text-shadow: 1px 1px 2px #ffffff;
+}
+
 
 
