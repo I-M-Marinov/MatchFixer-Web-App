@@ -294,3 +294,39 @@
     color: ghostwhite !important;
     text-shadow: 1px 1px 1px black !important;
 }
+
+#home-header .bet-option {
+    background-color: white;
+    color: black;
+    border: 2px solid #0a58ca;
+    border-radius: 0.75em;
+}
+
+#draw-header .bet-option {
+    background-color: white;
+    color: black;
+    border:2px solid #f1d302;
+    border-radius: 0.75em;
+}
+
+#away-header .bet-option {
+    background-color: white;
+    color: black;
+    border: 2px solid #0DAB76;
+    border-radius: 0.75em;
+}
+
+#home-header:hover .bet-option {
+    background-color: #0a58ca;
+    color: white;
+}
+
+#draw-header:hover .bet-option {
+    background-color: #f1d302;
+    color: black;
+}
+
+#away-header:hover .bet-option {
+    background-color: #0DAB76;
+    color: white;
+}
