@@ -120,11 +120,14 @@ namespace MatchFixer.Core.Services
 		{
 			var timeZoneId = _sessionService.GetUserTimezone();
 
+			var cutoffTime = DateTime.UtcNow.AddHours(-2.5);
+
 			var matches = await _dbContext.MatchEvents
 				.Include(m => m.HomeTeam)
 				.Include(m => m.AwayTeam)
 				.Include(m => m.LiveResult)
 				.Where(m => m.LiveResult == null)
+				.Where(m => m.MatchDate <= cutoffTime) // Only matches that started more than two and a half hours ago 
 				.OrderBy(m => m.MatchDate)
 				.ToListAsync();
 
