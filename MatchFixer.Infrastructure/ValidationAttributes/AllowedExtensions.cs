@@ -8,8 +8,8 @@ namespace MatchFixer.Infrastructure.ValidationAttributes
 	{
 		private readonly string[] _validExtensions;
 
-		private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".jpeg", ".png" };
-		private static readonly string[] AdminValidImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+		private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+		private static readonly string[] AdminValidImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
 
 		public AllowedExtensions()
 		{
