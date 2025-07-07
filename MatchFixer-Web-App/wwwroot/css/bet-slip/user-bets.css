@@ -1,9 +1,35 @@
 ﻿@import "/css/bet-slip/user-slip-responsive.css";
 
 
+.betslip-submitted {
+    background: #ffffff;
+    padding: 0.15em 0.20em;
+    border: 2px dotted #0dab76;
+    border-radius: 0.5em 1em;
+}
+
+.betslip-submitted p{
+    color: black;
+}
+
 .slip-container {
     border: 1px solid #000000 !important;
     box-shadow: 0 0 0 0.11rem #3370a8, 0 0 0 0.22rem #0dab76 !important;
+}
+
+.slip-border-won {
+    border: 1px solid #056301 !important;
+    box-shadow: 0 0 0 0.11rem #198754, 0 0 0 0.22rem #28a745 !important;
+}
+
+.slip-border-lost {
+    border: 1px solid #8B0000 !important;
+    box-shadow: 0 0 0 0.11rem #dc3545, 0 0 0 0.22rem #a71d2a !important;
+}
+
+.slip-border-pending {
+    border: 1px solid #ffcc00 !important;
+    box-shadow: 0 0 0 0.11rem #ffc107, 0 0 0 0.22rem #ffdd57 !important;
 }
 
 .card-betslip-body p {
@@ -40,6 +66,9 @@
     max-width: 60vw;
     width: 100%;
     border: none;
+    background: #3370a8 !important;
+    border-radius: 0.75em;
+    box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
 }
 
 .user-bets-table {
@@ -98,4 +127,70 @@
     opacity: 90%;
     padding: 0.15rem;
     color: #ffffff;
+}
+
+.alert-custom-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000000;
+    background-color: #75b4ed;
+    border: 1px solid #056301;
+    padding: 1rem 1.25rem;
+    border-radius: 0.375rem;
+    font-size: 0.95rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    width: 65%;
+    text-shadow: 1px 1px 1px #ffffff !important;
+}
+
+.alert-custom-info-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 30vh;
+}
+
+#betSlipTabs{
+    font-size: 0.65em;
+}
+
+
+#betSlipTabs #won-tab,
+#betSlipTabs #lost-tab,
+#betSlipTabs #pending-tab {
+    color: white;
+}
+
+#won-tab.active {
+    background-color: #0dab76 !important;
+    color: black !important;
+    border-color: black;
+    border-bottom: 3px white solid;
+}
+
+#pending-tab.active {
+    background-color: rgb(255,193,7) !important;
+    color: black !important;
+    border-color: black;
+    border-bottom: 3px white solid;
+}
+
+#lost-tab.active {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: black;
+    border-bottom: 3px white solid;
+}
+
+
+#won-tab:hover,
+#lost-tab:hover,
+#pending-tab:hover {
+    color: black;
+    background-color: #043c6f;
+}
+
+.card-header{
+    font-size: 0.85em;
 }
