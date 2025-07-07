@@ -241,7 +241,31 @@ namespace MatchFixer.Core.Services
 			await _dbContext.WalletTransactions.AddAsync(transaction);
 			await _dbContext.SaveChangesAsync();
 		}
+		public async Task<bool> AwardBirthdayBonusAsync(Guid userId)
+		{
+			const decimal bonusAmount = 10m;
 
+			var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			wallet.Balance += bonusAmount;
+			wallet.UpdatedAt = DateTime.UtcNow;
+
+			var transaction = new WalletTransaction
+			{
+				Id = Guid.NewGuid(),
+				WalletId = wallet.Id,
+				Amount = bonusAmount,
+				TransactionType = WalletTransactionType.BirthdayBonus,
+				Description = "🎂 Birthday Bonus",
+				Reference = $"User: {userId} - Birthday bonus granted",
+				CreatedAt = DateTime.UtcNow
+			};
+
+			await _dbContext.WalletTransactions.AddAsync(transaction);
+			await _dbContext.SaveChangesAsync();
+
+			return true;
+		}
 
 	}
 }
