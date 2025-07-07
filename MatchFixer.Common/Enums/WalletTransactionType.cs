@@ -6,7 +6,8 @@
 		Withdrawal = 1,
 		BetPlaced = 2,
 		Winnings = 3,
-		Refund = 4
+		Refund = 4,
+		BirthdayBonus = 5
 
 	}
 
