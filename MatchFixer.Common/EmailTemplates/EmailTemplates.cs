@@ -173,6 +173,46 @@ namespace MatchFixer.Common.EmailTemplates
 					</body>
 				</html>";
 		}
+		public static string BirthdayEmail(string logoUrl, string username)
+		{
+			return $@"
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<meta charset='UTF-8'>
+			<title>Happy Birthday!</title>
+		</head>
+		<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
+			<div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+				<div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
+					<img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
+				</div>
+				<div style='padding: 30px; text-align: center;'>
+					<h2 style='color: #333;'>🎉 Happy Birthday, {username}! 🎂</h2>
+					<p style='color: #555; font-size: 16px;'>
+						Everyone at MatchFixer wishes you a fantastic day filled with joy, luck, and a few winning bets. 🍀<br/><br/>
+						To celebrate, we’ve rigged the algorithm in your favor today… just kidding 😅 (or are we?).<br/>
+						Thanks for being part of the most dangerously fun betting community on the internet.
+					</p>
+					<p style='font-size: 15px; color: #0dab76; font-weight: bold; margin-top: 20px;'>
+						🎁 Enjoy your day and make it count!
+					</p>
+
+					<p style='font-size: 15px; color: #0dab76; font-weight: bold; margin-top: 20px;'>
+						To make it more special for you we have credited your wallet €10 for you to bet on anything you want ! Best of luck !
+					</p>
+
+					<p style='margin-top: 30px; font-size: 13px; color: #888;'>
+						If you received this by mistake, it’s probably because your doppelganger shares your birthday.
+					</p>
+					<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
+						All Rights Reserved. MatchFixer ® 2025
+					</p>
+				</div>
+			</div>
+		</body>
+		</html>";
+		}
 
 	}
 
