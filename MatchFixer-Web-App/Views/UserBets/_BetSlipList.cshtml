@@ -1,200 +1,226 @@
 ﻿@model IEnumerable<MatchFixer.Core.DTOs.Bets.UserBetSlipDTO>
 
+@{
+	var currentTab = Model.FirstOrDefault()?.Status ?? "Pending";
 
+    decimal summaryAmount = currentTab switch
+    {
+        "Pending" => Model.Sum(x => x.Amount * x.TotalOdds),
+        "Won" => Model.Sum(x => x.WinAmount ?? 0),
+        "Lost" => Model.Sum(x => x.Amount),
+        _ => 0
+    };
+
+    string summaryTitle = currentTab switch
+    {
+        "Pending" => "Total Potential Win",
+        "Won" => "Total Won",
+        "Lost" => "Total Lost",
+        _ => "Summary"
+    };
+
+    string summaryClass = currentTab switch
+    {
+        "Pending" => "bg-warning text-dark pending-betslips",
+		"Won" => "bg-success text-dark won-betslips",
+		"Lost" => "bg-danger text-white lost-betslips",
+		_ => "bg-secondary text-dark"
+    };
+}
 
 @if (!Model.Any())
 {
-	<div class="alert-custom-info-wrapper">
-		<div class="alert-custom-info">No bet slips in this category yet.</div>
-	</div>}
+    <div class="alert-custom-info-wrapper">
+        <div class="alert-custom-info">No bet slips in this category right now.</div>
+    </div>
+}
 else
 {
-	<div class="row">
-		@for (int i = 0; i < Model.Count(); i++)
-		{
-			var betSlip = Model.ElementAt(i);
-			var collapseId = $"collapseBetslip{i}";
+    <div class="row">
+        <!-- Left Betslips Column -->
+		<div class="col-md-8 betslips-col">
+	        <div class="d-flex flex-column gap-3">
+		        @for (int i = 0; i < Model.Count(); i++)
+		        {
+			        var betSlip = Model.ElementAt(i);
+			        var collapseId = $"collapseBetslip{i}";
 
-			var statusClass = betSlip.Status switch
-			{
-				"Won" => "bg-success",
-				"Lost" => "bg-danger",
-				"Pending" => "bg-warning text-black",
-				_ => "bg-secondary"
-			};
+			        var statusClass = betSlip.Status switch
+			        {
+				        "Won" => "bg-success",
+				        "Lost" => "bg-danger",
+				        "Pending" => "bg-warning text-dark",
+				        _ => "bg-secondary"
+			        };
 
-			var borderClass = betSlip.Status switch
-			{
-				"Won" => "slip-border-won",
-				"Lost" => "slip-border-lost",
-				"Pending" => "slip-border-pending",
-				_ => ""
-			};
-		}
+			        var borderClass = betSlip.Status switch
+			        {
+				        "Won" => "slip-border-won",
+				        "Lost" => "slip-border-lost",
+				        "Pending" => "slip-border-pending",
+				        _ => ""
+			        };
 
-		@for (int i = 0; i < Model.Count(); i++)
-		{
-			var betSlip = Model.ElementAt(i);
-			var collapseId = $"collapseBetslip{i}";
+			        <div class="card shadow-sm slip-container @borderClass">
+				        <!-- Header -->
+				        <div class="card-header card-header-bet-totals @statusClass d-flex justify-content-between align-items-center"
+				             data-bs-toggle="collapse" data-bs-target="#@collapseId"
+				             title="Click to view betslip details" data-bs-toggle="tooltip" data-bs-placement="top"
+				             style="cursor: pointer;">
+					        <div class="w-100 text-center">
+						        @if (betSlip.Status == "Won")
+						        {
+							        <span class="text-black">
+								        <i class="bi bi-check-circle me-1 text-black"></i>
+								        <strong>Won:</strong> €@(betSlip.WinAmount?.ToString("0.00") ?? "0.00")
+							        </span>
+						        }
+						        else if (betSlip.Status == "Lost")
+						        {
+							        <span class="text-white">
+								        <i class="bi bi-x-circle me-1 text-white"></i>
+								        <strong>Lost:</strong> €@betSlip.Amount.ToString("0.00")
+							        </span>
+						        }
+						        else if (betSlip.Status == "Pending")
+						        {
+							        var potentialWin = Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
+							        <span class="text-black">
+								        <i class="bi bi-clock me-1 text-black"></i>
+								        <strong>Potential Win:</strong> €@potentialWin.ToString("0.00")
+							        </span>
+						        }
+						        else
+						        {
+							        <span class="text-secondary">
+								        <i class="bi bi-question-circle me-1 text-black"></i>
+								        @betSlip.Status
+							        </span>
+						        }
+					        </div>
+				        </div>
 
-			var statusClass = betSlip.Status switch
-			{
-				"Won" => "bg-success",
-				"Lost" => "bg-danger",
-				"Pending" => "bg-warning text-black",
-				_ => "bg-secondary"
-			};
+				        <!-- Body -->
+				        <div id="@collapseId" class="collapse">
+					        <div class="card-body d-flex flex-column align-items-center fuzzy-points">
+						        <div class="custom-card-user-bets text-center">
+							        <p><strong>Amount:</strong> €@betSlip.Amount.ToString("F2")</p>
+							        <p>
+								        <strong>Total Odds:</strong>
+								        <i class="bi bi-lightning-charge-fill lightning-icon-all-odds" style="text-shadow: 1px 2px 3px #0dab76;"></i>
+								        @betSlip.TotalOdds.ToString("F2")x
+							        </p>
+							        <p>
+								        <strong>@(betSlip.Status == "Won" ? "Won:" : "Potential Win:")</strong>
+								        @{
+									        var displayedAmount = betSlip.WinAmount.HasValue
+										        ? Math.Floor(betSlip.WinAmount.Value * 100) / 100
+										        : Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
+								        }
+								        €@displayedAmount.ToString("0.00")
+							        </p>
+						        </div>
 
-			var borderClass = betSlip.Status switch
-			{
-				"Won" => "slip-border-won",
-				"Lost" => "slip-border-lost",
-				"Pending" => "slip-border-pending",
-				_ => ""
-			};
+						        <div class="betslip-submitted custom-card-user-bets">
+							        <p class="small">
+								        <i class="bi bi-calendar-check me-1"></i>
+								        <strong>Submitted:</strong> @betSlip.DisplayTime
+							        </p>
+						        </div>
 
-			<div class="col-md-6 mb-4">
-				<div class="card shadow-sm slip-container @borderClass">
-
-					<!-- Toggle Header -->
-					<div class="card-header card-header-bet-totals @statusClass d-flex justify-content-between align-items-center"
-					     data-bs-toggle="collapse" data-bs-target="#@collapseId"
-					     title="Click to view betslip details" data-bs-toggle="tooltip" data-bs-placement="top"
-					     style="cursor: pointer;">
-
-						<div class="d-flex flex-column justify-content-center align-items-center w-100">
-							@if (betSlip.Status == "Won")
-							{
-								<div class="text-black">
-									<i class="bi bi-check-circle me-1 text-black"></i>
-									<strong class="text-black">Won:</strong> €@(betSlip.WinAmount?.ToString("0.00") ?? "0.00")
-								</div>
-							}
-							else if (betSlip.Status == "Lost")
-							{
-								<div class="text-white">
-									<i class="bi bi-x-circle me-1 text-white"></i>
-									<strong class="text-white">Lost:</strong> €@betSlip.Amount.ToString("0.00")
-								</div>
-							}
-							else if (betSlip.Status == "Pending")
-							{
-								var potentialWin = Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
-								<div class="text-warning text-black">
-									<i class="bi bi-clock me-1 text-black"></i>
-									<strong class="text-black">Potential Win:</strong> €@potentialWin.ToString("0.00")
-								</div>
-							}
-							else
-							{
-								<div class="text-secondary">
-									<i class="bi bi-question-circle me-1 text-black"></i>
-									@betSlip.Status
-								</div>
-							}
-						</div>
-
-					</div>
-
-
-					<!-- Collapsible Content -->
-					<div id="@collapseId" class="collapse">
-						<div class="card-body card-betslip-body d-flex flex-column justify-content-center align-items-center fuzzy-points">
-
-							<div class="custom-card-user-bets d-flex flex-column justify-content-center align-items-center">
-
-								<p><strong>Amount:</strong> €@betSlip.Amount.ToString("F2")</p>
-								<p>
-									<strong>Total Odds:</strong>
-									<i class="bi bi-lightning-charge-fill lightning-icon-all-odds" style="text-shadow: 1px 2px 3px #0dab76;"></i>
-									@betSlip.TotalOdds.ToString("F2")x
-								</p>
-								<p>
-									<strong>@(betSlip.Status == "Won" ? "Won:" : "Potential Win:")</strong>
-									@{
-										var displayedAmount = betSlip.WinAmount.HasValue
-											? Math.Floor(betSlip.WinAmount.Value * 100) / 100
-											: Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
-									}
-									€@displayedAmount.ToString("0.00")
-								</p>
-							</div>
-							
-							<div class="betslip-submitted">
-								<p class="small">
-									<i class="bi bi-calendar-check me-1"></i>
-									<strong>Submitted:</strong> @betSlip.DisplayTime
-								</p>
-							</div>
-
-							@if (betSlip.Bets != null && betSlip.Bets.Any())
-							{
-								<h5 class="mt-3">Bets breakdown:</h5>
-								<div class="table-responsive user-bets-table">
-									<table class="table table-sm table-bordered text-center">
-										<thead class="table-light">
-											<tr>
-												<th>Event</th>
-												<th>Pick</th>
-												<th>Odds</th>
-												<th>Outcome</th>
-											</tr>
-										</thead>
-										<tbody>
-											@foreach (var bet in betSlip.Bets)
-											{
-												<tr>
-													<td>@bet.HomeTeam <strong>vs</strong> @bet.AwayTeam</td>
-													<td>
-														@if (bet.SelectedOption == "Home")
-														{
-															<span class="pill-brand-blue" style="font-size: 0.65rem;">@bet.SelectedOption</span>
-														}
-														else if (bet.SelectedOption == "Away")
-														{
-															<span class="pill-brand-green" style="font-size: 0.65rem;">@bet.SelectedOption</span>
-														}
-														else
-														{
-															<span class="pill-brand-yellow" style="font-size: 0.65rem;">@bet.SelectedOption</span>
-														}
-													</td>
-													<td>@bet.Odds.ToString("F2")x</td>
-													<td>
-														@if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome == bet.SelectedOption)
-														{
-															<i class="ri-checkbox-circle-fill" style="color: #056301;"></i>
-														}
-														else if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome != bet.SelectedOption)
-														{
-															<i class="ri-close-circle-fill" style="color:#dc3545;"></i>
-														}
-														else
-														{
-															<i class="bi bi-question-circle" title="N/A" style="color:#ff6a00;"></i>
-														}
-														@bet.Outcome
-													</td>
-												</tr>
-											}
-										</tbody>
-									</table>
-								</div>
-							}
-						</div>
-					</div> <!-- end collapse -->
-
-				</div>
-			</div>
-		}
-	</div>
+						        @if (betSlip.Bets != null && betSlip.Bets.Any())
+						        {
+							        <h6 class="mt-3">Bets Breakdown</h6>
+							        <div class="table-responsive user-bets-table">
+								        <table class="table table-sm table-bordered text-center">
+									        <thead class="table-light">
+									        <tr>
+										        <th>Event</th>
+										        <th>Pick</th>
+										        <th>Odds</th>
+										        <th>Outcome</th>
+									        </tr>
+									        </thead>
+									        <tbody>
+									        @foreach (var bet in betSlip.Bets)
+									        {
+										        <tr>
+											        <td>@bet.HomeTeam <strong>vs</strong> @bet.AwayTeam</td>
+											        <td>
+												        @{
+													        string pickClass = bet.SelectedOption switch
+													        {
+														        "Home" => "pill-brand-blue",
+														        "Away" => "pill-brand-green",
+														        _ => "pill-brand-yellow"
+													        };
+												        }
+												        <span class="@pickClass" style="font-size: 0.65rem;">@bet.SelectedOption</span>
+											        </td>
+											        <td>@bet.Odds.ToString("F2")x</td>
+											        <td>
+												        @if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome == bet.SelectedOption)
+												        {
+													        <i class="ri-checkbox-circle-fill" style="color: #056301;"></i>
+												        }
+												        else if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome != bet.SelectedOption)
+												        {
+													        <i class="ri-close-circle-fill" style="color:#dc3545;"></i>
+												        }
+												        else
+												        {
+													        <i class="bi bi-question-circle" title="N/A" style="color:#ff6a00;"></i>
+												        }
+												        @bet.Outcome
+											        </td>
+										        </tr>
+									        }
+									        </tbody>
+								        </table>
+							        </div>
+						        }
+					        </div>
+				        </div>
+			        </div>
+		        }
+	        </div>
+        </div>
+        <!-- Right Summary Column -->
+		<div class="col-md-4 mb-4 summary-col">
+	        <div class="card shadow-sm @summaryClass">
+		        <div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 120px;">
+			        <h5 class="card-title">@summaryTitle</h5>
+					<h2 class="fw-bold @summaryClass">€@summaryAmount.ToString("0.00")</h2>
+		        </div>
+	        </div>
+        </div>
+    </div>
 }
+
 
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
-		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+		// Tooltips
+		const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 		tooltipTriggerList.forEach(function (tooltipTriggerEl) {
 			new bootstrap.Tooltip(tooltipTriggerEl);
+		});
+
+		// Collapse all open betslips before switching tabs
+		const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+
+		tabButtons.forEach(tab => {
+			tab.addEventListener('hide.bs.tab', () => {
+				const openCollapses = document.querySelectorAll('.collapse.show');
+				openCollapses.forEach(collapse => {
+					const bsCollapse = bootstrap.Collapse.getInstance(collapse);
+					if (bsCollapse) {
+						bsCollapse.hide(); // collapse immediately
+					} else {
+						new bootstrap.Collapse(collapse, { toggle: false }).hide();
+					}
+				});
+			});
 		});
 	});
 </script>
