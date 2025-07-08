@@ -7,6 +7,18 @@
     .card-header-bet-totals {
         font-size: 0.75em;
     }
+
+    .betslip-grid {
+        max-width: 100%;
+    }
+
+    #betSlipTabContent .summary-col {
+        order: 1;
+    }
+
+    #betSlipTabContent .betslips-col {
+        order: 2;
+    }
 }
 
 @media (max-width: 1250px) {
@@ -17,6 +29,18 @@
     .card-header-bet-totals{
         font-size: 0.65em;
     }
+
+    .betslip-grid {
+        max-width: 100%;
+    }
+
+    #betSlipTabContent .summary-col {
+        order: 1;
+    }
+
+    #betSlipTabContent .betslips-col {
+        order: 2;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -26,5 +50,17 @@
 
     .card-header-bet-totals {
         font-size: 0.5em;
+    }
+
+    .betslip-grid {
+        max-width: 100% !important;
+    }
+
+    #betSlipTabContent .summary-col {
+        order: 1;
+    }
+
+    #betSlipTabContent .betslips-col {
+        order: 2;
     }
 }
