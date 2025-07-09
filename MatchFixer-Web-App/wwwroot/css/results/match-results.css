@@ -33,7 +33,9 @@
 }
 
 .add-scores-card label {
+    font-size: 0.90rem;
     text-shadow: 1px 1px 2px #000000;
+    margin-bottom: -0.5em !important;
 }
 
 .add-scores-card input {
