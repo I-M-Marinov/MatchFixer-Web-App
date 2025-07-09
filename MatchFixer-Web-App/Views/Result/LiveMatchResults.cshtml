@@ -54,7 +54,7 @@ else
                                     <strong>@match.DisplayTime</strong>
                                 </p>
 
-                                <div class="d-flex justify-content-center gap-3">
+                                <div class="d-flex justify-content-center gap-3 mb-3">
                                     <div style="width: 100px;">
                                         <label class="form-label text-white text-center w-100">Home</label>
                                         <input type="number" name="HomeScore" value="@match.HomeScore" class="form-control text-center" min="0" />
@@ -65,9 +65,9 @@ else
                                     </div>
                                 </div>
 
-                                <div class="mb-3 text-center">
-                                    <label class="form-label text-white">Notes (optional)</label>
-                                    <textarea name="Notes" class="form-control" rows="2">@match.Notes</textarea>
+                                <div class="mb-3 text-center" style="max-width: 300px; width: 100%;">
+                                    <label class="form-label text-white">Notes*</label>
+                                    <textarea name="Notes" class="form-control" rows="4">@match.Notes</textarea>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Submit Result</button>
