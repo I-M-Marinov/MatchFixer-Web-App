@@ -1,10 +1,12 @@
-﻿using MatchFixer.Common.Enums;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
+using MatchFixer.Infrastructure.Factories;
 using Microsoft.EntityFrameworkCore;
+
+using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -105,37 +107,32 @@ namespace MatchFixer.Core.Services
 		{
 			var userId = _userContextService.GetUserId();
 
-			if (amount <= 0) throw new ArgumentException("Amount must be positive.");
+			if (amount <= 0)
+				throw new ArgumentException(MoneyAmountMustBePositive);
 
 			var wallet = await GetWalletAsync();
 
-			if (wallet == null) throw new InvalidOperationException("Wallet not found.");
+			if (wallet == null)
+				throw new InvalidOperationException(WalletNotFound);
 
 			wallet.Balance += amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			await _dbContext.WalletTransactions.AddAsync(new WalletTransaction
-			{
-				Id = Guid.NewGuid(),
-				WalletId = wallet.Id,
-				Amount = amount,
-				TransactionType = WalletTransactionType.Deposit,
-				Reference = $"User: {userId} - Wallet: {wallet.Id} - Deposit",
-				Description = description ?? "User deposit",
-				CreatedAt = DateTime.UtcNow
-			});
+			var transaction = WalletTransactionFactory.CreateDepositTransaction(wallet.Id, userId, amount, description);
+			await _dbContext.WalletTransactions.AddAsync(transaction);
 
 			await _dbContext.SaveChangesAsync();
 		}
+
 
 		public async Task<bool> WithdrawAsync(decimal amount, string description = null)
 		{
 			var userId = _userContextService.GetUserId();
 
-			if (amount <= 0) throw new ArgumentException("Amount must be positive.");
+			if (amount <= 0) throw new ArgumentException(MoneyAmountMustBePositive);
 
 			var wallet = await GetWalletAsync();
-			if (wallet == null) throw new InvalidOperationException("Wallet not found.");
+			if (wallet == null) throw new InvalidOperationException(WalletNotFound);
 
 			if (wallet.Balance < amount)
 				return false;
@@ -143,18 +140,11 @@ namespace MatchFixer.Core.Services
 			wallet.Balance -= amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			await _dbContext.WalletTransactions.AddAsync(new WalletTransaction
-			{
-				Id = Guid.NewGuid(),
-				WalletId = wallet.Id,
-				Amount = -amount,
-				TransactionType = WalletTransactionType.Withdrawal,
-				Reference = $"User: {userId} - Wallet: {wallet.Id} - Withdrawal",
-				Description = description ?? "User withdrawal",
-				CreatedAt = DateTime.UtcNow
-			});
+			var withdrawalTransaction = WalletTransactionFactory.CreateWithdrawalTransaction(wallet.Id, userId, amount, description);
 
+			await _dbContext.WalletTransactions.AddAsync(withdrawalTransaction);
 			await _dbContext.SaveChangesAsync();
+
 			return true;
 		}
 
@@ -167,7 +157,7 @@ namespace MatchFixer.Core.Services
 				.FirstOrDefaultAsync(w => w.UserId == userId);		
 
 			if (wallet == null)
-				return (false, "Wallet not found.");
+				return (false, WalletNotFound);
 
 			var historyClearedAt = wallet.HistoryClearedAt;
 
@@ -176,12 +166,12 @@ namespace MatchFixer.Core.Services
 				: wallet.Transactions.ToList();
 
 			if (!visibleTransactions.Any())
-				return (false, "No transactions to clear.");
+				return (false, NoTransactionsToClear);
 
 			wallet.HistoryClearedAt = DateTime.UtcNow;
 			await _dbContext.SaveChangesAsync();
 
-			return (true, "Transaction history cleared.");
+			return (true, TransactionHistoryCleared);
 		}
 
 		public async Task<(bool Success, string Message)> DeductForBetAsync(Guid userId, decimal amount)
@@ -191,54 +181,39 @@ namespace MatchFixer.Core.Services
 				.FirstOrDefaultAsync(w => w.UserId == userId);
 
 			if (wallet == null)
-				return (false, "Wallet not found.");
+				return (false, WalletNotFound);
 
 			if (wallet.Balance < amount)
-				return (false, "Insufficient balance to place the bet.");
+				return (false, InsufficientBalanceToPlaceBet);
 
 			wallet.Balance -= amount;
 
-			wallet.Transactions.Add(new WalletTransaction
-			{
-				Amount = -amount,
-				CreatedAt = DateTime.UtcNow,
-				Description = "Bet placed",
-				TransactionType = WalletTransactionType.BetPlaced,
-				Reference = $"User: {userId} - Wallet: {wallet.Id} - Bet Placed",
-				WalletId = wallet.Id
-			});
+			var transaction = WalletTransactionFactory.CreateBetPlacedTransaction(wallet.Id, userId, amount);
+			wallet.Transactions.Add(transaction);
 
 			await _dbContext.SaveChangesAsync();
 
-			return (true, "Amount deducted for bet.");
+			return (true, AmountDeductedForTheBet);
 		}
+
 
 		public async Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription)
 		{
 			if (amount <= 0)
-				throw new ArgumentException("Winning amount must be greater than zero.");
+				throw new ArgumentException(WinAmountMustBeGreaterThanZero);
 
 			var wallet = await _dbContext.Wallets
 				.FirstOrDefaultAsync(w => w.UserId == userId);
 
 			if (wallet == null)
-				throw new InvalidOperationException("Wallet not found for the user.");
+				throw new InvalidOperationException(WalletNotFound);
 
 			wallet.Balance += amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			var transaction = new WalletTransaction
-			{
-				Id = Guid.NewGuid(),
-				WalletId = wallet.Id,
-				Amount = amount,
-				TransactionType = WalletTransactionType.Winnings,
-				Reference = $"User: {userId} - Wallet: {wallet.Id} - Winnings",
-				Description = $"Winnings from {matchDescription}",
-				CreatedAt = DateTime.UtcNow
-			};
+			var winningsTransaction = WalletTransactionFactory.CreateWinningsTransaction(wallet.Id, userId, amount, matchDescription);
 
-			await _dbContext.WalletTransactions.AddAsync(transaction);
+			await _dbContext.WalletTransactions.AddAsync(winningsTransaction);
 			await _dbContext.SaveChangesAsync();
 		}
 		public async Task<bool> AwardBirthdayBonusAsync(Guid userId)
@@ -250,16 +225,7 @@ namespace MatchFixer.Core.Services
 			wallet.Balance += bonusAmount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			var transaction = new WalletTransaction
-			{
-				Id = Guid.NewGuid(),
-				WalletId = wallet.Id,
-				Amount = bonusAmount,
-				TransactionType = WalletTransactionType.BirthdayBonus,
-				Description = "🎂 Birthday Bonus",
-				Reference = $"User: {userId} - Birthday bonus granted",
-				CreatedAt = DateTime.UtcNow
-			};
+			var transaction = WalletTransactionFactory.CreateBirthdayBonus(wallet.Id, userId, bonusAmount);
 
 			await _dbContext.WalletTransactions.AddAsync(transaction);
 			await _dbContext.SaveChangesAsync();
