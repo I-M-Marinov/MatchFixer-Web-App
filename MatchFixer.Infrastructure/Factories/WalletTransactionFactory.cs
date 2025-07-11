@@ -5,7 +5,6 @@ namespace MatchFixer.Infrastructure.Factories
 {
 	public static class WalletTransactionFactory
 	{
-		
 		public static WalletTransaction CreateTransaction(
 			Guid walletId,
 			decimal amount,
