@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
@@ -119,11 +120,10 @@ namespace MatchFixer.Core.Services
 			wallet.UpdatedAt = DateTime.UtcNow;
 
 			var transaction = WalletTransactionFactory.CreateDepositTransaction(wallet.Id, userId, amount, description);
-			await _dbContext.WalletTransactions.AddAsync(transaction);
 
+			await _dbContext.WalletTransactions.AddAsync(transaction);
 			await _dbContext.SaveChangesAsync();
 		}
-
 
 		public async Task<bool> WithdrawAsync(decimal amount, string description = null)
 		{
@@ -189,13 +189,12 @@ namespace MatchFixer.Core.Services
 			wallet.Balance -= amount;
 
 			var transaction = WalletTransactionFactory.CreateBetPlacedTransaction(wallet.Id, userId, amount);
-			wallet.Transactions.Add(transaction);
 
+			await _dbContext.WalletTransactions.AddAsync(transaction);
 			await _dbContext.SaveChangesAsync();
 
 			return (true, AmountDeductedForTheBet);
 		}
-
 
 		public async Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription)
 		{
