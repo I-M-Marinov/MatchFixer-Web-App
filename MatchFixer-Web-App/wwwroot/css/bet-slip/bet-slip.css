@@ -122,3 +122,13 @@
     animation: flashfade 0.6s ease-in-out;
 }
 
+.bet-item {
+    position: relative;
+}
+
+.status-badge {
+    position: absolute;
+    right: 0.4em;
+    bottom: 0.4em;
+}
+
