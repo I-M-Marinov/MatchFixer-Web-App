@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using Microsoft.AspNetCore.Mvc;
+using MatchFixer.Infrastructure;
 
 
 namespace MatchFixer_Web_App.Controllers
@@ -44,7 +45,9 @@ namespace MatchFixer_Web_App.Controllers
 					homeLogoUrl = b.HomeLogoUrl,
 					awayLogoUrl = b.AwayLogoUrl,
 					option = b.SelectedOption,
-					odds = b.Odds
+					odds = b.Odds,
+					startTimeUtc = b.StartTimeUtc.ToString("o")
+
 				}),
 				totalOdds = betSlip.TotalOdds,
 				stakeAmount = betSlip.StakeAmount
@@ -55,12 +58,19 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Add([FromBody] BetSlipItem betDto)
+		public async Task<IActionResult> Add([FromBody] BetSlipItem betDto, [FromServices] MatchFixerDbContext dbContext)
 		{
 			if (betDto == null)
 				return BadRequest("Invalid bet data.");
 
+			var match = await dbContext.MatchEvents.FindAsync(betDto.MatchId);
+
+			if (match == null)
+				return NotFound("Match not found.");
+
+			betDto.StartTimeUtc = match.MatchDate;
 			_sessionService.AddBetToSlip(betDto);
+
 			return Ok();
 		}
 
