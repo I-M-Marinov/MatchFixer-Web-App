@@ -80,10 +80,24 @@ namespace MatchFixer.Core.Services
 				existingBet.AwayTeam = item.AwayTeam;
 				existingBet.HomeLogoUrl = item.HomeLogoUrl;
 				existingBet.AwayLogoUrl = item.AwayLogoUrl;
+				existingBet.StartTimeUtc = item.StartTimeUtc;
+
 			}
 			else
 			{
-				betSlip.Bets.Add(item); // If bet does not exist, add it
+				var newBet = new BetSlipItem
+				{
+					MatchId = item.MatchId,
+					SelectedOption = item.SelectedOption,
+					Odds = item.Odds,
+					HomeTeam = item.HomeTeam,
+					AwayTeam = item.AwayTeam,
+					HomeLogoUrl = item.HomeLogoUrl,
+					AwayLogoUrl = item.AwayLogoUrl,
+					StartTimeUtc = item.StartTimeUtc 
+				};
+
+				betSlip.Bets.Add(newBet); // If bet does not exist, add it
 			}
 
 			SetBetSlipState(betSlip);
