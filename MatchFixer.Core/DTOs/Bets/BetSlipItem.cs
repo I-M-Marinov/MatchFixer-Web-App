@@ -13,5 +13,7 @@ namespace MatchFixer.Core.DTOs.Bets
 		[JsonPropertyName("SelectedOption")]
 		public string SelectedOption { get; set; }
 		public decimal Odds { get; set; }
+		public DateTime StartTimeUtc { get; set; }
+
 	}
 }
