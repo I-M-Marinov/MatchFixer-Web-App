@@ -59,6 +59,10 @@ public class BettingService : IBettingService
 			if (matchEvent == null)
 				return ($"Match with ID {betDto.MatchId} not found.", false);
 
+			// Validate if all events in the betlsip are actually live ( started events fall off site and cannot be bet on ) 
+			if (DateTime.UtcNow >= matchEvent.MatchDate)
+				return ($"An event or events in your slip already started ! Choose other events to bet on.", false);
+
 			// Validate pick is a known enum value
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
 				return ($"Invalid pick option '{betDto.SelectedOption}'.", false);
