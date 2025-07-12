@@ -1,0 +1,106 @@
+﻿@model MatchFixer.Core.DTOs.Bets.BetSlipState
+
+<form asp-controller="Bet" asp-action="PlaceBet" method="post" id="betSlipForm">
+	@Html.AntiForgeryToken()
+	<div id="betSlipPanel" class="bet-slip-panel shadow-lg">
+		<div class="bet-slip-header d-flex justify-content-between align-items-center p-3">
+			<h5>Your Bet Slip</h5>
+		</div>
+
+		<div id="betSlipContent" class="p-3">
+			@if (Model?.Bets == null || !Model.Bets.Any())
+			{
+				<p class="mt-5">Bet slip is empty.</p>
+				<p>
+					Check the <a href="@Url.Action("LiveEvents", "Event")" class="btn btn-link btn-sm">Events Board</a> to bet on an event.
+				</p>
+			}
+			else
+			{
+				foreach (var bet in Model.Bets)
+				{
+					<div class="bet-item border rounded p-2 mb-2" data-start-time="@bet.StartTimeUtc.ToString("o")" data-match-id="@bet.MatchId">
+						<div class="d-flex justify-content-between">
+							<div>
+								<strong>@bet.HomeTeam</strong> vs <strong>@bet.AwayTeam</strong><br />
+								Pick: <span class="text-info">@bet.SelectedOption</span><br />
+								Odds: <strong>@bet.Odds</strong>
+							</div>
+							<div class="text-end">
+								<span class="badge status-badge bg-secondary">Checking...</span>
+							</div>
+
+						</div>
+
+						<input type="hidden" name="Bets[@Model.Bets.IndexOf(bet)].MatchId" value="@bet.MatchId" />
+						<input type="hidden" name="Bets[@Model.Bets.IndexOf(bet)].SelectedOption" value="@bet.SelectedOption" />
+						<input type="hidden" name="Bets[@Model.Bets.IndexOf(bet)].Odds" value="@bet.Odds" />
+						<input type="hidden" name="Bets[@Model.Bets.IndexOf(bet)].HomeTeam" value="@bet.HomeTeam" />
+						<input type="hidden" name="Bets[@Model.Bets.IndexOf(bet)].AwayTeam" value="@bet.AwayTeam" />
+						<input type="hidden" name="Bets[@Model.Bets.IndexOf(bet)].StartTimeUtc" value="@bet.StartTimeUtc.ToString("o")" />
+					</div>
+				}
+			}
+		</div>
+
+		<div class="p-3 d-flex flex-column justify-content-center align-items-center">
+			<div id="amountContainer">
+				<div class="d-flex justify-content-center align-items-center gap-2">
+					<button type="button" class="btn btn-primary btn-sm step-btn flex-shrink-0" onclick="changeBetAmount(this, -1)">−</button>
+
+					<div class="position-relative" style="width: 90px;">
+						<span class="position-absolute top-50 start-0 translate-middle-y ps-2">€</span>
+						<input type="number" id="betAmount" name="Amount" class="form-control ps-4" min="1" value="1" required oninput="updatePotentialReturn()" />
+					</div>
+
+					<button type="button" class="btn btn-primary btn-sm step-btn flex-shrink-0" onclick="changeBetAmount(this, 1)">+</button>
+				</div>
+			</div>
+
+			<div id="potentialReturnOddsContainer" class="d-flex justify-content-center align-items-center mb-3 mt-2">
+				<div class="me-4" id="potentialReturnContainer">To Win: <strong>€</strong><strong id="potentialReturn">0.00</strong></div>
+
+				<div>
+					<i class="bi bi-lightning-charge-fill lightning-icon-all-odds"></i><strong id="totalOdds">0.00</strong><strong style="text-shadow: 0px 1px 1px white;">x</strong>
+				</div>
+			</div>
+
+			<button type="submit" class="btn btn-success w-100">Submit slip</button>
+		</div>
+	</div>
+</form>
+
+<script>
+
+	function updateBetStatuses() {
+		const now = new Date();
+
+		document.querySelectorAll('.bet-item').forEach(item => {
+			let startTimeStr = item.dataset.startTime;
+
+			if (!startTimeStr) return;
+
+			if (!startTimeStr.endsWith('Z')) {
+				startTimeStr += 'Z';
+			}
+
+			const startTime = new Date(startTimeStr);
+
+			const statusBadge = item.querySelector('.status-badge');
+			if (!statusBadge) return;
+
+			if (now >= startTime) {
+				statusBadge.textContent = 'Started';
+				statusBadge.className = 'badge status-badge bg-danger';
+			} else {
+				const minutesLeft = Math.ceil((startTime - now) / 60000);
+				statusBadge.textContent = `Starts in ${minutesLeft}m`;
+				statusBadge.className = 'badge status-badge bg-success';
+			}
+		});
+	}
+	// Run immediately and every 3 seconds
+	updateBetStatuses();
+	setInterval(updateBetStatuses, 3000);
+
+</script>
