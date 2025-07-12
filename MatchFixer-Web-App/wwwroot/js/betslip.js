@@ -244,6 +244,10 @@ function renderBetSlip() {
         customTooltipSpan.classList.add('custom-event-tooltip');
         customTooltipSpan.textContent = "Remove this pick";
 
+        item.classList.add("bet-item", "border", "rounded", "p-2", "mb-2");
+        item.dataset.startTime = bet.startTimeUtc;
+        item.dataset.matchId = bet.matchId;
+
         removeBtnSpan.appendChild(removeIconElement);
         removeBtnSpan.appendChild(customTooltipSpan);
         removeBtn.appendChild(removeBtnSpan);
@@ -254,6 +258,11 @@ function renderBetSlip() {
         right.appendChild(oddsLabel);
         right.appendChild(document.createElement("br"));
         right.appendChild(removeBtn);
+
+        const statusBadge = document.createElement("span");
+        statusBadge.classList.add("badge", "status-badge", "bg-secondary");
+        statusBadge.textContent = "";
+        right.appendChild(statusBadge);
 
         wrapper.appendChild(left);
         wrapper.appendChild(right);
