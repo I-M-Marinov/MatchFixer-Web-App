@@ -27,7 +27,7 @@
 								Odds: <strong>@bet.Odds</strong>
 							</div>
 							<div class="text-end">
-								<span class="badge status-badge bg-secondary">Checking...</span>
+								<span class="badge status-badge bg-secondary"></span>
 							</div>
 
 						</div>
@@ -69,38 +69,3 @@
 		</div>
 	</div>
 </form>
-
-<script>
-
-	function updateBetStatuses() {
-		const now = new Date();
-
-		document.querySelectorAll('.bet-item').forEach(item => {
-			let startTimeStr = item.dataset.startTime;
-
-			if (!startTimeStr) return;
-
-			if (!startTimeStr.endsWith('Z')) {
-				startTimeStr += 'Z';
-			}
-
-			const startTime = new Date(startTimeStr);
-
-			const statusBadge = item.querySelector('.status-badge');
-			if (!statusBadge) return;
-
-			if (now >= startTime) {
-				statusBadge.textContent = 'Started';
-				statusBadge.className = 'badge status-badge bg-danger';
-			} else {
-				const minutesLeft = Math.ceil((startTime - now) / 60000);
-				statusBadge.textContent = `Starts in ${minutesLeft}m`;
-				statusBadge.className = 'badge status-badge bg-success';
-			}
-		});
-	}
-	// Run immediately and every 3 seconds
-	updateBetStatuses();
-	setInterval(updateBetStatuses, 3000);
-
-</script>
