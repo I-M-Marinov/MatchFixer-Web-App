@@ -283,7 +283,7 @@
     font-size: 1rem;
 }
 
-#event-countdown {
+#event-countdown{
     font-size: 0.75rem;
     width: 37%;
     margin: 0 auto;
@@ -293,6 +293,19 @@
     background-color: tomato;
     color: ghostwhite !important;
     text-shadow: 1px 1px 1px black !important;
+}
+
+
+.event-countdown {
+    padding: 0.35em 0.55em !important;
+    font-size: 0.75em;
+    width: 27%;
+    margin: 0 auto;
+    border: 2px solid #f1d302;
+    border-radius: 0.5em;
+    background-color: orange !important;
+    color: black !important;
+    text-shadow: 1px 1px 1px white !important;
 }
 
 #home-header .bet-option {
