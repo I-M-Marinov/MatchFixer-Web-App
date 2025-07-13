@@ -98,7 +98,8 @@
 													    data-home-logo-url="@match.HomeTeamLogoUrl"
 													    data-away-logo-url="@match.AwayTeamLogoUrl"
 													    data-option="Home"
-													    data-odds="@match.HomeWinOdds">
+													    data-odds="@match.HomeWinOdds"
+													    data-start-time="@match.KickoffTime.ToString("o")">
 
 														<button class="bet-option">
 															Home
@@ -111,7 +112,9 @@
 													    data-home-logo-url="@match.HomeTeamLogoUrl"
 													    data-away-logo-url="@match.AwayTeamLogoUrl"
 													    data-option="Draw"
-													    data-odds="@match.DrawOdds">
+													    data-odds="@match.DrawOdds" 
+													    data-start-time="@match.KickoffTime.ToString("o")">
+
 														<button class="bet-option">
 															Draw
 														</button>
@@ -123,7 +126,9 @@
 													    data-home-logo-url="@match.HomeTeamLogoUrl"
 													    data-away-logo-url="@match.AwayTeamLogoUrl"
 													    data-option="Away"
-													    data-odds="@match.AwayWinOdds">
+													    data-odds="@match.AwayWinOdds"
+													    data-start-time="@match.KickoffTime.ToString("o")">
+													    
 														<button class="bet-option">
 															Away
 														</button>
