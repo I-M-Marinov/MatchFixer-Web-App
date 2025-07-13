@@ -27,13 +27,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const homeLogoUrl = el.dataset.homeLogoUrl;
                 const awayLogoUrl = el.dataset.awayLogoUrl;
                 const option = el.dataset.option;
+                const startTimeUtc = el.dataset.startTime;
+
                 const odds = parseFloat(el.dataset.odds);
 
-                if (matchId && home && away && homeLogoUrl && awayLogoUrl && option && !isNaN(odds)) {
-                    addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, option, odds);
+                if (matchId && home && away && homeLogoUrl && awayLogoUrl && option && startTimeUtc &&
+                    !isNaN(Date.parse(startTimeUtc)) && !isNaN(odds)) {
+                    addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc);
 
                     updateBadge();
-                }
+                } 
             });
         });
     });
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
 
-function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds) {
+function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
     // Find if any bet for same matchId exists
     const existingBet = betSlip.bets.find(b => b.matchId === matchId);
 
@@ -56,6 +59,7 @@ function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, opt
         existingBet.odds = odds;
         existingBet.homeLogoUrl = homeLogoUrl;
         existingBet.awayLogoUrl = awayLogoUrl;
+        existingBet.startTimeUtc = startTimeUtc;
 
         // Update server session
         removeBetFromSession(matchId, oldOption);
@@ -70,7 +74,8 @@ function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, opt
             homeLogoUrl,
             awayLogoUrl,
             option,
-            odds
+            odds,
+            startTimeUtc
         };
 
         betSlip.bets.push(betItem);
@@ -78,6 +83,7 @@ function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, opt
     }
 
     renderBetSlip();
+    updateBetStatuses();
     openBetSlip();
     animateLightning("lightning-flash");
 }
@@ -297,6 +303,7 @@ function renderBetSlip() {
 
     document.getElementById("totalOdds").innerText = totalOdds.toFixed(2);
     updatePotentialReturn();
+    updateBetStatuses();
     updateBadge();
 }
 
@@ -394,3 +401,69 @@ function getAntiForgeryToken() {
     const meta = document.querySelector('meta[name="csrf-token"]');
     return meta ? meta.getAttribute('content') : null;
 }
+
+function updateBetStatuses() {
+    const now = new Date();
+
+
+    document.querySelectorAll('.bet-item').forEach(item => {
+        let startTimeStr = item.dataset.startTime;
+
+        if (!startTimeStr) return;
+
+        if (!startTimeStr.endsWith('Z')) {
+            startTimeStr += 'Z';
+        }
+
+        const startTime = new Date(startTimeStr);
+
+        const statusBadge = item.querySelector('.status-badge');
+        const removeBtn = item.querySelector('#remove-bet-button');
+
+
+        if (!statusBadge || !removeBtn) return;
+
+        if (now >= startTime) {
+
+            statusBadge.textContent = 'Started';
+            statusBadge.className = 'badge status-badge bg-danger animate__animated animate__headShake animate__slower animate__infinite';
+
+            statusBadge.style.position = 'absolute';
+            statusBadge.style.right = '';
+            statusBadge.style.bottom = '0.4em';
+            statusBadge.style.left = '0.4em';
+
+            statusBadge.style.width = "auto";
+            statusBadge.style.maxWidth = "fit-content";
+            statusBadge.style.whiteSpace = "nowrap";
+
+            removeBtn.classList.add('animate__animated', 'animate__pulse', 'animate__infinite');
+            removeBtn.style.color = "rgba(220, 53, 69)";
+
+            const tooltip = removeBtn.querySelector('.custom-event-tooltip');
+            if (tooltip) {
+                tooltip.style.visibility = "visible";
+                tooltip.style.opacity = "1";
+                tooltip.style.backgroundColor = "rgba(220, 53, 69)";
+                tooltip.classList.add("animate__animated", "animate__fadeIn");
+            }
+
+
+
+        } else {
+            const diffMs = startTime - now;
+            const diffMinutes = Math.ceil(diffMs / 60000);
+
+            if (diffMinutes < 60) {
+                statusBadge.className = 'badge status-badge bg-danger event-countdown';
+                statusBadge.textContent = `Starts in ${diffMinutes}m`;
+            } else {
+                const diffHours = Math.ceil(diffMinutes / 60);
+                statusBadge.textContent = `Starts in ${diffHours}h`;
+            }
+        }
+
+    });
+}
+// Run every 3 seconds
+setInterval(updateBetStatuses, 3000);
