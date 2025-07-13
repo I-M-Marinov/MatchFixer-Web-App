@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
         amount: 0
     };
 
-
 function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
     // Find if any bet for same matchId exists
     const existingBet = betSlip.bets.find(b => b.matchId === matchId);
