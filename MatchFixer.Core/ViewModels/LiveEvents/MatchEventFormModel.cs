@@ -33,6 +33,9 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		[Required(ErrorMessage = ChooseValidAwayTeamOdds)]
 		[Range(1.01, 100)]
 		public decimal? AwayOdds { get; set; }
+
+		public List<LiveEventViewModel> CurrentEvents { get; set; } = new();
+
 	}
 
 }
