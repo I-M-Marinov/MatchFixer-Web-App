@@ -60,6 +60,48 @@ namespace MatchFixer.Core.Services
 			return events;
 		}
 
+		public async Task<List<LiveEventViewModel>> GetAllEventsAsync()
+		{
+			var now = DateTime.UtcNow;
+			var user = await _userContextService.GetCurrentUserAsync();
+			var cutoff = now.AddHours(-2.5);
+
+			var events = await _dbContext.MatchEvents
+				.Include(e => e.HomeTeam)
+				.Include(e => e.AwayTeam)
+				.Include(e => e.LiveResult)
+				.Where(e => e.LiveResult == null) // Don't return finished matches
+				.Where(e => e.MatchDate > cutoff) // Don't return matches that started >2h30m ago
+				.OrderBy(e => e.MatchDate)
+				.AsNoTracking()
+				.ToListAsync();
+
+			var viewModels = events.Select(e => new LiveEventViewModel
+			{
+				Id = e.Id,
+				HomeTeam = e.HomeTeam.Name,
+				AwayTeam = e.AwayTeam.Name,
+				KickoffTime = DateTime.SpecifyKind(e.MatchDate, DateTimeKind.Utc),
+				HomeWinOdds = e.HomeOdds ?? 0,
+				DrawOdds = e.DrawOdds ?? 0,
+				AwayWinOdds = e.AwayOdds ?? 0,
+				HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
+				AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
+				IsDerby = e.IsDerby,
+				IsCancelled = e.IsCancelled,
+				UserTimeZone = user.TimeZone,
+				MatchStatus = e.IsCancelled
+					? "Cancelled"
+					: e.MatchDate <= now
+						? "Started"
+						: "Live"
+			}).ToList();
+
+			return viewModels;
+		}
+
+
+
 		public async Task AddEventAsync(MatchEventFormModel model)
 		{
 			var homeTeam = await _dbContext.Teams.FindAsync(model.HomeTeamId);
@@ -121,6 +163,32 @@ namespace MatchFixer.Core.Services
 				);
 
 			return teamsByLeague;
+		}
+
+		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime kickoffTime)
+		{
+			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
+			if (match == null || match.IsCancelled)
+				return false;
+
+			match.HomeOdds = homeOdds;
+			match.DrawOdds = drawOdds;
+			match.AwayOdds = awayOdds;
+			match.MatchDate = kickoffTime;
+
+			await _dbContext.SaveChangesAsync();
+			return true;
+		}
+
+		public async Task<bool> CancelMatchEventAsync(Guid matchEventId)
+		{
+			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
+			if (match == null || match.IsCancelled)
+				return false;
+
+			match.IsCancelled = true;
+			await _dbContext.SaveChangesAsync();
+			return true;
 		}
 
 
