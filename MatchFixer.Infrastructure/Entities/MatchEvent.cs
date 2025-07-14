@@ -33,6 +33,7 @@ namespace MatchFixer.Infrastructure.Entities
 
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
 		public LiveMatchResult? LiveResult { get; set; }
+		public bool IsCancelled { get; set; } = false; 
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 	}
 }
