@@ -1,7 +1,5 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
-using MatchFixer.Infrastructure;
-using MatchFixer.Infrastructure.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +20,9 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			var model = new MatchEventFormModel
 			{
-				TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync()
+				TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync(),
+				CurrentEvents = await _matchEventService.GetAllEventsAsync()
+
 			};
 
 			return View(model);
@@ -71,5 +71,39 @@ namespace MatchFixer_Web_App.Controllers
 
 			return View(events);
 		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> EditMatchEvent(Guid id, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime matchDate)
+		{
+			var result = await _matchEventService.EditMatchEventAsync(id, homeOdds, drawOdds, awayOdds, matchDate);
+
+			if (!result)
+			{
+				TempData["Error"] = "Failed to edit the match. It might not exist or is already cancelled.";
+				return RedirectToAction("LiveEvents");
+			}
+
+			TempData["Success"] = "Match updated successfully.";
+			return RedirectToAction("LiveEvents");
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> CancelMatchEvent(Guid id)
+		{
+			var result = await _matchEventService.CancelMatchEventAsync(id);
+
+			if (!result)
+			{
+				TempData["Error"] = "Could not cancel the event.";
+				return RedirectToAction("LiveEvents");
+			}
+
+			TempData["Success"] = "Event cancelled.";
+			return RedirectToAction("LiveEvents");
+		}
+
+
 	}
 }
