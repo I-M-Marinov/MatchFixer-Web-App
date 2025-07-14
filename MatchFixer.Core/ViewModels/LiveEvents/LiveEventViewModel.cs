@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.Identity.Client;
-
-namespace MatchFixer.Core.ViewModels.LiveEvents
+﻿namespace MatchFixer.Core.ViewModels.LiveEvents
 {
 	public class LiveEventViewModel
 	{
@@ -16,6 +13,9 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public string? AwayTeamLogoUrl { get; set; }
 		public bool IsDerby { get; set; }
 		public string UserTimeZone { get; set; }
-	}
+		public bool IsCancelled { get; set; }
+		public string MatchStatus { get; set; } = "Scheduled"; 
 
+
+	}
 }
