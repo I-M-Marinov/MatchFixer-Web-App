@@ -3,7 +3,7 @@
 
 <div class="game-background"></div>
 
-<div class="position-relative"> <!-- Add this wrapper -->
+<div class="position-relative"> 
 	<div id="model-error-add-event" asp-validation-summary="ModelOnly"
 	     class="position-absolute start-50 translate-middle-x"
 	     style="top: -80px; white-space: nowrap; z-index: 1005;">
@@ -96,6 +96,104 @@
 	</div>
 </div>
 
+<div class="live-events-section mt-5 mx-auto" style="max-width: 1200px;">
+	<h3 class="text-center mb-4">Current Live Events</h3>
+
+	<table class="table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
+		<thead class="table-dark">
+			<tr>
+				<th>Date</th>
+				<th>Home Team</th>
+				<th>Away Team</th>
+				<th>Odds</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var ev in Model.CurrentEvents)
+			{
+				<tr>
+					<td>
+						@ev.KickoffTime.ToLocalTime().ToString("g")
+					</td>
+					<td>
+						<img src="@ev.HomeTeamLogoUrl" alt="@ev.HomeTeam Logo" style="width: 25px; margin-right: 5px;" />
+						@ev.HomeTeam
+					</td>
+					<td>
+						<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="width: 25px; margin-right: 5px;" />
+						@ev.AwayTeam
+					</td>
+					<td style="max-width: 250px;">
+						<div class="d-flex justify-content-between align-items-start flex-wrap">
+
+							<div class="d-flex flex-column gap-1">
+
+								<div class="d-flex gap-2">
+									<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+									       value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home"/>
+									<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+									       value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw"/>
+									<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+									       value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away"/>
+
+								</div>
+
+								<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
+								       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
+								       class="form-control form-control-sm" style="min-width: 260px;"/>
+							</div>
+
+							<div class="d-flex flex-column gap-1 align-items-end">
+								<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="Id" value="@ev.Id" />
+									<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id" />
+									<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id" />
+									<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id" />
+									<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id" />								
+									<button type="submit" class="btn btn-success btn-sm">Save</button>
+								</form>
+
+								<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="id" value="@ev.Id" />
+									<button type="submit" class="btn btn-outline-danger btn-sm"
+									        onclick="return confirm('Are you sure you want to void this event?');">
+										Void
+									</button>
+								</form>
+							</div>
+
+						</div>
+					</td>
+
+					<td>
+						@switch (ev.MatchStatus)
+						{
+							case "Live":
+								<span class="badge bg-success">Live</span>
+								break;
+							case "Started":
+								<span class="badge bg-warning text-dark">Started</span>
+								break;
+							case "Scheduled":
+								<span class="badge bg-secondary">Scheduled</span>
+								break;
+							case "Cancelled":
+								<span class="badge bg-danger">Cancelled</span>
+								break;
+						}
+					</td>
+
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+
+
 @section Scripts {
 	<partial name="_ValidationScriptsPartial" />
 
@@ -121,6 +219,29 @@
 
 		logoChange('home-team-select', 'home-team-logo', placeholderImage);
 		logoChange('away-team-select', 'away-team-logo', placeholderImage);
+
+		document.addEventListener('DOMContentLoaded', function () {
+
+			document.querySelectorAll("form[id^='editForm-']").forEach(form => {
+
+				form.addEventListener('submit', function (e) {
+
+					const id = form.querySelector("input[name='Id']").value;
+
+					const homeVal = document.getElementById(`HomeOddsInput-${id}`).value;
+					const drawVal = document.getElementById(`DrawOddsInput-${id}`).value;
+					const awayVal = document.getElementById(`AwayOddsInput-${id}`).value;
+					const dateVal = document.getElementById(`MatchDateInput-${id}`).value;
+
+					document.getElementById(`HiddenHomeOdds-${id}`).value = homeVal;
+					document.getElementById(`HiddenDrawOdds-${id}`).value = drawVal;
+					document.getElementById(`HiddenAwayOdds-${id}`).value = awayVal;
+					document.getElementById(`HiddenMatchDate-${id}`).value = dateVal;
+
+				});
+			});
+		});
+
 
 	</script>
 }
