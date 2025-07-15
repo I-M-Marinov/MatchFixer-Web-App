@@ -136,3 +136,67 @@
 #model-error-add-event.field-validation-error {
     display: block !important;
 }
+
+#live-events-table {
+    font-size: 0.65em;
+}
+
+table.responsive-stack {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.responsive-stack th,
+table.responsive-stack td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+
+    table.responsive-stack,
+    table.responsive-stack thead,
+    table.responsive-stack tbody,
+    table.responsive-stack th,
+    table.responsive-stack td,
+    table.responsive-stack tr {
+        display: block;
+        width: 100%;
+    }
+
+    table.responsive-stack thead tr {
+        display: none; 
+    }
+
+    table.responsive-stack tr {
+        margin-bottom: 1.5rem;
+        border: 1px solid #ccc;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+
+    table.responsive-stack td {
+        position: relative;
+        border: none;
+        border-bottom: 1px solid #eee;
+    }
+
+    table.responsive-stack td:first-of-type{
+        font-size: 1em !important;
+    }
+
+    table.responsive-stack td:last-child span{
+        border-bottom: 0;
+    }
+
+    table.responsive-stack td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding-left: 0.75rem;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+}
