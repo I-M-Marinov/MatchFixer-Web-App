@@ -50,7 +50,7 @@ namespace MatchFixer_Web_App.Controllers
 				return View(model);
 			}
 
-			return RedirectToAction(nameof(LiveEvents));
+			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
 
@@ -81,11 +81,11 @@ namespace MatchFixer_Web_App.Controllers
 			if (!result)
 			{
 				TempData["Error"] = "Failed to edit the match. It might not exist or is already cancelled.";
-				return RedirectToAction("LiveEvents");
+				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
 			TempData["Success"] = "Match updated successfully.";
-			return RedirectToAction("LiveEvents");
+			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
 		[HttpPost]
@@ -97,11 +97,11 @@ namespace MatchFixer_Web_App.Controllers
 			if (!result)
 			{
 				TempData["Error"] = "Could not cancel the event.";
-				return RedirectToAction("LiveEvents");
+				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
 			TempData["Success"] = "Event cancelled.";
-			return RedirectToAction("LiveEvents");
+			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
 
