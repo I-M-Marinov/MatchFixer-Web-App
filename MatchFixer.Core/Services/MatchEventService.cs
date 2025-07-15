@@ -35,8 +35,7 @@ namespace MatchFixer.Core.Services
 			var user = await _userContextService.GetCurrentUserAsync();
 
 			var events = await _dbContext.MatchEvents
-				.Where(e => e.MatchDate > now) // Only upcoming matches
-				.Where(e => e.LiveResult == null) // No result submitted yet
+				.Where(e => e.MatchDate > now && e.LiveResult == null && e.IsCancelled != true) // Only upcoming matches + result submitted yet + matches that are not already voided
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.OrderBy(e => e.MatchDate)
@@ -70,8 +69,7 @@ namespace MatchFixer.Core.Services
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.Include(e => e.LiveResult)
-				.Where(e => e.LiveResult == null) // Don't return finished matches
-				.Where(e => e.MatchDate > cutoff) // Don't return matches that started >2h30m ago
+				.Where(e => e.MatchDate > now && e.LiveResult == null && e.IsCancelled != true && e.MatchDate > cutoff) // Only upcoming matches + result submitted yet + matches that are not already voided
 				.OrderBy(e => e.MatchDate)
 				.AsNoTracking()
 				.ToListAsync();
