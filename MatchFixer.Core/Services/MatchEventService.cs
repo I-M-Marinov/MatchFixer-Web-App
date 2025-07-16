@@ -69,7 +69,7 @@ namespace MatchFixer.Core.Services
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.Include(e => e.LiveResult)
-				.Where(e => e.MatchDate > now && e.LiveResult == null && e.IsCancelled != true && e.MatchDate > cutoff) // Only upcoming matches + result submitted yet + matches that are not already voided
+				.Where(e => e.LiveResult == null && e.IsCancelled != true && e.MatchDate > cutoff) // Only upcoming matches + result submitted yet + matches that are not already voided
 				.OrderBy(e => e.MatchDate)
 				.AsNoTracking()
 				.ToListAsync();
