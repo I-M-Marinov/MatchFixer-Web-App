@@ -80,11 +80,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["Error"] = "Failed to edit the match. It might not exist or is already cancelled.";
+				TempData["ErrorMessage"] = "Failed to edit the match. It might not exist or is already cancelled.";
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			TempData["Success"] = "Match updated successfully.";
+			TempData["SuccessMessage"] = "Match updated successfully.";
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
@@ -96,11 +96,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["Error"] = "Could not cancel the event.";
+				TempData["ErrorMessage"] = "Could not cancel the event.";
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			TempData["Success"] = "Event cancelled.";
+			TempData["SuccessMessage"] = "Event cancelled.";
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
