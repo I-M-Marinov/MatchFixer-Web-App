@@ -188,7 +188,11 @@
 													<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id" />
 													<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id" />
 													<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id" />
-													<button type="submit" class="btn btn-success btn-sm">Save</button>
+													<button type="submit" class="btn btn-success btn-sm update-event-btn">
+														<div class="icon">
+															<i class="bx bxs-save"></i>
+														</div>
+													</button>
 												</form>
 
 												@if (ev.IsCancelled != true)
@@ -196,9 +200,12 @@
 													<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@ev.Id" />
-														<button type="submit" class="btn btn-outline-danger btn-sm"
+														<button type="submit" class="btn btn-outline-danger btn-sm update-event-btn"
 																onclick="return confirm('Are you sure you want to void this event?');">
-															Void
+															<div class="icon">
+																<i class="ri-delete-bin-2-fill"></i>
+																<div class="label"></div>
+															</div>
 														</button>
 													</form>
 												}
