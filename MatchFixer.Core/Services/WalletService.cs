@@ -191,7 +191,6 @@ namespace MatchFixer.Core.Services
 			var transaction = WalletTransactionFactory.CreateBetPlacedTransaction(wallet.Id, userId, amount);
 
 			await _dbContext.WalletTransactions.AddAsync(transaction);
-			await _dbContext.SaveChangesAsync();
 
 			return (true, AmountDeductedForTheBet);
 		}
