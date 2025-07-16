@@ -3,6 +3,23 @@
 
 <div class="game-background"></div>
 
+<div class="border-0 rounded-4 p-2 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
+
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
+
+</div>
+
 <div class="position-relative"> 
 	<div id="model-error-add-event" asp-validation-summary="ModelOnly"
 	     class="position-absolute start-50 translate-middle-x"
