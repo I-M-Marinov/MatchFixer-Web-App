@@ -93,7 +93,19 @@ namespace MatchFixer.Infrastructure.Factories
 			};
 		}
 
-
+		public static WalletTransaction CreateBetRefundedTransaction(Guid walletId, Guid userId, decimal amount, Guid betSlipId, string? description = null)
+		{
+			return new WalletTransaction
+			{
+				Id = Guid.NewGuid(),
+				WalletId = walletId,
+				Amount = amount,
+				TransactionType = WalletTransactionType.Refund, 
+				Reference = $"User: {userId} - Wallet: {walletId} - Refund for BetSlip: {betSlipId}",
+				Description = description ?? $"Refund for cancelled bet slip ({betSlipId})",
+				CreatedAt = DateTime.UtcNow
+			};
+		}
 	}
 
 }
