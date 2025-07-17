@@ -36,5 +36,9 @@ namespace MatchFixer.Infrastructure.Entities
 
 		[Comment("Odds for this particular pick")]
 		public decimal Odds { get; set; }
+
+		[Required]
+		[Comment("Status of the bet")]
+		public BetStatus Status { get; set; } = BetStatus.Pending; // default to pending status 
 	}
 }
