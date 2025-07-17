@@ -102,6 +102,19 @@ public class BettingService : IBettingService
 			.Where(bs => bs.UserId == userId)
 			.ToListAsync();
 
+
+		foreach (var slip in betSlips)
+		{
+			slip.Bets = slip.Bets
+				.Where(b => b.Status != BetStatus.Voided)
+				.ToList();
+
+		}
+
+		betSlips = betSlips
+			.Where(bs => bs.Bets.Any())
+			.ToList();
+
 		var timeZoneId = _sessionService.GetUserTimezone();
 
 
@@ -147,5 +160,47 @@ public class BettingService : IBettingService
 			}).ToList()
 		});
 	}
+
+	public async Task<bool> CancelBetsForMatchAsync(Guid matchEventId)
+	{
+		var relatedBets = await _dbContext.Bets
+			.Include(b => b.BetSlip)
+			.Where(b => b.MatchEventId == matchEventId && b.Status == BetStatus.Pending)
+			.ToListAsync();
+
+		if (!relatedBets.Any())
+			return true;
+
+		var betSlipGroups = relatedBets.GroupBy(b => b.BetSlipId);
+
+		foreach (var group in betSlipGroups)
+		{
+			var betSlip = group.First().BetSlip;
+
+			var allBetsInSlip = await _dbContext.Bets
+				.Where(b => b.BetSlipId == betSlip.Id && b.Status == BetStatus.Pending)
+				.ToListAsync();
+
+			if (allBetsInSlip.Count == group.Count()) 
+			{
+				foreach (var bet in group)
+					bet.Status = BetStatus.Voided;
+
+				await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
+
+				betSlip.IsSettled = true;
+				betSlip.WinAmount = 0;
+			}
+			else
+			{
+				foreach (var bet in group)
+					bet.Status = BetStatus.Voided;
+
+			}
+		}
+
+		return true;
+	}
+
 
 }
