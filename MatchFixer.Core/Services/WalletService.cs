@@ -231,5 +231,23 @@ namespace MatchFixer.Core.Services
 			return true;
 		}
 
+		public async Task<bool> RefundBetAsync(Guid userId, decimal amount, Guid betSlipId)
+		{
+			var wallet = await _dbContext.Wallets
+				.Include(w => w.Transactions)
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return false;
+
+			wallet.Balance += amount;
+
+			var transaction = WalletTransactionFactory.CreateBetRefundedTransaction(wallet.Id, userId, amount, betSlipId);
+
+			await _dbContext.WalletTransactions.AddAsync(transaction);
+
+			return true;
+		}
+
 	}
 }
