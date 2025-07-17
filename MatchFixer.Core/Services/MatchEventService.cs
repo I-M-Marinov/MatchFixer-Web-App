@@ -18,14 +18,17 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext; 
 		private readonly IUserContextService _userContextService;
+		private readonly IBettingService _bettingService;
 
 
 		public MatchEventService(
 			MatchFixerDbContext dbContext, 
-			 IUserContextService userContextService)
+			 IUserContextService userContextService,
+			 IBettingService bettingService)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
+			_bettingService = bettingService;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -185,10 +188,15 @@ namespace MatchFixer.Core.Services
 				return false;
 
 			match.IsCancelled = true;
+
+			var betsCancelled = await _bettingService.CancelBetsForMatchAsync(matchEventId);
+
+			if (!betsCancelled)
+				return false;
+
 			await _dbContext.SaveChangesAsync();
 			return true;
 		}
-
 
 	}
 }
