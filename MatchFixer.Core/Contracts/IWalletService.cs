@@ -15,6 +15,7 @@ namespace MatchFixer.Core.Contracts
 		Task<(bool Success, string Message)> DeductForBetAsync(Guid userId, decimal amount);
 		Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription);
 		Task<bool> AwardBirthdayBonusAsync(Guid userId);
+		Task<bool> RefundBetAsync(Guid userId, decimal amount, Guid betSlipId);
 
 	}
 }
