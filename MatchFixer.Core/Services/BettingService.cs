@@ -6,6 +6,8 @@ using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using MatchFixer.Infrastructure.Contracts;
 
+using static MatchFixer.Common.GeneralConstants.BettingServiceConstants;
+
 namespace MatchFixer.Core.Services;
 
 public class BettingService : IBettingService
@@ -29,10 +31,10 @@ public class BettingService : IBettingService
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto)
 	{
 		if (betSlipDto == null || betSlipDto.Bets == null || !betSlipDto.Bets.Any())
-			return ("No bets provided.", false);
+			return (NoBetsProvided, false);
 
 		if (betSlipDto.Amount <= 0)
-			return ("Bet amount must be greater than zero.", false);
+			return (BetAmountMustBeGreaterThanZero, false);
 
 		// Create the BetSlip first
 		var betSlip = new BetSlip
@@ -61,7 +63,7 @@ public class BettingService : IBettingService
 
 			// Validate if all events in the betlsip are actually live ( started events fall off site and cannot be bet on ) 
 			if (DateTime.UtcNow >= matchEvent.MatchDate)
-				return ($"An event or events in your slip already started ! Choose other events to bet on.", false);
+				return (EventAlreadyStartedInSlip, false);
 
 			// Validate pick is a known enum value
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
@@ -84,7 +86,7 @@ public class BettingService : IBettingService
 		await _dbContext.BetSlips.AddAsync(betSlip);
 		await _dbContext.SaveChangesAsync();
 
-		return ("Your betting slip was successfully submitted! Good Luck!", true);
+		return (BetSlipSubmittedSuccessfully, true);
 	}
 
 	public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
@@ -131,8 +133,8 @@ public class BettingService : IBettingService
 				? bs.Bets.Select(b => b.Odds).Aggregate((acc, odd) => acc * odd)
 				: 1,
 			Status = bs.IsSettled
-				? (bs.WinAmount > 0 ? "Won" : "Lost")
-				: "Pending",
+				? (bs.WinAmount > 0 ? nameof(BetStatus.Won) : nameof(BetStatus.Lost))
+				: nameof(BetStatus.Pending),
 
 			Bets = bs.Bets.Select(b =>
 			{
