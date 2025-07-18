@@ -3,6 +3,8 @@ using MatchFixer.Core.ViewModels.LiveEvents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
+
 namespace MatchFixer_Web_App.Controllers
 {
 	public class EventController : Controller
@@ -66,7 +68,7 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (Exception e)
 			{
-				TempData["ErrorMessage"] = "Failed to get the live events!"; 
+				TempData["ErrorMessage"] = FailedToGetLiveEvents;
 			}
 
 			return View(events);
@@ -80,11 +82,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["ErrorMessage"] = "Failed to edit the match. It might not exist or is already cancelled.";
+				TempData["ErrorMessage"] = MatchUpdateFailed;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			TempData["SuccessMessage"] = "Match updated successfully.";
+			TempData["SuccessMessage"] = MatchUpdateSuccessful;
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
@@ -96,11 +98,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["ErrorMessage"] = "Could not cancel the event.";
+				TempData["ErrorMessage"] = EventCancellationUnsuccessful;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			TempData["SuccessMessage"] = "Event cancelled.";
+			TempData["SuccessMessage"] = EventCancellationSuccessful;
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
