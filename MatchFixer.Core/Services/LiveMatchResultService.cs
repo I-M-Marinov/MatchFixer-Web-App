@@ -63,13 +63,16 @@ namespace MatchFixer.Core.Services
 				.Where(bs => !bs.IsSettled && bs.Bets.Any(b => b.MatchEventId == match.Id))
 				.ToListAsync();
 
+
 			foreach (var slip in betSlips)
 			{
 				bool allResolved = true;
 				bool allWinning = true;
 				decimal totalOdds = 1.0m;
 
-				foreach (var bet in slip.Bets)
+				var activeBets = slip.Bets.Where(b => b.Status != BetStatus.Voided).ToList();
+
+				foreach (var bet in activeBets)
 				{
 					var betMatch = await _dbContext.MatchEvents
 						.Include(m => m.LiveResult)
