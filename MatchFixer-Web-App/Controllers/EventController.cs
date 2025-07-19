@@ -78,11 +78,18 @@ namespace MatchFixer_Web_App.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> EditMatchEvent(Guid id, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime matchDate)
 		{
-			var result = await _matchEventService.EditMatchEventAsync(id, homeOdds, drawOdds, awayOdds, matchDate);
-
-			if (!result)
+			try
 			{
-				TempData["ErrorMessage"] = MatchUpdateFailed;
+				var result = await _matchEventService.EditMatchEventAsync(id, homeOdds, drawOdds, awayOdds, matchDate);
+
+				if (!result)
+				{
+					return RedirectToAction(nameof(AddMatchEvent));
+				}
+			}
+			catch (Exception e)
+			{
+				TempData["ErrorMessage"] = e.Message;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
