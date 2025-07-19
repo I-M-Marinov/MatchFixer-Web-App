@@ -170,7 +170,15 @@ namespace MatchFixer.Core.Services
 		{
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
 			if (match == null || match.IsCancelled)
+			{
+				throw new Exception(MatchUpdateFailed);
+			}
+			
+			if (match.HomeOdds == homeOdds && match.DrawOdds == drawOdds && match.AwayOdds == awayOdds &&
+			    match.MatchDate == kickoffTime)
+			{
 				return false;
+			}
 
 			match.HomeOdds = homeOdds;
 			match.DrawOdds = drawOdds;
