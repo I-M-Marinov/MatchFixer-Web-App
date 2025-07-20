@@ -49,14 +49,14 @@
 
 			<h2 id="fix-number">Fix @Model.QuestionNumber of @Model.TotalQuestions</h2>
 			
-			<div class="d-flex flex-column align-items-center justify-content-center">
+			<div class="d-flex flex-column align-items-center justify-content-center" id="league-logo">
 				@if (!string.IsNullOrEmpty(leagueLogoUrl))
 				{
-					<img src="@leagueLogoUrl" id="leagueLogoImage" style="width: auto; height: 60px;"/>
+					<img src="@leagueLogoUrl" id="leagueLogoImage" style="width: 60px; height: 60px;"/>
 				}
 			</div>
-			<div class="row align-items-center justify-content-center">
-				<div class="col-4 text-center">
+			<div class="row d-flex align-items-center justify-content-center">
+				<div class="col-4 text-center d-flex flex-column justify-content-center align-items-center">
 					<div class="team-logo-wrapper mx-auto mb-3">
 						<img src="@Model.HomeTeamLogo" class="team-logo" alt="@Model.HomeTeam logo"/>
 					</div>
@@ -70,7 +70,7 @@
 				</div>
 
 				<div class="col-1 text-center">
-					<img src="/images/live-events/versus.png" alt="@Model.HomeTeam" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
+					<img src="/images/live-events/versus.png" alt="@Model.HomeTeam" style="width: 40px; height: 40px;" class="mb-2" id="versus-img"/>
 					@if ((bool)Model.IsDerby)
 					{
 						<img class="animate__animated animate__heartBeat animate__slower animate__infinite" id="derby-match-game-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 50px;" class="img-fluid mb-2" />
