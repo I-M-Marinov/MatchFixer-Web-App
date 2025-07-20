@@ -2,12 +2,27 @@
 
 <div class="background-profile"></div>
 
+<div class="sponsor-container">
+	<div class="sponsor-track" id="sponsorTrack">
+		<div class="sponsor-set" id="sponsorSet">
+			@for (int i = 0; i < 6; i++)
+			{
+				<img src="https://media.api-sports.io/football/leagues/39.png" alt="Sponsor 1" />
+				<img src="https://media.api-sports.io/football/leagues/140.png" alt="Sponsor 2" />
+				<img src="https://media.api-sports.io/football/leagues/78.png" alt="Sponsor 3" />
+				<img src="https://media.api-sports.io/football/leagues/135.png" alt="Sponsor 4" />
+				<img src="https://media.api-sports.io/football/teams/33.png" alt="Sponsor 5" />
+			}
 
-<div class="card custom-card shadow-lg rounded-4 p-4">
+		</div>
+	</div>
+</div>
+
+<div class="card custom-card shadow-lg rounded-4 p-4" id="game-over-container">
 	<div class="card-body text-center">
 		<div class="flex-column justify-content-center mt-2">
 			<div class="d-flex flex-column justify-content-center align-items-center mt-2 flex-wrap gap-2">
-				<h2>Game Over!</h2>
+				<h2>Game Over ! Better luck next time !</h2>
 				<p>Your final score: 
 					<strong>@Model</strong>
 					points</p>
@@ -18,4 +33,34 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	
+	document.addEventListener('DOMContentLoaded', function () {
+		const track = document.getElementById('sponsorTrack');
+		const set = document.getElementById('sponsorSet');
+
+		const clone = set.cloneNode(true);
+		track.appendChild(clone);
+
+		let setWidth = set.offsetWidth;
+		let scrollPos = 0;
+		const speed = 0.25; // speed of the carousel
+
+		function step() {
+			scrollPos += speed;
+			if (scrollPos >= setWidth) {
+				scrollPos = 0;
+			}
+			track.style.transform = `translateX(-${scrollPos}px)`;
+			requestAnimationFrame(step);
+		}
+
+		window.addEventListener('load', () => {
+			setWidth = set.offsetWidth;
+			requestAnimationFrame(step);
+		});
+	});
+
+</script>
 
