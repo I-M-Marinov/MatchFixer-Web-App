@@ -22,6 +22,7 @@
 			["Estrela"] = "C.F. Estrela da Amadora",
 			["AVS"] = "AVS Futebol SAD",
 			["Gil Vicente"] = "Gil Vicente F.C.",
+			["Rio Ave"] = "Rio Ave F.C.",
 
 
 			// German clubs
