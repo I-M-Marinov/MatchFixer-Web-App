@@ -5,7 +5,7 @@
     background: #ffffff;
     padding: 0.15em 1.5em;
     border: 2px dotted #0dab76;
-    border-radius: 0.5em 1em;
+    border-radius: 0.5em 1em 0.5em 1em;
 }
 
 .betslip-submitted p {
@@ -14,6 +14,10 @@
     margin: 0 auto;
     padding: 0.2em 1em;
     text-shadow: 3px 4px 5px #0dab76 !important;
+}
+
+.slip-container .card-header {
+    background-color: #125fa7 !important;
 }
 
 .slip-container {
@@ -27,7 +31,7 @@
 }
 
 .slip-border-lost {
-    border: 1px solid #8B0000 !important;
+    border: 1px solid #b55656 !important;
     box-shadow: 0 0 0 0.11rem #dc3545, 0 0 0 0.22rem #a71d2a !important;
 }
 
@@ -35,7 +39,6 @@
     border: 1px solid #ffcc00 !important;
     box-shadow: 0 0 0 0.11rem #ffc107, 0 0 0 0.22rem #ffdd57 !important;
 }
-
 
 .custom-card-user-bets p {
     font-size: 0.80em;
@@ -131,10 +134,19 @@
     background-image: url('/images/bet-slip/noise.png');
     background-size: contain;
     background-color: #00ff21;
-    opacity: 90%;
+    opacity: 80%;
     padding: 0.15rem;
     color: #ffffff;
     border-radius: 0em 0em 0.375rem 0.375rem;
+}
+
+.card-header-bet-totals{
+    border-radius: 0.25em !important;
+}
+
+.card-header-bet-totals.open {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 .alert-custom-info {
