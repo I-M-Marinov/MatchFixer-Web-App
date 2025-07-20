@@ -70,7 +70,7 @@ else
 					        <div class="w-100 text-center">
 						        @if (betSlip.Status == "Won")
 						        {
-							        <span class="text-black">
+							        <span class="text-white">
 								        <i class="bi bi-check-circle me-1 text-black"></i>
 								        <strong>Won:</strong> €@(betSlip.WinAmount?.ToString("0.00") ?? "0.00")
 							        </span>
@@ -111,12 +111,12 @@ else
 								        @betSlip.TotalOdds.ToString("F2")x
 							        </p>
 							        <p>
-								        <strong>@(betSlip.Status == "Won" ? "Won:" : "Potential Win:")</strong>
 								        @{
 									        var displayedAmount = betSlip.WinAmount.HasValue
 										        ? Math.Floor(betSlip.WinAmount.Value * 100) / 100
 										        : Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
 								        }
+								        <strong>@(betSlip.Status == "Won" ? "Won:" : "Potential Win:")</strong>
 								        €@displayedAmount.ToString("0.00")
 							        </p>
 						        </div>
@@ -199,28 +199,43 @@ else
 
 
 <script>
-	document.addEventListener('DOMContentLoaded', function () {
-		// Tooltips
+		document.addEventListener('DOMContentLoaded', function () {
+		// Initialize tooltips
 		const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 		tooltipTriggerList.forEach(function (tooltipTriggerEl) {
 			new bootstrap.Tooltip(tooltipTriggerEl);
 		});
 
-		// Collapse all open betslips before switching tabs
-		const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+		// Handle collapse border radius
+		document.querySelectorAll('.collapse').forEach(collapse => {
+			collapse.addEventListener('show.bs.collapse', function () {
+				const header = collapse.previousElementSibling;
+				if (header?.classList.contains('card-header-bet-totals')) {
+					header.classList.add('open');
+				}
+			});
 
-		tabButtons.forEach(tab => {
-			tab.addEventListener('hide.bs.tab', () => {
-				const openCollapses = document.querySelectorAll('.collapse.show');
-				openCollapses.forEach(collapse => {
-					const bsCollapse = bootstrap.Collapse.getInstance(collapse);
-					if (bsCollapse) {
-						bsCollapse.hide(); // collapse immediately
-					} else {
-						new bootstrap.Collapse(collapse, { toggle: false }).hide();
-					}
-				});
+			collapse.addEventListener('hide.bs.collapse', function () {
+				const header = collapse.previousElementSibling;
+				if (header?.classList.contains('card-header-bet-totals')) {
+					header.classList.remove('open');
+				}
 			});
 		});
+
+		// Collapse open betslips before tab switch
+		const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+			tabButtons.forEach(tab => {
+				tab.addEventListener('hide.bs.tab', () => {
+					const openCollapses = document.querySelectorAll('.collapse.show');
+					openCollapses.forEach(collapse => {
+						const bsCollapse = bootstrap.Collapse.getInstance(collapse);
+						if (bsCollapse) {
+							bsCollapse.hide();
+						}
+					});
+				});
+			});
 	});
+
 </script>
