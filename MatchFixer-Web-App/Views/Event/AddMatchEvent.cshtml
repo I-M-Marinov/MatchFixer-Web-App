@@ -153,55 +153,62 @@
 										@ev.KickoffTime.ToLocalTime().ToString("g")
 									</td>
 									<td>
-										<img src="@ev.HomeTeamLogoUrl" alt="@ev.HomeTeam Logo" style="width: 30px; margin-right: 5px;" />
+										<img src="@ev.HomeTeamLogoUrl" alt="@ev.HomeTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
 										@ev.HomeTeam
 									</td>
 									<td>
-										<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="width: 30px; margin-right: 5px;" />
+										<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
 										@ev.AwayTeam
 									</td>
 									<td style="max-width: 350px;">
 										<div class="d-flex justify-content-between align-items-start flex-wrap">
 
 											<div class="d-flex flex-column gap-1">
+												
+												@{
+													var isDisabled = ev.MatchStatus == "Started" ? "disabled" : "";
+												}
 
 												<div class="d-flex gap-2">
 													<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														   value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home" />
+														   value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home" @isDisabled />
 													<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														   value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw" />
+														   value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw" @isDisabled />
 													<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														   value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away" />
+														   value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away" @isDisabled />
 
 												</div>
 
 												<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
-													   value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
-													   class="form-control form-control-sm" style="min-width: 240px;" />
+												       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
+													   class="form-control form-control-sm" style="min-width: 240px;" @isDisabled />
 											</div>
 
 											<div class="d-flex flex-column gap-1 align-items-end">
-												<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
-													@Html.AntiForgeryToken()
-													<input type="hidden" name="Id" value="@ev.Id" />
-													<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id" />
-													<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id" />
-													<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id" />
-													<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id" />
-													<button type="submit" class="btn btn-success btn-sm update-event-btn">
-														<div class="icon">
-															<i class="bx bxs-save"></i>
-														</div>
-													</button>
-												</form>
+												@if (ev.MatchStatus != "Started")
+												{
+													<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="Id" value="@ev.Id"/>
+														<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
+														<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
+														<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
+														<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
+														<button type="submit" class="btn btn-success btn-sm update-event-btn">
+															<div class="icon">
+																<i class="bx bxs-save"></i>
+															</div>
+														</button>
+													</form>
+												}
 
 												@if (ev.IsCancelled != true)
 												{
 													<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
 														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@ev.Id" />
+														<input type="hidden" name="id" value="@ev.Id"/>
 														<button type="submit" class="btn btn-outline-danger btn-sm update-event-btn"
-																onclick="return confirm('Are you sure you want to void this event?');">
+														        onclick="return confirm('Are you sure you want to void this event?');">
 															<div class="icon">
 																<i class="ri-delete-bin-2-fill"></i>
 																<div class="label"></div>
