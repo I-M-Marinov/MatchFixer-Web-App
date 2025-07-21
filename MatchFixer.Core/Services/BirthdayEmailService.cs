@@ -1,7 +1,6 @@
 ﻿using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
-using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -57,13 +56,12 @@ public class BirthdayEmailService : BackgroundService
 
 					if (eligibleUsers.Any())
 					{
-						const string subject = "🎂 Happy Birthday from MatchFixer!";
 						var logoUrl = LogoUrl;
 
 						foreach (var user in usersWithBirthdayToday)
 						{
 							string emailBody = EmailTemplates.BirthdayEmail(logoUrl, user.FullName);
-							await emailService.SendEmailAsync(user.Email, subject, emailBody);
+							await emailService.SendEmailAsync(user.Email, EmailTemplates.SubjectHappyBirthdayFromMatchFixer, emailBody);
 							_logger.LogInformation($"Sent birthday email to {user.Email}");
 
 							await walletService.AwardBirthdayBonusAsync(user.Id);
