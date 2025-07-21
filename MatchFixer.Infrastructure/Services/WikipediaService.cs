@@ -216,12 +216,18 @@ namespace MatchFixer.Infrastructure.Services
 			// Common infobox logo field patterns
 			var logoPatterns = new[]
 			{
-				@"\|\s*logo\s*=\s*([^\|\r\n]+)",
-				@"\|\s*crest\s*=\s*([^\|\r\n]+)",
-				@"\|\s*badge\s*=\s*([^\|\r\n]+)",
-				@"\|\s*image\s*=\s*([^\|\r\n]+)",
-				@"\|\s*logo_image\s*=\s*([^\|\r\n]+)",
-				@"\|\s*logo_black\s*=\s*([^\|\r\n]+)"
+				@"\|\s*logo\s*=\s*\[\[\s*(?:File|Image):([^|\]]+)",
+				@"\|\s*crest\s*=\s*\[\[\s*(?:File|Image):([^|\]]+)",
+				@"\|\s*badge\s*=\s*\[\[\s*(?:File|Image):([^|\]]+)",
+				@"\|\s*image\s*=\s*\[\[\s*(?:File|Image):([^|\]]+)",
+				@"\|\s*logo_image\s*=\s*\[\[\s*(?:File|Image):([^|\]]+)",
+				@"\|\s*logo_black\s*=\s*\[\[\s*(?:File|Image):([^|\]]+)",
+				@"\|\s*logo\s*=\s*([^\|\r\n\]]+)",
+				@"\|\s*crest\s*=\s*([^\|\r\n\]]+)",
+				@"\|\s*badge\s*=\s*([^\|\r\n\]]+)",
+				@"\|\s*image\s*=\s*([^\|\r\n\]]+)",
+				@"\|\s*logo_image\s*=\s*([^\|\r\n\]]+)",
+				@"\|\s*logo_black\s*=\s*([^\|\r\n\]]+)"
 			};
 
 			foreach (var pattern in logoPatterns)
