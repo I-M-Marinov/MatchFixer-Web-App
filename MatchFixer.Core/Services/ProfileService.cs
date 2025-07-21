@@ -271,7 +271,7 @@ namespace MatchFixer.Core.Services
 
 				var emailBody = EmailTemplates.EmailUpdateConfirmation(logoUrl, callbackUrl);
 
-				await _emailSender.SendEmailAsync(newEmail, "MatchFixer - Your email address was changed", emailBody);
+				await _emailSender.SendEmailAsync(newEmail, EmailTemplates.SubjectEmailAddressChanged, emailBody);
 
 				return (true, EmailUpdatedSuccessfully);
 			}
@@ -530,14 +530,13 @@ namespace MatchFixer.Core.Services
 
 		private async Task SendPasswordChangedEmailAsync(ApplicationUser user)
 		{
-			var emailSubject = "MatchFixer - Your account password was changed";
 
 			var userTime = _timezoneService.ConvertToUserTime(DateTime.UtcNow, user.TimeZone);
 			var formattedTime = userTime.ToString("dd MMM yyyy HH:mm");
 
 			var emailBody = EmailTemplates.PasswordChanged(LogoUrl, formattedTime);
 
-			await _emailSender.SendEmailAsync(user.Email!, emailSubject, emailBody);
+			await _emailSender.SendEmailAsync(user.Email!, EmailTemplates.SubjectAccountPasswordChanged, emailBody);
 		}
 
 
