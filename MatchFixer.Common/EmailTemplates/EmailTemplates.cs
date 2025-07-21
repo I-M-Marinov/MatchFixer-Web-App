@@ -5,6 +5,13 @@ namespace MatchFixer.Common.EmailTemplates
 	public static class EmailTemplates
 	{
 
+		public const string SubjectPleaseConfirmEmail = "MatchFixer - Please confirm your email"; // Welcome email & Resend email confirmation
+		public const string SubjectEmailAddressChanged = "MatchFixer - Your email address was changed"; // Email subject for the email changed emails
+		public const string SubjectAccountPasswordChanged = "MatchFixer - Your account password was changed"; // Email subject for the password changed emails
+		public const string SubjectPasswordResetRequested = "MatchFixer - Password reset requested"; // Email subject for the password reset requested emails
+		public const string SubjectHappyBirthdayFromMatchFixer = "🎂 Happy Birthday from MatchFixer!"; // Email subject for the birthday emails
+
+
 		public static string WelcomeEmail(string logoUrl, string callbackUrl)
 		{
 			return $@"
