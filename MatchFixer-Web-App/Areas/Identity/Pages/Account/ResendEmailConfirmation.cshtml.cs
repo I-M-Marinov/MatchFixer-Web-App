@@ -10,12 +10,12 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using System;
+
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
+
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using static MatchFixer.Common.EmailTemplates.EmailMessages;
 
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
@@ -67,7 +67,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
+                ModelState.AddModelError(string.Empty, "Verification email was resent. Please check your email.");
                 return Page();
             }
 
@@ -85,11 +85,9 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
 			var emailBody = EmailTemplates.EmailConfirmation(logoUrl, callbackUrl);
 
-			await _emailSender.SendEmailAsync(
-                Input.Email,
-                "MatchFixer - Confirm your email",emailBody);
+			await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPleaseConfirmEmail, emailBody);
 
-            ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
+            ModelState.AddModelError(string.Empty, VerificationEmailResent);
             return Page();
         }
     }
