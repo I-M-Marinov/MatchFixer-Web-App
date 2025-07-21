@@ -10,7 +10,7 @@
         height: 100px !important;
     }
 
-    .card-body .text-center {
+    #matchfix-card-body {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -61,7 +61,7 @@
         min-width: unset;
     }
 
-    .card-body .text-center{
+    #matchfix-card-body {
         display: flex;
         flex-direction: column;
         justify-content: center;
