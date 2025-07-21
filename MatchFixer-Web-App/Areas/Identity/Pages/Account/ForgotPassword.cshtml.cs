@@ -13,6 +13,7 @@ using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Common.EmailTemplates;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using static MatchFixer.Common.EmailTemplates.EmailMessages;
 
 
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
@@ -76,11 +77,9 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
                 var emailBody = EmailTemplates.PasswordResetEmail(logoUrl, callbackUrl);
 
-				await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "MatchFixer - Reset Password",emailBody);
+				await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPasswordResetRequested, emailBody);
 
-				ModelState.AddModelError(string.Empty, "An email with a reset link was sent to the specified email.");
+				ModelState.AddModelError(string.Empty, PasswordLinkSentToSpecifiedEmail);
 
 				return Page();
 			}
