@@ -168,8 +168,8 @@ function renderBetSlip() {
         homeLogo.alt = `${bet.homeTeam} Logo`;
         homeLogo.title = `${bet.homeTeam}`;
         homeLogo.classList.add("rounded-full", "mr-4", "object-cover");
-        homeLogo.style.width = "60px";
-        homeLogo.style.height = "auto";
+        homeLogo.style.width = "auto";
+        homeLogo.style.height = "60px";
         homeLogo.style.marginLeft = "0.2em";
 
         const versus = document.createElement("img");
@@ -185,8 +185,8 @@ function renderBetSlip() {
         awayLogo.alt = `${bet.awayTeam} Logo`;
         awayLogo.title = `${bet.awayTeam}`;
         awayLogo.classList.add("rounded-full", "ml-2", "object-cover");
-        awayLogo.style.width = "60px";
-        awayLogo.style.height = "auto";
+        awayLogo.style.width = "auto";
+        awayLogo.style.height = "60px";
 
         teamsDiv.appendChild(homeLogo);
         teamsDiv.appendChild(versus);
@@ -456,8 +456,13 @@ function updateBetStatuses() {
             if (diffMinutes < 60) {
                 statusBadge.className = 'badge status-badge bg-danger event-countdown';
                 statusBadge.textContent = `Starts in ${diffMinutes}m`;
+            } else if (diffMinutes >= 1440) {
+                const diffDays = Math.ceil(diffMinutes / 1440);
+                statusBadge.className = 'badge status-badge bg-warning event-countdown';
+                statusBadge.textContent = `Starts in ${diffDays}d`;
             } else {
                 const diffHours = Math.ceil(diffMinutes / 60);
+                statusBadge.className = 'badge status-badge bg-warning event-countdown';
                 statusBadge.textContent = `Starts in ${diffHours}h`;
             }
         }
