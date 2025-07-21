@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using static MatchFixer.Common.EmailTemplates.EmailMessages;
 
 
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
@@ -191,12 +192,12 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
                     var emailBody = EmailTemplates.WelcomeEmail(logoUrl, callbackUrl);
 
-					await _emailSender.SendEmailAsync(Input.Email, "MatchFixer - Please confirm your email", emailBody);
+					await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPleaseConfirmEmail, emailBody);
 
 
 					if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-	                    TempData["SuccessMessage"] = "We have sent you a confirmation email. Please confirm your account."; // Store success message
+	                    TempData["SuccessMessage"] = ConfirmationEmailSent; // Store success message
 						return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
 					}
                     else
