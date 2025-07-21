@@ -21,9 +21,9 @@
 
     string summaryClass = currentTab switch
     {
-        "Pending" => "bg-warning text-dark pending-betslips",
-		"Won" => "bg-success text-dark won-betslips",
-		"Lost" => "bg-danger text-white lost-betslips",
+		"Pending" => "bg-warning text-dark pending-betslips potential-wins-summary",
+		"Won" => "bg-success text-dark won-betslips wins-summary",
+		"Lost" => "bg-danger text-white lost-betslips lost-summary",
 		_ => "bg-secondary text-dark"
     };
 }
@@ -71,22 +71,22 @@ else
 						        @if (betSlip.Status == "Won")
 						        {
 							        <span class="text-white">
-								        <i class="bi bi-check-circle me-1 text-black"></i>
+								        <i class="bi bi-check-circle me-1 text-white"></i>
 								        <strong>Won:</strong> €@(betSlip.WinAmount?.ToString("0.00") ?? "0.00")
 							        </span>
 						        }
 						        else if (betSlip.Status == "Lost")
 						        {
 							        <span class="text-white">
-								        <i class="bi bi-x-circle me-1 text-white"></i>
+										<i class="bi bi-x-circle me-1 text-tomato"></i>
 								        <strong>Lost:</strong> €@betSlip.Amount.ToString("0.00")
 							        </span>
 						        }
 						        else if (betSlip.Status == "Pending")
 						        {
 							        var potentialWin = Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
-							        <span class="text-black">
-								        <i class="bi bi-clock me-1 text-black"></i>
+							        <span class="text-black text-white">
+								        <i class="bi bi-clock me-1 text-yellow"></i>
 								        <strong>Potential Win:</strong> €@potentialWin.ToString("0.00")
 							        </span>
 						        }

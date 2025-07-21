@@ -25,9 +25,10 @@
 .wiki-tooltip-content {
     max-width: 500px;
     max-height: 500px;
-    background: white;
-    border: 1px solid #3370a8;
-    border-radius: 0.5rem; 
+    background: #2A7B9B;
+    background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+    border: 2px solid #3370a8;
+    border-radius: 0.5rem;
     box-shadow: 0 0.25rem 0.55rem rgba(0, 0, 0, 0.09);
     padding: 1rem;
 }
@@ -44,7 +45,8 @@
 
 .wiki-tooltip-content h5 {
     font-size: 1.1rem;
-    color: #212529;
+    border: 1px solid #0d6efd;
+    color: #000000;
     margin-bottom: 0.85rem;
     display: flex;
     justify-content: center;
@@ -53,13 +55,13 @@
     color: #000000;
     border-radius: 0.5rem;
     padding: 0.2rem;
-    text-shadow: 0px 1px 1px #3370a8;
+    text-shadow: 0px 1px 2px white;
 }
 
 
 .wiki-tooltip-content p {
     font-size: 0.8rem;
-    color: #495057;
+    color: #1a1a1a;
     margin-bottom: 1rem;
 }
 
