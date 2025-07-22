@@ -31,6 +31,26 @@
 		</div>
 
 
+		<div class="d-flex flex-column align-items-center gap-3 mb-4 position-relative">
+
+			<div class="w-100 d-flex justify-content-center">
+				<div class="input-group" style="max-width: 400px;">
+					<span class="input-group-text bg-white border-end-0">
+						<i class="bi bi-search"></i> 
+					</span>
+					<input type="text" id="matchSearch" class="form-control border-start-0" placeholder="Search team name..." />
+				</div>
+			</div>
+
+			<div id="datePillContainer" class="d-flex flex-wrap justify-content-center gap-2 position-relative" style="z-index: 1;">
+			</div>
+
+		</div>
+
+		
+
+
+
 		@if (!Model.Any())
 		{
 			<div class="alert alert-info text-center">
@@ -312,6 +332,91 @@
 		el.addEventListener('animationend', () => {
 			el.classList.add('mask-rotated');
 		});
+	});
+
+	function filterMatches() {
+		const searchQuery = document.getElementById('matchSearch').value.toLowerCase();
+
+		document.querySelectorAll('.event-card').forEach(card => {
+			const home = card.querySelector('[data-team-name]').dataset.teamName.toLowerCase();
+			const away = card.querySelectorAll('[data-team-name]')[1].dataset.teamName.toLowerCase();
+
+			const matchesSearch = home.includes(searchQuery) || away.includes(searchQuery);
+
+			card.closest('.col').style.display = matchesSearch ? '' : 'none';
+		});
+	}
+
+	function getUniqueEventDates() {
+		const dateSet = new Set();
+
+		document.querySelectorAll('.event-card').forEach(card => {
+			const kickoff = new Date(card.dataset.kickoff);
+			const dateStr = kickoff.toISOString().split('T')[0]; // format: YYYY-MM-DD
+			dateSet.add(dateStr);
+		});
+
+		return Array.from(dateSet).sort();
+	}
+
+
+	document.getElementById('matchSearch').addEventListener('input', filterMatches);
+
+	function renderDatePills() {
+		const container = document.getElementById('datePillContainer');
+		container.innerHTML = '';
+
+		const allBtn = document.createElement('button');
+		allBtn.textContent = 'All';
+		allBtn.className = 'custom-date-pill me-2 active';
+		allBtn.dataset.date = 'all';
+		container.appendChild(allBtn);
+
+		getUniqueEventDates().forEach(date => {
+			const btn = document.createElement('button');
+			const dateObj = new Date(date);
+			const displayText = formatDisplayDate(dateObj); // Jul 24th Thu
+
+			btn.textContent = displayText;
+			btn.className = 'custom-date-pill me-2';
+			btn.dataset.date = date;
+			container.appendChild(btn);
+		});
+	}
+
+	function getOrdinalSuffix(day) {
+		const j = day % 10, k = day % 100;
+		if (j === 1 && k !== 11) return day + "st";
+		if (j === 2 && k !== 12) return day + "nd";
+		if (j === 3 && k !== 13) return day + "rd";
+		return day + "th";
+	}
+
+	function formatDisplayDate(dateObj) {
+		const month = dateObj.toLocaleString(undefined, { month: 'short' }); // "Aug"
+		const weekday = dateObj.toLocaleString(undefined, { weekday: 'short' }); // "Sat"
+		const day = getOrdinalSuffix(dateObj.getDate()); // "30th"
+		return `${month} ${day} ${weekday}`; // "Aug 30th Sat"
+	}
+
+	document.addEventListener('click', function (e) {
+		if (e.target.matches('#datePillContainer button')) {
+			const selectedDate = e.target.dataset.date;
+
+			document.querySelectorAll('#datePillContainer button').forEach(btn =>
+				btn.classList.remove('active'));
+			e.target.classList.add('active');
+
+			document.querySelectorAll('.event-card').forEach(card => {
+				const kickoffDate = card.dataset.kickoff.split('T')[0];
+				const matches = (selectedDate === 'all') || (kickoffDate === selectedDate);
+				card.closest('.col').style.display = matches ? '' : 'none';
+			});
+		}
+	});
+
+	document.addEventListener('DOMContentLoaded', () => {
+		renderDatePills();
 	});
 
 </script>
