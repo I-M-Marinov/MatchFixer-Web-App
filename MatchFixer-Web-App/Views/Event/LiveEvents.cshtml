@@ -29,7 +29,10 @@
 
 		<div class="game-background">
 		</div>
-
+		
+		<div id="noMatchesMessage" class="no-matches-message text-center">
+			No matching teams found.
+		</div>
 
 		<div class="d-flex flex-column align-items-center gap-3 mb-4 position-relative">
 
@@ -38,9 +41,10 @@
 					<span class="input-group-text bg-white border-end-0">
 						<i class="bi bi-search"></i> 
 					</span>
-					<input type="text" id="matchSearch" class="form-control border-start-0" placeholder="Search team name..." />
+					<input type="text" id="matchSearch" class="form-control border-start-0" placeholder="Search team name..." oninput="filterMatches()" />
 				</div>
 			</div>
+			
 
 			<div id="datePillContainer" class="d-flex flex-wrap justify-content-center gap-2 position-relative" style="z-index: 1;">
 			</div>
@@ -334,17 +338,30 @@
 		});
 	});
 
+
 	function filterMatches() {
 		const searchQuery = document.getElementById('matchSearch').value.toLowerCase();
+		const cards = document.querySelectorAll('.event-card');
 
-		document.querySelectorAll('.event-card').forEach(card => {
-			const home = card.querySelector('[data-team-name]').dataset.teamName.toLowerCase();
+		let anyMatch = false;
+
+		cards.forEach(card => {
+			const home = card.querySelectorAll('[data-team-name]')[0].dataset.teamName.toLowerCase();
 			const away = card.querySelectorAll('[data-team-name]')[1].dataset.teamName.toLowerCase();
 
 			const matchesSearch = home.includes(searchQuery) || away.includes(searchQuery);
 
 			card.closest('.col').style.display = matchesSearch ? '' : 'none';
+
+			if (matchesSearch) anyMatch = true;
 		});
+
+		const message = document.getElementById('noMatchesMessage');
+		if (anyMatch) {
+			message.classList.remove('visible');
+		} else {
+			message.classList.add('visible');
+		}
 	}
 
 	function getUniqueEventDates() {
