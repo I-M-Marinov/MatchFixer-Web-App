@@ -96,3 +96,34 @@
         background-position: 0% 50%;
     }
 }
+
+
+@keyframes splat-move-half-backstop {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    75% {
+        background-position: 50% 50%;
+    }
+
+    100% {
+        background-position: 50% 50%;
+    }
+}
+
+@keyframes splat-expand {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.9;
+    }
+
+    100% {
+        transform: scale(6);
+        opacity: 1;
+    }
+}
