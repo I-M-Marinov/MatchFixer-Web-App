@@ -26,95 +26,95 @@
 	     style="top: -80px; white-space: nowrap; z-index: 1005;">
 	</div>
 
-<div class="d-flex justify-content-center align-items-start flex-wrap gap-1 mt-1">
+	<div class="d-flex justify-content-center align-items-start flex-wrap gap-1 mt-1">
 
-	<div class="add-match-event-container mt-4">
-		<form id="team-selection-form" asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
-			@Html.AntiForgeryToken()
-			<div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
-				<div class="col">
-					<div class="text-center my-2">
-						<img id="home-team-logo"
-						     src="/images/add-match/question-mark.png"
-						     alt="Home Team Logo"
-						     class="team-logo" 
-						     style="max-height: 75px; margin-bottom:1em;" />			    
+		<div class="add-match-event-container mt-4">
+			<form id="team-selection-form" asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
+				@Html.AntiForgeryToken()
+				<div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
+					<div class="col">
+						<div class="text-center my-2">
+							<img id="home-team-logo"
+							     src="/images/add-match/question-mark.png"
+							     alt="Home Team Logo"
+							     class="team-logo" 
+							     style="max-height: 75px; margin-bottom:1em;" />			    
+						</div>
+						<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
+							<option value="">-- Select Home Team --</option>
+							@foreach (var league in Model.TeamsByLeague)
+							{
+								<optgroup class="add-team-league-label" label="@league.Key">
+									@foreach (var team in league.Value)
+									{
+										var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+										var teamName = team.Text.Split('|').FirstOrDefault();
+										<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+									}
+								</optgroup>
+							}
+						</select>
+						<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
 					</div>
-					<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
-						<option value="">-- Select Home Team --</option>
-						@foreach (var league in Model.TeamsByLeague)
-						{
-							<optgroup class="add-team-league-label" label="@league.Key">
-								@foreach (var team in league.Value)
-								{
-									var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-									var teamName = team.Text.Split('|').FirstOrDefault();
-									<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
-								}
-							</optgroup>
-						}
-					</select>
-					<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
-				</div>
 			   
-				<div class="col">
-					<div class="text-center my-2">
-						<img id="away-team-logo" 
-						     src="/images/add-match/question-mark.png" 
-						     alt="Away Team Logo" 
-						     class="team-logo"
-						     style="max-height: 75px; margin-bottom:1em;"  />
+					<div class="col">
+						<div class="text-center my-2">
+							<img id="away-team-logo" 
+							     src="/images/add-match/question-mark.png" 
+							     alt="Away Team Logo" 
+							     class="team-logo"
+							     style="max-height: 75px; margin-bottom:1em;"  />
+						</div>
+						<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
+							<option value="">-- Select Away Team --</option>
+							@foreach (var league in Model.TeamsByLeague)
+							{
+								<optgroup class="add-team-league-label" label="@league.Key">
+									@foreach (var team in league.Value)
+									{
+										var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+										var teamName = team.Text.Split('|').FirstOrDefault();
+										<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+									}
+								</optgroup>
+							}
+						</select>
+						<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
 					</div>
-					<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
-						<option value="">-- Select Away Team --</option>
-						@foreach (var league in Model.TeamsByLeague)
-						{
-							<optgroup class="add-team-league-label" label="@league.Key">
-								@foreach (var team in league.Value)
-								{
-									var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-									var teamName = team.Text.Split('|').FirstOrDefault();
-									<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
-								}
-							</optgroup>
-						}
-					</select>
-					<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
 				</div>
-			</div>
 
-			<div id="dateAndTime" class="mb-3">
-				<label asp-for="MatchDate" class="form-label">Date and Time</label>
-				<input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
-				<span asp-validation-for="MatchDate" class="bg-info validation-add-event centered-validation"></span>
-			</div>
-
-			<div class="d-flex justify-content-center align-items-center row mb-3">
-				<div class="home-odds col">
-					<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
-					<input asp-for="HomeOdds" class="form-control"/>
-					<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
+				<div id="dateAndTime" class="mb-3">
+					<label asp-for="MatchDate" class="form-label">Date and Time</label>
+					<input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
+					<span asp-validation-for="MatchDate" class="bg-info validation-add-event centered-validation"></span>
 				</div>
-				<div class="draw-odds col">
-					<label asp-for="DrawOdds" class="form-label">Draw</label>
-					<input asp-for="DrawOdds" class="form-control"/>
-					<span asp-validation-for="DrawOdds" class="bg-info validation-add-event centered-validation"></span>
 
+				<div class="d-flex justify-content-center align-items-center row mb-3">
+					<div class="home-odds col">
+						<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
+						<input asp-for="HomeOdds" class="form-control"/>
+						<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
+					</div>
+					<div class="draw-odds col">
+						<label asp-for="DrawOdds" class="form-label">Draw</label>
+						<input asp-for="DrawOdds" class="form-control"/>
+						<span asp-validation-for="DrawOdds" class="bg-info validation-add-event centered-validation"></span>
+
+					</div>
+					<div class="away-odds col">
+						<label asp-for="AwayOdds" class="form-label">Away Team Win</label>
+						<input asp-for="AwayOdds" class="form-control"/>
+						<span asp-validation-for="AwayOdds" class="bg-info validation-add-event centered-validation"></span>
+
+					</div>
 				</div>
-				<div class="away-odds col">
-					<label asp-for="AwayOdds" class="form-label">Away Team Win</label>
-					<input asp-for="AwayOdds" class="form-control"/>
-					<span asp-validation-for="AwayOdds" class="bg-info validation-add-event centered-validation"></span>
 
-				</div>
-			</div>
+				<button type="submit" class="btn btn-success">Add event</button>
+			</form>
+		</div>
+	
 
-			<button type="submit" class="btn btn-success">Add event</button>
-		</form>
-	</div>
-
-
-		<div class="live-events-section mt-5 mx-auto" style="max-width: 1400px;">
+		<div class="live-events-section mt-3 mx-auto" style="max-width: 1400px;">
 			<h3 class="text-center mb-4">Current Live Events</h3>
 
 			@if (Model.CurrentEvents.Any())
@@ -123,106 +123,111 @@
 
 					<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle" id="live-events-table">
 						<thead class="table-dark">
-							<tr>
-								<th>Status</th>
-								<th>Date & Time</th>
-								<th>Home Team</th>
-								<th>Away Team</th>
-								<th>Update</th>
-							</tr>
+						<tr>
+							<th>Status</th>
+							<th>Date & Time</th>
+							<th>Home Team</th>
+							<th>Away Team</th>
+							<th>Update</th>
+						</tr>
 						</thead>
 						<tbody>
-							@foreach (var ev in Model.CurrentEvents)
-							{
-								<tr>
-									<td>
-										@switch (ev.MatchStatus)
-										{
-											case "Live":
-												<span class="badge bg-success">Live</span>
-												break;
-											case "Started":
-												<span class="badge bg-warning text-dark">Started</span>
-												break;
-											case "Cancelled":
-												<span class="badge bg-danger">Cancelled</span>
-												break;
-										}
-									</td>
-									<td>
-										@ev.KickoffTime.ToLocalTime().ToString("g")
-									</td>
-									<td>
-										<img src="@ev.HomeTeamLogoUrl" alt="@ev.HomeTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
-										@ev.HomeTeam
-									</td>
-									<td>
-										<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
-										@ev.AwayTeam
-									</td>
-									<td style="max-width: 350px;">
-										<div class="d-flex justify-content-between align-items-start flex-wrap">
+						@foreach (var ev in Model.CurrentEvents)
+						{
+							<tr>
+								<td>
+									@switch (ev.MatchStatus)
+									{
+										case "Live":
+											<span class="badge bg-success">Live</span>
+											break;
+										case "Started":
+											<span class="badge bg-warning text-dark">Started</span>
+											break;
+										case "Cancelled":
+											<span class="badge bg-danger">Cancelled</span>
+											break;
+									}
+								</td>
+								<td>
+									@ev.KickoffTime.ToLocalTime().ToString("g")
+								</td>
+								<td>
+									<img src="@ev.HomeTeamLogoUrl" alt="@ev.HomeTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
+									@ev.HomeTeam
+								</td>
+								<td>
+									<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
+									@ev.AwayTeam
+								</td>
+								<td style="max-width: 350px;">
+									<div class="d-flex justify-content-between align-items-start flex-wrap">
 
-											<div class="d-flex flex-column gap-1">
+										<div class="d-flex flex-column gap-1">
 												
-												@{
-													var isDisabled = ev.MatchStatus == "Started" ? "disabled" : "";
-												}
+											@{
+												var isDisabled = ev.MatchStatus == "Started" ? "disabled" : "";
+											}
 
-												<div class="d-flex gap-2">
-													<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														   value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home" @isDisabled />
-													<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														   value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw" @isDisabled />
-													<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														   value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away" @isDisabled />
+											<div class="d-flex gap-2">
+												<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+												       value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home" @isDisabled />
+												<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+												       value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw" @isDisabled />
+												<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+												       value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away" @isDisabled />
 
-												</div>
-
-												<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
-												       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
-													   class="form-control form-control-sm" style="min-width: 240px;" @isDisabled />
 											</div>
 
-											<div class="d-flex flex-column gap-1 align-items-end">
-												@if (ev.MatchStatus != "Started")
-												{
-													<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="Id" value="@ev.Id"/>
-														<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
-														<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
-														<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
-														<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
-														<button type="submit" class="btn btn-success btn-sm update-event-btn">
-															<div class="icon">
-																<i class="bx bxs-save"></i>
-															</div>
-														</button>
-													</form>
-												}
-
-												@if (ev.IsCancelled != true)
-												{
-													<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@ev.Id"/>
-														<button type="submit" class="btn btn-outline-danger btn-sm update-event-btn"
-														        onclick="return confirm('Are you sure you want to void this event?');">
-															<div class="icon">
-																<i class="ri-delete-bin-2-fill"></i>
-																<div class="label"></div>
-															</div>
-														</button>
-													</form>
-												}
-											</div>
-
+											<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
+											       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
+											       class="form-control form-control-sm" style="min-width: 240px;" @isDisabled />
 										</div>
-									</td>
 
-								</tr>
-							}
+										<div class="d-flex flex-column gap-1 align-items-end">
+											@if (ev.MatchStatus != "Started")
+											{
+												<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="Id" value="@ev.Id"/>
+													<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
+													<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
+													<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
+													<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
+													<button type="submit" class="btn btn-success btn-sm update-event-btn">
+														<div class="icon">
+															<i class="bx bxs-save" title="Save event"></i>
+														</div>
+													</button>
+												</form>
+											}
+
+											@if (ev.IsCancelled != true)
+											{
+												<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="id" value="@ev.Id"/>
+
+													<button type="button" 
+													        class="btn btn-outline-danger btn-sm update-event-btn"
+													        data-bs-toggle="modal" 
+													        data-bs-target="#confirmCancelModal"
+													        data-event-id="@ev.Id">
+														<div class="icon">
+															<i class="ri-delete-bin-2-fill"></i>
+															<div class="label"></div>
+														</div>
+													</button>
+
+												</form>
+											}
+										</div>
+
+									</div>
+								</td>
+
+							</tr>
+						}
 						</tbody>
 					</table>
 				</div>
@@ -240,7 +245,30 @@
 </div>
 
 
-
+<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content border-danger">
+			<div class="modal-header text-danger fw-bold">
+				<h5 class="modal-title" id="confirmCancelLabel">
+					<i class="bi bi-exclamation-triangle-fill me-2"></i>
+					Confirm Cancellation
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body text-center">
+				Are you sure you want to void this event?
+			</div>
+			<div class="modal-footer justify-content-center">
+				<form id="cancelEventForm" asp-action="CancelMatchEvent" asp-controller="Event" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="cancelEventId" value="" />
+					<button type="submit" class="btn btn-danger">Yes, Void</button>
+				</form>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 @section Scripts {
@@ -291,6 +319,19 @@
 			});
 		});
 
+
+
+		document.addEventListener('DOMContentLoaded', function () {
+
+			const confirmModal = document.getElementById('confirmCancelModal');
+
+			confirmModal.addEventListener('show.bs.modal', function (event) {
+				const button = event.relatedTarget;
+				const eventId = button.getAttribute('data-event-id');
+				document.getElementById('cancelEventId').value = eventId;
+			});
+
+		});
 
 	</script>
 }
