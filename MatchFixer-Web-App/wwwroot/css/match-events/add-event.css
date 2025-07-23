@@ -208,4 +208,38 @@ table.responsive-stack td {
 .update-event-btn{
     margin-left: 0.3rem;
 }
- 
+
+
+
+.modal-header{
+    display:flex;
+    justify-content: center;
+}
+
+#confirmCancelLabel{
+    font-size: 1.2rem !important;
+}
+
+
+#confirmCancelModal .modal-content {
+    animation: pulse-border-red 2s infinite;
+}
+
+#confirmCancelModal .modal-body {
+    font-size: 1.1rem !important;
+}
+
+#confirmCancelModal .btn-close {
+    font-size: 0.85em;
+    margin: 0.35em;
+}
+
+#confirmCancelModal .btn-danger,
+#confirmCancelModal .btn-secondary
+{
+    font-size: 0.90rem !important;
+}
+
+#confirmCancelModal .btn-close:hover {
+    color: aqua !important;
+}
