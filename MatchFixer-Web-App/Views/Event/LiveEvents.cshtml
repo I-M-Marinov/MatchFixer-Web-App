@@ -39,7 +39,7 @@
 			<div class="w-100 d-flex justify-content-center">
 				<div class="input-group" style="max-width: 400px;">
 					<span class="input-group-text bg-white border-end-0">
-						<i class="bi bi-search"></i> 
+						<i class="bi bi-search animate__animated animate__flipInX"></i>
 					</span>
 					<input type="text" id="matchSearch" class="form-control border-start-0" placeholder="Search team name..." oninput="filterMatches()" />
 				</div>
@@ -89,7 +89,7 @@
 										<div class="tw-flex tw-justify-around tw-items-center mb-2 gap-4">
 											<div class="text-center">
 												<div class="tw-flex  tw-flex-col  tw-items-center  tw-justify-center">
-													<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam"/>
+													<img src="@match.HomeTeamLogoUrl" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo animate__animated animate__heartBeat" data-team-name="@match.HomeTeam" />
 													<div class="event-team-name">@match.HomeTeam</div>
 												</div>
 											</div>
@@ -99,7 +99,7 @@
 
 											<div class="text-center">
 												<div class="flex flex-col items-center justify-center object-fit-contain">
-													<img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam"/>
+													<img src="@match.AwayTeamLogoUrl" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo animate__animated animate__heartBeat" data-team-name="@match.AwayTeam" />
 													<div class="event-team-name">@match.AwayTeam</div>
 												</div>
 											</div>
@@ -115,7 +115,7 @@
 											<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden">
 												<thead class="tw-bg-gray-50 tw-shadow">
 												<tr>
-													<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger" data-column-index="0"
+														<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInLeft" data-column-index="0"
 													    data-match-id="@match.Id"
 													    data-home="@match.HomeTeam"
 													    data-away="@match.AwayTeam"
@@ -129,7 +129,7 @@
 															Home
 														</button>
 													</th>
-													<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger" data-column-index="1"
+														<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="1"
 													    data-match-id="@match.Id"
 													    data-home="@match.HomeTeam"
 													    data-away="@match.AwayTeam"
@@ -143,7 +143,7 @@
 															Draw
 														</button>
 													</th>
-													<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger" data-column-index="2"
+														<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInRight" data-column-index="2"
 													    data-match-id="@match.Id"
 													    data-home="@match.HomeTeam"
 													    data-away="@match.AwayTeam"
@@ -162,7 +162,7 @@
 												<tbody class="tw-divide-y tw-divide-gray-200">
 												<tr>
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold"
+															<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
 														      data-away="@match.AwayTeam"
@@ -174,7 +174,7 @@
 														</span>
 													</td>
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold"
+															<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
 														      data-away="@match.AwayTeam"
@@ -186,7 +186,7 @@
 														</span>
 													</td>
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold"
+															<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
 														      data-away="@match.AwayTeam"
@@ -410,6 +410,21 @@
 	}
 
 	function formatDisplayDate(dateObj) {
+		const today = new Date();
+		const tomorrow = new Date();
+		tomorrow.setDate(today.getDate() + 1);
+
+		const todayStr = today.toISOString().split('T')[0];
+		const tomorrowStr = tomorrow.toISOString().split('T')[0];
+		const dateStr = dateObj.toISOString().split('T')[0];
+
+		if (dateStr === todayStr) {
+			return "Today";
+		}
+		if (dateStr === tomorrowStr) {
+			return "Tomorrow";
+		}
+
 		const month = dateObj.toLocaleString(undefined, { month: 'short' }); // "Aug"
 		const weekday = dateObj.toLocaleString(undefined, { weekday: 'short' }); // "Sat"
 		const day = getOrdinalSuffix(dateObj.getDate()); // "30th"
