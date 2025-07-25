@@ -85,7 +85,7 @@
 			["Napoli"] = "SSC Napoli",
 			["Fiorentina"] = "ACF Fiorentina",
 			["Sassuolo"] = "US Sassuolo Calcio",
-			["Torino"] = "Torino F.C.",
+			["Torino"] = "Torino FC",
 			["Udinese"] = "Udinese Calcio",
 			["Verona"] = "Hellas Verona FC",
 			["Salernitana"] = "US Salernitana 1919",
