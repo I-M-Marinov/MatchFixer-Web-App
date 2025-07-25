@@ -85,8 +85,37 @@ function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, opt
     updateBetStatuses();
     openBetSlip();
     animateLightning("lightning-flash");
-}
+    animateBetSlipBadge();
 
+}
+function animateBetSlipBadge() {
+    const btn = document.getElementById('betSlipToggle');
+    if (!btn) return;
+
+    btn.classList.remove("animate__animated", "animate__rubberBand");
+
+    void btn.offsetWidth;
+
+    btn.classList.add("animate__animated", "animate__rubberBand");
+
+    btn.addEventListener("animationend", () => {
+        btn.classList.remove("animate__animated", "animate__rubberBand");
+    }, { once: true });
+}
+function animateBetSlipBadgeOnRemoval() {
+    const btn = document.getElementById('betSlipToggle');
+    if (!btn) return;
+
+    btn.classList.remove("animate__animated", "animate__bounceIn");
+
+    void btn.offsetWidth;
+
+    btn.classList.add("animate__animated", "animate__bounceIn");
+
+    btn.addEventListener("animationend", () => {
+        btn.classList.remove("animate__animated", "animate__bounceIn");
+    }, { once: true });
+}
 function addBetToSession(betItem) {
     fetch('/BetSlip/Add', {
         method: 'POST',
@@ -109,7 +138,6 @@ function addBetToSession(betItem) {
         }
     }).catch(err => console.error("Fetch error adding bet:", err));
 }
-
 function renderBetSlip() {
     const container = document.getElementById("betSlipContent");
     const amountContainer = document.getElementById("amountContainer");
@@ -168,6 +196,7 @@ function renderBetSlip() {
             await clearAllBetsFromSession();
             betSlip.bets = [];
             updateBadge();
+            animateBetSlipBadgeOnRemoval();
             animateLightning("lightning-fade");
             renderBetSlip();
         };
@@ -341,12 +370,12 @@ function renderBetSlip() {
     updateBetStatuses();
     updateBadge();
 }
-
 function removeBet(matchId, selectedOption) {
     // Remove locally
     betSlip.bets = betSlip.bets.filter(b => !(b.matchId === matchId && b.option === selectedOption));
 
     updateBadge();
+    animateBetSlipBadgeOnRemoval();
 
     // Remove from session server-side
     removeBetFromSession(matchId, selectedOption);
@@ -354,6 +383,7 @@ function removeBet(matchId, selectedOption) {
     animateLightning("lightning-fade");
     renderBetSlip();
 }
+
 async function clearAllBetsFromSession() {
 
     const token = getAntiForgeryToken();
@@ -367,7 +397,6 @@ async function clearAllBetsFromSession() {
         }
     });
 }
-
 function removeBetFromSession(matchId, selectedOption) {
 
     const token = getAntiForgeryToken();
@@ -382,16 +411,15 @@ function removeBetFromSession(matchId, selectedOption) {
         body: JSON.stringify({ MatchId: matchId, SelectedOption: selectedOption })
     });
 }
-
 function updatePotentialReturn() {
     const amount = parseFloat(document.getElementById("betAmount").value || "0");
     const totalOdds = parseFloat(document.getElementById("totalOdds").innerText || "0");
     const potential = (amount * totalOdds).toFixed(2);
     document.getElementById("potentialReturn").innerText = potential;
 }
-
 function updateBadge() {
     const betSlipBadge = document.getElementById('betCountBadge');
+    const betSlipBadgeContainer = document.getElementById('betSlipToggle');
 
     if (!betSlipBadge) return;
 
@@ -400,27 +428,18 @@ function updateBadge() {
 
     if (hasBets) {
         betSlipBadge.style.display = "inline-block";
-
-        betSlipBadge.classList.remove("animate__animated", "animate__bounce", "animate__infinite");
-
-        void betSlipBadge.offsetWidth;
-
-        betSlipBadge.classList.add("animate__animated", "animate__bounce", "animate__infinite");
+        betSlipBadgeContainer.classList.add("animate__animated", "animate__rubberBand");
 
     } else {
         betSlipBadge.style.display = "none";
-        betSlipBadge.classList.remove("animate__animated", "animate__bounce", "animate__infinite");
+        betSlipBadgeContainer.classList.remove("animate__animated", "animate__rubberBand");
     }
 }
-
-
-
 function openBetSlip() {
     const panel = document.getElementById("betSlipPanel");
     panel?.classList.add("open");
     panel?.classList.remove("d-none");
 }
-
 function closeBetSlip() {
     const panel = document.getElementById("betSlipPanel");
     panel?.classList.remove("open");
@@ -428,7 +447,6 @@ function closeBetSlip() {
 }
 
 document.getElementById("closeBetSlip")?.addEventListener("click", closeBetSlip);
-
 function changeBetAmount(button, delta) {
     const input = button.parentElement.querySelector('input');
     const value = parseInt(input.value || '0', 10);
@@ -436,7 +454,6 @@ function changeBetAmount(button, delta) {
     input.value = newValue;
     updatePotentialReturn();
 }
-
 function animateLightning(effectClass) {
     const lightningIcon = document.querySelector(".lightning-icon-all-odds");
     if (lightningIcon) {
@@ -447,7 +464,6 @@ function animateLightning(effectClass) {
         });
     }
 }
-
 function initializeBetSlip() {
     fetch('/BetSlip/Get')
         .then(response => response.json())
@@ -460,12 +476,10 @@ function initializeBetSlip() {
         })
         .catch(err => console.error("Failed to load bet slip:", err));
 }
-
 function getAntiForgeryToken() {
     const input = document.querySelector('input[name="__RequestVerificationToken"]');
     return input ? input.value : null;
 }
-
 function updateBetStatuses() {
     const now = new Date();
 
