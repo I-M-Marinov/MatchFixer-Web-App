@@ -93,5 +93,17 @@ namespace MatchFixer_Web_App.Controllers
 			return Ok();
 		}
 
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public IActionResult RemoveAll()
+		{
+			var betSlip = _sessionService.GetBetSlipState() ?? new BetSlipState();
+
+			betSlip.Bets.Clear();
+			_sessionService.SetBetSlipState(betSlip);
+
+			return Ok();
+		}
+
 	}
 }
