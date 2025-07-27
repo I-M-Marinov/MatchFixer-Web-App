@@ -47,12 +47,14 @@
 
              const getSpinnerHtml = () => `
                  <div class="wiki-tooltip-inner animate__animated animate__slideInDown">
-                     <div class="d-flex justify-content-center py-3">
+                     <div class="d-flex justify-content-center align-items-center py-3">
                          <div class="spinner-sequence">
                              <div class="spinner-grow text-brand-blue" style="animation-delay: 0s"></div>
-                             <div class="spinner-grow text-brand-green" style="animation-delay: 0.2s"></div>
+                             <div class="spinner-grow text-brand-green" style="animation-delay: 0.2s"></div> 
                              <div class="spinner-grow text-brand-blue" style="animation-delay: 0.4s"></div>
                              <div class="spinner-grow text-brand-green" style="animation-delay: 0.6s"></div>
+                             <div class="spinner-grow text-brand-blue" style="animation-delay: 0.8s"></div>
+                             <div class="spinner-grow text-brand-green" style="animation-delay: 0.99s"></div>
                          </div>
                      </div>
                  </div>
@@ -60,7 +62,7 @@
 
              const removeTooltip = () => {
                  tooltip.classList.add('fade-out');
-                 setTimeout(() => tooltip.remove(), 200);
+                 setTimeout(() => tooltip.remove(), 250);
              };
 
              tooltip.innerHTML = getSpinnerHtml();
