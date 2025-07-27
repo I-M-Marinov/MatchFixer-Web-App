@@ -177,6 +177,12 @@ else
 									        }
 									        </tbody>
 								        </table>
+								        <!-- Only for the time being this will be here, until the admin page for betslips is created ! -->
+								        <form asp-action="EvaluateSlip" method="post">
+									        @Html.AntiForgeryToken()
+									        <input type="hidden" name="betSlipId" value="@betSlip.Id"/>
+									        <button type="submit" class="btn btn-sm btn-warning">Reclassify</button>
+								        </form>
 							        </div>
 						        }
 					        </div>
@@ -186,11 +192,11 @@ else
 	        </div>
         </div>
         <!-- Right Summary Column -->
-		<div class="col-md-4 mb-4 summary-col">
+        <div class="col-md-4 mb-4 summary-col">
 	        <div class="card shadow-sm @summaryClass">
 		        <div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 120px;">
 			        <h5 class="card-title">@summaryTitle</h5>
-					<h2 class="fw-bold @summaryClass">€@summaryAmount.ToString("0.00")</h2>
+			        <h2 class="fw-bold @summaryClass">€@summaryAmount.ToString("0.00")</h2>
 		        </div>
 	        </div>
         </div>
