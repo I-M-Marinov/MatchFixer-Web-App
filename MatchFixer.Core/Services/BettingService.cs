@@ -178,30 +178,129 @@ public class BettingService : IBettingService
 		{
 			var betSlip = group.First().BetSlip;
 
+			// Void only the bets for the canceled match
+			foreach (var bet in group)
+				bet.Status = BetStatus.Voided;
+
+			// Load all bets for this slip (regardless of status)
 			var allBetsInSlip = await _dbContext.Bets
-				.Where(b => b.BetSlipId == betSlip.Id && b.Status == BetStatus.Pending)
+				.Where(b => b.BetSlipId == betSlip.Id)
 				.ToListAsync();
 
-			if (allBetsInSlip.Count == group.Count()) 
+			bool allVoided = allBetsInSlip.All(b => b.Status == BetStatus.Voided);
+			bool anyPending = allBetsInSlip.Any(b => b.Status == BetStatus.Pending);
+			bool allWon = allBetsInSlip.All(b => b.Status == BetStatus.Won || b.Status == BetStatus.Voided);
+			bool anyLost = allBetsInSlip.Any(b => b.Status == BetStatus.Lost);
+
+			if (!anyPending)
 			{
-				foreach (var bet in group)
-					bet.Status = BetStatus.Voided;
-
-				await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
-
+				// Settle the slip because no more pending bets
 				betSlip.IsSettled = true;
-				betSlip.WinAmount = 0;
-			}
-			else
-			{
-				foreach (var bet in group)
-					bet.Status = BetStatus.Voided;
 
+				if (allVoided)
+				{
+					betSlip.WinAmount = 0;
+					await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
+				}
+				else if (allWon && !anyLost)
+				{
+					// Calculate winnings from only the WON bets (skip voided ones)
+					var totalOdds = allBetsInSlip
+						.Where(b => b.Status == BetStatus.Won)
+						.Aggregate(1m, (acc, bet) => acc * bet.Odds);
+
+					betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
+
+					await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
+				}
+				else
+				{
+					// Some bet lost, no win
+					betSlip.WinAmount = 0;
+				}
 			}
 		}
 
+		await _dbContext.SaveChangesAsync();
 		return true;
 	}
+
+
+	public async Task<bool> EvaluateBetSlipAsync(Guid betSlipId)
+	{
+		var betSlip = await _dbContext.BetSlips
+			.Include(bs => bs.Bets)
+			.FirstOrDefaultAsync(bs => bs.Id == betSlipId);
+
+		if (betSlip == null || betSlip.IsSettled)
+			return false;
+
+		var bets = betSlip.Bets.ToList();
+		bool anyPending = false;
+
+		decimal totalOdds = 1.0m;
+
+		foreach (var bet in bets)
+		{
+			if (bet.Status == BetStatus.Voided)
+				continue;
+
+			var match = await _dbContext.MatchEvents
+				.Include(m => m.LiveResult)
+				.FirstOrDefaultAsync(m => m.Id == bet.MatchEventId);
+
+			if (match?.LiveResult == null)
+			{
+				anyPending = true;
+				continue;
+			}
+
+			var actualOutcome = match.LiveResult.HomeScore > match.LiveResult.AwayScore
+				? MatchPick.Home
+				: match.LiveResult.HomeScore < match.LiveResult.AwayScore
+					? MatchPick.Away
+					: MatchPick.Draw;
+
+			if (bet.Pick == actualOutcome)
+			{
+				bet.Status = BetStatus.Won;
+				totalOdds *= bet.Odds;
+			}
+			else
+			{
+				bet.Status = BetStatus.Lost;
+			}
+		}
+
+		if (anyPending)
+			return false; // Cannot evaluate yet
+
+		betSlip.IsSettled = true;
+
+		bool allVoided = bets.All(b => b.Status == BetStatus.Voided);
+		bool anyLost = bets.Any(b => b.Status == BetStatus.Lost);
+		bool allWonOrVoided = bets.All(b => b.Status == BetStatus.Won || b.Status == BetStatus.Voided);
+
+		if (allVoided)
+		{
+			betSlip.WinAmount = 0;
+			await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
+		}
+		else if (allWonOrVoided && !anyLost)
+		{
+			betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
+			await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
+		}
+		else
+		{
+			betSlip.WinAmount = 0; // At least one lost
+		}
+
+		await _dbContext.SaveChangesAsync();
+		return true;
+	}
+
+
 
 
 }
