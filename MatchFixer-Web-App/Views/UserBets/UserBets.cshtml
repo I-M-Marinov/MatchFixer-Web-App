@@ -8,6 +8,23 @@
 
 <div class="game-background"></div>
 
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
+
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
+
+</div>
+
 <div class="card custom-card custom-betslip-card shadow-lg rounded-4 p-4">
 	<ul class="nav nav-tabs mb-4" id="betSlipTabs" role="tablist">
 		<li class="nav-item" role="presentation">
