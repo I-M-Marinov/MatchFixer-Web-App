@@ -9,14 +9,18 @@
 }
 
 .wiki-tooltip-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
-    box-sizing: border-box; 
-    background: white; 
-    border: 1px solid #3370a8; 
-    border-radius: 0.5rem; 
-    box-shadow: 0 0.25rem 0.55rem rgba(0, 0, 0, 0.09); 
-    padding: 1rem; 
+    box-sizing: border-box;
+    background: white;
+    border: 2px solid #3370a8;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.55rem rgba(0, 0, 0, 0.09);
+    background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+    padding: 1rem;
 }
 .wiki-tooltip.fade-out {
     opacity: 0;
@@ -89,8 +93,8 @@
 
 .spinner-grow.text-brand-green,
 .spinner-grow.text-brand-blue {
-    --bs-spinner-width: 1.5rem;
-    --bs-spinner-height: 1.5rem;
+    --bs-spinner-width: 1.75rem;
+    --bs-spinner-height: 1.75rem;
 }
 
 @keyframes spinner-grow-brand-green {
@@ -125,11 +129,16 @@
     animation: spinner-grow-brand-blue 0.75s linear infinite;
 }
 
+.spinner-sequence .text-brand-blue {
+    border: 4px solid white;
+}
+
+.spinner-sequence .text-brand-green {
+    border: 4px solid black;
+}
 /*----------------------------------------------------------------
 |        CUSTOM BUTTON CSS FOR THE "MORE INFO" BUTTON             |
 -----------------------------------------------------------------*/
-
-
 .more-info-button {
     color: black;
     background-color: #65feb3;
