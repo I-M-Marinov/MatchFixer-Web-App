@@ -28,6 +28,27 @@ namespace MatchFixer_Web_App.Controllers
 
 			return View(userBets);
 		}
-		
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> EvaluateSlip(Guid betSlipId)
+		{
+			if (betSlipId == Guid.Empty)
+				return BadRequest();
+
+			var success = await _bettingService.EvaluateBetSlipAsync(betSlipId);
+
+			if (!success)
+			{
+				TempData["ErrorMessage"] = "Could not evaluate this bet slip. It may still be pending or already settled.";
+			}
+			else
+			{
+				TempData["SuccessMessage"] = "Bet slip evaluated successfully.";
+			}
+
+			return RedirectToAction(nameof(UserBets));
+		}
+
 	}
 }
