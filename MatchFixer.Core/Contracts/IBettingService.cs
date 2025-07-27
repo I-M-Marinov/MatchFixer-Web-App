@@ -8,5 +8,6 @@ namespace MatchFixer.Core.Contracts
 		Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto);
 		Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId);
 		Task<bool> CancelBetsForMatchAsync(Guid matchEventId);
+		Task<bool> EvaluateBetSlipAsync(Guid betSlipId);
 	}
 }
