@@ -90,10 +90,16 @@ namespace MatchFixer.Core.Services
 							? MatchPick.Away
 							: MatchPick.Draw;
 
-					if (bet.Pick != actualOutcome)
+					if (bet.Pick == actualOutcome)
+					{
+						bet.Status = BetStatus.Won;
+						totalOdds *= bet.Odds;
+					}
+					else
+					{
+						bet.Status = BetStatus.Lost;
 						allWinning = false;
-
-					totalOdds *= bet.Odds;
+					}
 				}
 
 				if (allResolved)
