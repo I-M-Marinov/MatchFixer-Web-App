@@ -21,6 +21,12 @@
 }
 
 .profile-wrapper {
+    padding-top: 3rem !important;
+    padding-bottom: 1rem !important;
+}
+
+.profile-wrapper,
+.cabinet-wrapper {
     width: 100%;
     max-width: 1200px;
 }
@@ -77,6 +83,8 @@
     max-width: 700px !important;
     height: auto;
     min-height: 300px;
+    padding-top: 3rem !important;
+    padding-bottom: 1rem !important;
 }
 
 .profile-info {
@@ -496,8 +504,6 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     font-size: 1em !important;
 }
 
-
-
 #live-clock {
     color: #00c2a8;
     text-shadow: 1px 2px 4px #000000;
@@ -506,4 +512,18 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     right: 0;
     font-size: 0.65em;
     margin: 0.65em 0.65em 0em 0em;
+}
+
+.trophy-cabinet-container {
+    background-color: var(--primary-color);
+    border: 2px solid var(--secondary-color);
+    color: #faf3dd;
+    width: 100%;
+    max-width: 989px;
+    display: flex;
+    justify-content: flex-start;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    z-index: 1; 
 }
