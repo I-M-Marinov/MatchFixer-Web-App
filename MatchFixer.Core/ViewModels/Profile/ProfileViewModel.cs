@@ -23,6 +23,7 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public int MatchFixScore { get; set; }
 		public int UserRank { get; set; }
 		public List<SelectListItem> CountryOptions { get; set; } = new();
+		public List<TrophyViewModel> Trophies { get; set; } = new();
 
 
 	}
