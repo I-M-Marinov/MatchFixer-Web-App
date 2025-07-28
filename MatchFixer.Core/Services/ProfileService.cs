@@ -83,7 +83,7 @@ namespace MatchFixer.Core.Services
 			return user;
 		}
 
-		public async Task<ProfileViewModel> GetProfileAsync(string userId)
+		public async Task<ProfileViewModel?> GetProfileAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
@@ -91,7 +91,7 @@ namespace MatchFixer.Core.Services
 				return null;
 			}
 
-			// Load the user again, this time with the profile picture loaded eagerly
+			// Reload with profile picture
 			user = await _dbContext.Users
 				.Include(u => u.ProfilePicture)
 				.FirstOrDefaultAsync(u => u.Id == user.Id);
@@ -104,6 +104,32 @@ namespace MatchFixer.Core.Services
 					Text = c.Name
 				})
 				.ToList();
+
+			// Load all trophies and user's earned trophies
+			var allTrophies = await _dbContext.Trophies.AsNoTracking().ToListAsync();
+			var userTrophies = await _dbContext.UserTrophies
+				.Where(ut => ut.UserId == user.Id)
+				.Include(ut => ut.Trophy)
+				.ToListAsync();
+
+			var trophyViewModels = allTrophies.Select(t =>
+			{
+				var earnedTrophy = userTrophies.FirstOrDefault(ut => ut.TrophyId == t.Id);
+				return new TrophyViewModel
+				{
+					TrophyId = t.Id,
+					Name = t.Name,
+					IconUrl = t.IconUrl,
+					Description = t.Description,
+					Type = t.Type.ToString(),
+					Level = t.Level,
+					IsHiddenUntilEarned = t.IsHiddenUntilEarned,
+					ExpirationDate = t.ExpirationDate,
+					IsEarned = earnedTrophy != null,
+					AwardedOn = earnedTrophy?.AwardedOn,
+					Notes = earnedTrophy?.Notes
+				};
+			}).ToList();
 
 			return new ProfileViewModel
 			{
@@ -118,11 +144,13 @@ namespace MatchFixer.Core.Services
 				MatchFixScore = user.MatchFixScore,
 				UserRank = await GetUserRankAsync(user.Id.ToString()) ?? 0,
 				ProfileImageUrl = user.ProfilePicture?.ImageUrl,
-				CountryOptions = countryOptions
+				CountryOptions = countryOptions,
+				Trophies = trophyViewModels
 			};
 		}
 
-			public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
+
+		public async Task<(bool Success, string Message)> UpdateProfileAsync(ProfileViewModel model)
 			{
 				var user = await _userManager.FindByIdAsync(model.Id);
 
