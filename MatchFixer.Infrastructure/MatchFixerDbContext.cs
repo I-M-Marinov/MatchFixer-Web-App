@@ -23,6 +23,8 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<Wallet> Wallets { get; set; }
 		public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
 		public virtual DbSet<LiveMatchResult> LiveMatchResults { get; set; }
+		public virtual DbSet<Trophy> Trophies { get; set; }
+		public virtual DbSet<UserTrophy> UserTrophies { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -78,6 +80,10 @@ namespace MatchFixer.Infrastructure
 				.WithMany(t => t.AwayMatches)
 				.HasForeignKey(m => m.AwayTeamId)
 				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.Entity<UserTrophy>()
+				.HasIndex(ut => new { ut.UserId, ut.TrophyId })
+				.IsUnique(); // a user can get only one unique trophy 
 		}
 	}
 }
