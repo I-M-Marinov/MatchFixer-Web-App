@@ -281,21 +281,17 @@
 </section>
 <section class="cabinet-wrapper d-flex justify-content-start mx-auto">
 
-	<div class="card shadow border-0 rounded-2 p-4 d-flex trophy-cabinet-container" style="min-width:600px;">
+	<div class="card shadow border-0 rounded-2 p-4 d-flex trophy-cabinet-container" style="min-width:300px;">
 		<h5 class="fw-bold mb-3">Trophy Cabinet</h5>
 
-		<div class="d-flex flex-wrap gap-3 justify-content-start align-items-start">
+		<div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
 			@if (Model.Trophies != null && Model.Trophies.Any())
 			{
 				foreach (var trophy in Model.Trophies)
 				{
-					<div class="trophy-card text-center p-2 border rounded-3 shadow-sm position-relative" style="width: 120px;">
-						<img src="@trophy.IconUrl" alt="@trophy.Name" class="img-fluid" style="max-height: 80px; object-fit: contain;" />
-						<div class="fw-semibold mt-2">@trophy.Name</div>
+					<div class="trophy-card text-center rounded-3 position-relative" style="width: 140px;">
+						<img src="@trophy.IconUrl" alt="@trophy.Name" class="img-fluid"/>
 						<small class="text-muted">@trophy.AwardedOn.ToString()</small>
-						<span class="trophy-tooltip position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" title="@trophy.Description">
-							<i class="bi bi-info-circle"></i>
-						</span>
 					</div>
 				}
 			}
