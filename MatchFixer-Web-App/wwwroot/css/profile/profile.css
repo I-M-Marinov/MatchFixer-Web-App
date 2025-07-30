@@ -555,4 +555,74 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 
 .trophy-card img:hover {
     transform: scale(1.05);
+    cursor: pointer;
+}
+
+#modalTrophyIcon {
+    background: #000;
+    border: 2px solid #08ac93;
+    border-radius: 33.3%;
+    padding: 0.5rem;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+#trophyModal .modal-content {
+    background: #2A7B9B;
+    background: linear-gradient(180deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+    box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 25px 20px -20px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
+}
+
+
+#trophyModal .modal-body {
+    margin-top: 0.5em;
+    padding: 0.5em;
+}
+
+#modalTrophyName {
+    align-self: center;
+    padding-bottom: 0.45em !important;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+    font-size: 1.5em;
+    text-shadow: 1px 2px 2px #258cfb;
+
+}
+
+#modalTrophyDescription {
+    font-size: 0.85em;
+    padding: 1.5em;
+    min-height: 50%;
+    width: 100%;
+    border: 2px black transparent;
+    background-color: #08ac93;
+    border-radius: 1em;
+    color: black;
+    text-shadow: 1px 1px 2px white;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+#modalTrophyLevel {
+    position: absolute;
+    top: 0.2em;
+    right: 0.75em;
+}
+
+#modalTrophyLevelIcon {
+    border: none;
+    border: 2px #c1a902 solid !important;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+#close-trophy-description-btn {
+    background: rgba(6, 24, 44, 0.65);
+    color: white;
+    border: 1px #FAF3DD solid;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+#close-trophy-description-btn:hover {
+    background: #398e7d;
+    color: black;
 }
