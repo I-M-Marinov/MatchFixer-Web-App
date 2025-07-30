@@ -289,7 +289,17 @@
 			{
 				foreach (var trophy in Model.Trophies)
 				{
-					<div class="trophy-card text-center rounded-3 position-relative" style="width: 140px;">
+					<div class="trophy-card text-center rounded-3 position-relative" style="width: 140px;" 
+					     data-bs-toggle="modal"
+					     data-bs-target="#trophyModal"
+					     data-name="@trophy.Name"
+					     data-description="@trophy.Description"
+					     data-iconurl="@trophy.IconUrl"
+					     data-level="@trophy.Level"
+					     data-type="@trophy.Type"
+					     data-earned="@trophy.IsEarned"
+					     data-awardedon="@trophy.AwardedOn?.ToString("dd MMM yyyy")"
+					     data-notes="@trophy.Notes">
 						<img src="@trophy.IconUrl" alt="@trophy.Name" class="img-fluid"/>
 						<small class="text-muted">@trophy.AwardedOn.ToString()</small>
 					</div>
@@ -299,6 +309,42 @@
 			{
 				<div class="text-muted">No trophies earned yet.</div>
 			}
+		</div>
+	</div>
+		
+	<div class="modal fade" id="trophyModal" tabindex="-1" aria-labelledby="trophyModalLabel"
+	     aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body text-center">
+					<h4 id="modalTrophyName" class="fw-bold mb-2 text-center"></h4>
+
+					<div class="d-flex flex-row justify-content-around align-items-center">
+						<!-- Left: Trophy Image -->
+						<div class="col-md-4 text-center">
+							<img id="modalTrophyIcon" src="" alt="Trophy Icon" class="img-fluid rounded border p-2"
+							     style="max-height: 200px; object-fit: contain;"/>
+						</div>
+
+						<!-- Right: Trophy Details -->
+						<div class="col-md-6">
+
+							<p id="modalTrophyDescription" class="mb-2"></p>
+
+							<span id="modalTrophyLevel">
+								<img id="modalTrophyLevelIcon" src="" alt="Level" title="" class="img-fluid rounded border p-2"
+								     style="max-height: 50px; object-fit: contain;" />
+							</span>
+
+							<div id="modalNotes" class="text-muted small"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-footer border-0">
+					<button type="button" id="close-trophy-description-btn" class="btn" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </section>
@@ -532,5 +578,47 @@
 	// Update clock immediately and every second
 	updateClock();
 	setInterval(updateClock, 1000);
+
+
+		document.addEventListener('DOMContentLoaded', function () {
+		const trophyModal = document.getElementById('trophyModal');
+		if (!trophyModal) return;
+
+		trophyModal.addEventListener('show.bs.modal', function (event) {
+			const trigger = event.relatedTarget;
+			if (!trigger) return;
+
+			const name = trigger.getAttribute('data-name') || '';
+			const desc = trigger.getAttribute('data-description') || '';
+			const icon = trigger.getAttribute('data-iconurl') || '';
+			const level = trigger.getAttribute('data-level') || 'Bronze';  
+			const earned = trigger.getAttribute('data-earned') === 'True';
+			const awardedOn = trigger.getAttribute('data-awardedon') || '';
+			const notes = trigger.getAttribute('data-notes') || '';
+
+			const iconPath = `/images/trophies/levels/${level.toLowerCase()}.png`;
+
+			const modalIcon = document.getElementById('modalTrophyIcon');
+			const modalName = document.getElementById('modalTrophyName');
+			const modalDescription = document.getElementById('modalTrophyDescription');
+			const levelIcon = document.getElementById('modalTrophyLevelIcon');
+			const statusEl = document.getElementById('modalEarnedStatus');
+			const notesEl = document.getElementById('modalNotes');
+
+			if (modalIcon) modalIcon.src = icon;
+			if (modalName) modalName.textContent = name;
+			if (modalDescription) modalDescription.textContent = desc;
+
+			if (levelIcon) {
+				levelIcon.src = iconPath;
+				levelIcon.alt = `${level} Trophy`;
+				levelIcon.title = `${level} Level Trophy`;
+			}
+
+			if (notesEl) {
+				notesEl.textContent = notes ? `Note: ${notes}` : '';
+			}
+		});
+	});
 
 </script>
