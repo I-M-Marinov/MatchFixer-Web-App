@@ -237,7 +237,8 @@ public class BettingService : IBettingService
 
 		var bets = betSlip.Bets.ToList();
 		bool anyPending = false;
-
+		bool anyLost = false;
+		bool allVoided = true;
 		decimal totalOdds = 1.0m;
 
 		foreach (var bet in bets)
@@ -265,40 +266,48 @@ public class BettingService : IBettingService
 			{
 				bet.Status = BetStatus.Won;
 				totalOdds *= bet.Odds;
+				allVoided = false;
 			}
 			else
 			{
 				bet.Status = BetStatus.Lost;
+				anyLost = true;
+				allVoided = false;
 			}
 		}
 
+		// Settle immediately if lost
+		if (anyLost)
+		{
+			betSlip.IsSettled = true;
+			betSlip.WinAmount = 0;
+			await _dbContext.SaveChangesAsync();
+			return true;
+		}
+
+		// If any pending and no losses, wait
 		if (anyPending)
-			return false; // Cannot evaluate yet
-
+		{
+			return false;
+		}
+		
 		betSlip.IsSettled = true;
-
-		bool allVoided = bets.All(b => b.Status == BetStatus.Voided);
-		bool anyLost = bets.Any(b => b.Status == BetStatus.Lost);
-		bool allWonOrVoided = bets.All(b => b.Status == BetStatus.Won || b.Status == BetStatus.Voided);
 
 		if (allVoided)
 		{
 			betSlip.WinAmount = 0;
 			await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
 		}
-		else if (allWonOrVoided && !anyLost)
+		else
 		{
 			betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
 			await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
-		}
-		else
-		{
-			betSlip.WinAmount = 0; // At least one lost
 		}
 
 		await _dbContext.SaveChangesAsync();
 		return true;
 	}
+
 
 
 
