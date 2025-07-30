@@ -102,22 +102,23 @@ namespace MatchFixer.Core.Services
 					}
 				}
 
-				if (allResolved)
+				if (allWinning && allResolved)
 				{
 					slip.IsSettled = true;
+					var winnings = slip.Amount * totalOdds;
+					slip.WinAmount = winnings;
 
-					if (allWinning)
-					{
-						var winnings = slip.Amount * totalOdds;
-						slip.WinAmount = winnings;
-
-						await _walletService.AwardWinningsAsync(
-							userId: slip.UserId,
-							amount: winnings,
-							matchDescription: $"{match.HomeTeam.Name} vs {match.AwayTeam.Name}"
-						);
-
-					}
+					await _walletService.AwardWinningsAsync(
+						userId: slip.UserId,
+						amount: winnings,
+						matchDescription: $"Winnings for slip # {slip.Id}, submitted on {slip.BetTime}"
+					);
+				}
+				else if (!allWinning)
+				{
+					// At least one bet lost – settle as a losing slip immediately
+					slip.IsSettled = true;
+					slip.WinAmount = 0;
 				}
 			}
 
