@@ -21,7 +21,7 @@ namespace MatchFixer.Infrastructure.SeedData
 				new Trophy
 				{
 					Name = "Rookie Rigger",
-					Description = "Place your first bet",
+					Description = "Every legend starts with one rigged match.",
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Bronze,
 					MilestoneTarget = 1,
@@ -31,7 +31,7 @@ namespace MatchFixer.Infrastructure.SeedData
 				new Trophy
 				{
 					Name = "Fixer's Dozen",
-					Description = "Place 100 total bets",
+					Description = "You’ve hit triple digits. Fixing matches like a true pro.",
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Silver,
 					MilestoneTarget = 100,
@@ -41,7 +41,7 @@ namespace MatchFixer.Infrastructure.SeedData
 				new Trophy
 				{
 					Name = "Bet Syndicate Boss",
-					Description = "Wager a total of 2000 euros",
+					Description = "Cash flows, bets grow, you run this show.",
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Gold,
 					MilestoneTarget = 2000, 
@@ -51,7 +51,7 @@ namespace MatchFixer.Infrastructure.SeedData
 				new Trophy
 				{
 					Name = "Ultimate Grinder",
-					Description = "Place 1000 total bets",
+					Description = "If placing bets were a job, you'd already be CEO of MatchFix Inc.",
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Platinum,
 					MilestoneTarget = 1000,
