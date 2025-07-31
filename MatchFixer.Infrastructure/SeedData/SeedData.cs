@@ -71,6 +71,64 @@ namespace MatchFixer.Infrastructure.SeedData
 
 			await dbContext.SaveChangesAsync();
 		}
+
+		public static async Task SeedTimeBasedTrophiesAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var timeBasedTrophies = new List<Trophy>
+			{
+				new Trophy
+				{
+					Name = "Fixer at Dawn",
+					Description = "Up before the bookies — rigging the odds with your morning brew.",
+					Type = TrophyType.TimeBased,
+					Level = TrophyLevel.Bronze,
+					IconUrl = "/images/trophies/fixer-at-dawn.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Midnight Fixer",
+					Description = "While others sleep, you’re cooking bets in the moonlight.",
+					Type = TrophyType.TimeBased,
+					Level = TrophyLevel.Silver,
+					IconUrl = "/images/trophies/midnight-fixer.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Weekend Wager Warlord",
+					Description = "Weekends are for shady wagers and syndicate profits.",
+					Type = TrophyType.TimeBased,
+					Level = TrophyLevel.Gold,
+					IconUrl = "/images/trophies/weekend-wager-warlord.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Last-Minute Leak",
+					Description = "Betting at the buzzer with 'insider' info in hand.",
+					Type = TrophyType.TimeBased,
+					Level = TrophyLevel.Platinum,
+					IconUrl = "/images/trophies/last-minute-leak.png",
+					IsHiddenUntilEarned = false
+				}
+			};
+
+			foreach (var trophy in timeBasedTrophies)
+			{
+				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
+				if (!exists)
+				{
+					dbContext.Trophies.Add(trophy);
+				}
+			}
+
+			await dbContext.SaveChangesAsync();
+		}
+
+
 		public static async Task SeedDefaultProfilePicture(UserManager<ApplicationUser> userManager, IServiceProvider serviceProvider)
 		{
 			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
