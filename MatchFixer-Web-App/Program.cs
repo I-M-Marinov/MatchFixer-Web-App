@@ -95,8 +95,9 @@ using (var scope = app.Services.CreateScope())
 	var services = scope.ServiceProvider;
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-	await SeedMilestoneTrophiesAsync(services);                         // Seed the Milestone Trophies 
-	await SeedTimeBasedTrophiesAsync(services);                        // Seed the Time Based Trophies 
+	await SeedMilestoneTrophiesAsync(services);					         // Seed the Milestone Trophies 
+	await SeedTimeBasedTrophiesAsync(services);                         // Seed the Time Based Trophies 
+	await SeedSpecialEventTrophiesAsync(services);                     // Seed the Special Event Trophies 
 	await SeedDefaultProfilePicture(userManager, services);           // Seed the Default User Image
 	await SeedDeletedUsersProfilePicture(userManager, services);     // Seed the Deleted User Image ( when user deletes their profile ) 
 	await SeedTeams(services);										// Seed the Teams in the Teams Table
