@@ -128,6 +128,72 @@ namespace MatchFixer.Infrastructure.SeedData
 			await dbContext.SaveChangesAsync();
 		}
 
+		public static async Task SeedSpecialEventTrophiesAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var specialEventTrophies = new List<Trophy>
+	{
+		new Trophy
+		{
+			Name = "Silent Bet, Shady Night",
+			Description = "Placed a bet on Christmas Day – even Santa can’t fix this outcome.",
+			Type = TrophyType.SpecialEvent,
+			Level = TrophyLevel.Bronze,
+			ExpirationDate = new DateTime(2025, 12, 26), // expires after Dec 25, 2025
+			IconUrl = "/images/trophies/silent-bet-shady-night.png",
+			IsHiddenUntilEarned = false
+		},
+		new Trophy
+		{
+			Name = "Fixmas Miracle",
+			Description = "Placed 3 bets on Christmas Day – triple the cheer, triple the rigging.",
+			Type = TrophyType.SpecialEvent,
+			Level = TrophyLevel.Silver,
+			ExpirationDate = new DateTime(2025, 12, 26), // expires after Dec 25, 2025
+			IconUrl = "/images/trophies/fixmas-miracle.png",
+			IsHiddenUntilEarned = false
+		},
+		new Trophy
+		{
+			Name = "New Year, New Fix",
+			Description = "Started the year with a wager – resolutions are temporary, betting is forever.",
+			Type = TrophyType.SpecialEvent,
+			Level = TrophyLevel.Bronze,
+			IconUrl = "/images/trophies/new-year-new-fix.png",
+			IsHiddenUntilEarned = false
+		},
+		new Trophy
+		{
+			Name = "One Year, Many Fixes",
+			Description = "Your betting career turns 1 – we see you, Fixer-in-Chief.",
+			Type = TrophyType.SpecialEvent,
+			Level = TrophyLevel.Gold,
+			IconUrl = "/images/trophies/one-year-many-fixes.png",
+			IsHiddenUntilEarned = false
+		},
+		new Trophy
+		{
+			Name = "Summer Syndicate Slam",
+			Description = "10 shady bets in July – when the sun’s out, the fixes come out to play.",
+			Type = TrophyType.SpecialEvent,
+			Level = TrophyLevel.Silver,
+			IconUrl = "/images/trophies/summer-syndicate-slam.png",
+			IsHiddenUntilEarned = false
+		}
+	};
+
+			foreach (var trophy in specialEventTrophies)
+			{
+				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
+				if (!exists)
+				{
+					dbContext.Trophies.Add(trophy);
+				}
+			}
+
+			await dbContext.SaveChangesAsync();
+		}
 
 		public static async Task SeedDefaultProfilePicture(UserManager<ApplicationUser> userManager, IServiceProvider serviceProvider)
 		{
