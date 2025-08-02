@@ -112,23 +112,38 @@ namespace MatchFixer.Core.Services
 				.Include(ut => ut.Trophy)
 				.ToListAsync();
 
-			var trophyViewModels = allTrophies.Select(t =>
+			//var trophyViewModels = allTrophies.Select(t =>
+			//{
+			//	var earnedTrophy = userTrophies.FirstOrDefault(ut => ut.TrophyId == t.Id);
+			//	return new TrophyViewModel
+			//	{
+			//		TrophyId = t.Id,
+			//		Name = t.Name,
+			//		IconUrl = t.IconUrl,
+			//		Description = t.Description,
+			//		Type = t.Type.ToString(),
+			//		Level = t.Level,
+			//		IsHiddenUntilEarned = t.IsHiddenUntilEarned,
+			//		ExpirationDate = t.ExpirationDate,
+			//		IsEarned = earnedTrophy != null,
+			//		AwardedOn = earnedTrophy?.AwardedOn,
+			//		Notes = earnedTrophy?.Notes
+			//	};
+			//}).ToList();
+
+			var trophyViewModels = userTrophies.Select(ut => new TrophyViewModel
 			{
-				var earnedTrophy = userTrophies.FirstOrDefault(ut => ut.TrophyId == t.Id);
-				return new TrophyViewModel
-				{
-					TrophyId = t.Id,
-					Name = t.Name,
-					IconUrl = t.IconUrl,
-					Description = t.Description,
-					Type = t.Type.ToString(),
-					Level = t.Level,
-					IsHiddenUntilEarned = t.IsHiddenUntilEarned,
-					ExpirationDate = t.ExpirationDate,
-					IsEarned = earnedTrophy != null,
-					AwardedOn = earnedTrophy?.AwardedOn,
-					Notes = earnedTrophy?.Notes
-				};
+				TrophyId = ut.Trophy.Id,
+				Name = ut.Trophy.Name,
+				IconUrl = ut.Trophy.IconUrl,
+				Description = ut.Trophy.Description,
+				Type = ut.Trophy.Type.ToString(),
+				Level = ut.Trophy.Level,
+				IsHiddenUntilEarned = ut.Trophy.IsHiddenUntilEarned,
+				ExpirationDate = ut.Trophy.ExpirationDate,
+				IsEarned = true,
+				AwardedOn = ut.AwardedOn,
+				Notes = ut.Notes
 			}).ToList();
 
 			return new ProfileViewModel
