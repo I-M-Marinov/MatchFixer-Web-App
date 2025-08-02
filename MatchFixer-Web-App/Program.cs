@@ -49,6 +49,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();					// Add the Se
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();			// Add URL Helper Factory
 builder.Services.AddTransient<IEmailSender, EmailSender>();						// Register Email Sender Service 
 builder.Services.AddScoped<IUserService, UserService>();                        // Add the User Service
+builder.Services.AddScoped<ITrophyService, TrophyService>();                    // Add the Trophy Service
 builder.Services.AddScoped<IImageService, ImageService>();						// Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Profile Service 
 builder.Services.AddScoped<IWalletService, WalletService>();					// Add the Wallet Service
