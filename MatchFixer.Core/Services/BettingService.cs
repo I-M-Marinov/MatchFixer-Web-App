@@ -15,16 +15,21 @@ public class BettingService : IBettingService
 	private readonly ISessionService _sessionService;
 	private readonly ITimezoneService _timezoneService;
 	private readonly IWalletService _walletService;
+	private readonly ITrophyService _trophyService;
+
 
 	public BettingService(MatchFixerDbContext dbContext, 
 		ISessionService sessionService, 
 		ITimezoneService timezoneService,
-		IWalletService walletService)
+		IWalletService walletService,
+		ITrophyService trophyService)
 	{
 		_dbContext = dbContext;
 		_sessionService = sessionService;
 		_timezoneService = timezoneService;
 		_walletService = walletService;
+		_trophyService = trophyService;
+		
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto)
@@ -84,6 +89,8 @@ public class BettingService : IBettingService
 
 		await _dbContext.BetSlips.AddAsync(betSlip);
 		await _dbContext.SaveChangesAsync();
+
+		await _trophyService.EvaluateTrophiesAsync(userId);
 
 		return (BetSlipSubmittedSuccessfully, true);
 	}
