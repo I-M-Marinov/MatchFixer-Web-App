@@ -289,7 +289,7 @@
 			{
 				foreach (var trophy in Model.Trophies)
 				{
-					<div class="trophy-card text-center rounded-3 position-relative" style="width: 140px;" 
+					<div class="trophy-card text-center rounded-3 position-relative" style="width: 166px;" 
 					     data-bs-toggle="modal"
 					     data-bs-target="#trophyModal"
 					     data-name="@trophy.Name"
@@ -301,7 +301,6 @@
 					     data-awardedon="@trophy.AwardedOn?.ToString("dd MMM yyyy")"
 					     data-notes="@trophy.Notes">
 						<img src="@trophy.IconUrl" alt="@trophy.Name" class="img-fluid"/>
-						<small class="text-muted">@trophy.AwardedOn.ToString()</small>
 					</div>
 				}
 			}
@@ -323,7 +322,7 @@
 						<!-- Left: Trophy Image -->
 						<div class="col-md-4 text-center">
 							<img id="modalTrophyIcon" src="" alt="Trophy Icon" class="img-fluid rounded border p-2"
-							     style="max-height: 200px; object-fit: contain;"/>
+							     style="max-height: 220px; object-fit: contain;"/>
 						</div>
 
 						<!-- Right: Trophy Details -->
@@ -337,6 +336,7 @@
 							</span>
 
 							<div id="modalNotes" class="text-muted small"></div>
+							<div id="modalAwardedOn"></div>
 						</div>
 					</div>
 				</div>
@@ -580,7 +580,7 @@
 	setInterval(updateClock, 1000);
 
 
-		document.addEventListener('DOMContentLoaded', function () {
+	document.addEventListener('DOMContentLoaded', function () {
 		const trophyModal = document.getElementById('trophyModal');
 		if (!trophyModal) return;
 
@@ -604,10 +604,12 @@
 			const levelIcon = document.getElementById('modalTrophyLevelIcon');
 			const statusEl = document.getElementById('modalEarnedStatus');
 			const notesEl = document.getElementById('modalNotes');
+			const awardedOnEl = document.getElementById('modalAwardedOn');
 
 			if (modalIcon) modalIcon.src = icon;
 			if (modalName) modalName.textContent = name;
 			if (modalDescription) modalDescription.textContent = desc;
+			if (awardedOnEl) awardedOnEl.textContent = `Earned on: ${awardedOn}`;
 
 			if (levelIcon) {
 				levelIcon.src = iconPath;
