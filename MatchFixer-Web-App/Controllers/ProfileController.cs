@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations;
 using MatchFixer_Web_App.Areas.Identity.Pages.Account;
 using MatchFixer.Infrastructure.Models.Image;
 using Microsoft.AspNetCore.Authorization;
-using MatchFixer.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using MatchFixer.Infrastructure.Entities;
 
