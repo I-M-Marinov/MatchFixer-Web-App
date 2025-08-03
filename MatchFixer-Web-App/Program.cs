@@ -96,12 +96,18 @@ using (var scope = app.Services.CreateScope())
 	var services = scope.ServiceProvider;
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-	await SeedMilestoneTrophiesAsync(services);					         // Seed the Milestone Trophies 
-	await SeedTimeBasedTrophiesAsync(services);                         // Seed the Time Based Trophies 
-	await SeedSpecialEventTrophiesAsync(services);                     // Seed the Special Event Trophies 
-	await SeedDefaultProfilePicture(userManager, services);           // Seed the Default User Image
-	await SeedDeletedUsersProfilePicture(userManager, services);     // Seed the Deleted User Image ( when user deletes their profile ) 
-	await SeedTeams(services);										// Seed the Teams in the Teams Table
+	// trophies
+	await SeedInitialTrophiesAsync(services);                                 // Seed the Initial Trophies 
+	await SeedMilestoneTrophiesAsync(services);					             // Seed the Milestone Trophies 
+	await SeedTimeBasedTrophiesAsync(services);                             // Seed the Time Based Trophies 
+	await SeedSpecialEventTrophiesAsync(services);                         // Seed the Special Event Trophies 
+	await SeedOutcomeTrophiesAsync(services);                             // Seed the Outcome Trophies 
+	// profile pictures
+	await SeedDefaultProfilePicture(userManager, services);             // Seed the Default User Image
+	await SeedDeletedUsersProfilePicture(userManager, services);       // Seed the Deleted User Image ( when user deletes their profile ) 
+	// teams 
+	await SeedTeams(services);										 // Seed the Teams in the Teams Table
+	// match results
 	await SeedMatchResultsAsync(services);						   // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 }
 
