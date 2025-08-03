@@ -26,6 +26,6 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public DateTime? ExpirationDate { get; set; }
 
 		public string? Notes { get; set; }
-
+		public bool IsNew { get; set; }
 	}
 }
