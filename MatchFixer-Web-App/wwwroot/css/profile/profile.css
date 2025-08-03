@@ -632,3 +632,13 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     background: #398e7d;
     color: black;
 }
+
+.trophy-badge-new {
+    position: absolute;
+    top: 2px;
+    right: 1px;
+    cursor: pointer;
+    background-color: #08ac93;
+    border-radius: 0.5em;
+    text-shadow: 1px 1px 2px #258cfb;
+}
