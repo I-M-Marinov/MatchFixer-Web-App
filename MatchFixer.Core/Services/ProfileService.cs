@@ -143,7 +143,8 @@ namespace MatchFixer.Core.Services
 				ExpirationDate = ut.Trophy.ExpirationDate,
 				IsEarned = true,
 				AwardedOn = ut.AwardedOn,
-				Notes = ut.Notes
+				Notes = ut.Notes,
+				IsNew = ut?.IsNew ?? false
 			}).ToList();
 
 			return new ProfileViewModel
