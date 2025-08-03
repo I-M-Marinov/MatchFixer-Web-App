@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using MatchFixer.Common.GeneralConstants;
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 
@@ -184,6 +185,127 @@ namespace MatchFixer.Infrastructure.SeedData
 	};
 
 			foreach (var trophy in specialEventTrophies)
+			{
+				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
+				if (!exists)
+				{
+					dbContext.Trophies.Add(trophy);
+				}
+			}
+
+			await dbContext.SaveChangesAsync();
+		}
+
+		public static async Task SeedInitialTrophiesAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var specialEventTrophies = new List<Trophy>
+			{
+				new Trophy
+				{
+					Name = TrophyNames.ShadowSyndicateRecruit,
+					Description = "Welcome to the underworld — you've been initiated just by showing up.",
+					Type = TrophyType.SpecialEvent,
+					Level = TrophyLevel.Bronze,
+					IconUrl = "/images/trophies/shadow-syndicate-recruit.png",
+					IsHiddenUntilEarned = false
+				}
+			};
+
+			foreach (var trophy in specialEventTrophies)
+			{
+				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
+				if (!exists)
+				{
+					dbContext.Trophies.Add(trophy);
+				}
+			}
+
+			await dbContext.SaveChangesAsync();
+		}
+
+		public static async Task SeedOutcomeTrophiesAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var outcomeTrophies = new List<Trophy>
+			{
+				new Trophy
+				{
+					Name = "Fixer’s Hot Streak",
+					Description = "Won 3 bets in a row — the syndicate’s golden goose is on fire.",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Bronze,
+					IconUrl = "/images/trophies/fixers-hot-streak.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Syndicate Sharpshooter",
+					Description = "5 winning bets in a single day — you’re making bookies sweat.",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Silver,
+					IconUrl = "/images/trophies/syndicate-sharpshooter.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Rigged to Win",
+					Description = "20 total winning bets — statistically suspicious, impressively efficient.",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Gold,
+					IconUrl = "/images/trophies/rigged-to-win.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Fix Gone Wrong",
+					Description = "Lost 3 bets in a row — even the best plans fall apart sometimes.",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Bronze,
+					IconUrl = "/images/trophies/fix-gone-wrong.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Unlucky Syndicate Soldier",
+					Description = "Lost 10 bets total — it’s not fixing, it’s just bad luck… right?",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Silver,
+					IconUrl = "/images/trophies/unlucky-syndicate-soldier.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Bankroll Obliterator",
+					Description = "Lost 5 bets in a single day — did you even try?",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Gold,
+					IconUrl = "/images/trophies/bankroll-obliterator.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "Comeback Kingpin",
+					Description = "Won a bet after 5 straight losses — resilience or divine intervention?",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Platinum,
+					IconUrl = "/images/trophies/comeback-kingpin.png",
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = "The Rollercoaster Rigger",
+					Description = "Alternated between win and loss 4 times in a row — your luck swings like a pendulum.",
+					Type = TrophyType.OutcomeBased,
+					Level = TrophyLevel.Silver,
+					IconUrl = "/images/trophies/rollercoaster-rigger.png",
+					IsHiddenUntilEarned = false
+				}
+			};
+
+			foreach (var trophy in outcomeTrophies)
 			{
 				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
 				if (!exists)
