@@ -299,9 +299,20 @@
 					     data-type="@trophy.Type"
 					     data-earned="@trophy.IsEarned"
 					     data-awardedon="@trophy.AwardedOn?.ToString("dd MMM yyyy")"
-					     data-notes="@trophy.Notes">
+					     data-notes="@trophy.Notes"
+						 data-trophy-id="@trophy.TrophyId">
 						<img src="@trophy.IconUrl" alt="@trophy.Name" class="img-fluid"/>
+
+						<form id="antiForgeryForm" style="display:none;">
+							@Html.AntiForgeryToken()
+						</form>
+
+						@if (trophy.IsEarned && trophy.IsNew)
+						{
+							<span id="trophy-badge-@trophy.TrophyId" class="badge trophy-badge-new">New</span>						}
 					</div>
+
+					
 				}
 			}
 			else
@@ -622,5 +633,41 @@
 			}
 		});
 	});
+
+	function onTrophyModalOpen(trophyId) {
+		const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+		fetch(`/Trophy/MarkAsSeen?trophyId=${trophyId}`, {
+			method: 'POST',
+			headers: {
+				'RequestVerificationToken': token
+			}
+		}).then(response => {
+			if (response.ok) {
+				// Remove "New" badge
+				const badge = document.querySelector(`#trophy-badge-${trophyId}`);
+				if (badge) {
+					badge.remove();
+				}
+			}
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function () {
+		const trophyModal = document.getElementById('trophyModal');
+
+		trophyModal.addEventListener('show.bs.modal', function (event) {
+			const trigger = event.relatedTarget; 
+			const trophyId = trigger.getAttribute('data-trophy-id');
+
+			// Only call if the New badge exists
+			const badge = document.querySelector(`#trophy-badge-${trophyId}`);
+			if (badge) {
+				onTrophyModalOpen(trophyId);
+			}
+		});
+	});
+
+
 
 </script>
