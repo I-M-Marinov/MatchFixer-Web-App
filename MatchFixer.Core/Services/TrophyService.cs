@@ -1,4 +1,5 @@
-﻿using MatchFixer.Common.GeneralConstants;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
@@ -27,7 +28,8 @@ namespace MatchFixer.Core.Services
 					UserId = userId,
 					TrophyId = trophyId,
 					AwardedOn = DateTime.UtcNow,
-					Notes = notes
+					Notes = notes,
+					IsNew = true
 				};
 
 				_dbContext.UserTrophies.Add(userTrophy);
@@ -63,6 +65,11 @@ namespace MatchFixer.Core.Services
 			{
 				switch (trophy.Name)
 				{
+					// First trophy for all users ( just by registering ) 
+					case TrophyNames.ShadowSyndicateRecruit:
+						await AwardTrophy(userId, trophy.Id);
+						break;
+
 					// Milestone Trophies
 					case TrophyNames.RookieRigger:
 						if (totalBets >= 1)
@@ -144,16 +151,141 @@ namespace MatchFixer.Core.Services
 						if (userBets.Count(b => b.BetTime.Month == 7) >= 10)
 							await AwardTrophy(userId, trophy.Id);
 						break;
+
+					// Outcome-Based Trophies
+					case TrophyNames.FixersHotStreak:
+						if (HasConsecutiveOutcomes(userBets, BetStatus.Won, 3))
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.SyndicateSharpshooter:
+						if (userBets.GroupBy(b => b.BetTime.Date)
+						    .Any(g => g.Count(b => b.Status == BetStatus.Won) >= 5))
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.RiggedToWin:
+						if (userBets.Count(b => b.Status == BetStatus.Won) >= 20)
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.FixGoneWrong:
+						if (HasConsecutiveOutcomes(userBets, BetStatus.Lost, 3))
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.UnluckySyndicateSoldier:
+						if (userBets.Count(b => b.Status != BetStatus.Won) >= 10)
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.BankrollObliterator:
+						if (userBets.GroupBy(b => b.BetTime.Date)
+						    .Any(g => g.Count(b => b.Status != BetStatus.Won) >= 5))
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.ComebackKingpin:
+						if (HasLossStreakThenWin(userBets, 5))
+							await AwardTrophy(userId, trophy.Id);
+						break;
+
+					case TrophyNames.RollercoasterRigger:
+						if (HasAlternatingOutcomes(userBets, 4))
+							await AwardTrophy(userId, trophy.Id);
+						break;
 				}
 
 			}
 		}
 
+		public async Task MarkTrophyAsSeenAsync(Guid userId, int trophyId)
+		{
+			var userTrophy = await _dbContext.UserTrophies
+				.FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TrophyId == trophyId);
+
+			if (userTrophy != null && userTrophy.IsNew)
+			{
+				userTrophy.IsNew = false;
+				await _dbContext.SaveChangesAsync();
+			}
+		}
 
 		private async Task AwardTrophy(Guid userId, int trophyId, string? notes = null)
 		{
 			await AwardTrophyIfNotAlreadyAsync(userId, trophyId, notes);
 		}
+
+		private bool HasConsecutiveOutcomes(List<Bet> bets, BetStatus targetStatus, int count)
+		{
+			int streak = 0;
+			foreach (var bet in bets)
+			{
+				if (bet.Status == BetStatus.Pending || bet.Status == BetStatus.Voided)
+					continue; // Skip irrelevant bets
+
+				if (bet.Status == targetStatus)
+				{
+					streak++;
+					if (streak >= count)
+						return true;
+				}
+				else
+				{
+					streak = 0;
+				}
+			}
+			return false;
+		}
+
+		private bool HasLossStreakThenWin(List<Bet> bets, int lossCount)
+		{
+			int losses = 0;
+
+			for (int i = 0; i < bets.Count; i++)
+			{
+				if (bets[i].Status == BetStatus.Lost)
+				{
+					losses++;
+					if (losses >= lossCount)
+					{
+						// Check next bet is Won
+						if (i + 1 < bets.Count && bets[i + 1].Status == BetStatus.Won)
+							return true;
+					}
+				}
+				else if (bets[i].Status == BetStatus.Won)
+				{
+					losses = 0; // Reset loss streak
+				}
+			}
+			return false;
+		}
+
+		private bool HasAlternatingOutcomes(List<Bet> bets, int alternations)
+		{
+			// Filter to only Won/Lost bets
+			var filtered = bets.Where(b => b.Status == BetStatus.Won || b.Status == BetStatus.Lost).ToList();
+			if (filtered.Count < alternations + 1)
+				return false;
+
+			int streak = 1;
+			for (int i = 1; i < filtered.Count; i++)
+			{
+				if (filtered[i].Status != filtered[i - 1].Status)
+				{
+					streak++;
+					if (streak >= alternations + 1)
+						return true;
+				}
+				else
+				{
+					streak = 1;
+				}
+			}
+			return false;
+		}
+
 
 	}
 
