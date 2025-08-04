@@ -1,0 +1,60 @@
+﻿@using MatchFixer.Common.Enums
+@model IEnumerable<MatchFixer.Core.ViewModels.Profile.TrophyViewModel>
+
+@{
+	var bronze = Model.Where(t => t.Level == TrophyLevel.Bronze).ToList();
+	var silver = Model.Where(t => t.Level == TrophyLevel.Silver).ToList();
+	var gold = Model.Where(t => t.Level == TrophyLevel.Gold).ToList();
+	var platinum = Model.Where(t => t.Level == TrophyLevel.Platinum).ToList();
+}
+
+<div class="game-background"></div>
+
+
+<div class="card custom-card trophy-catalog-card shadow-lg rounded-4 p-4">
+	<ul class="nav nav-tabs mb-4 d-flex justify-content-center gap-3" id="trophyTabs" role="tablist">
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active d-flex align-items-center gap-2" id="bronze-tab" data-bs-toggle="tab" data-bs-target="#bronze" type="button" role="tab">
+				<img src="/images/trophies/levels/bronze.png" alt="Bronze" width="24" height="auto" />
+				Bronze
+				<span class="badge bg-custom-blue">@bronze.Count</span>
+			</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link d-flex align-items-center gap-2" id="silver-tab" data-bs-toggle="tab" data-bs-target="#silver" type="button" role="tab">
+				<img src="/images/trophies/levels/silver.png" alt="Silver" width="24" height="auto" />
+				Silver
+				<span class="badge bg-custom-blue">@silver.Count</span>
+			</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link d-flex align-items-center gap-2" id="gold-tab" data-bs-toggle="tab" data-bs-target="#gold" type="button" role="tab">
+				<img src="/images/trophies/levels/gold.png" alt="Gold" width="24" height="auto" />
+				Gold
+				<span class="badge bg-custom-blue">@gold.Count</span>
+			</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link d-flex align-items-center gap-2" id="platinum-tab" data-bs-toggle="tab" data-bs-target="#platinum" type="button" role="tab">
+				<img src="/images/trophies/levels/platinum.png" alt="Platinum" width="24" height="auto" />
+				Platinum
+				<span class="badge bg-custom-blue">@platinum.Count</span>
+			</button>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="trophyTabContent">
+		<div class="tab-pane fade show active" id="bronze" role="tabpanel">
+			@await Html.PartialAsync("_TrophyList", bronze)
+		</div>
+		<div class="tab-pane fade" id="silver" role="tabpanel">
+			@await Html.PartialAsync("_TrophyList", silver)
+		</div>
+		<div class="tab-pane fade" id="gold" role="tabpanel">
+			@await Html.PartialAsync("_TrophyList", gold)
+		</div>
+		<div class="tab-pane fade" id="platinum" role="tabpanel">
+			@await Html.PartialAsync("_TrophyList", platinum)
+		</div>
+	</div>
+</div>
