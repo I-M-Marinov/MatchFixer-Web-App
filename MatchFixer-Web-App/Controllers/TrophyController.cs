@@ -16,6 +16,18 @@ namespace MatchFixer_Web_App.Controllers
 			_trophyService = trophyService;
 		}
 
+		[Authorize]
+		[HttpGet]
+		public async Task<IActionResult> TrophyCatalog()
+		{
+			var userId = _userContextService.GetUserId();
+			if (userId == Guid.Empty)
+				return Unauthorized();
+
+			var allTrophies = await _trophyService.GetAllTrophiesWithUserStatusAsync(userId);
+			return View(allTrophies); 
+		}
+
 
 		[Authorize]
 		[HttpPost]
