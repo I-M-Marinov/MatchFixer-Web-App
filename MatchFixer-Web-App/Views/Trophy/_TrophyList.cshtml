@@ -1,0 +1,61 @@
+﻿@using MatchFixer.Core.ViewModels.Profile
+@model IEnumerable<TrophyViewModel>
+
+@if (!Model.Any())
+{
+	<div class="alert-custom-info-wrapper">
+		<div class="alert-custom-info">No trophies in this category yet.</div>
+	</div>
+}
+else
+{
+	<div class="row row-cols-1 g-3">
+		@foreach (var trophy in Model)
+		{
+			var earnedClass = trophy.IsEarned ? "border-success" : "border-secondary";
+			var opacityClass = trophy.IsEarned ? "" : "opacity-50";
+
+			<div class="col">
+				<div class="card h-100 shadow-sm border-2 @earnedClass">
+					<div class="row g-0 align-items-center">
+						<!-- Left Image -->
+						@* <div class="col-md-3 d-flex justify-content-center p-2">
+							<img src="@trophy.IconUrl" class="img-fluid rounded-2 @opacityClass" alt="@trophy.Name" style="max-height: 100px;" />
+						</div> *@
+						
+						<div class="col-md-3 d-flex justify-content-center p-2">
+							@if (trophy.IsEarned)
+							{
+								<img src="@trophy.IconUrl" class="img-fluid rounded-2" alt="@trophy.Name" style="max-height: 100px;" />
+							}
+							else
+							{
+								<i class="ri-lock-2-line fs-1 text-muted"></i>
+							}
+						</div>
+
+						<!-- Right Info -->
+						<div class="col-md-9">
+							<div class="card-body">
+								<h5 class="card-title mb-1">@trophy.Name</h5>
+								<p class="card-text mb-2">@trophy.Description</p>
+								<p class="card-text">
+									<small class="text-muted">
+										@if (trophy.IsEarned)
+										{
+											<span class="badge bg-success animate__animated animate__pulse animate__infinite"><i class="ri-checkbox-circle-line"></i> Already earned</span>
+										}
+										else
+										{
+											<span class="badge bg-secondary"><i class="ri-lock-2-fill"></i> Locked</span>
+										}
+									</small>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+}
