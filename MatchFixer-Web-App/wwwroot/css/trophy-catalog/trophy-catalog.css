@@ -1,0 +1,124 @@
+﻿.trophy-catalog-card {
+    margin-top: 2em;
+    box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 25px 20px -20px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
+    padding: 1em;
+    background: #2A7B9B;
+    background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+    color: black;
+}
+
+
+.bg-custom-blue {
+    background-color: #1e90ff;
+    color: #fff;
+}
+
+.badge.bg-custom-blue {
+    font-size: 0.65rem;
+    padding: 4px 8px; 
+    border-radius: 12px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: -0.75em;
+    right: -0.5em;
+    z-index: 100;
+}
+
+#bronze-tab.active .bg-custom-blue,
+#silver-tab.active .bg-custom-blue,
+#gold-tab.active .bg-custom-blue,
+#platinum-tab.active .bg-custom-blue {
+    background-color: #1c3b8a; 
+    color: #fff;
+}
+
+#bronze-tab,
+#silver-tab,
+#gold-tab,
+#platinum-tab{
+    position: relative;
+    color: black;
+}
+
+.nav-tabs .nav-link {
+    color: #555;
+    background-color: transparent;
+    border: none;
+    transition: background-color 0.3s, color 0.3s;
+    font-weight: 600;
+    font-size: 0.90em;
+}
+
+.nav-tabs .nav-link.active {
+    color: #fff;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+#bronze-tab.active {
+    background-color: #cd7f32; 
+    color: #fff;
+}
+
+#silver-tab.active {
+    background-color: #c0c0c0; 
+    color: #333;
+}
+
+#gold-tab.active {
+    background-color: #ffd700; 
+    color: #333;
+}
+
+#platinum-tab.active {
+    background-color: #e5e4e2; 
+    color: #333;
+}
+
+#bronze-tab:hover {
+    background-color: #b87333;
+    color: #fff;
+}
+
+#silver-tab:hover {
+    background-color: #b0b0b0;
+    color: #333;
+}
+
+#gold-tab:hover {
+    background-color: #ffcc00;
+    color: #333;
+}
+
+#platinum-tab:hover {
+    background-color: #d8d8d8;
+    color: #333;
+}
+
+#bronze-tab img,
+#gold-tab img {
+    width: 30px;
+    height: auto;
+}
+
+#silver-tab img,
+#platinum-tab img {
+    width: 23px;
+    height: auto;
+}
+
+#trophyTabContent .row {
+    background: #faf7e6;
+    background: radial-gradient(circle, rgba(250, 247, 230, 1) 0%, rgba(95, 167, 250, 1) 100%);
+}
+
+
+#trophyTabContent .row .card-body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#trophyTabContent .row .card-body .card-text{
+    font-size: 0.95em;
+}
