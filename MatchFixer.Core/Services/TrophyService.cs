@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Core.Contracts;
+using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,31 @@ namespace MatchFixer.Core.Services
 		{
 			_dbContext = dbContext;
 		}
+
+		public async Task<List<TrophyViewModel>> GetAllTrophiesWithUserStatusAsync(Guid userId)
+		{
+			var allTrophies = await _dbContext.Trophies.AsNoTracking().ToListAsync();
+
+			var earned = await _dbContext.UserTrophies
+				.Where(ut => ut.UserId == userId)
+				.ToListAsync();
+
+			var earnedDict = earned.ToDictionary(ut => ut.TrophyId, ut => ut.IsNew);
+
+			var result = allTrophies.Select(t => new TrophyViewModel
+			{
+				TrophyId = t.Id,
+				Name = t.Name,
+				Description = t.Description,
+				IconUrl = t.IconUrl,
+				Level = t.Level,
+				IsEarned = earnedDict.ContainsKey(t.Id),
+				IsNew = earnedDict.TryGetValue(t.Id, out var isNew) && isNew
+			}).ToList();
+
+			return result;
+		}
+
 
 		public async Task AwardTrophyIfNotAlreadyAsync(Guid userId, int trophyId, string? notes = null)
 		{
