@@ -26,7 +26,10 @@ else
 						<div class="col-md-3 d-flex justify-content-center p-2">
 							@if (trophy.IsEarned)
 							{
-								<img src="@trophy.IconUrl" class="img-fluid rounded-2" alt="@trophy.Name" style="max-height: 100px;" />
+								<div class="trophy-image-container">
+									<img src="@trophy.IconUrl" class="img-fluid rounded-2" alt="@trophy.Name" style="max-height: 100px;" />
+									<img src="@trophy.IconUrl" class="hover-zoom-img" alt="Zoomed @trophy.Name" />
+								</div>
 							}
 							else
 							{
