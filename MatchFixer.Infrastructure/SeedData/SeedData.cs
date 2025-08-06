@@ -21,42 +21,42 @@ namespace MatchFixer.Infrastructure.SeedData
 			{
 				new Trophy
 				{
-					Name = "Rookie Rigger",
-					Description = "Every legend starts with one rigged match.",
+					Name = TrophyNames.RookieRigger,
+					Description = TrophyNames.RookieRiggerDescription,
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Bronze,
 					MilestoneTarget = 1,
-					IconUrl = "/images/trophies/rookier-rigger.png",
+					IconUrl = TrophyNames.RookieRiggerImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Fixer's Dozen",
-					Description = "You’ve hit triple digits. Fixing matches like a true pro.",
+					Name = TrophyNames.FixersDozen,
+					Description = TrophyNames.FixersDozenDescription,
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Silver,
 					MilestoneTarget = 100,
-					IconUrl = "/images/trophies/fixers-dozen.png",
+					IconUrl = TrophyNames.FixersDozenImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Bet Syndicate Boss",
-					Description = "Cash flows, bets grow, you run this show.",
+					Name = TrophyNames.BetSyndicateBoss,
+					Description = TrophyNames.BetSyndicateBossDescription,
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Gold,
-					MilestoneTarget = 2000, 
-	                IconUrl = "/images/trophies/bet-syndicate-boss.png",
+					MilestoneTarget = 2000,
+					IconUrl = TrophyNames.BetSyndicateBossImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Ultimate Grinder",
-					Description = "If placing bets were a job, you'd already be CEO of MatchFix Inc.",
+					Name = TrophyNames.UltimateGrinder,
+					Description = TrophyNames.UltimateGrinderDescription,
 					Type = TrophyType.Milestone,
 					Level = TrophyLevel.Platinum,
 					MilestoneTarget = 1000,
-					IconUrl = "/images/trophies/ultimate-grinder.png",
+					IconUrl = TrophyNames.UltimateGrinderImagePath,
 					IsHiddenUntilEarned = false
 				}
 			};
@@ -81,38 +81,38 @@ namespace MatchFixer.Infrastructure.SeedData
 			{
 				new Trophy
 				{
-					Name = "Fixer at Dawn",
-					Description = "Up before the bookies — rigging the odds with your morning brew.",
+					Name = TrophyNames.FixerAtDawn,
+					Description = TrophyNames.FixerAtDawnDescription,
 					Type = TrophyType.TimeBased,
 					Level = TrophyLevel.Bronze,
-					IconUrl = "/images/trophies/fixer-at-dawn.png",
+					IconUrl = TrophyNames.FixerAtDawnImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Midnight Fixer",
-					Description = "While others sleep, you’re cooking bets in the moonlight.",
+					Name = TrophyNames.MidnightFixer,
+					Description = TrophyNames.MidnightFixerDescription,
 					Type = TrophyType.TimeBased,
 					Level = TrophyLevel.Silver,
-					IconUrl = "/images/trophies/midnight-fixer.png",
+					IconUrl = TrophyNames.MidnightFixerImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Weekend Wager Warlord",
-					Description = "Weekends are for shady wagers and syndicate profits.",
+					Name = TrophyNames.WeekendWagerWarlord,
+					Description = TrophyNames.WeekendWagerWarlordDescription,
 					Type = TrophyType.TimeBased,
 					Level = TrophyLevel.Gold,
-					IconUrl = "/images/trophies/weekend-wager-warlord.png",
+					IconUrl = TrophyNames.WeekendWagerWarlordImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Last-Minute Leak",
-					Description = "Betting at the buzzer with 'insider' info in hand.",
+					Name = TrophyNames.LastMinuteLeak,
+					Description = TrophyNames.LastMinuteLeakDescription,
 					Type = TrophyType.TimeBased,
 					Level = TrophyLevel.Platinum,
-					IconUrl = "/images/trophies/last-minute-leak.png",
+					IconUrl = TrophyNames.LastMinuteLeakImagePath,
 					IsHiddenUntilEarned = false
 				}
 			};
@@ -134,55 +134,55 @@ namespace MatchFixer.Infrastructure.SeedData
 			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
 
 			var specialEventTrophies = new List<Trophy>
-	{
-		new Trophy
-		{
-			Name = "Silent Bet, Shady Night",
-			Description = "Placed a bet on Christmas Day – even Santa can’t fix this outcome.",
-			Type = TrophyType.SpecialEvent,
-			Level = TrophyLevel.Bronze,
-			ExpirationDate = new DateTime(2025, 12, 26), // expires after Dec 25, 2025
-			IconUrl = "/images/trophies/silent-bet-shady-night.png",
-			IsHiddenUntilEarned = false
-		},
-		new Trophy
-		{
-			Name = "Fixmas Miracle",
-			Description = "Placed 3 bets on Christmas Day – triple the cheer, triple the rigging.",
-			Type = TrophyType.SpecialEvent,
-			Level = TrophyLevel.Silver,
-			ExpirationDate = new DateTime(2025, 12, 26), // expires after Dec 25, 2025
-			IconUrl = "/images/trophies/fixmas-miracle.png",
-			IsHiddenUntilEarned = false
-		},
-		new Trophy
-		{
-			Name = "New Year, New Fix",
-			Description = "Started the year with a wager – resolutions are temporary, betting is forever.",
-			Type = TrophyType.SpecialEvent,
-			Level = TrophyLevel.Bronze,
-			IconUrl = "/images/trophies/new-year-new-fix.png",
-			IsHiddenUntilEarned = false
-		},
-		new Trophy
-		{
-			Name = "One Year, Many Fixes",
-			Description = "Your betting career turns 1 – we see you, Fixer-in-Chief.",
-			Type = TrophyType.SpecialEvent,
-			Level = TrophyLevel.Gold,
-			IconUrl = "/images/trophies/one-year-many-fixes.png",
-			IsHiddenUntilEarned = false
-		},
-		new Trophy
-		{
-			Name = "Summer Syndicate Slam",
-			Description = "10 shady bets in July – when the sun’s out, the fixes come out to play.",
-			Type = TrophyType.SpecialEvent,
-			Level = TrophyLevel.Silver,
-			IconUrl = "/images/trophies/summer-syndicate-slam.png",
-			IsHiddenUntilEarned = false
-		}
-	};
+			{
+				new Trophy
+				{
+					Name = TrophyNames.SilentBetShadyNight,
+					Description = TrophyNames.SilentBetShadyNightDescription,
+					Type = TrophyType.SpecialEvent,
+					Level = TrophyLevel.Bronze,
+					ExpirationDate = new DateTime(2025, 12, 26),
+					IconUrl = TrophyNames.SilentBetShadyNightImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.FixmasMiracle,
+					Description = TrophyNames.FixmasMiracleDescription,
+					Type = TrophyType.SpecialEvent,
+					Level = TrophyLevel.Silver,
+					ExpirationDate = new DateTime(2025, 12, 26),
+					IconUrl = TrophyNames.FixmasMiracleImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.NewYearNewFix,
+					Description = TrophyNames.NewYearNewFixDescription,
+					Type = TrophyType.SpecialEvent,
+					Level = TrophyLevel.Bronze,
+					IconUrl = TrophyNames.NewYearNewFixImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.OneYearManyFixes,
+					Description = TrophyNames.OneYearManyFixesDescription,
+					Type = TrophyType.SpecialEvent,
+					Level = TrophyLevel.Gold,
+					IconUrl = TrophyNames.OneYearManyFixesImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.SummerSyndicateSlam,
+					Description = TrophyNames.SummerSyndicateSlamDescription,
+					Type = TrophyType.SpecialEvent,
+					Level = TrophyLevel.Silver,
+					IconUrl = TrophyNames.SummerSyndicateSlamImagePath,
+					IsHiddenUntilEarned = false
+				}
+			};
 
 			foreach (var trophy in specialEventTrophies)
 			{
@@ -205,10 +205,10 @@ namespace MatchFixer.Infrastructure.SeedData
 				new Trophy
 				{
 					Name = TrophyNames.ShadowSyndicateRecruit,
-					Description = "Welcome to the underworld — you've been initiated just by showing up.",
+					Description = TrophyNames.ShadowSyndicateRecruitDescription,
 					Type = TrophyType.SpecialEvent,
 					Level = TrophyLevel.Bronze,
-					IconUrl = "/images/trophies/shadow-syndicate-recruit.png",
+					IconUrl = TrophyNames.ShadowSyndicateRecruitImagePath,
 					IsHiddenUntilEarned = false
 				}
 			};
@@ -233,74 +233,74 @@ namespace MatchFixer.Infrastructure.SeedData
 			{
 				new Trophy
 				{
-					Name = "Fixer’s Hot Streak",
-					Description = "Won 3 bets in a row — the syndicate’s golden goose is on fire.",
+					Name = TrophyNames.FixersHotStreak,
+					Description = TrophyNames.FixersHotStreakDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Bronze,
-					IconUrl = "/images/trophies/fixers-hot-streak.png",
+					IconUrl = TrophyNames.FixersHotStreakImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Syndicate Sharpshooter",
-					Description = "5 winning bets in a single day — you’re making bookies sweat.",
+					Name = TrophyNames.SyndicateSharpshooter,
+					Description = TrophyNames.SyndicateSharpshooterDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Silver,
-					IconUrl = "/images/trophies/syndicate-sharpshooter.png",
+					IconUrl = TrophyNames.SyndicateSharpshooterImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Rigged to Win",
-					Description = "20 total winning bets — statistically suspicious, impressively efficient.",
+					Name = TrophyNames.RiggedToWin,
+					Description = TrophyNames.RiggedToWinDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Gold,
-					IconUrl = "/images/trophies/rigged-to-win.png",
+					IconUrl = TrophyNames.RiggedToWinImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Fix Gone Wrong",
-					Description = "Lost 3 bets in a row — even the best plans fall apart sometimes.",
+					Name = TrophyNames.FixGoneWrong,
+					Description = TrophyNames.FixGoneWrongDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Bronze,
-					IconUrl = "/images/trophies/fix-gone-wrong.png",
+					IconUrl = TrophyNames.FixGoneWrongImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Unlucky Syndicate Soldier",
-					Description = "Lost 10 bets total — it’s not fixing, it’s just bad luck… right?",
+					Name = TrophyNames.UnluckySyndicateSoldier,
+					Description = TrophyNames.UnluckySyndicateSoldierDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Silver,
-					IconUrl = "/images/trophies/unlucky-syndicate-soldier.png",
+					IconUrl = TrophyNames.UnluckySyndicateSoldierImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Bankroll Obliterator",
-					Description = "Lost 5 bets in a single day — did you even try?",
+					Name = TrophyNames.BankrollObliterator,
+					Description = TrophyNames.BankrollObliteratorDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Gold,
-					IconUrl = "/images/trophies/bankroll-obliterator.png",
+					IconUrl = TrophyNames.BankrollObliteratorImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "Comeback Kingpin",
-					Description = "Won a bet after 5 straight losses — resilience or divine intervention?",
+					Name = TrophyNames.ComebackKingpin,
+					Description = TrophyNames.ComebackKingpinDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Platinum,
-					IconUrl = "/images/trophies/comeback-kingpin.png",
+					IconUrl = TrophyNames.ComebackKingpinImagePath,
 					IsHiddenUntilEarned = false
 				},
 				new Trophy
 				{
-					Name = "The Rollercoaster Rigger",
-					Description = "Alternated between win and loss 4 times in a row — your luck swings like a pendulum.",
+					Name = TrophyNames.RollercoasterRigger,
+					Description = TrophyNames.RollercoasterRiggerDescription,
 					Type = TrophyType.OutcomeBased,
 					Level = TrophyLevel.Silver,
-					IconUrl = "/images/trophies/rollercoaster-rigger.png",
+					IconUrl = TrophyNames.RollercoasterRiggerImagePath,
 					IsHiddenUntilEarned = false
 				}
 			};
