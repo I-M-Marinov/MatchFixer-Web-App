@@ -35,12 +35,12 @@
 #bronze-tab,
 #silver-tab,
 #gold-tab,
-#platinum-tab{
+#platinum-tab {
     position: relative;
     color: black;
 }
 
-.nav-tabs .nav-link {
+.trophy-nav-tabs .nav-link {
     color: #555;
     background-color: transparent;
     border: none;
@@ -49,49 +49,66 @@
     font-size: 0.90em;
 }
 
-.nav-tabs .nav-link.active {
+.trophy-nav-tabs .nav-link.active {
     color: #fff;
     border-radius: 0.5rem 0.5rem 0 0;
 }
 
 #bronze-tab.active {
-    background-color: #cd7f32; 
+    background-color: #cd7f32;
     color: #fff;
 }
 
 #silver-tab.active {
-    background-color: #c0c0c0; 
+    background-color: #c0c0c0;
     color: #333;
 }
 
 #gold-tab.active {
-    background-color: #ffd700; 
+    background-color: #ffd700;
     color: #333;
 }
 
 #platinum-tab.active {
-    background-color: #e5e4e2; 
+    background-color: #e5e4e2;
     color: #333;
 }
 
+
 #bronze-tab:hover {
+    border-radius: 0.5em;
     background-color: #b87333;
     color: #fff;
+    outline: 2px transparent;
+    outline-offset: 5px;
+    animation: bronzeOutlineGlow 1.2s linear infinite;
 }
 
 #silver-tab:hover {
+    border-radius: 0.5em;
     background-color: #b0b0b0;
     color: #333;
+    outline: 2px transparent;
+    outline-offset: 5px;
+    animation: silverOutlineGlow 1.2s linear infinite;
 }
 
 #gold-tab:hover {
+    border-radius: 0.5em;
     background-color: #ffcc00;
     color: #333;
+    outline: 2px transparent;
+    outline-offset: 5px;
+    animation: goldOutlineGlow 1.2s linear infinite;
 }
 
 #platinum-tab:hover {
+    border-radius: 0.5em;
     background-color: #d8d8d8;
     color: #333;
+    outline: 2px transparent;
+    outline-offset: 5px;
+    animation: platinumOutlineGlow 1.2s linear infinite;
 }
 
 #bronze-tab img,
