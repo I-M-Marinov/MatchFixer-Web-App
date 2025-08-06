@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using static MatchFixer.Infrastructure.SeedData.SeedData;
 
 
@@ -97,11 +98,7 @@ using (var scope = app.Services.CreateScope())
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
 	// trophies
-	await SeedInitialTrophiesAsync(services);                                 // Seed the Initial Trophies 
-	await SeedMilestoneTrophiesAsync(services);					             // Seed the Milestone Trophies 
-	await SeedTimeBasedTrophiesAsync(services);                             // Seed the Time Based Trophies 
-	await SeedSpecialEventTrophiesAsync(services);                         // Seed the Special Event Trophies 
-	await SeedOutcomeTrophiesAsync(services);                             // Seed the Outcome Trophies 
+	await SeedAllTrophiesAsync(services);								  // Seed all trophies 
 	// profile pictures
 	await SeedDefaultProfilePicture(userManager, services);             // Seed the Default User Image
 	await SeedDeletedUsersProfilePicture(userManager, services);       // Seed the Deleted User Image ( when user deletes their profile ) 
