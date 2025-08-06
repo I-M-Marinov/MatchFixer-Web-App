@@ -1,11 +1,12 @@
-﻿using MatchFixer.Common.Enums;
-using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Infrastructure.Services;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
+
+using MatchFixer.Common.Enums;
+using MatchFixer.Infrastructure.Entities;
+using MatchFixer.Infrastructure.Services;
 using MatchFixer.Common.GeneralConstants;
+
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 
@@ -13,6 +14,14 @@ namespace MatchFixer.Infrastructure.SeedData
 {
 	public class SeedData
 	{
+		public static async Task SeedAllTrophiesAsync(IServiceProvider serviceProvider)
+		{
+			await SeedInitialTrophiesAsync(serviceProvider);
+			await SeedMilestoneTrophiesAsync(serviceProvider);
+			await SeedTimeBasedTrophiesAsync(serviceProvider);
+			await SeedSpecialEventTrophiesAsync(serviceProvider);
+			await SeedOutcomeTrophiesAsync(serviceProvider);
+		}
 		public static async Task SeedMilestoneTrophiesAsync(IServiceProvider serviceProvider)
 		{
 			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
