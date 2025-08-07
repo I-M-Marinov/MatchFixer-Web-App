@@ -323,11 +323,15 @@
 				<div class="accordion-body">
 					@if (User.Identity.IsAuthenticated)
 					{
-						<p>Visit the Trophy Catalog <a asp-controller="Trophy" asp-action="TrophyCatalog">HERE</a></p>
+						<div class="d-flex justify-content-center gap-2">
+							<a asp-controller="Trophy" asp-action="TrophyCatalog" id="trophy-catalog-link"><i class="bi bi-trophy-fill"></i> Visit the Trophy Catalog</a>
+						</div>
 					}
 					else
 					{
-						<p>You must be logged in to view the Trophy Catalog.</p>
+						<div class="d-flex justify-content-center">
+							You must be logged in to view the Trophy Catalog.
+						</div>
 					}
 				</div>
 			</div>
