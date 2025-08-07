@@ -40,7 +40,7 @@
 
 <div class="background-profile"></div>
 
-<section class="profile-wrapper d-flex justify-content-start mx-auto">
+<section class="profile-wrapper d-flex justify-content-start mx-auto mb-0">
 <div class="profile-container d-flex gap-3 w-100">
 
 <!-- Left: Side-by-side Profile Cards -->
@@ -268,7 +268,7 @@
 	</div>
 
 	<!-- Submit Button -->
-	<div class="text-center mt-3">
+	<div class="text-center mt-3 pb-3">
 		<button type="submit" class="btn btn-primary d-none" id="save-btn">Save</button>
 	</div>
 </form>
@@ -440,7 +440,7 @@
     });
 
 
-       document.querySelectorAll('.edit-toggle-btn').forEach(button => {
+     document.querySelectorAll('.edit-toggle-btn').forEach(button => {
 
         if (!button.dataset.original) {
             button.dataset.original = button.innerHTML;
@@ -469,8 +469,8 @@
                 // Revert the input or select to the original value
                 input.value = input.dataset.originalValue;  // Revert the value
             } else {
-                button.textContent = 'Cancel';
-                button.classList.remove('edit-toggle-btn');
+				button.innerHTML = '<i class="ri-arrow-go-back-fill"></i>';
+				button.classList.remove('edit-toggle-btn');
                 button.classList.add('cancel-toggle-btn');
             }
 
