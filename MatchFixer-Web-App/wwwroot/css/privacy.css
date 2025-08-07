@@ -83,3 +83,17 @@
 .icon-content:hover .portfolio-icon path {
     fill: #ff0000; /* change SVG color on hover */
 }
+
+#trophy-catalog-link {
+    text-decoration: none;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
+    font-size: 1.2em;
+    font-family: "Special Gothic Expanded One", sans-serif !important;
+    font-weight: 400 !important;
+    color: #0DAB76;
+    transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+}
+
+#trophy-catalog-link:hover {
+    transform: scale(1.15);
+}
