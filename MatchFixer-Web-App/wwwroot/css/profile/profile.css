@@ -126,6 +126,7 @@
     height: auto;
     padding: 0.65rem 0.75em;
     margin-left: 0.25em;
+    margin-top: -0.65em;
 }
 
 .fw-lighter {
