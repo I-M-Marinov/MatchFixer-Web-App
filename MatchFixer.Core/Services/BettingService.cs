@@ -2,9 +2,9 @@
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
-using MatchFixer.Infrastructure.Contracts;
 using static MatchFixer.Common.GeneralConstants.BettingServiceConstants;
 
 namespace MatchFixer.Core.Services;
