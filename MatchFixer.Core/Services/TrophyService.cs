@@ -4,17 +4,23 @@ using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+
+using static MatchFixer.Common.EmailTemplates.EmailTemplates;
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 namespace MatchFixer.Core.Services
 {
 	public class TrophyService : ITrophyService
 	{
 		private readonly MatchFixerDbContext _dbContext;
+		private readonly IEmailSender _emailSender;
 
-		public TrophyService(MatchFixerDbContext dbContext)
+		public TrophyService(MatchFixerDbContext dbContext, IEmailSender emailSender)
 		{
 			_dbContext = dbContext;
+			_emailSender = emailSender;
 		}
 
 		public async Task<List<TrophyViewModel>> GetAllTrophiesWithUserStatusAsync(Guid userId)
@@ -41,7 +47,6 @@ namespace MatchFixer.Core.Services
 			return result;
 		}
 
-
 		public async Task AwardTrophyIfNotAlreadyAsync(Guid userId, int trophyId, string? notes = null)
 		{
 			bool alreadyAwarded = await _dbContext.UserTrophies
@@ -60,6 +65,25 @@ namespace MatchFixer.Core.Services
 
 				_dbContext.UserTrophies.Add(userTrophy);
 				await _dbContext.SaveChangesAsync();
+
+				var trophy = await _dbContext.Trophies.FirstOrDefaultAsync(t => t.Id == trophyId);
+				var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+				var logoUrl = LogoUrl;
+				var profileUrl = $"https://dummy-website.com/Profile/{userId}"; 
+
+				string htmlBody = EmailTrophyWon(
+					logoUrl,
+					trophy.IconUrl, 
+					trophy.Name,
+					profileUrl
+				);
+
+				await _emailSender.SendEmailAsync(
+					user.Email,
+					$"🏆 You’ve won the '{trophy.Name}' Trophy!",
+					htmlBody
+				);
 			}
 		}
 
