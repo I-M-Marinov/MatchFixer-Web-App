@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Text.Encodings.Web;
 
 namespace MatchFixer.Common.EmailTemplates
 {
@@ -11,7 +12,10 @@ namespace MatchFixer.Common.EmailTemplates
 		public const string SubjectPasswordResetRequested = "MatchFixer - Password reset requested"; // Email subject for the password reset requested emails
 		public const string SubjectHappyBirthdayFromMatchFixer = "🎂 Happy Birthday from MatchFixer!"; // Email subject for the birthday emails
 
-
+		public static string SubjectTrophyWonEmail(string trophyName)
+		{
+			return $@"🏆 You’ve won the '{trophyName}' Trophy!"; 
+		}
 		public static string WelcomeEmail(string logoUrl, string callbackUrl)
 		{
 			return $@"
