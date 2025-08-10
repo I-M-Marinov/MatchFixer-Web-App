@@ -158,10 +158,11 @@ namespace MatchFixer.Core.Services
 					profileUrl
 				);
 
+				var emailSubject = SubjectTrophyWonEmail(trophy.Name);
 
 				await _emailSender.SendEmailAsync(
 					user.Email,
-					$"🏆 You’ve won the '{trophy.Name}' Trophy!",
+					emailSubject,
 					htmlBody
 				);
 			}
