@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Core.Contracts;
+using MatchFixer.Core.DTOs.UserTrophyContext;
 using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
@@ -17,10 +18,89 @@ namespace MatchFixer.Core.Services
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IEmailSender _emailSender;
 
+		private readonly Dictionary<string, Func<UserTrophyContext, Task<bool>>> _trophyConditions;
+
+
 		public TrophyService(MatchFixerDbContext dbContext, IEmailSender emailSender)
 		{
 			_dbContext = dbContext;
 			_emailSender = emailSender;
+
+			_trophyConditions = new Dictionary<string, Func<UserTrophyContext, Task<bool>>>
+			{
+				// First trophy for all users
+				[TrophyNames.ShadowSyndicateRecruit] = ctx => Task.FromResult(true),
+
+				// Milestones
+				[TrophyNames.RookieRigger] = ctx => Task.FromResult(ctx.TotalBets >= 1),
+				[TrophyNames.FixersDozen] = ctx => Task.FromResult(ctx.TotalBets >= 100),
+				[TrophyNames.BetSyndicateBoss] = ctx => Task.FromResult(ctx.TotalWagered >= 2000),
+				[TrophyNames.UltimateGrinder] = ctx => Task.FromResult(ctx.TotalBets >= 1000),
+
+				// Time-based
+				[TrophyNames.FixerAtDawn] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
+					b.BetTime.TimeOfDay >= TimeSpan.FromHours(5) &&
+					b.BetTime.TimeOfDay <= TimeSpan.FromHours(8))),
+
+				[TrophyNames.MidnightFixer] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
+					b.BetTime.TimeOfDay >= TimeSpan.Zero &&
+					b.BetTime.TimeOfDay <= TimeSpan.FromHours(4))),
+
+				[TrophyNames.WeekendWagerWarlord] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
+					b.BetTime.DayOfWeek == DayOfWeek.Saturday ||
+					b.BetTime.DayOfWeek == DayOfWeek.Sunday)),
+
+				[TrophyNames.LastMinuteLeak] = async ctx =>
+					await ctx.DbContext.Set<Bet>()
+						.Include(b => b.MatchEvent)
+						.Where(b => b.BetSlip.UserId == ctx.UserId &&
+									b.MatchEvent != null &&
+									EF.Functions.DateDiffMinute(b.BetTime, b.MatchEvent.MatchDate) <= 5)
+						.AnyAsync(),
+
+				// Special dates
+				[TrophyNames.SilentBetShadyNight] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
+					b.BetTime.Date == new DateTime(2025, 12, 25))),
+
+				[TrophyNames.FixmasMiracle] = ctx => Task.FromResult(ctx.UserBets.Count(b =>
+					b.BetTime.Date == new DateTime(2025, 12, 25)) >= 3),
+
+				[TrophyNames.NewYearNewFix] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
+					b.BetTime.Month == 1 && b.BetTime.Day == 1)),
+
+				[TrophyNames.OneYearManyFixes] = ctx => Task.FromResult(
+					ctx.User != null && ctx.User.CreatedOn.Date <= ctx.Now.Date.AddYears(-1)),
+
+				[TrophyNames.SummerSyndicateSlam] = ctx => Task.FromResult(ctx.UserBets.Count(b =>
+					b.BetTime.Month == 7) >= 10),
+
+				// Outcome-based
+				[TrophyNames.FixersHotStreak] = ctx => Task.FromResult(
+					HasConsecutiveOutcomes(ctx.UserBets, BetStatus.Won, 3)),
+
+				[TrophyNames.SyndicateSharpshooter] = ctx => Task.FromResult(
+					ctx.UserBets.GroupBy(b => b.BetTime.Date)
+						.Any(g => g.Count(b => b.Status == BetStatus.Won) >= 5)),
+
+				[TrophyNames.RiggedToWin] = ctx => Task.FromResult(
+					ctx.UserBets.Count(b => b.Status == BetStatus.Won) >= 20),
+
+				[TrophyNames.FixGoneWrong] = ctx => Task.FromResult(
+					HasConsecutiveOutcomes(ctx.UserBets, BetStatus.Lost, 3)),
+
+				[TrophyNames.UnluckySyndicateSoldier] = ctx => Task.FromResult(
+					ctx.UserBets.Count(b => b.Status == BetStatus.Lost) >= 10),
+
+				[TrophyNames.BankrollObliterator] = ctx => Task.FromResult(
+					ctx.UserBets.GroupBy(b => b.BetTime.Date)
+						.Any(g => g.Count(b => b.Status == BetStatus.Lost) >= 5)),
+
+				[TrophyNames.ComebackKingpin] = ctx => Task.FromResult(
+					HasLossStreakThenWin(ctx.UserBets, 5)),
+
+				[TrophyNames.RollercoasterRigger] = ctx => Task.FromResult(
+					HasAlternatingOutcomes(ctx.UserBets, 4))
+			};
 		}
 
 		public async Task<List<TrophyViewModel>> GetAllTrophiesWithUserStatusAsync(Guid userId)
@@ -47,7 +127,7 @@ namespace MatchFixer.Core.Services
 			return result;
 		}
 
-		public async Task AwardTrophyIfNotAlreadyAsync(Guid userId, int trophyId, string? notes = null)
+		public async Task AwardTrophyIfNotAlreadyAsync(Guid userId, int trophyId, string profileUrl, string? notes = null)
 		{
 			bool alreadyAwarded = await _dbContext.UserTrophies
 				.AnyAsync(ut => ut.UserId == userId && ut.TrophyId == trophyId);
@@ -70,7 +150,6 @@ namespace MatchFixer.Core.Services
 				var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
 				var logoUrl = LogoUrl;
-				var profileUrl = $"https://dummy-website.com/Profile/{userId}"; 
 
 				string htmlBody = EmailTrophyWon(
 					logoUrl,
@@ -78,6 +157,7 @@ namespace MatchFixer.Core.Services
 					trophy.Name,
 					profileUrl
 				);
+
 
 				await _emailSender.SendEmailAsync(
 					user.Email,
@@ -87,13 +167,12 @@ namespace MatchFixer.Core.Services
 			}
 		}
 
-		public async Task EvaluateTrophiesAsync(Guid userId)
+		public async Task EvaluateTrophiesAsync(Guid userId, string profileUrl)
 		{
 			var now = DateTime.UtcNow;
 
 			// Load all trophies and user's earned trophies
 			var allTrophies = await _dbContext.Trophies.AsNoTracking().ToListAsync();
-
 			var earnedIds = await _dbContext.UserTrophies
 				.Where(ut => ut.UserId == userId)
 				.Select(ut => ut.TrophyId)
@@ -101,7 +180,7 @@ namespace MatchFixer.Core.Services
 
 			var toEvaluate = allTrophies.Where(t => !earnedIds.Contains(t.Id)).ToList();
 
-			// Fetch user bets + related BetSlip + MatchEvent in a single query
+			// Fetch user bets in one go
 			var userBets = await _dbContext.Bets
 				.Include(b => b.BetSlip)
 				.Include(b => b.MatchEvent)
@@ -111,143 +190,32 @@ namespace MatchFixer.Core.Services
 			int totalBets = userBets.Count;
 			decimal totalWagered = userBets.Sum(b => b.BetSlip.Amount);
 
-			foreach (var trophy in toEvaluate)
+			var user = await _dbContext.Users
+				.AsNoTracking()
+				.FirstOrDefaultAsync(u => u.Id == userId);
+
+			var context = new UserTrophyContext
 			{
-				switch (trophy.Name)
+				UserBets = userBets,
+				UserId = userId,
+				TotalBets = totalBets,
+				TotalWagered = totalWagered,
+				User = user,
+				Now = now,
+				DbContext = _dbContext
+			};
+
+			foreach (var kv in _trophyConditions)
+			{
+				var trophyId = toEvaluate.FirstOrDefault(t => t.Name == kv.Key)?.Id;
+				if (trophyId != null && await kv.Value(context))
 				{
-					// First trophy for all users ( just by registering ) 
-					case TrophyNames.ShadowSyndicateRecruit:
-						await AwardTrophy(userId, trophy.Id);
-						break;
-
-					// Milestone Trophies
-					case TrophyNames.RookieRigger:
-						if (totalBets >= 1)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.FixersDozen:
-						if (totalBets >= 100)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.BetSyndicateBoss:
-						if (totalWagered >= 2000)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.UltimateGrinder:
-						if (totalBets >= 1000)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					// Time-Based Trophies
-					case TrophyNames.FixerAtDawn:
-						if (userBets.Any(b => b.BetTime.TimeOfDay >= TimeSpan.FromHours(5) &&
-											  b.BetTime.TimeOfDay <= TimeSpan.FromHours(8)))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.MidnightFixer:
-						if (userBets.Any(b => b.BetTime.TimeOfDay >= TimeSpan.Zero &&
-											  b.BetTime.TimeOfDay <= TimeSpan.FromHours(4)))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.WeekendWagerWarlord:
-						if (userBets.Any(b => b.BetTime.DayOfWeek == DayOfWeek.Saturday ||
-											  b.BetTime.DayOfWeek == DayOfWeek.Sunday))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.LastMinuteLeak:
-						bool hasLastMinuteLeak = await _dbContext.Bets
-							.Include(b => b.MatchEvent)
-							.Where(b => b.BetSlip.UserId == userId &&
-										b.MatchEvent != null &&
-										EF.Functions.DateDiffMinute(b.BetTime, b.MatchEvent.MatchDate) <= 5)
-							.AnyAsync();
-
-						if (hasLastMinuteLeak)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					// Special Event Trophies
-					case TrophyNames.SilentBetShadyNight:
-						if (userBets.Any(b => b.BetTime.Date == new DateTime(2025, 12, 25)))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.FixmasMiracle:
-						if (userBets.Count(b => b.BetTime.Date == new DateTime(2025, 12, 25)) >= 3)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.NewYearNewFix:
-						if (userBets.Any(b => b.BetTime.Month == 1 && b.BetTime.Day == 1))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.OneYearManyFixes:
-						var user = await _dbContext.Users
-							.AsNoTracking()
-							.FirstOrDefaultAsync(u => u.Id == userId);
-
-						if (user != null && user.CreatedOn.Date <= now.Date.AddYears(-1))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.SummerSyndicateSlam:
-						if (userBets.Count(b => b.BetTime.Month == 7) >= 10)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					// Outcome-Based Trophies
-					case TrophyNames.FixersHotStreak:
-						if (HasConsecutiveOutcomes(userBets, BetStatus.Won, 3))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.SyndicateSharpshooter:
-						if (userBets.GroupBy(b => b.BetTime.Date)
-						    .Any(g => g.Count(b => b.Status == BetStatus.Won) >= 5))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.RiggedToWin:
-						if (userBets.Count(b => b.Status == BetStatus.Won) >= 20)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.FixGoneWrong:
-						if (HasConsecutiveOutcomes(userBets, BetStatus.Lost, 3))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.UnluckySyndicateSoldier:
-						if (userBets.Count(b => b.Status != BetStatus.Won) >= 10)
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.BankrollObliterator:
-						if (userBets.GroupBy(b => b.BetTime.Date)
-						    .Any(g => g.Count(b => b.Status != BetStatus.Won) >= 5))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.ComebackKingpin:
-						if (HasLossStreakThenWin(userBets, 5))
-							await AwardTrophy(userId, trophy.Id);
-						break;
-
-					case TrophyNames.RollercoasterRigger:
-						if (HasAlternatingOutcomes(userBets, 4))
-							await AwardTrophy(userId, trophy.Id);
-						break;
+					await AwardTrophy(userId, trophyId.Value, profileUrl);
 				}
-
 			}
+
 		}
+
 
 		public async Task MarkTrophyAsSeenAsync(Guid userId, int trophyId)
 		{
@@ -261,9 +229,9 @@ namespace MatchFixer.Core.Services
 			}
 		}
 
-		private async Task AwardTrophy(Guid userId, int trophyId, string? notes = null)
+		private async Task AwardTrophy(Guid userId, int trophyId, string profileUrl, string? notes = null)
 		{
-			await AwardTrophyIfNotAlreadyAsync(userId, trophyId, notes);
+			await AwardTrophyIfNotAlreadyAsync(userId, trophyId, profileUrl, notes);
 		}
 
 		private bool HasConsecutiveOutcomes(List<Bet> bets, BetStatus targetStatus, int count)
