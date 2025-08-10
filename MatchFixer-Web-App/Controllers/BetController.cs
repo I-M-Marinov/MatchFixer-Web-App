@@ -1,6 +1,5 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
-using MatchFixer.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -24,7 +23,9 @@ namespace MatchFixer_Web_App.Controllers
 		public async Task<IActionResult> PlaceBet(BetSlipDto model)
 		{
 			var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var (message, success) = await _bettingService.PlaceBetAsync(userId, model);
+			var profileUrl = Url.Action("Profile", "Profile", null, Request.Scheme);
+
+			var (message, success) = await _bettingService.PlaceBetAsync(userId, model, profileUrl);
 
 			if (!success)
 			{
