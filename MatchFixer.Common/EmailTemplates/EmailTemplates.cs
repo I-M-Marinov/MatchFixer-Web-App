@@ -224,37 +224,43 @@ namespace MatchFixer.Common.EmailTemplates
 		{
 			return $@"
 			    <!DOCTYPE html>
-			    <html>
-			        <head>
-			            <meta charset='UTF-8'>
-			            <title>You've Won a Trophy!</title>
-			        </head>
-			        <body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-			            <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
-			                <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-			                    <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
-			                </div>
-			                <div style='padding: 30px; text-align: center;'>
-			                    <h2 style='color: #333;'>🏆 Congratulations!</h2>
-			                    <p style='font-size: 1.1em; color: #555;'>You have just unlocked a new trophy:</p>
-			                    <h3 style='color: #27ae60; margin-top: 10px;'>{trophyName}</h3>
-			                    <img src='{trophyImageUrl}' alt='{trophyName}' style='max-width: 200px; margin: 20px 0;' />
-			                    
-			                    <a href='{HtmlEncoder.Default.Encode(profileUrl)}' 
-			                       style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; color: black; text-decoration: none; border-radius: 6px; font-weight: bold;'>
-			                        View Your Trophy Cabinet
-			                    </a>
+					<html>
+					    <head>
+					        <meta charset='UTF-8'>
+					        <title>You've Won a Trophy!</title>
+					    </head>
+					    <body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
+					        <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+					            <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
+					                <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
+					            </div>
+					            <div style='padding: 30px; text-align: center;'>
+					                <h2 style='color: #333;'>🏆 Congratulations!</h2>
+					                <p style='font-size: 1.1em; color: #555;'>You have just unlocked a new trophy:</p>
+					                <h3 style='color: #27ae60; margin-top: 10px;'>{trophyName}</h3>
+					                <table role='presentation' width='100%'>
+									    <tr>
+									        <td align='center'>
+									            <img src='{trophyImageUrl}' alt='{trophyName}' style='max-width: 200px;' />
+									        </td>
+									    </tr>
+									</table>
+					                
+					                <a href='{HtmlEncoder.Default.Encode(profileUrl)}' 
+					                   style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #27ae60; border: 2px black solid; color: black; text-decoration: none; border-radius: 6px; font-weight: bold;'>
+					                    View It In Your Trophy Cabinet
+					                </a>
 
-			                    <p style='margin-top: 30px; font-size: 13px; color: #888;'>
-			                        Keep betting smart to earn even more trophies!
-			                    </p>
-			                    <p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-			                       All Rights Reserved. MatchFixer ® 2025
-			                    </p>
-			                </div>
-			            </div>
-			        </body>
-			    </html>";
+					                <p style='margin-top: 30px; font-size: 13px; color: #888;'>
+					                    Keep betting smart to earn even more trophies!
+					                </p>
+					                <p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
+					                   All Rights Reserved. MatchFixer ® 2025
+					                </p>
+					            </div>
+					        </div>
+					    </body>
+					</html>";
 		}
 
 	}
