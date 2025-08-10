@@ -32,7 +32,7 @@ public class BettingService : IBettingService
 		
 	}
 
-	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto)
+	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl)
 	{
 		if (betSlipDto == null || betSlipDto.Bets == null || !betSlipDto.Bets.Any())
 			return (NoBetsProvided, false);
@@ -90,7 +90,7 @@ public class BettingService : IBettingService
 		await _dbContext.BetSlips.AddAsync(betSlip);
 		await _dbContext.SaveChangesAsync();
 
-		await _trophyService.EvaluateTrophiesAsync(userId);
+		await _trophyService.EvaluateTrophiesAsync(userId, profileUrl);
 
 		return (BetSlipSubmittedSuccessfully, true);
 	}
