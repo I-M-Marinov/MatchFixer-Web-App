@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 
 namespace MatchFixer.Common.EmailTemplates
 {
