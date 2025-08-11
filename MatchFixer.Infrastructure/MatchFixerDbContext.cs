@@ -25,6 +25,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<LiveMatchResult> LiveMatchResults { get; set; }
 		public virtual DbSet<Trophy> Trophies { get; set; }
 		public virtual DbSet<UserTrophy> UserTrophies { get; set; }
+		public virtual DbSet<MatchEventLog> MatchEventLogs { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
