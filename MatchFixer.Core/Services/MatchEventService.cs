@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using static MatchFixer.Common.DerbyLookup.DerbyLookup;
 using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
+
 
 
 #nullable disable
@@ -101,8 +101,6 @@ namespace MatchFixer.Core.Services
 			return viewModels;
 		}
 
-
-
 		public async Task AddEventAsync(MatchEventFormModel model)
 		{
 			var homeTeam = await _dbContext.Teams.FindAsync(model.HomeTeamId);
@@ -168,22 +166,35 @@ namespace MatchFixer.Core.Services
 
 		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime kickoffTime)
 		{
+			var userId = _userContextService.GetUserId();
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
 			if (match == null || match.IsCancelled)
 			{
 				throw new Exception(MatchUpdateFailed);
 			}
-			
-			if (match.HomeOdds == homeOdds && match.DrawOdds == drawOdds && match.AwayOdds == awayOdds &&
-			    match.MatchDate == kickoffTime)
+
+			var changes = new (string Property, object? OldValue, object? NewValue, Action Apply)[]
 			{
-				return false;
+				(nameof(match.HomeOdds), match.HomeOdds, homeOdds, () => match.HomeOdds = homeOdds),
+				(nameof(match.DrawOdds), match.DrawOdds, drawOdds, () => match.DrawOdds = drawOdds),
+				(nameof(match.AwayOdds), match.AwayOdds, awayOdds, () => match.AwayOdds = awayOdds),
+				(nameof(match.MatchDate), match.MatchDate, kickoffTime, () => match.MatchDate = kickoffTime)
+			};
+
+			bool anyChange = false;
+
+			foreach (var (property, oldVal, newVal, apply) in changes)
+			{
+				if (!Equals(oldVal, newVal))
+				{
+					LogChange(match.Id, property, oldVal, newVal, userId);
+					apply();
+					anyChange = true;
+				}
 			}
 
-			match.HomeOdds = homeOdds;
-			match.DrawOdds = drawOdds;
-			match.AwayOdds = awayOdds;
-			match.MatchDate = kickoffTime;
+			if (!anyChange)
+				return false;
 
 			await _dbContext.SaveChangesAsync();
 			return true;
@@ -204,6 +215,22 @@ namespace MatchFixer.Core.Services
 
 			await _dbContext.SaveChangesAsync();
 			return true;
+		}
+
+		private void LogChange(Guid matchEventId, string property, object? oldValue, object? newValue, Guid changedByUserId)
+		{
+			if (Equals(oldValue, newValue))
+				return;
+
+			_dbContext.MatchEventLogs.Add(new MatchEventLog()
+			{
+				MatchEventId = matchEventId,
+				PropertyName = property,
+				OldValue = oldValue?.ToString(),
+				NewValue = newValue?.ToString(),
+				ChangedByUserId = changedByUserId,
+				ChangedAt = DateTime.UtcNow
+			});
 		}
 
 	}
