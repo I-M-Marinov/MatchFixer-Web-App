@@ -4,7 +4,6 @@ using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using static MatchFixer.Common.DerbyLookup.DerbyLookup;
 using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
 
@@ -19,16 +18,19 @@ namespace MatchFixer.Core.Services
 		private readonly MatchFixerDbContext _dbContext; 
 		private readonly IUserContextService _userContextService;
 		private readonly IBettingService _bettingService;
+		private readonly IMatchEventNotifier _notifier;
 
 
 		public MatchEventService(
 			MatchFixerDbContext dbContext, 
 			 IUserContextService userContextService,
-			 IBettingService bettingService)
+			 IBettingService bettingService,
+			 IMatchEventNotifier notifier)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
 			_bettingService = bettingService;
+			_notifier = notifier;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -197,6 +199,8 @@ namespace MatchFixer.Core.Services
 				return false;
 
 			await _dbContext.SaveChangesAsync();
+			await _notifier.NotifyMatchEventUpdatedAsync(matchEventId, homeOdds, drawOdds, awayOdds);
+
 			return true;
 		}
 
