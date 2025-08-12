@@ -63,7 +63,7 @@
 				@foreach (var match in Model)
 				{
 					<div class="col">
-						<div class="event-card position-relative" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone">
+						<div class="event-card position-relative" data-match-id="@match.Id" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone">
 
 							<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
 								<div class="card-body d-flex flex-column justify-content-around @(match.IsDerby ? "derby-match-container-effects" : "")" style="position: relative; object-fit: contain;">
@@ -155,7 +155,7 @@
 												<tbody class="tw-divide-y tw-divide-gray-200">
 												<tr>
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-															<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
+														<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
 														      data-away="@match.AwayTeam"
@@ -163,6 +163,7 @@
 														      data-away-logo-url="@match.AwayTeamLogoUrl"
 														      data-option="Home"
 														      data-odds="@match.HomeWinOdds">
+
 															@match.HomeWinOdds
 														</span>
 													</td>
@@ -467,4 +468,54 @@
 		renderDatePills();
 	});
 
+		document.addEventListener("DOMContentLoaded", function () {
+		const connection = new signalR.HubConnectionBuilder()
+			.withUrl("/matchEventHub")
+			.withAutomaticReconnect()
+			.build();
+
+		connection.on("MatchEventUpdated", function (update) {
+
+			const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
+			if (!card) {
+				return;
+			}
+
+			card.classList.add("highlight-change");
+			setTimeout(() => card.classList.remove("highlight-change"), 2000);
+
+			const homeOddsElement = card.querySelector('tbody span[data-option="Home"]');
+			const drawOddsElement = card.querySelector('tbody span[data-option="Draw"]');
+			const awayOddsElement = card.querySelector('tbody span[data-option="Away"]');
+
+			if (homeOddsElement) homeOddsElement.textContent = update.homeOdds.toFixed(2);
+			if (drawOddsElement) drawOddsElement.textContent = update.drawOdds.toFixed(2);
+			if (awayOddsElement) awayOddsElement.textContent = update.awayOdds.toFixed(2);
+		});
+
+		connection.start()
+			.then(() => {
+				// After connected, subscribe to each match group
+				document.querySelectorAll('.event-card').forEach(card => {
+					const matchId = card.dataset.matchId;
+					connection.invoke("SubscribeToEvent", matchId)
+						.catch(err => console.error(`Failed to subscribe to match ${matchId}:`, err.toString()));
+				});
+			})
+			.catch(err => {
+				console.error('SignalR connection failed:', err.toString());
+			});
+	});
+
+
+
+
+	
 </script>
+
+<style>
+	.highlight-change {
+		background-color: yellow;
+		transition: background-color 2s ease;
+	}
+</style>
