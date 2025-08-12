@@ -1,10 +1,11 @@
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Middlewares;
 using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
+using MatchFixer_Web_App.Hubs;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,8 @@ using static MatchFixer.Infrastructure.SeedData.SeedData;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
 
 // Configuration for the password of the application 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -39,7 +42,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
 builder.Services.AddHttpClient();                                               // Add HTTP Client
-builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service 
+builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
 builder.Services.AddHostedService<UserCleanupService>();						// Add User Cleanup Service ( background service ) 
 builder.Services.AddHostedService<BirthdayEmailService>();						// Add User Birthday Email Service ( background service that runs once a day ! ) 
@@ -55,6 +58,7 @@ builder.Services.AddScoped<IImageService, ImageService>();						// Add the Image
 builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Profile Service 
 builder.Services.AddScoped<IWalletService, WalletService>();					// Add the Wallet Service
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
+builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
 builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();				// Add the Logo Quiz Service
 builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
@@ -134,6 +138,12 @@ app.UseAuthorization();
 
 // custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
+
+app.UseEndpoints(endpoints =>
+{
+	endpoints.MapControllers();
+	endpoints.MapHub<MatchEventHub>("/matchEventHub"); // 
+});
 
 app.MapControllerRoute(
     name: "default",
