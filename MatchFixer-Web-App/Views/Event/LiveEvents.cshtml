@@ -481,16 +481,36 @@
 				return;
 			}
 
-			card.classList.add("highlight-change");
-			setTimeout(() => card.classList.remove("highlight-change"), 2000);
 
 			const homeOddsElement = card.querySelector('tbody span[data-option="Home"]');
 			const drawOddsElement = card.querySelector('tbody span[data-option="Draw"]');
 			const awayOddsElement = card.querySelector('tbody span[data-option="Away"]');
 
-			if (homeOddsElement) homeOddsElement.textContent = update.homeOdds.toFixed(2);
-			if (drawOddsElement) drawOddsElement.textContent = update.drawOdds.toFixed(2);
-			if (awayOddsElement) awayOddsElement.textContent = update.awayOdds.toFixed(2);
+			const homeHeader = card.querySelector('thead th[data-option="Home"]');
+			const drawHeader = card.querySelector('thead th[data-option="Draw"]');
+			const awayHeader = card.querySelector('thead th[data-option="Away"]');
+
+			animateOddsChange(homeOddsElement, update.homeOdds);
+			animateOddsChange(drawOddsElement, update.drawOdds);
+			animateOddsChange(awayOddsElement, update.awayOdds);
+
+			if (homeOddsElement && homeHeader) {
+				homeOddsElement.textContent = update.homeOdds.toFixed(2);
+				homeOddsElement.dataset.lastOdds = update.homeOdds;
+				homeHeader.dataset.odds = update.homeOdds;
+			}
+
+			if (drawOddsElement && drawHeader) {
+				drawOddsElement.textContent = update.drawOdds.toFixed(2);
+				drawOddsElement.dataset.lastOdds = update.drawOdds;
+				drawHeader.dataset.odds = update.drawOdds;
+			}
+
+			if (awayOddsElement && awayHeader) {
+				awayOddsElement.textContent = update.awayOdds.toFixed(2);
+				awayOddsElement.dataset.lastOdds = update.awayOdds;
+				awayHeader.dataset.odds = update.awayOdds;
+			}
 		});
 
 		connection.start()
@@ -507,6 +527,43 @@
 			});
 	});
 
+		function animateOddsChange(element, newOdds) {
+	  if (!element) return;
+
+	  const oldOdds = parseFloat(element.dataset.lastOdds ?? element.textContent) || 0;
+	  newOdds = parseFloat(newOdds);
+	  if (!Number.isFinite(newOdds) || newOdds === oldOdds) return;
+
+	  const wentUp = newOdds > oldOdds;
+	  const colorClass = wentUp ? 'odds-up' : 'odds-down';
+	  const animClass  = wentUp ? 'animate__rubberBand' : 'animate__rubberBand';
+
+	  // Update number + store for next time
+	  element.textContent = newOdds.toFixed(2);
+	  element.dataset.lastOdds = newOdds;
+
+	  // 1) Remove *all* animation and color classes
+	  [...element.classList].forEach(c => {
+		if (c.startsWith('animate__')) element.classList.remove(c);
+	  });
+	  element.classList.remove('odds-up', 'odds-down');
+
+	  // 2) Force reflow so animation restarts
+	  void element.offsetWidth;
+
+	  // 3) Add new animation + color
+	  element.style.setProperty('--animate-duration', '0.8s');
+	  element.classList.add('animate__animated', animClass, colorClass, 'animate__slower');
+
+	  // 4) Remove animation + color after animation completes
+	  function onEnd(e) {
+		if (e.target !== element) return;
+		element.classList.remove('animate__animated', animClass, 'odds-up', 'odds-down');
+		element.removeEventListener('animationend', onEnd);
+		element.style.removeProperty('--animate-duration');
+	  }
+	  element.addEventListener('animationend', onEnd);
+	}
 
 
 
@@ -514,8 +571,14 @@
 </script>
 
 <style>
-	.highlight-change {
-		background-color: yellow;
-		transition: background-color 2s ease;
+	.odds-up {
+		color: #28a745;
+		transition: color 0.4s ease;
 	}
+
+	.odds-down {
+		color: #dc3545;
+		transition: color 0.4s ease;
+	}
+
 </style>
