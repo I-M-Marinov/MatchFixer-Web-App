@@ -519,3 +519,13 @@
     z-index: 2;
 }
 
+odds-up {
+    color: #007c30;
+    transition: color 0.4s ease;
+}
+
+.odds-down {
+    color: #b51919;
+    transition: color 0.4s ease;
+}
+
