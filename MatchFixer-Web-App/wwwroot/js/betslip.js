@@ -332,7 +332,13 @@ function renderBetSlip() {
         const statusBadge = document.createElement("span");
         statusBadge.classList.add("badge", "status-badge", "bg-secondary");
         statusBadge.textContent = "";
+
+        const oddsChangeBadge = document.createElement("span");
+        oddsChangeBadge.classList.add("badge", "odds-change-badge", "bg-secondary");
+        oddsChangeBadge.textContent = "";
+
         right.appendChild(statusBadge);
+        right.appendChild(oddsChangeBadge);
 
         wrapper.appendChild(left);
         wrapper.appendChild(right);
