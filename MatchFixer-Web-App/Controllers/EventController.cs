@@ -113,6 +113,14 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
+		[HttpPost]
+		[ValidateAntiForgeryToken] 
+		public async Task<IActionResult> GetLatestOdds([FromBody] Guid[] matchIds)
+		{
+			var odds = await _matchEventService.GetOddsForMatchesAsync(matchIds);
+			return Json(odds);
+		}
+
 
 	}
 }
