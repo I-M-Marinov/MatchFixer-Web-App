@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
@@ -237,5 +238,18 @@ namespace MatchFixer.Core.Services
 			});
 		}
 
+		public async Task<Dictionary<Guid, OddsDTO>> GetOddsForMatchesAsync(Guid[] matchIds)
+		{
+			return await _dbContext.MatchEvents
+				.Where(me => matchIds.Contains(me.Id))
+				.Select(me => new OddsDTO
+				{
+					Id = me.Id,
+					HomeOdds = me.HomeOdds,
+					DrawOdds = me.DrawOdds,
+					AwayOdds = me.AwayOdds
+				})
+				.ToDictionaryAsync(x => x.Id, x => x);
+		}
 	}
 }
