@@ -183,3 +183,9 @@
 .clear-all-bets.add-bet-to-submit:hover {
     text-shadow: 1px 1px 3px #53be7f !important;
 }
+
+.odds-change-badge{
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+}
