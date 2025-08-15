@@ -19,12 +19,13 @@
 			{
 				foreach (var bet in Model.Bets)
 				{
-					<div class="bet-item border rounded p-2 mb-2" data-start-time="@bet.StartTimeUtc.ToString("o")" data-match-id="@bet.MatchId">
+					<div class="bet-item border rounded p-2 mb-2" data-start-time="@bet.StartTimeUtc.ToString("o")" data-match-id="@bet.MatchId" data-option="@bet.SelectedOption">
 						<div class="d-flex justify-content-between">
 							<div>
 								<strong>@bet.HomeTeam</strong> vs <strong>@bet.AwayTeam</strong><br />
 								Pick: <span class="text-info">@bet.SelectedOption</span><br />
-								Odds: <strong>@bet.Odds</strong>
+								Odds: <span class="bet-odds">@bet.Odds</span>
+
 							</div>
 							<div class="text-end">
 								<span class="badge status-badge bg-secondary"></span>
@@ -69,3 +70,103 @@
 		</div>
 	</div>
 </form>
+
+			
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		setInterval(checkForOddsChanges, 3000);
+	});
+
+	async function checkForOddsChanges() {
+		const betItems = document.querySelectorAll('.bet-item');
+		const matchIds = [...betItems].map(item => item.dataset.matchId);
+
+		if (!matchIds.length) return;
+
+		try {
+			const res = await fetch('/Event/GetLatestOdds', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'RequestVerificationToken': getCsrfToken()
+				},
+				body: JSON.stringify(matchIds)
+			});
+
+			const latestOdds = await res.json();
+
+				betItems.forEach(item => {
+					const matchId = item.dataset.matchId;
+					const selectedOption = item.querySelector('input[name*=".SelectedOption"]').value;
+					const currentOddsEl = item.querySelector('#odds-multiplier');
+					const hiddenOddsInput = item.querySelector('input[name*=".Odds"]');
+
+					if (!latestOdds[matchId]) return;
+
+					let newOdds;
+					switch (selectedOption) {
+						case 'Home': newOdds = latestOdds[matchId].HomeOdds; break;
+						case 'Draw': newOdds = latestOdds[matchId].DrawOdds; break;
+						case 'Away': newOdds = latestOdds[matchId].AwayOdds; break;
+					}
+
+					const oldOdds = parseFloat(hiddenOddsInput.value);
+					newOdds = parseFloat(newOdds);
+					if (isNaN(newOdds) || oldOdds === newOdds) return;
+
+					// Highlight the change
+					highlightOddsChange(item, oldOdds, newOdds);
+
+					// Update the visible odds inside #odds-multiplier
+					const oddsLabel = currentOddsEl.querySelector('strong');
+					if (oddsLabel) oddsLabel.textContent = newOdds.toFixed(2) + 'x';
+
+					// Update hidden input for form submission
+					hiddenOddsInput.value = newOdds.toFixed(2);
+
+					addBetToSession({
+						MatchId: matchId,
+						HomeTeam: item.querySelector('input[name*=".HomeTeam"]').value,
+						AwayTeam: item.querySelector('input[name*=".AwayTeam"]').value,
+						HomeLogoUrl: item.dataset.homeLogoUrl || '',
+						AwayLogoUrl: item.dataset.awayLogoUrl || '',
+						SelectedOption: selectedOption,
+						Odds: newOdds
+					});
+
+				});
+
+
+			updateTotalOddsAndReturn();
+		} catch (err) {
+			console.error('Failed to fetch latest odds', err);
+		}
+	}
+
+	function highlightOddsChange(item, oldOdds, newOdds) {
+		const badge = item.querySelector('.odds-change-badge');
+		badge.className = `badge odds-change-badge ${newOdds > oldOdds ? 'bg-success' : 'bg-danger'}`;
+		badge.textContent = newOdds > oldOdds ? '↑' : '↓';
+		setTimeout(() => {
+			badge.className = 'badge odds-change-badge bg-secondary';
+			badge.textContent = '';
+		}, 5000);
+	}
+
+	function getCsrfToken() {
+		return document.querySelector('input[name="__RequestVerificationToken"]').value;
+	}
+
+	function updateTotalOddsAndReturn() {
+		let totalOdds = 1;
+		document.querySelectorAll('.bet-item input[name*=".Odds"]').forEach(inp => {
+			totalOdds *= parseFloat(inp.value);
+		});
+		document.getElementById('totalOdds').innerText = totalOdds.toFixed(2);
+		updatePotentialReturn();
+	}
+
+
+
+
+</script>
