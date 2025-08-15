@@ -1,10 +1,9 @@
-﻿using System.Text.Json;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.Extensions;
 using MatchFixer.Core.ViewModels.GameSessionState;
 using Microsoft.AspNetCore.Http;
-
+using System.Text.Json;
 using static MatchFixer.Common.GeneralConstants.SessionConstants;
 
 namespace MatchFixer.Core.Services
