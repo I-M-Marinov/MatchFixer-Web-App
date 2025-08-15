@@ -2,6 +2,7 @@
 using MatchFixer.Core.DTOs.Bets;
 using Microsoft.AspNetCore.Mvc;
 using MatchFixer.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace MatchFixer_Web_App.Controllers
@@ -18,13 +19,11 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Get()
+		public async Task<IActionResult> Get([FromServices] MatchFixerDbContext dbContext)
 		{
-
 			var betSlip = _sessionService.GetBetSlipState();
 
-			if (betSlip == null)
-			{
+			if (betSlip == null || !betSlip.Bets.Any())
 				return new JsonResult(new
 				{
 					userId = (string?)null,
@@ -32,7 +31,29 @@ namespace MatchFixer_Web_App.Controllers
 					totalOdds = 0.0,
 					stakeAmount = 0.0
 				});
+
+			// Fetch latest odds for all matches in the bet slip
+			var matchIds = betSlip.Bets.Select(b => b.MatchId).ToList();
+			var matches = await dbContext.MatchEvents
+				.Where(m => matchIds.Contains(m.Id))
+				.ToDictionaryAsync(m => m.Id);
+
+			// Update session bets with latest odds
+			foreach (var bet in betSlip.Bets)
+			{
+				if (matches.TryGetValue(bet.MatchId, out var match))
+				{
+					switch (bet.SelectedOption)
+					{
+						case "Home": bet.Odds = (decimal)match.HomeOdds; break;
+						case "Draw": bet.Odds = (decimal)match.DrawOdds; break;
+						case "Away": bet.Odds = (decimal)match.AwayOdds; break;
+					}
+				}
 			}
+
+			// Save updated session
+			_sessionService.SetBetSlipState(betSlip);
 
 			var jsBetSlip = new
 			{
@@ -47,7 +68,6 @@ namespace MatchFixer_Web_App.Controllers
 					option = b.SelectedOption,
 					odds = b.Odds,
 					startTimeUtc = b.StartTimeUtc.ToString("o")
-
 				}),
 				totalOdds = betSlip.TotalOdds,
 				stakeAmount = betSlip.StakeAmount
@@ -55,6 +75,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			return new JsonResult(jsBetSlip);
 		}
+
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
