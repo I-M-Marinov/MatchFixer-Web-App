@@ -4,6 +4,7 @@ using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.UserTrophyContext;
 using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,14 +18,16 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IEmailSender _emailSender;
+		private readonly ITimezoneService _timezoneService;
 
 		private readonly Dictionary<string, Func<UserTrophyContext, Task<bool>>> _trophyConditions;
 
 
-		public TrophyService(MatchFixerDbContext dbContext, IEmailSender emailSender)
+		public TrophyService(MatchFixerDbContext dbContext, IEmailSender emailSender, ITimezoneService timezoneService)
 		{
 			_dbContext = dbContext;
 			_emailSender = emailSender;
+			_timezoneService = timezoneService;
 
 			_trophyConditions = new Dictionary<string, Func<UserTrophyContext, Task<bool>>>
 			{
@@ -38,9 +41,18 @@ namespace MatchFixer.Core.Services
 				[TrophyNames.UltimateGrinder] = ctx => Task.FromResult(ctx.TotalBets >= 1000),
 
 				// Time-based
-				[TrophyNames.FixerAtDawn] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
-					b.BetTime.TimeOfDay >= TimeSpan.FromHours(5) &&
-					b.BetTime.TimeOfDay <= TimeSpan.FromHours(8))),
+				[TrophyNames.FixerAtDawn] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
+
+					return Task.FromResult(ctx.UserBets.Any(b =>
+					{
+						var localBetTime = _timezoneService.ConvertToUserTime(b.BetTime, ctx.User.TimeZone);
+						return localBetTime.TimeOfDay >= TimeSpan.FromHours(5) &&
+						       localBetTime.TimeOfDay <= TimeSpan.FromHours(8);
+					}));
+				},
 
 				[TrophyNames.MidnightFixer] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
 					b.BetTime.TimeOfDay >= TimeSpan.Zero &&
