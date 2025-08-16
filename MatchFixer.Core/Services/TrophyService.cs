@@ -54,20 +54,38 @@ namespace MatchFixer.Core.Services
 					}));
 				},
 
-				[TrophyNames.MidnightFixer] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
-					b.BetTime.TimeOfDay >= TimeSpan.Zero &&
-					b.BetTime.TimeOfDay <= TimeSpan.FromHours(4))),
+				[TrophyNames.MidnightFixer] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
 
-				[TrophyNames.WeekendWagerWarlord] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
-					b.BetTime.DayOfWeek == DayOfWeek.Saturday ||
-					b.BetTime.DayOfWeek == DayOfWeek.Sunday)),
+					return Task.FromResult(ctx.UserBets.Any(b =>
+					{
+						var localBetTime = _timezoneService.ConvertToUserTime(b.BetTime, ctx.User.TimeZone);
+						return localBetTime.TimeOfDay >= TimeSpan.Zero &&
+						       localBetTime.TimeOfDay <= TimeSpan.FromHours(4);
+					}));
+				},
+
+				[TrophyNames.WeekendWagerWarlord] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
+
+					return Task.FromResult(ctx.UserBets.Any(b =>
+					{
+						var localBetTime = _timezoneService.ConvertToUserTime(b.BetTime, ctx.User.TimeZone);
+						return localBetTime.DayOfWeek == DayOfWeek.Saturday ||
+						       localBetTime.DayOfWeek == DayOfWeek.Sunday;
+					}));
+				},
 
 				[TrophyNames.LastMinuteLeak] = async ctx =>
 					await ctx.DbContext.Set<Bet>()
 						.Include(b => b.MatchEvent)
 						.Where(b => b.BetSlip.UserId == ctx.UserId &&
-									b.MatchEvent != null &&
-									EF.Functions.DateDiffMinute(b.BetTime, b.MatchEvent.MatchDate) <= 5)
+						            b.MatchEvent != null &&
+						            EF.Functions.DateDiffMinute(b.BetTime, b.MatchEvent.MatchDate) <= 5)
 						.AnyAsync(),
 
 				// Special dates
