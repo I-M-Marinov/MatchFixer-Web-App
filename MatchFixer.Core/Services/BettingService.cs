@@ -108,6 +108,7 @@ public class BettingService : IBettingService
 			.ThenInclude(b => b.MatchEvent)
 			.ThenInclude(me => me.LiveResult) 
 			.Where(bs => bs.UserId == userId)
+			.OrderByDescending(b => b.BetTime)
 			.ToListAsync();
 
 
