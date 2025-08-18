@@ -186,6 +186,18 @@
 
 .odds-change-badge{
     position: absolute;
-    top: 0.5em;
+    top: 3em;
     right: 0.5em;
+}
+
+.odds-change-badge.up {
+    background-color: #28a745; 
+    border: 1px solid #3370a8;
+    color: white;
+}
+
+.odds-change-badge.down {
+    background-color: #dc3545; 
+    border: 1px solid #3370a8;
+    color: white;
 }
