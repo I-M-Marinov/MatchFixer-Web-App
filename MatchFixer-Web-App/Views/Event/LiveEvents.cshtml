@@ -271,7 +271,7 @@
 	});
 
 
-		document.querySelectorAll('.event-card').forEach(card => {
+	document.querySelectorAll('.event-card').forEach(card => {
 		const userTimeZone = card.dataset.userTz;
 
 		const kickoffDate = new Date(card.dataset.kickoff); // ******************** / UTC / ********************
@@ -468,7 +468,7 @@
 		renderDatePills();
 	});
 
-		document.addEventListener("DOMContentLoaded", function () {
+	document.addEventListener("DOMContentLoaded", function () {
 		const connection = new signalR.HubConnectionBuilder()
 			.withUrl("/matchEventHub")
 			.withAutomaticReconnect()
@@ -527,7 +527,7 @@
 			});
 	});
 
-		function animateOddsChange(element, newOdds) {
+	function animateOddsChange(element, newOdds) {
 	  if (!element) return;
 
 	  const oldOdds = parseFloat(element.dataset.lastOdds ?? element.textContent) || 0;
@@ -542,20 +542,15 @@
 	  element.textContent = newOdds.toFixed(2);
 	  element.dataset.lastOdds = newOdds;
 
-	  // 1) Remove *all* animation and color classes
 	  [...element.classList].forEach(c => {
 		if (c.startsWith('animate__')) element.classList.remove(c);
 	  });
 	  element.classList.remove('odds-up', 'odds-down');
-
-	  // 2) Force reflow so animation restarts
 	  void element.offsetWidth;
 
-	  // 3) Add new animation + color
 	  element.style.setProperty('--animate-duration', '0.8s');
 	  element.classList.add('animate__animated', animClass, colorClass, 'animate__slower');
 
-	  // 4) Remove animation + color after animation completes
 	  function onEnd(e) {
 		if (e.target !== element) return;
 		element.classList.remove('animate__animated', animClass, 'odds-up', 'odds-down');
