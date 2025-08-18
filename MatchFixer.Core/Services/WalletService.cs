@@ -77,7 +77,6 @@ namespace MatchFixer.Core.Services
 			return model;
 		}
 
-
 		public async Task<Wallet> CreateWalletAsync()
 		{
 			var userId = _userContextService.GetUserId();
