@@ -25,7 +25,7 @@
 								<strong>@bet.HomeTeam</strong> vs <strong>@bet.AwayTeam</strong><br />
 								Pick: <span class="text-info">@bet.SelectedOption</span><br />
 								Odds: <span class="bet-odds">@bet.Odds</span>
-
+								<span class="odds-change-badge"></span>
 							</div>
 							<div class="text-end">
 								<span class="badge status-badge bg-secondary"></span>
@@ -145,12 +145,19 @@
 
 	function highlightOddsChange(item, oldOdds, newOdds) {
 		const badge = item.querySelector('.odds-change-badge');
-		badge.className = `badge odds-change-badge ${newOdds > oldOdds ? 'bg-success' : 'bg-danger'}`;
-		badge.textContent = newOdds > oldOdds ? '↑' : '↓';
-		setTimeout(() => {
-			badge.className = 'badge odds-change-badge bg-secondary';
-			badge.textContent = '';
-		}, 5000);
+
+		const matchId = item.dataset.matchId;
+		const option = item.dataset.option;
+		const isUp = newOdds > oldOdds;
+
+		localStorage.setItem(`oddsDir_${matchId}_${option}`, isUp ? 'up' : 'down');
+
+		renderArrow(badge, isUp);
+	}
+
+	function renderArrow(badge, isUp) {
+		badge.textContent = isUp ? '↑' : '↓';
+		badge.className = `animate__animated animate__slower badge odds-change-badge ${isUp ? 'up animate__fadeInUp' : 'down animate__fadeInDown'}`;
 	}
 
 	function getCsrfToken() {
@@ -165,8 +172,6 @@
 		document.getElementById('totalOdds').innerText = totalOdds.toFixed(2);
 		updatePotentialReturn();
 	}
-
-
 
 
 </script>
