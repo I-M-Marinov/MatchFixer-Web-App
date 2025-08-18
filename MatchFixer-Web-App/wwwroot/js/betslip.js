@@ -317,6 +317,7 @@ function renderBetSlip() {
         item.classList.add("bet-item", "border", "rounded", "p-2", "mb-2");
         item.dataset.startTime = bet.startTimeUtc;
         item.dataset.matchId = bet.matchId;
+        item.dataset.option = bet.option;
 
         removeBtnSpan.appendChild(removeIconElement);
         removeBtnSpan.appendChild(customTooltipSpan);
@@ -336,6 +337,14 @@ function renderBetSlip() {
         const oddsChangeBadge = document.createElement("span");
         oddsChangeBadge.classList.add("badge", "odds-change-badge", "bg-secondary");
         oddsChangeBadge.textContent = "";
+
+        const matchId = bet.matchId;
+        const option = bet.option;
+
+        const state = localStorage.getItem(`oddsDir_${matchId}_${option}`);
+        if (state) {
+            renderArrow(oddsChangeBadge, state === 'up');
+        }
 
         right.appendChild(statusBadge);
         right.appendChild(oddsChangeBadge);
