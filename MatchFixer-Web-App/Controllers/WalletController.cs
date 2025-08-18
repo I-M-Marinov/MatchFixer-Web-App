@@ -1,6 +1,8 @@
 ﻿using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
+using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
+
 namespace MatchFixer_Web_App.Controllers
 {
 
@@ -22,7 +24,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			var wallet = await _walletService.CreateWalletAsync();
 
-			TempData["SuccessMessage"] = "Wallet created successfully.";
+			TempData["SuccessMessage"] = WalletCreatedSuccessfully;
 			return RedirectToAction("WalletDetails");
 		}
 
@@ -46,7 +48,7 @@ namespace MatchFixer_Web_App.Controllers
 			try
 			{
 				await _walletService.DepositAsync(amount, "Manual deposit");
-				TempData["SuccessMessage"] = $"Successfully deposited {amount:0.00} EUR.";
+				TempData["SuccessMessage"] = SuccessfullyDeposited(amount);
 			}
 			catch (ArgumentException ex)
 			{
@@ -54,7 +56,7 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (InvalidOperationException ex)
 			{
-				TempData["ErrorMessage"] = "Your wallet could not be found.";
+				TempData["ErrorMessage"] = WalletNotFound;
 			}
 
 			return RedirectToAction("WalletDetails");
@@ -70,11 +72,11 @@ namespace MatchFixer_Web_App.Controllers
 
 				if (success)
 				{
-					TempData["SuccessMessage"] = $"Successfully withdrew {amount:0.00} EUR.";
+					TempData["SuccessMessage"] = SuccessfullyWithdrew(amount);
 				}
 				else
 				{
-					TempData["ErrorMessage"] = "Insufficient balance for this withdrawal.";
+					TempData["ErrorMessage"] = InsufficientBalanceForWithdrawal;
 				}
 			}
 			catch (ArgumentException ex)
@@ -83,7 +85,7 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (InvalidOperationException)
 			{
-				TempData["ErrorMessage"] = "Your wallet could not be found.";
+				TempData["ErrorMessage"] = WalletNotFound;
 			}
 
 			return RedirectToAction("WalletDetails");
