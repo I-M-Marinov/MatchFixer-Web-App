@@ -1,5 +1,4 @@
-﻿using MatchFixer.Common.Enums;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
