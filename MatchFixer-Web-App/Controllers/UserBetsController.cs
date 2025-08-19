@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
+using static MatchFixer.Common.GeneralConstants.UserBetsConstants;
+
 namespace MatchFixer_Web_App.Controllers
 {
 	[Authorize]
@@ -40,11 +42,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!success)
 			{
-				TempData["ErrorMessage"] = "Could not evaluate this bet slip. It may still be pending or already settled.";
+				TempData["ErrorMessage"] = CouldNotEvaluateBetslip;
 			}
 			else
 			{
-				TempData["SuccessMessage"] = "Bet slip evaluated successfully.";
+				TempData["SuccessMessage"] = BetSlipEvaluatedSuccessfully;
 			}
 
 			return RedirectToAction(nameof(UserBets));
