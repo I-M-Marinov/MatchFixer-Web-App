@@ -1,9 +1,8 @@
 ﻿using MatchFixer.Core.Contracts;
-using MatchFixer.Core.Services;
 using MatchFixer.Core.ViewModels.MatchResults;
-using MatchFixer.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
+using static MatchFixer.Common.GeneralConstants.MatchResultConstants;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -41,9 +40,9 @@ namespace MatchFixer_Web_App.Controllers
 			var success = await _resultService.AddMatchResultAsync(input.MatchId, input.HomeScore, input.AwayScore, input.Notes);
 
 			if (success)
-				TempData["SuccessMessage"] = "Match result saved successfully and winnings awarded.";
+				TempData["SuccessMessage"] = MatchResultSavedSuccessfully;
 			else
-				TempData["ErrorMessage"] = "Could not save result. It might already be recorded.";
+				TempData["ErrorMessage"] = MatchResultSaveFailed;
 
 			return RedirectToAction(nameof(LiveMatchResults));
 		}
