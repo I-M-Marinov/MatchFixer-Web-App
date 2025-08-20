@@ -54,3 +54,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 4500);
     }
 });
+
+/*-------------------------------------------------------------------------------------------
+| SPONSOR CAROUSEL ON THE INDEX PAGE AND ON THE GAME OVER VIEW IN THE MATCHFIXER GAME        |
+--------------------------------------------------------------------------------------------*/
+
+document.addEventListener('DOMContentLoaded', function () {
+    const track = document.getElementById('sponsorTrack');
+    const set = document.getElementById('sponsorSet');
+
+    const clone = set.cloneNode(true);
+    track.appendChild(clone);
+
+    let setWidth = set.offsetWidth;
+    let scrollPos = 0;
+    const speed = 0.25; // speed of the carousel
+
+    function step() {
+        scrollPos += speed;
+        if (scrollPos >= setWidth) {
+            scrollPos = 0;
+        }
+        track.style.transform = `translateX(-${scrollPos}px)`;
+        requestAnimationFrame(step);
+    }
+
+    window.addEventListener('load', () => {
+        setWidth = set.offsetWidth;
+        requestAnimationFrame(step);
+    });
+});
