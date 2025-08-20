@@ -142,6 +142,7 @@
     flex-grow: 0;
     height: fit-content;
     min-height: 300px;
+    margin-bottom: 0.5em;
 }
 
 
