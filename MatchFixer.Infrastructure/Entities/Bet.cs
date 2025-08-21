@@ -40,5 +40,9 @@ namespace MatchFixer.Infrastructure.Entities
 		[Required]
 		[Comment("Status of the bet")]
 		public BetStatus Status { get; set; } = BetStatus.Pending; // default to pending status 
+
+		public Guid? OddsBoostId { get; set; }
+		[ForeignKey(nameof(OddsBoostId))]
+		public OddsBoost? OddsBoost { get; set; }
 	}
 }
