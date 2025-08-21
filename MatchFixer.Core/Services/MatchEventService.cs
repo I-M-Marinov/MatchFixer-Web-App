@@ -20,32 +20,43 @@ namespace MatchFixer.Core.Services
 		private readonly IUserContextService _userContextService;
 		private readonly IBettingService _bettingService;
 		private readonly IMatchEventNotifier _notifier;
+		private readonly IOddsBoostService _oddsBoostService;
 
 
 		public MatchEventService(
 			MatchFixerDbContext dbContext, 
 			 IUserContextService userContextService,
 			 IBettingService bettingService,
-			 IMatchEventNotifier notifier)
+			 IMatchEventNotifier notifier,
+			 IOddsBoostService oddsBoostService)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
 			_bettingService = bettingService;
 			_notifier = notifier;
+			_oddsBoostService = oddsBoostService;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
 		{
 			var now = DateTime.UtcNow;
-
 			var user = await _userContextService.GetCurrentUserAsync();
 
 			var events = await _dbContext.MatchEvents
-				.Where(e => e.MatchDate > now && e.LiveResult == null && e.IsCancelled != true) // Only upcoming matches + result submitted yet + matches that are not already voided
+				.Where(e => e.MatchDate > now && e.LiveResult == null && e.IsCancelled != true)
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.OrderBy(e => e.MatchDate)
-				.Select(e => new LiveEventViewModel
+				.ToListAsync();
+
+			var result = new List<LiveEventViewModel>();
+
+			foreach (var e in events)
+			{
+				var (effHome, effDraw, effAway, boost) = await _oddsBoostService
+					.GetEffectiveOddsAsync(e.Id, e.HomeOdds, e.DrawOdds, e.AwayOdds);
+
+				result.Add(new LiveEventViewModel
 				{
 					Id = e.Id,
 					HomeTeam = e.HomeTeam.Name,
@@ -54,16 +65,20 @@ namespace MatchFixer.Core.Services
 					HomeWinOdds = e.HomeOdds ?? 0,
 					DrawOdds = e.DrawOdds ?? 0,
 					AwayWinOdds = e.AwayOdds ?? 0,
+					EffectiveHomeWinOdds = effHome,
+					EffectiveDrawOdds = effDraw,
+					EffectiveAwayWinOdds = effAway,
+					ActiveBoost = boost,
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					IsDerby = e.IsDerby,
 					UserTimeZone = user.TimeZone
-				})
-				.AsNoTracking()
-				.ToListAsync();
+				});
+			}
 
-			return events;
+			return result;
 		}
+
 
 		public async Task<List<LiveEventViewModel>> GetAllEventsAsync()
 		{
