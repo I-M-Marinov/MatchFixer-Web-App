@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Services;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,14 @@ namespace MatchFixer_Web_App.Controllers
 	public class EventController : Controller
 	{
 		private readonly IMatchEventService _matchEventService;
+		private readonly IUserContextService _userContextService;
+		private readonly IOddsBoostService _oddsBoostService;
 
-		public EventController(IMatchEventService matchEventService)
+		public EventController(IMatchEventService matchEventService, IUserContextService userContextService, IOddsBoostService oddsBoostService)
 		{
 			_matchEventService = matchEventService;
+			_userContextService = userContextService;
+			_oddsBoostService = oddsBoostService;
 		}
 
 		[HttpGet]
@@ -120,6 +125,42 @@ namespace MatchFixer_Web_App.Controllers
 			var odds = await _matchEventService.GetOddsForMatchesAsync(matchIds);
 			return Json(odds);
 		}
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> CreateOddsBoost(CreateOddsBoostViewModel model)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			try
+			{
+				var user = await _userContextService.GetCurrentUserAsync();
+
+				DateTime? startUtc = null;
+
+				if (model.StartUtc.HasValue)
+				{
+					startUtc = model.StartUtc.Value.ToUniversalTime();
+				}
+
+				var boost = await _oddsBoostService.CreateOddsBoostAsync(
+					matchEventId: model.MatchEventId,
+					boostValue: model.BoostValue,
+					duration: TimeSpan.FromMinutes(model.DurationMinutes),
+					createdByUserId: user.Id,
+					startUtc: startUtc, 
+					maxStakePerBet: model.MaxStakePerBet,
+					maxUsesPerUser: model.MaxUsesPerUser,
+					note: model.Note);
+
+				return Json(new { success = true, boost });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = ex.Message });
+			}
+		}
+
 
 
 	}
