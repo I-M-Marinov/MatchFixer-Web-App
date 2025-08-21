@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using MatchFixer.Infrastructure.Entities;
+﻿using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace MatchFixer.Infrastructure
@@ -26,6 +26,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<Trophy> Trophies { get; set; }
 		public virtual DbSet<UserTrophy> UserTrophies { get; set; }
 		public virtual DbSet<MatchEventLog> MatchEventLogs { get; set; }
+		public virtual DbSet<OddsBoost> OddsBoosts { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -85,6 +86,23 @@ namespace MatchFixer.Infrastructure
 			builder.Entity<UserTrophy>()
 				.HasIndex(ut => new { ut.UserId, ut.TrophyId })
 				.IsUnique(); // a user can get only one unique trophy 
+
+			builder.Entity<OddsBoost>()
+				.HasIndex(x => new { x.MatchEventId, x.StartUtc, x.EndUtc, x.IsActive });
+
+			builder.Entity<OddsBoost>()
+				.HasOne(x => x.MatchEvent) // One oddsboost belongs to one MatchEvent
+				.WithMany(e => e.OddsBoosts) // One MatchEvent can have many OddsBoosts
+				.HasForeignKey(x => x.MatchEventId);
+
+			builder.Entity<OddsBoost>(entity =>
+			{
+				entity.Property(e => e.BoostValue)
+					.HasPrecision(5, 2); 
+
+				entity.Property(e => e.MaxStakePerBet)
+					.HasPrecision(18, 2);
+			});
 		}
 	}
 }
