@@ -35,5 +35,6 @@ namespace MatchFixer.Infrastructure.Entities
 		public LiveMatchResult? LiveResult { get; set; }
 		public bool IsCancelled { get; set; } = false; 
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
+		public ICollection<OddsBoost> OddsBoosts { get; set; } = new List<OddsBoost>();
 	}
 }
