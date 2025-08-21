@@ -153,45 +153,71 @@
 												</tr>
 												</thead>
 												<tbody class="tw-divide-y tw-divide-gray-200">
-												<tr>
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
-														      data-match-id="@match.Id"
-														      data-home="@match.HomeTeam"
-														      data-away="@match.AwayTeam"
-														      data-home-logo-url="@match.HomeTeamLogoUrl"
-														      data-away-logo-url="@match.AwayTeamLogoUrl"
-														      data-option="Home"
-														      data-odds="@match.HomeWinOdds">
+													<tr>
+														<!-- Home Odds -->
+														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+															<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
+																  data-match-id="@match.Id"
+																  data-home="@match.HomeTeam"
+																  data-away="@match.AwayTeam"
+																  data-home-logo-url="@match.HomeTeamLogoUrl"
+																  data-away-logo-url="@match.AwayTeamLogoUrl"
+																  data-option="Home"
+																  data-odds="@match.EffectiveHomeWinOdds ?? match.HomeWinOdds">
+																@if (match.ActiveBoost != null)
+																{
+																	@match.EffectiveHomeWinOdds
+																}
+																else
+																{
+																	@match.HomeWinOdds
+																}
+															</span>
+														</td>
 
-															@match.HomeWinOdds
-														</span>
-													</td>
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+														<!-- Draw Odds -->
+														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
 															<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
-														      data-match-id="@match.Id"
-														      data-home="@match.HomeTeam"
-														      data-away="@match.AwayTeam"
-														      data-home-logo-url="@match.HomeTeamLogoUrl"
-														      data-away-logo-url="@match.AwayTeamLogoUrl"
-														      data-option="Draw"
-														      data-odds="@match.DrawOdds">
-															@match.DrawOdds
-														</span>
-													</td>
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+																  data-match-id="@match.Id"
+																  data-home="@match.HomeTeam"
+																  data-away="@match.AwayTeam"
+																  data-home-logo-url="@match.HomeTeamLogoUrl"
+																  data-away-logo-url="@match.AwayTeamLogoUrl"
+																  data-option="Draw"
+																  data-odds="@match.EffectiveDrawOdds ?? match.DrawOdds">
+																@if (match.ActiveBoost != null)
+																{
+																	@match.EffectiveDrawOdds
+																}
+																else
+																{
+																	@match.DrawOdds
+																}
+															</span>
+														</td>
+
+														<!-- Away Odds -->
+														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
 															<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
-														      data-match-id="@match.Id"
-														      data-home="@match.HomeTeam"
-														      data-away="@match.AwayTeam"
-														      data-home-logo-url="@match.HomeTeamLogoUrl"
-														      data-away-logo-url="@match.AwayTeamLogoUrl"
-														      data-option="Away"
-														      data-odds="@match.AwayWinOdds">
-															@match.AwayWinOdds
-														</span>
-													</td>
-												</tr>
+																  data-match-id="@match.Id"
+																  data-home="@match.HomeTeam"
+																  data-away="@match.AwayTeam"
+																  data-home-logo-url="@match.HomeTeamLogoUrl"
+																  data-away-logo-url="@match.AwayTeamLogoUrl"
+																  data-option="Away"
+																  data-odds="@match.EffectiveAwayWinOdds ?? match.AwayWinOdds">
+																@if (match.ActiveBoost != null)
+																{
+																	@match.EffectiveAwayWinOdds
+																}
+																else
+																{
+																	@match.AwayWinOdds
+																}
+															</span>
+														</td>
+													</tr>
+
 												</tbody>
 											</table>
 										</div>
