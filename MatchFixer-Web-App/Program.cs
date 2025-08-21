@@ -57,6 +57,7 @@ builder.Services.AddScoped<ITrophyService, TrophyService>();                    
 builder.Services.AddScoped<IImageService, ImageService>();						// Add the Image Service 
 builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Profile Service 
 builder.Services.AddScoped<IWalletService, WalletService>();					// Add the Wallet Service
+builder.Services.AddScoped<IOddsBoostService, OddsBoostService>();				// Add the Odds Boost Service
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
 builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
