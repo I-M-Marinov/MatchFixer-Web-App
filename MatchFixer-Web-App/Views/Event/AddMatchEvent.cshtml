@@ -20,6 +20,55 @@
 
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="createBoostModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="createBoostForm">
+				@Html.AntiForgeryToken()
+				<div class="modal-header">
+					<h5 class="modal-title">Create Odds Boost</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" name="MatchEventId" id="MatchEventId"/>
+
+					<div class="mb-3">
+						<label class="form-label">Boost Value</label>
+						<input type="number" step="0.01" class="form-control" name="BoostValue" required/>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Start Time (UTC)</label>
+						<input type="datetime-local" class="form-control" name="StartUtc"/>
+						<small class="form-text text-muted">Leave empty to start immediately.</small>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Duration (minutes)</label>
+						<input type="number" class="form-control" name="DurationMinutes" value="30"/>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Max Stake Per Bet</label>
+						<input type="number" step="0.01" class="form-control" name="MaxStakePerBet"/>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Max Uses Per User</label>
+						<input type="number" class="form-control" name="MaxUsesPerUser"/>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Note</label>
+						<input type="text" class="form-control" name="Note"/>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Create</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
 <div class="position-relative"> 
 	<div id="model-error-add-event" asp-validation-summary="ModelOnly"
 	     class="position-absolute start-50 translate-middle-x"
@@ -128,6 +177,7 @@
 							<th>Date & Time</th>
 							<th>Home Team</th>
 							<th>Away Team</th>
+							<th>Add a Boost</th>
 							<th>Update</th>
 						</tr>
 						</thead>
@@ -159,6 +209,14 @@
 								<td>
 									<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="height: 40px; width:auto; margin-right: 5px;" />
 									@ev.AwayTeam
+								</td>
+								<td>
+									<button type="button" class="btn btn-sm btn-warning create-boost-btn"
+									        data-bs-toggle="modal"
+									        data-bs-target="#createBoostModal"
+									        data-match-id="@ev.Id">
+										<i class="ri-fire-fill"></i>
+									</button>
 								</td>
 								<td style="max-width: 350px;">
 									<div class="d-flex justify-content-between align-items-start flex-wrap">
@@ -332,6 +390,63 @@
 			});
 
 		});
+
+					document.addEventListener("DOMContentLoaded", () => {
+			const form = document.getElementById("createBoostForm");
+			const matchIdInput = document.getElementById("MatchEventId");
+
+			// When modal is triggered, set the hidden field
+			document.querySelectorAll(".create-boost-btn").forEach(btn => {
+				btn.addEventListener("click", () => {
+					const matchId = btn.getAttribute("data-match-id");
+					matchIdInput.value = matchId;
+				});
+			});
+
+			form.addEventListener("submit", async function (e) {
+				e.preventDefault();
+
+				const formData = new FormData(form);
+
+				// Convert local datetime-local to UTC
+				const startInput = form.querySelector("input[name='StartUtc']");
+				if (startInput && startInput.value) {
+					const localDate = new Date(startInput.value);
+					formData.set("StartUtc", localDate.toISOString());
+				}
+
+				// Get anti-forgery token
+				const tokenInput = form.querySelector("input[name='__RequestVerificationToken']");
+				const token = tokenInput ? tokenInput.value : "";
+
+				try {
+					const response = await fetch("/Event/CreateOddsBoost", {
+						method: "POST",
+						body: formData,
+						headers: {
+							"RequestVerificationToken": token
+						}
+					});
+
+					if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+
+					const result = await response.json();
+
+					if (result.success) {
+						alert("Promo created successfully!");
+						location.reload();
+					} else {
+						alert("Error: " + (result.message || "Unknown error occurred."));
+					}
+				} catch (err) {
+					console.error("Request failed", err);
+					alert("Request failed: " + err.message);
+				}
+			});
+		});
+
+
+
 
 	</script>
 }
