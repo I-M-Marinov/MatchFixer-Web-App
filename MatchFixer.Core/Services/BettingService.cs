@@ -16,20 +16,23 @@ public class BettingService : IBettingService
 	private readonly ITimezoneService _timezoneService;
 	private readonly IWalletService _walletService;
 	private readonly ITrophyService _trophyService;
+	private readonly IOddsBoostService _oddsBoostService;
 
 
 	public BettingService(MatchFixerDbContext dbContext, 
 		ISessionService sessionService, 
 		ITimezoneService timezoneService,
 		IWalletService walletService,
-		ITrophyService trophyService)
+		ITrophyService trophyService,
+		IOddsBoostService oddsBoostService)
 	{
 		_dbContext = dbContext;
 		_sessionService = sessionService;
 		_timezoneService = timezoneService;
 		_walletService = walletService;
 		_trophyService = trophyService;
-		
+		_oddsBoostService = oddsBoostService;
+
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl)
@@ -40,7 +43,6 @@ public class BettingService : IBettingService
 		if (betSlipDto.Amount <= 0)
 			return (BetAmountMustBeGreaterThanZero, false);
 
-		// Create the BetSlip first
 		var betSlip = new BetSlip
 		{
 			Id = Guid.NewGuid(),
@@ -50,38 +52,67 @@ public class BettingService : IBettingService
 			IsSettled = false
 		};
 
-		// Deduct the amount from the user's wallet if has enough money to place the bet
+		// Deduct once for the whole slip
 		var (success, message) = await _walletService.DeductForBetAsync(userId, betSlipDto.Amount);
-
 		if (!success)
-		{
 			return (message, false);
-		}
 
 		foreach (var betDto in betSlipDto.Bets)
 		{
-			// Validate match event exists
 			var matchEvent = await _dbContext.MatchEvents.FindAsync(betDto.MatchId);
 			if (matchEvent == null)
 				return ($"Match with ID {betDto.MatchId} not found.", false);
 
-			// Validate if all events in the betlsip are actually live ( started events fall off site and cannot be bet on ) 
 			if (DateTime.UtcNow >= matchEvent.MatchDate)
 				return (EventAlreadyStartedInSlip, false);
 
-			// Validate pick is a known enum value
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
 				return ($"Invalid pick option '{betDto.SelectedOption}'.", false);
 
-			// Create the Bet entity (no amount per individual bet anymore)
+			// Use the shared odds calculator
+			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
+				matchEvent.Id,
+				matchEvent.HomeOdds,
+				matchEvent.DrawOdds,
+				matchEvent.AwayOdds
+			);
+
+			decimal? effectiveOdds = betDto.SelectedOption.ToLower() switch
+			{
+				"home" => home,
+				"draw" => draw,
+				"away" => away,
+				_ => betDto.Odds // fallback, shouldn't happen if validated
+			};
+
+			if (boost != null)
+			{
+				// Enforce max stake
+				if (boost.MaxStakePerBet.HasValue && betSlipDto.Amount > boost.MaxStakePerBet.Value)
+					return ($"Max stake per bet is {boost.MaxStakePerBet.Value}", false);
+
+				// Enforce max uses per user
+				if (boost.MaxUsesPerUser.HasValue)
+				{
+					var used = await _dbContext.Bets
+						.CountAsync(x => x.BetSlip.UserId == userId &&
+										 x.MatchEventId == matchEvent.Id &&
+										 x.OddsBoostId == boost.Id);
+
+					if (used >= boost.MaxUsesPerUser.Value)
+						return ($"Boost already used maximum times for this event.", false);
+				}
+			}
+
 			var bet = new Bet
 			{
 				Id = Guid.NewGuid(),
 				BetSlipId = betSlip.Id,
 				MatchEventId = matchEvent.Id,
 				Pick = parsedPick,
-				Odds = betDto.Odds,
-				BetTime = DateTime.UtcNow
+				Odds = (decimal)effectiveOdds,
+				BetTime = DateTime.UtcNow,
+				OddsBoostId = boost?.Id
 			};
 
 			betSlip.Bets.Add(bet);
@@ -94,6 +125,8 @@ public class BettingService : IBettingService
 
 		return (BetSlipSubmittedSuccessfully, true);
 	}
+
+
 
 	public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
 	{
