@@ -243,3 +243,16 @@ table.responsive-stack td {
 #confirmCancelModal .btn-close:hover {
     color: aqua !important;
 }
+
+#createBoostModal{
+    margin-top: 5em;
+}
+
+.create-boost-btn{
+    border: 1px solid #daa208;
+    background-color: white;
+    color: tomato;
+    font-size: 1.2em !important;
+}
+
+
