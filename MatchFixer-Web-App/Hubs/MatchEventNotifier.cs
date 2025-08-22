@@ -12,7 +12,15 @@ namespace MatchFixer_Web_App.Hubs
 			_hubContext = hubContext;
 		}
 
-		public Task NotifyMatchEventUpdatedAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds)
+		public Task NotifyMatchEventUpdatedAsync(
+			Guid matchEventId,
+			decimal homeOdds,
+			decimal drawOdds,
+			decimal awayOdds,
+			decimal? effectiveHomeOdds = null,
+			decimal? effectiveDrawOdds = null,
+			decimal? effectiveAwayOdds = null,
+			Guid? activeBoostId = null)
 		{
 			return _hubContext.Clients
 				.Group(matchEventId.ToString())
@@ -21,7 +29,11 @@ namespace MatchFixer_Web_App.Hubs
 					matchEventId,
 					homeOdds,
 					drawOdds,
-					awayOdds
+					awayOdds,
+					effectiveHomeOdds = effectiveHomeOdds ?? homeOdds,
+					effectiveDrawOdds = effectiveDrawOdds ?? drawOdds,
+					effectiveAwayOdds = effectiveAwayOdds ?? awayOdds,
+					activeBoostId
 				});
 		}
 	}
