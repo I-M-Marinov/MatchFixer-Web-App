@@ -163,6 +163,7 @@
 																  data-home-logo-url="@match.HomeTeamLogoUrl"
 																  data-away-logo-url="@match.AwayTeamLogoUrl"
 																  data-option="Home"
+																  data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
 																  data-odds="@match.EffectiveHomeWinOdds ?? match.HomeWinOdds">
 																@if (match.ActiveBoost != null)
 																{
@@ -184,6 +185,7 @@
 																  data-home-logo-url="@match.HomeTeamLogoUrl"
 																  data-away-logo-url="@match.AwayTeamLogoUrl"
 																  data-option="Draw"
+																  data-has-boost="@(match.ActiveBoost != null ? "true" : "false")" 
 																  data-odds="@match.EffectiveDrawOdds ?? match.DrawOdds">
 																@if (match.ActiveBoost != null)
 																{
@@ -205,6 +207,7 @@
 																  data-home-logo-url="@match.HomeTeamLogoUrl"
 																  data-away-logo-url="@match.AwayTeamLogoUrl"
 																  data-option="Away"
+																  data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
 																  data-odds="@match.EffectiveAwayWinOdds ?? match.AwayWinOdds">
 																@if (match.ActiveBoost != null)
 																{
@@ -501,12 +504,8 @@
 			.build();
 
 		connection.on("MatchEventUpdated", function (update) {
-
 			const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
-			if (!card) {
-				return;
-			}
-
+			if (!card) return;
 
 			const homeOddsElement = card.querySelector('tbody span[data-option="Home"]');
 			const drawOddsElement = card.querySelector('tbody span[data-option="Draw"]');
@@ -516,28 +515,44 @@
 			const drawHeader = card.querySelector('thead th[data-option="Draw"]');
 			const awayHeader = card.querySelector('thead th[data-option="Away"]');
 
-			animateOddsChange(homeOddsElement, update.homeOdds);
-			animateOddsChange(drawOddsElement, update.drawOdds);
-			animateOddsChange(awayOddsElement, update.awayOdds);
+			const hasBoost = update.activeBoostId != null;
+			console.log(hasBoost);
 
-			if (homeOddsElement && homeHeader) {
-				homeOddsElement.textContent = update.homeOdds.toFixed(2);
-				homeOddsElement.dataset.lastOdds = update.homeOdds;
-				homeHeader.dataset.odds = update.homeOdds;
-			}
+			if (!hasBoost) {
+				// No boost, just run original logic
+				if (homeOddsElement && homeHeader) {
+					homeOddsElement.textContent = update.homeOdds.toFixed(2);
+					homeOddsElement.dataset.lastOdds = update.homeOdds;
+					homeHeader.dataset.odds = update.homeOdds;
+					animateOddsChange(homeOddsElement, update.homeOdds);
+				}
 
-			if (drawOddsElement && drawHeader) {
-				drawOddsElement.textContent = update.drawOdds.toFixed(2);
-				drawOddsElement.dataset.lastOdds = update.drawOdds;
-				drawHeader.dataset.odds = update.drawOdds;
-			}
+				if (drawOddsElement && drawHeader) {
+					drawOddsElement.textContent = update.drawOdds.toFixed(2);
+					drawOddsElement.dataset.lastOdds = update.drawOdds;
+					drawHeader.dataset.odds = update.drawOdds;
+					animateOddsChange(drawOddsElement, update.drawOdds);
+				}
 
-			if (awayOddsElement && awayHeader) {
-				awayOddsElement.textContent = update.awayOdds.toFixed(2);
-				awayOddsElement.dataset.lastOdds = update.awayOdds;
-				awayHeader.dataset.odds = update.awayOdds;
+				if (awayOddsElement && awayHeader) {
+					awayOddsElement.textContent = update.awayOdds.toFixed(2);
+					awayOddsElement.dataset.lastOdds = update.awayOdds;
+					awayHeader.dataset.odds = update.awayOdds;
+					animateOddsChange(awayOddsElement, update.awayOdds);
+				}
+			} else {
+				// Boosted match logic
+				// Use effective odds and ensure boost prevails in the UI and localStorage
+				animateOddsChange(homeOddsElement, update.effectiveHomeOdds, update.matchEventId, "Home", true);
+				animateOddsChange(drawOddsElement, update.effectiveDrawOdds, update.matchEventId, "Draw", true);
+				animateOddsChange(awayOddsElement, update.effectiveAwayOdds, update.matchEventId, "Away", true);
+
+				if (homeHeader) homeHeader.dataset.odds = update.effectiveHomeOdds.toFixed(2);
+				if (drawHeader) drawHeader.dataset.odds = update.effectiveDrawOdds.toFixed(2);
+				if (awayHeader) awayHeader.dataset.odds = update.effectiveAwayOdds.toFixed(2);
 			}
 		});
+
 
 		connection.start()
 			.then(() => {
@@ -553,38 +568,61 @@
 			});
 	});
 
-	function animateOddsChange(element, newOdds) {
-	  if (!element) return;
+	function animateOddsChange(element, newOdds, matchId, option, isBoosted = false) {
+		if (!element) return;
 
-	  const oldOdds = parseFloat(element.dataset.lastOdds ?? element.textContent) || 0;
-	  newOdds = parseFloat(newOdds);
-	  if (!Number.isFinite(newOdds) || newOdds === oldOdds) return;
+		const oldOdds = parseFloat(element.dataset.lastOdds ?? element.textContent) || 0;
+		newOdds = parseFloat(newOdds);
 
-	  const wentUp = newOdds > oldOdds;
-	  const colorClass = wentUp ? 'odds-up' : 'odds-down';
-	  const animClass  = wentUp ? 'animate__rubberBand' : 'animate__rubberBand';
+		const boostKey = `boost_${matchId}_${option}`;
+		const storedBoost = parseFloat(localStorage.getItem(boostKey));
 
-	  // Update number + store for next time
-	  element.textContent = newOdds.toFixed(2);
-	  element.dataset.lastOdds = newOdds;
+		// Determine which odds to actually use
+		let displayOdds;
+		if (isBoosted && !isNaN(storedBoost)) {
+			displayOdds = storedBoost; // boosted odds prevail
+		} else if (isBoosted && isNaN(storedBoost)) {
+			displayOdds = newOdds;
+			localStorage.setItem(boostKey, displayOdds); // store boost
+		} else {
+			displayOdds = newOdds;
+			// regular odds storage logic
+			const regKey = `reg_${matchId}_${option}`;
+			if (oldOdds !== newOdds) {
+				localStorage.setItem(regKey, newOdds);
+			} else {
+				localStorage.removeItem(regKey);
+			}
+		}
 
-	  [...element.classList].forEach(c => {
-		if (c.startsWith('animate__')) element.classList.remove(c);
-	  });
-	  element.classList.remove('odds-up', 'odds-down');
-	  void element.offsetWidth;
+		if (!Number.isFinite(displayOdds) || displayOdds === oldOdds) return;
 
-	  element.style.setProperty('--animate-duration', '0.8s');
-	  element.classList.add('animate__animated', animClass, colorClass, 'animate__slower');
+		const wentUp = displayOdds > oldOdds;
+		const colorClass = wentUp ? 'odds-up' : 'odds-down';
+		const animClass  = 'animate__rubberBand';
 
-	  function onEnd(e) {
-		if (e.target !== element) return;
-		element.classList.remove('animate__animated', animClass, 'odds-up', 'odds-down');
-		element.removeEventListener('animationend', onEnd);
-		element.style.removeProperty('--animate-duration');
-	  }
-	  element.addEventListener('animationend', onEnd);
+		element.textContent = displayOdds.toFixed(2);
+		element.dataset.lastOdds = displayOdds;
+
+		[...element.classList].forEach(c => {
+			if (c.startsWith('animate__')) element.classList.remove(c);
+		});
+		element.classList.remove('odds-up', 'odds-down');
+		void element.offsetWidth;
+
+		element.style.setProperty('--animate-duration', '0.8s');
+		element.classList.add('animate__animated', animClass, colorClass, 'animate__slower');
+
+		function onEnd(e) {
+			if (e.target !== element) return;
+			element.classList.remove('animate__animated', animClass, 'odds-up', 'odds-down');
+			element.removeEventListener('animationend', onEnd);
+			element.style.removeProperty('--animate-duration');
+		}
+		element.addEventListener('animationend', onEnd);
 	}
+
+
 
 
 
