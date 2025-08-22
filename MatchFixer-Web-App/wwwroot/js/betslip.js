@@ -28,13 +28,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const awayLogoUrl = el.dataset.awayLogoUrl;
                 const option = el.dataset.option;
                 const startTimeUtc = el.dataset.startTime;
+                console.log(startTimeUtc);
 
-                const odds = parseFloat(el.dataset.odds);
+
+                const odds = el.dataset.odds ? parseFloat(el.dataset.odds) : null;
 
                 if (matchId && home && away && homeLogoUrl && awayLogoUrl && option && startTimeUtc &&
-                    !isNaN(Date.parse(startTimeUtc)) && !isNaN(odds)) {
+                    !isNaN(Date.parse(startTimeUtc)) && odds !== null && !isNaN(odds)) {
                     addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc);
-
                     updateBadge();
                 } 
             });
@@ -46,48 +47,62 @@ document.addEventListener('DOMContentLoaded', function () {
         amount: 0
     };
 
-function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
-    // Find if any bet for same matchId exists
-    const existingBet = betSlip.bets.find(b => b.matchId === matchId);
+async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
+    try {
+        // 🎯 Fetch effective odds from server
+        const response = await fetch(`/BetSlip/GetEffectiveOdds?matchId=${matchId}&option=${option}`);
+        if (!response.ok) {
+            console.error("Failed to fetch odds:", response.statusText);
+            return;
+        }
 
-    if (existingBet) {
-        // Update existing bet with new option & odds
-        const oldOption = existingBet.option;  // capture old option before change
+        const data = await response.json(); // { odds: 2.35, boostId: "..." }
+        const odds = data.odds;
 
-        existingBet.option = option;
-        existingBet.odds = odds;
-        existingBet.homeLogoUrl = homeLogoUrl;
-        existingBet.awayLogoUrl = awayLogoUrl;
-        existingBet.startTimeUtc = startTimeUtc;
+        // 🔍 See if bet already exists
+        const existingBet = betSlip.bets.find(b => b.matchId === matchId);
 
-        // Update server session
-        removeBetFromSession(matchId, oldOption);
-        addBetToSession(existingBet);
+        if (existingBet) {
+            const oldOption = existingBet.selectedOption;
+
+            existingBet.selectedOption = option;
+            existingBet.odds = odds;
+            existingBet.homeLogoUrl = homeLogoUrl;
+            existingBet.awayLogoUrl = awayLogoUrl;
+            existingBet.startTimeUtc = startTimeUtc;
+
+            // sync server session
+            removeBetFromSession(matchId, oldOption);
+            addBetToSession(existingBet);
+        } else {
+            const betItem = {
+                matchId,
+                homeTeam,
+                awayTeam,
+                homeLogoUrl,
+                awayLogoUrl,
+                selectedOption: option, // ← must match renderBetSlip()
+                odds,
+                startTimeUtc
+            };
+            console.log(betItem);
+
+
+            betSlip.bets.push(betItem);
+            addBetToSession(betItem);
+        }
+
+        renderBetSlip();
+        updateBetStatuses();
+        openBetSlip();
+        animateLightning("lightning-flash");
+        animateBetSlipBadge();
+
+    } catch (err) {
+        console.error("Error adding to bet slip:", err);
     }
-    else {
-        // New bet - safe to add
-        const betItem = {
-            matchId: matchId,
-            homeTeam,
-            awayTeam,
-            homeLogoUrl,
-            awayLogoUrl,
-            option,
-            odds,
-            startTimeUtc
-        };
-
-        betSlip.bets.push(betItem);
-        addBetToSession(betItem);
-    }
-
-    renderBetSlip();
-    updateBetStatuses();
-    openBetSlip();
-    animateLightning("lightning-flash");
-    animateBetSlipBadge();
-
 }
+
 function animateBetSlipBadge() {
     const btn = document.getElementById('betSlipToggle');
     if (!btn) return;
@@ -117,27 +132,38 @@ function animateBetSlipBadgeOnRemoval() {
     }, { once: true });
 }
 function addBetToSession(betItem) {
+    if (!betItem.selectedOption) {
+        console.error("SelectedOption is missing!", betItem);
+        return; // stop sending invalid payload
+    }
+
+    const payload = {
+        MatchId: betItem.matchId,
+        HomeTeam: betItem.homeTeam,
+        AwayTeam: betItem.awayTeam,
+        HomeLogoUrl: betItem.homeLogoUrl,
+        AwayLogoUrl: betItem.awayLogoUrl,
+        SelectedOption: betItem.selectedOption,  // PascalCase
+        Odds: betItem.odds,
+        StartTimeUtc: betItem.startTimeUtc
+    };
+
+    console.log("Sending payload to server:", payload);
+
     fetch('/BetSlip/Add', {
         method: 'POST',
-            headers: {
-        'Content-Type': 'application/json',
-        'RequestVerificationToken': getAntiForgeryToken()
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': getAntiForgeryToken()
         },
-        body: JSON.stringify({
-            MatchId: betItem.matchId,
-            HomeTeam: betItem.homeTeam,
-            AwayTeam: betItem.awayTeam,
-            HomeLogoUrl: betItem.homeLogoUrl,
-            AwayLogoUrl: betItem.awayLogoUrl,
-            SelectedOption: betItem.option,
-            Odds: betItem.odds
-        })
+        body: JSON.stringify(payload)
     }).then(res => {
-        if (!res.ok) {
-            console.error("Failed to add bet to server:", res.status);
-        }
-    }).catch(err => console.error("Fetch error adding bet:", err));
+        console.log("Server response status:", res.status);
+        return res.json().catch(() => null);
+    }).then(data => console.log("Server response data:", data))
+        .catch(err => console.error("Fetch error adding bet:", err));
 }
+
 function renderBetSlip() {
     const container = document.getElementById("betSlipContent");
     const amountContainer = document.getElementById("amountContainer");
@@ -259,13 +285,13 @@ function renderBetSlip() {
 
         const br = document.createElement("br");
         const pick = document.createElement("span");
-        pick.textContent = bet.option;
+        pick.textContent = bet.selectedOption;
 
-        if(bet.option === "Home"){
+        if (bet.selectedOption === "Home"){
             pick.classList.add("pill-brand-blue");
-        } else if(bet.option === "Draw"){
+        } else if (bet.selectedOption === "Draw"){
             pick.classList.add("pill-brand-yellow");
-        } else {
+        } else if (bet.selectedOption === "Away") {
             pick.classList.add("pill-brand-green");
         }
 
@@ -317,13 +343,13 @@ function renderBetSlip() {
         item.classList.add("bet-item", "border", "rounded", "p-2", "mb-2");
         item.dataset.startTime = bet.startTimeUtc;
         item.dataset.matchId = bet.matchId;
-        item.dataset.option = bet.option;
+        item.dataset.option = bet.selectedOption;
 
         removeBtnSpan.appendChild(removeIconElement);
         removeBtnSpan.appendChild(customTooltipSpan);
         removeBtn.appendChild(removeBtnSpan);
 
-        removeBtn.addEventListener("click", () => removeBet(bet.matchId, bet.option));
+        removeBtn.addEventListener("click", () => removeBet(bet.matchId, bet.selectedOption));
 
         right.appendChild(oddsLightning);
         right.appendChild(oddsLabel);
@@ -339,7 +365,7 @@ function renderBetSlip() {
         oddsChangeBadge.textContent = "";
 
         const matchId = bet.matchId;
-        const option = bet.option;
+        const option = bet.selectedOption;
 
         const state = localStorage.getItem(`oddsDir_${matchId}_${option}`);
         if (state) {
@@ -364,7 +390,7 @@ function renderBetSlip() {
         const input2 = document.createElement("input");
         input2.type = "hidden";
         input2.name = `Bets[${index}].SelectedOption`;
-        input2.value = bet.option;
+        input2.value = bet.selectedOption;
 
         const input3 = document.createElement("input");
         input3.type = "hidden";
@@ -504,9 +530,9 @@ function updateBetStatuses() {
 
         if (!startTimeStr) return;
 
-        if (!startTimeStr.endsWith('Z')) {
-            startTimeStr += 'Z';
-        }
+        //if (!startTimeStr.endsWith('Z')) {
+        //    startTimeStr += 'Z';
+        //}
 
         const startTime = new Date(startTimeStr);
 
