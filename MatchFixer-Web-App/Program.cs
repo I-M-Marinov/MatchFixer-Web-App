@@ -91,6 +91,11 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+	options.JsonSerializerOptions.PropertyNamingPolicy = null; // disables camelCase conversion
+});
+
 
 var app = builder.Build();
 
