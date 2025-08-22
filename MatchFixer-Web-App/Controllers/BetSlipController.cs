@@ -1,8 +1,10 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
-using Microsoft.AspNetCore.Mvc;
+using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 
 namespace MatchFixer_Web_App.Controllers
@@ -12,14 +14,19 @@ namespace MatchFixer_Web_App.Controllers
 	public class BetSlipController : ControllerBase
 	{
 		private readonly ISessionService _sessionService;
+		private readonly MatchFixerDbContext _dbContext;
+		private readonly IOddsBoostService _oddsBoostService;
 
-		public BetSlipController(ISessionService sessionService)
+		public BetSlipController(ISessionService sessionService, MatchFixerDbContext dbContext,
+			IOddsBoostService oddsBoostService)
 		{
 			_sessionService = sessionService;
+			_dbContext = dbContext;
+			_oddsBoostService = oddsBoostService;
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Get([FromServices] MatchFixerDbContext dbContext)
+		public async Task<IActionResult> Get([FromServices] MatchFixerDbContext dbContext, [FromServices] IOddsBoostService oddsBoostService)
 		{
 			var betSlip = _sessionService.GetBetSlipState();
 
@@ -32,24 +39,33 @@ namespace MatchFixer_Web_App.Controllers
 					stakeAmount = 0.0
 				});
 
-			// Fetch latest odds for all matches in the bet slip
 			var matchIds = betSlip.Bets.Select(b => b.MatchId).ToList();
 			var matches = await dbContext.MatchEvents
 				.Where(m => matchIds.Contains(m.Id))
 				.ToDictionaryAsync(m => m.Id);
 
-			// Update session bets with latest odds
+			// Update session bets with latest effective odds (boosts respected)
 			foreach (var bet in betSlip.Bets)
 			{
-				if (matches.TryGetValue(bet.MatchId, out var match))
+				if (!matches.TryGetValue(bet.MatchId, out var match))
+					continue;
+
+				var (home, draw, away, _) = await oddsBoostService.GetEffectiveOddsAsync(
+					match.Id,
+					match.HomeOdds,
+					match.DrawOdds,
+					match.AwayOdds,
+					ct: default
+				);
+
+				// Only update odds if effective odds exist, otherwise keep current session odds
+				bet.Odds = bet.SelectedOption switch
 				{
-					switch (bet.SelectedOption)
-					{
-						case "Home": bet.Odds = (decimal)match.HomeOdds; break;
-						case "Draw": bet.Odds = (decimal)match.DrawOdds; break;
-						case "Away": bet.Odds = (decimal)match.AwayOdds; break;
-					}
-				}
+					"Home" => home ?? bet.Odds,
+					"Draw" => draw ?? bet.Odds,
+					"Away" => away ?? bet.Odds,
+					_ => bet.Odds
+				};
 			}
 
 			// Save updated session
@@ -67,7 +83,7 @@ namespace MatchFixer_Web_App.Controllers
 					awayLogoUrl = b.AwayLogoUrl,
 					option = b.SelectedOption,
 					odds = b.Odds,
-					startTimeUtc = b.StartTimeUtc.ToString("o")
+					startTimeUtc = b.StartTimeUtc
 				}),
 				totalOdds = betSlip.TotalOdds,
 				stakeAmount = betSlip.StakeAmount
@@ -77,22 +93,50 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 
+
+		//[HttpPost]
+		//[ValidateAntiForgeryToken]
+		//public async Task<IActionResult> Add([FromBody] BetSlipItem betDto, [FromServices] MatchFixerDbContext dbContext)
+		//{
+		//	if (betDto == null)
+		//		return BadRequest("Invalid bet data.");
+
+		//	var match = await dbContext.MatchEvents.FindAsync(betDto.MatchId);
+
+		//	if (match == null)
+		//		return NotFound("Match not found.");
+
+		//	betDto.StartTimeUtc = match.MatchDate;
+		//	await _sessionService.AddBetToSlipAsync(betDto);
+
+		//	return Ok();
+		//}
+
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Add([FromBody] BetSlipItem betDto, [FromServices] MatchFixerDbContext dbContext)
+		public async Task<IActionResult> Add([FromBody] BetSlipItem betDto)
 		{
-			if (betDto == null)
-				return BadRequest("Invalid bet data.");
+			if (!ModelState.IsValid)
+			{
+				foreach (var kvp in ModelState)
+				{
+					foreach (var error in kvp.Value.Errors)
+					{
+						Console.WriteLine($"{kvp.Key}: {error.ErrorMessage}");
+					}
+				}
+				return BadRequest(ModelState);
+			}
 
-			var match = await dbContext.MatchEvents.FindAsync(betDto.MatchId);
-
-			if (match == null)
-				return NotFound("Match not found.");
-
-			betDto.StartTimeUtc = match.MatchDate;
-			_sessionService.AddBetToSlip(betDto);
-
-			return Ok();
+			try
+			{
+				await _sessionService.AddBetToSlipAsync(betDto);
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				// log ex.Message or ex.ToString()
+				return StatusCode(500, new { error = ex.Message });
+			}
 		}
 
 		[HttpPost]
@@ -126,5 +170,35 @@ namespace MatchFixer_Web_App.Controllers
 			return Ok();
 		}
 
+
+		[HttpGet]
+		public async Task<IActionResult> GetEffectiveOdds(Guid matchId, string option, CancellationToken ct)
+		{
+			var match = await _dbContext.MatchEvents
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == matchId, ct);
+
+			if (match == null) return NotFound();
+
+			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
+				match.Id,
+				match.HomeOdds,
+				match.DrawOdds,
+				match.AwayOdds,
+				ct
+			);
+
+			decimal? odds = option switch
+			{
+				"Home" => home,
+				"Draw" => draw,
+				"Away" => away,
+				_ => null
+			};
+
+			if (odds == null) return BadRequest("Invalid option or odds unavailable.");
+
+			return new JsonResult(new { odds, boostId = boost?.Id });
+		}
 	}
-}
+}		
