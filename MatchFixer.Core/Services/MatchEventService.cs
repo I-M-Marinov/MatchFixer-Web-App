@@ -255,6 +255,8 @@ namespace MatchFixer.Core.Services
 
 		public async Task<Dictionary<Guid, OddsDTO>> GetOddsForMatchesAsync(Guid[] matchIds)
 		{
+			var now = DateTime.UtcNow;
+
 			return await _dbContext.MatchEvents
 				.Where(me => matchIds.Contains(me.Id))
 				.Select(me => new OddsDTO
@@ -262,9 +264,28 @@ namespace MatchFixer.Core.Services
 					Id = me.Id,
 					HomeOdds = me.HomeOdds,
 					DrawOdds = me.DrawOdds,
-					AwayOdds = me.AwayOdds
+					AwayOdds = me.AwayOdds,
+
+					// Look up any active boost for this match
+					HasActiveBoost = me.OddsBoosts.Any(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now),
+					EffectiveHomeOdds = me.HomeOdds + me.OddsBoosts
+						.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
+						.OrderByDescending(b => b.BoostValue)
+						.Select(b => b.BoostValue)
+						.FirstOrDefault(),
+					EffectiveDrawOdds = me.DrawOdds + me.OddsBoosts
+						.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
+						.OrderByDescending(b => b.BoostValue)
+						.Select(b => b.BoostValue)
+						.FirstOrDefault(),
+					EffectiveAwayOdds = me.AwayOdds + me.OddsBoosts
+						.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
+						.OrderByDescending(b => b.BoostValue)
+						.Select(b => b.BoostValue)
+						.FirstOrDefault()
 				})
 				.ToDictionaryAsync(x => x.Id, x => x);
 		}
+
 	}
 }
