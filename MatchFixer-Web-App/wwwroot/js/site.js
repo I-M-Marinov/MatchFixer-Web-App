@@ -62,25 +62,27 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener('DOMContentLoaded', function () {
     const track = document.getElementById('sponsorTrack');
     const set = document.getElementById('sponsorSet');
+    if (track && set) {
 
-    const clone = set.cloneNode(true);
-    track.appendChild(clone);
+        const clone = set.cloneNode(true);
+        track.appendChild(clone);
 
-    let setWidth = set.offsetWidth;
-    let scrollPos = 0;
-    const speed = 0.25; // speed of the carousel
+        let setWidth = set.offsetWidth;
+        let scrollPos = 0;
+        const speed = 0.25; // speed of the carousel
 
-    function step() {
-        scrollPos += speed;
-        if (scrollPos >= setWidth) {
-            scrollPos = 0;
+        function step() {
+            scrollPos += speed;
+            if (scrollPos >= setWidth) {
+                scrollPos = 0;
+            }
+            track.style.transform = `translateX(-${scrollPos}px)`;
+            requestAnimationFrame(step);
         }
-        track.style.transform = `translateX(-${scrollPos}px)`;
-        requestAnimationFrame(step);
-    }
 
-    window.addEventListener('load', () => {
-        setWidth = set.offsetWidth;
-        requestAnimationFrame(step);
-    });
+        window.addEventListener('load', () => {
+            setWidth = set.offsetWidth;
+            requestAnimationFrame(step);
+        });
+    }
 });
