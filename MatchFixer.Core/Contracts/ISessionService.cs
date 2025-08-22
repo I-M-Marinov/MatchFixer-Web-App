@@ -12,7 +12,7 @@ namespace MatchFixer.Core.Contracts
 		void SetBetSlipState(BetSlipState state);
 		void ClearBetSlip();
 		BetSlipState? GetBetSlipState();
-		void AddBetToSlip(BetSlipItem item);
+		Task AddBetToSlipAsync(BetSlipItem item, CancellationToken ct = default);
 		void SetUserTimezone(string timezoneId);
 		string GetUserTimezone();
 	}
