@@ -15,7 +15,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			_bettingService = bettingService;
 			_sessionService = sessionService;
-
+			
 		}
 
 		[HttpPost]
