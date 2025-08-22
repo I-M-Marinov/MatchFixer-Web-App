@@ -3,7 +3,9 @@ using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.Extensions;
 using MatchFixer.Core.ViewModels.GameSessionState;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using MatchFixer.Infrastructure;
 using static MatchFixer.Common.GeneralConstants.SessionConstants;
 
 namespace MatchFixer.Core.Services
@@ -12,10 +14,14 @@ namespace MatchFixer.Core.Services
 	{
 		private const string SessionKey = GameSessionName;
 		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly MatchFixerDbContext _dbContext;
+		private readonly IOddsBoostService _oddsBoostService;
 
-		public SessionService(IHttpContextAccessor httpContextAccessor)
+		public SessionService(IHttpContextAccessor httpContextAccessor, MatchFixerDbContext dbContext, IOddsBoostService oddsBoostService)
 		{
 			_httpContextAccessor = httpContextAccessor;
+			_dbContext = dbContext;
+			_oddsBoostService = oddsBoostService;
 		}
 
 		public GameSessionState? GetSessionState()
@@ -50,7 +56,7 @@ namespace MatchFixer.Core.Services
 		public void SetBetSlipState(BetSlipState state)
 		{
 			_httpContextAccessor.HttpContext?.Session.Set(BetSlipSessionName, state);
-		}
+		}  
 
 		public void ClearBetSlip()
 		{
@@ -59,28 +65,51 @@ namespace MatchFixer.Core.Services
 
 		public BetSlipState? GetBetSlipState()
 		{
-			var stateJson = _httpContextAccessor.HttpContext?.Session.GetString(BetSlipSessionName);
-			return stateJson == null ? null : JsonSerializer.Deserialize<BetSlipState>(stateJson);
+			return _httpContextAccessor.HttpContext?.Session.Get<BetSlipState>(BetSlipSessionName);
 		}
 
-		public void AddBetToSlip(BetSlipItem item)
+
+		public async Task AddBetToSlipAsync(BetSlipItem item, CancellationToken ct = default)
 		{
 			var betSlip = GetBetSlipState() ?? new BetSlipState();
 
-			// Check if there is any existing bet for that match
+			// Fetch the match (just to confirm it exists & get base odds)
+			var matchEvent = await _dbContext.MatchEvents
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == item.MatchId, ct);
+
+			if (matchEvent == null)
+				throw new InvalidOperationException($"Match with ID {item.MatchId} not found.");
+
+			// Get effective odds (including active boosts)
+			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
+				matchEvent.Id,
+				matchEvent.HomeOdds,
+				matchEvent.DrawOdds,
+				matchEvent.AwayOdds,
+				ct
+			);
+
+			decimal currentOdds = item.SelectedOption switch
+			{
+				"Home" => home ?? throw new InvalidOperationException("Home odds unavailable."),
+				"Draw" => draw ?? throw new InvalidOperationException("Draw odds unavailable."),
+				"Away" => away ?? throw new InvalidOperationException("Away odds unavailable."),
+				_ => throw new ArgumentException("Invalid SelectedOption")
+			};
+
+			// Update existing bet or add a new one
 			var existingBet = betSlip.Bets.FirstOrDefault(b => b.MatchId == item.MatchId);
 
 			if (existingBet != null)
 			{
-				// Update the option & odds
 				existingBet.SelectedOption = item.SelectedOption;
-				existingBet.Odds = item.Odds;
+				existingBet.Odds = currentOdds;
 				existingBet.HomeTeam = item.HomeTeam;
 				existingBet.AwayTeam = item.AwayTeam;
 				existingBet.HomeLogoUrl = item.HomeLogoUrl;
 				existingBet.AwayLogoUrl = item.AwayLogoUrl;
 				existingBet.StartTimeUtc = item.StartTimeUtc;
-
 			}
 			else
 			{
@@ -88,19 +117,19 @@ namespace MatchFixer.Core.Services
 				{
 					MatchId = item.MatchId,
 					SelectedOption = item.SelectedOption,
-					Odds = item.Odds,
+					Odds = currentOdds,
 					HomeTeam = item.HomeTeam,
 					AwayTeam = item.AwayTeam,
 					HomeLogoUrl = item.HomeLogoUrl,
 					AwayLogoUrl = item.AwayLogoUrl,
-					StartTimeUtc = item.StartTimeUtc 
 				};
 
-				betSlip.Bets.Add(newBet); // If bet does not exist, add it
+				betSlip.Bets.Add(newBet);
 			}
 
 			SetBetSlipState(betSlip);
 		}
+
 
 		public void SetUserTimezone(string timezoneId)
 		{
