@@ -22,6 +22,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 
 		// Active boost info (optional)
 		public OddsBoost? ActiveBoost { get; set; }
+		public DateTime? BoostEndUtc { get; set; }  // passing the end time of the odds boost for countdown timer
 
 		public string? HomeTeamLogoUrl { get; set; }
 		public string? AwayTeamLogoUrl { get; set; }
