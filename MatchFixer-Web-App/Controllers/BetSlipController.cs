@@ -66,10 +66,9 @@ namespace MatchFixer_Web_App.Controllers
 					"Away" => away ?? bet.Odds,
 					_ => bet.Odds
 				};
-			}
 
-			// Save updated session
-			_sessionService.SetBetSlipState(betSlip);
+
+			}
 
 			var jsBetSlip = new
 			{
@@ -81,40 +80,27 @@ namespace MatchFixer_Web_App.Controllers
 					awayTeam = b.AwayTeam,
 					homeLogoUrl = b.HomeLogoUrl,
 					awayLogoUrl = b.AwayLogoUrl,
-					option = b.SelectedOption,
+					selectedOption = b.SelectedOption,
 					odds = b.Odds,
-					startTimeUtc = b.StartTimeUtc
+					startTimeUtc = b.StartTimeUtc?.ToUniversalTime()
+						.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
 				}),
 				totalOdds = betSlip.TotalOdds,
 				stakeAmount = betSlip.StakeAmount
+
 			};
 
 			return new JsonResult(jsBetSlip);
 		}
 
-
-
-		//[HttpPost]
-		//[ValidateAntiForgeryToken]
-		//public async Task<IActionResult> Add([FromBody] BetSlipItem betDto, [FromServices] MatchFixerDbContext dbContext)
-		//{
-		//	if (betDto == null)
-		//		return BadRequest("Invalid bet data.");
-
-		//	var match = await dbContext.MatchEvents.FindAsync(betDto.MatchId);
-
-		//	if (match == null)
-		//		return NotFound("Match not found.");
-
-		//	betDto.StartTimeUtc = match.MatchDate;
-		//	await _sessionService.AddBetToSlipAsync(betDto);
-
-		//	return Ok();
-		//}
-
 		[HttpPost]
-		public async Task<IActionResult> Add([FromBody] BetSlipItem betDto)
+		public async Task<IActionResult> Add([FromBody] BetSlipItem betDto, [FromServices] MatchFixerDbContext dbContext)
 		{
+			var match = await dbContext.MatchEvents.FindAsync(betDto.MatchId);
+
+			if (match == null)
+				return NotFound($"Match with ID {betDto.MatchId} not found.");
+
 			if (!ModelState.IsValid)
 			{
 				foreach (var kvp in ModelState)
@@ -129,6 +115,8 @@ namespace MatchFixer_Web_App.Controllers
 
 			try
 			{
+				betDto.StartTimeUtc = betDto.StartTimeUtc = match.MatchDate.ToUniversalTime();
+
 				await _sessionService.AddBetToSlipAsync(betDto);
 				return Ok();
 			}
