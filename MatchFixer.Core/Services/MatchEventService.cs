@@ -69,6 +69,7 @@ namespace MatchFixer.Core.Services
 					EffectiveDrawOdds = effDraw,
 					EffectiveAwayWinOdds = effAway,
 					ActiveBoost = boost,
+					BoostEndUtc = boost?.EndUtc,  
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					IsDerby = e.IsDerby,
