@@ -26,16 +26,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const away = el.dataset.away;
                 const homeLogoUrl = el.dataset.homeLogoUrl;
                 const awayLogoUrl = el.dataset.awayLogoUrl;
-                const option = el.dataset.option;
+                const selectedOption = el.dataset.option;
                 const startTimeUtc = el.dataset.startTime;
                 console.log(startTimeUtc);
 
 
                 const odds = el.dataset.odds ? parseFloat(el.dataset.odds) : null;
 
-                if (matchId && home && away && homeLogoUrl && awayLogoUrl && option && startTimeUtc &&
+                if (matchId && home && away && homeLogoUrl && awayLogoUrl && selectedOption && startTimeUtc &&
                     !isNaN(Date.parse(startTimeUtc)) && odds !== null && !isNaN(odds)) {
-                    addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc);
+                    addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, selectedOption, odds, startTimeUtc);
                     updateBadge();
                 } 
             });
@@ -413,7 +413,7 @@ function renderBetSlip() {
 }
 function removeBet(matchId, selectedOption) {
     // Remove locally
-    betSlip.bets = betSlip.bets.filter(b => !(b.matchId === matchId && b.option === selectedOption));
+    betSlip.bets = betSlip.bets.filter(b => !(b.matchId === matchId && b.selectedOption === selectedOption));
 
     updateBadge();
     animateBetSlipBadgeOnRemoval();
