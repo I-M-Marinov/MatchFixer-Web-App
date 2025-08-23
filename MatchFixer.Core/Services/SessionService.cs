@@ -122,6 +122,7 @@ namespace MatchFixer.Core.Services
 					AwayTeam = item.AwayTeam,
 					HomeLogoUrl = item.HomeLogoUrl,
 					AwayLogoUrl = item.AwayLogoUrl,
+					StartTimeUtc = item.StartTimeUtc
 				};
 
 				betSlip.Bets.Add(newBet);
