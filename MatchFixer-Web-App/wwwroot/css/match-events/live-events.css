@@ -519,6 +519,50 @@
     z-index: 2;
 }
 
+.boosted-match-container-effects {
+    position: relative;
+    z-index: 1;
+}
+
+.boosted-match-container-effects::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+    border-radius: 8% 12%;
+    background: linear-gradient(360deg, #ffc107 0% 8%, rgba(255, 215, 0, 0.25) 40%, transparent 80%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border-radius: 5% 10%;
+    animation: boostedGlow 3s ease-in-out infinite;
+}
+
+.boosted-match-container-effects div div .odds-table {
+    border: 2px solid gold;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+    z-index: 2;
+}
+
+/* Glow animation for a subtle pulsing boost effect */
+@keyframes boostedGlow {
+0% {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+}
+
+50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+}
+
+100% {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+}
+}
+
+
 odds-up {
     color: #007c30;
     transition: color 0.4s ease;
@@ -527,5 +571,164 @@ odds-up {
 .odds-down {
     color: #b51919;
     transition: color 0.4s ease;
+}
+
+/* Boosted Pills */
+/*.pill-boosted-blue {
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+}
+
+.pill-boosted-yellow {
+    background: linear-gradient(135deg, #eab308, #facc15);
+    color: #111 !important;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.7);
+}
+
+.pill-boosted-green {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+}*/
+
+/* Boosted Pills - Animated Gradient Effect */
+.pill-boosted-blue {
+    font-size: 0.85rem;
+    background: linear-gradient(270deg, #3b82f6, #1d4ed8, #3b82f6);
+    background-size: 200% 100%;
+    animation: pillShimmerBlue 4s linear infinite;
+    color: #fff !important;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
+}
+
+.pill-boosted-yellow {
+    font-size: 0.85rem;
+    background: linear-gradient(270deg, #facc15, #eab308, #facc15);
+    background-size: 200% 100%;
+    animation: pillShimmerYellow 4s linear infinite;
+    color: #111 !important;
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.7);
+}
+
+.pill-boosted-green {
+    font-size: 0.85rem;
+    background: linear-gradient(270deg, #22c55e, #16a34a, #22c55e);
+    background-size: 200% 100%;
+    animation: pillShimmerGreen 4s linear infinite;
+    color: #fff !important;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
+}
+
+/* Keyframes for shimmer effect */
+@keyframes pillShimmerBlue {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes pillShimmerYellow {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes pillShimmerGreen {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+
+/* Boosted Header Pills - Default Shimmer */
+#home-header .bet-option.boosted {
+    background: linear-gradient(270deg, #3b82f6, #1d4ed8, #3b82f6);
+    background-size: 200% 100%;
+    animation: pillShimmer 3s linear infinite;
+    color: white;
+    border: 2px solid #0a58ca;
+    border-radius: 0.75em;
+}
+
+#draw-header .bet-option.boosted {
+    background: linear-gradient(270deg, #facc15, #eab308, #facc15);
+    background-size: 200% 100%;
+    animation: pillShimmer 3s linear infinite;
+    color: black;
+    border: 2px solid #f1d302;
+    border-radius: 0.75em;
+}
+
+#away-header .bet-option.boosted {
+    background: linear-gradient(270deg, #22c55e, #16a34a, #22c55e);
+    background-size: 200% 100%;
+    animation: pillShimmer 3s linear infinite;
+    color: white;
+    border: 2px solid #0DAB76;
+    border-radius: 0.75em;
+}
+
+/* Hover state - revert to outline style */
+#home-header:hover .bet-option.boosted,
+#draw-header:hover .bet-option.boosted,
+#away-header:hover .bet-option.boosted {
+    background-color: white;
+    color: inherit; /* keep text color appropriate */
+    border-width: 2px;
+    border-style: solid;
+}
+
+/* Single keyframes for all shimmer pills */
+@keyframes pillShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+
+.boost-fire-icon {
+    color: #ff6b00; 
+    animation: fire-pulse 0.75s infinite alternate;
+    font-size: 0.9rem;
+}
+
+/* subtle pulsing effect */
+@keyframes fire-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+.pill-boosted {
+    background: linear-gradient(90deg, #ff9a3c, #ff6b00);
+    color: white;
+    font-weight: 600;
 }
 
