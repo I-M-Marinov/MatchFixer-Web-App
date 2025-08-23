@@ -66,7 +66,12 @@
 						<div class="event-card position-relative" data-match-id="@match.Id" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone">
 
 							<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
-								<div class="card-body d-flex flex-column justify-content-around @(match.IsDerby ? "derby-match-container-effects" : "")" style="position: relative; object-fit: contain;">
+								<div class="card-body d-flex flex-column justify-content-around 
+									@(match.ActiveBoost != null
+									 ? "boosted-match-container-effects" 
+									 : (match.IsDerby ? "derby-match-container-effects" : ""))" style="position: relative; object-fit: contain;">
+									
+
 									<div id="oneVsOneContainer">
 										@if (match.IsDerby)
 										{
@@ -118,9 +123,9 @@
 													    data-odds="@match.HomeWinOdds"
 													    data-start-time="@match.KickoffTime.ToString("o")">
 
-														<button class="bet-option">
-															Home
-														</button>
+															<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
+																Home
+															</button>
 													</th>
 														<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="1"
 													    data-match-id="@match.Id"
@@ -132,9 +137,9 @@
 													    data-odds="@match.DrawOdds" 
 													    data-start-time="@match.KickoffTime.ToString("o")">
 
-														<button class="bet-option">
-															Draw
-														</button>
+															<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
+																Draw
+															</button>
 													</th>
 														<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="2"
 													    data-match-id="@match.Id"
@@ -146,81 +151,98 @@
 													    data-odds="@match.AwayWinOdds"
 													    data-start-time="@match.KickoffTime.ToString("o")">
 													    
-														<button class="bet-option">
-															Away
-														</button>
+															<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
+																Away
+															</button>
 													</th>
 												</tr>
 												</thead>
 												<tbody class="tw-divide-y tw-divide-gray-200">
-													<tr>
-														<!-- Home Odds -->
-														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-															<span class="badge pill-brand-blue tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
-																  data-match-id="@match.Id"
-																  data-home="@match.HomeTeam"
-																  data-away="@match.AwayTeam"
-																  data-home-logo-url="@match.HomeTeamLogoUrl"
-																  data-away-logo-url="@match.AwayTeamLogoUrl"
-																  data-option="Home"
-																  data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
-																  data-odds="@match.EffectiveHomeWinOdds ?? match.HomeWinOdds">
-																@if (match.ActiveBoost != null)
-																{
-																	@match.EffectiveHomeWinOdds
-																}
-																else
-																{
-																	@match.HomeWinOdds
-																}
-															</span>
-														</td>
+												<tr>
+													<!-- Home Odds -->
+													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+																		@(match.ActiveBoost != null ? "pill-boosted-blue" : "pill-brand-blue")"
+														      data-match-id="@match.Id"
+														      data-home="@match.HomeTeam"
+														      data-away="@match.AwayTeam"
+														      data-home-logo-url="@match.HomeTeamLogoUrl"
+														      data-away-logo-url="@match.AwayTeamLogoUrl"
+														      data-option="Home"
+														      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
+														      data-odds="@(match.EffectiveHomeWinOdds ?? match.HomeWinOdds)">
+															@if (match.ActiveBoost != null)
+															{
+																@match.EffectiveHomeWinOdds
+															}
+															else
+															{
+																@match.HomeWinOdds
+															}
+														</span>
+													</td>
 
-														<!-- Draw Odds -->
-														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-															<span class="badge pill-brand-yellow tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
-																  data-match-id="@match.Id"
-																  data-home="@match.HomeTeam"
-																  data-away="@match.AwayTeam"
-																  data-home-logo-url="@match.HomeTeamLogoUrl"
-																  data-away-logo-url="@match.AwayTeamLogoUrl"
-																  data-option="Draw"
-																  data-has-boost="@(match.ActiveBoost != null ? "true" : "false")" 
-																  data-odds="@match.EffectiveDrawOdds ?? match.DrawOdds">
-																@if (match.ActiveBoost != null)
-																{
-																	@match.EffectiveDrawOdds
-																}
-																else
-																{
-																	@match.DrawOdds
-																}
-															</span>
-														</td>
+													<!-- Draw Odds -->
+													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+																			@(match.ActiveBoost != null ? "pill-boosted-yellow" : "pill-brand-yellow")"
+																  
+														      data-match-id="@match.Id"
+														      data-home="@match.HomeTeam"
+														      data-away="@match.AwayTeam"
+														      data-home-logo-url="@match.HomeTeamLogoUrl"
+														      data-away-logo-url="@match.AwayTeamLogoUrl"
+														      data-option="Draw"
+														      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")" 
+														      data-odds="@(match.EffectiveDrawOdds ?? match.DrawOdds)">
+															@if (match.ActiveBoost != null)
+															{
+																@match.EffectiveDrawOdds
+															}
+															else
+															{
+																@match.DrawOdds
+															}
+														</span>	
+													</td>
 
-														<!-- Away Odds -->
-														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-															<span class="badge pill-brand-green tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp"
-																  data-match-id="@match.Id"
-																  data-home="@match.HomeTeam"
-																  data-away="@match.AwayTeam"
-																  data-home-logo-url="@match.HomeTeamLogoUrl"
-																  data-away-logo-url="@match.AwayTeamLogoUrl"
-																  data-option="Away"
-																  data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
-																  data-odds="@match.EffectiveAwayWinOdds ?? match.AwayWinOdds">
-																@if (match.ActiveBoost != null)
-																{
-																	@match.EffectiveAwayWinOdds
-																}
-																else
-																{
-																	@match.AwayWinOdds
-																}
+													<!-- Away Odds -->
+													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+																@(match.ActiveBoost != null ? "pill-boosted-green" : "pill-brand-green")"
+														      data-match-id="@match.Id"
+														      data-home="@match.HomeTeam"
+														      data-away="@match.AwayTeam"
+														      data-home-logo-url="@match.HomeTeamLogoUrl"
+														      data-away-logo-url="@match.AwayTeamLogoUrl"
+														      data-option="Away"
+														      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
+														      data-odds="@(match.EffectiveAwayWinOdds ?? match.AwayWinOdds)">
+															@if (match.ActiveBoost != null)
+															{
+																@match.EffectiveAwayWinOdds
+															}
+															else
+															{
+																@match.AwayWinOdds
+															}
+														</span>
+													</td>
+														
+												</tr>
+												@if (match.ActiveBoost != null)
+												{
+												<tr class="boost-timer-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
+														<td colspan="3" class="text-center">
+														
+															<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+																<i class="ri-fire-fill boost-fire-icon me-1"></i>
+																<span class="boost-countdown"> 00:00</span>
 															</span>
+															
 														</td>
 													</tr>
-
+												}
 												</tbody>
 											</table>
 										</div>
@@ -586,7 +608,6 @@
 			localStorage.setItem(boostKey, displayOdds); // store boost
 		} else {
 			displayOdds = newOdds;
-			// regular odds storage logic
 			const regKey = `reg_${matchId}_${option}`;
 			if (oldOdds !== newOdds) {
 				localStorage.setItem(regKey, newOdds);
@@ -621,6 +642,45 @@
 		}
 		element.addEventListener('animationend', onEnd);
 	}
+
+
+	document.addEventListener("DOMContentLoaded", () => {
+		document.querySelectorAll(".boost-timer-row").forEach(row => {
+			const countdownEl = row.querySelector(".boost-countdown");
+			const endTimeStr = row.dataset.boostEnd;
+			if (!endTimeStr || !countdownEl) return;
+
+			const fixedEndTimeStr = row.dataset.boostEnd.replace(/\.\d+/, match => match.slice(0, 4)) + "Z";
+			const endTime = new Date(fixedEndTimeStr);
+
+
+			if (isNaN(endTime)) {
+				countdownEl.textContent = "Invalid";
+				return;
+			}
+
+			const update = () => {
+				const now = new Date();
+				const diff = endTime.getTime() - now.getTime();
+
+				if (diff <= 0) {
+					countdownEl.textContent = "00:00";
+					clearInterval(interval);
+					return;
+				}
+
+				const minutes = Math.floor(diff / 60000).toString().padStart(2, "0");
+				const seconds = Math.floor((diff % 60000) / 1000).toString().padStart(2, "0");
+
+				countdownEl.textContent = `${minutes}:${seconds}`;
+			};
+
+			update(); // run immediately
+			const interval = setInterval(update, 1000);
+		});
+	});
+
+
 
 
 
