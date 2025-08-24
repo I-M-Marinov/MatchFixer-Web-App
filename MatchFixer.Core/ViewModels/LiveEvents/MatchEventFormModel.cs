@@ -10,7 +10,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 	public class MatchEventFormModel
 	{
 
-		[Required(ErrorMessage = ChooseAValidTeam)]
+		[Required(ErrorMessage = ChooseAValidTeam)]	
 		public Guid HomeTeamId { get; set; }
 
 		[Required(ErrorMessage = ChooseAValidTeam)]
@@ -35,7 +35,6 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public decimal? AwayOdds { get; set; }
 
 		public List<LiveEventViewModel> CurrentEvents { get; set; } = new();
-
 	}
 
 }
