@@ -80,7 +80,6 @@ namespace MatchFixer.Core.Services
 			return result;
 		}
 
-
 		public async Task<List<LiveEventViewModel>> GetAllEventsAsync()
 		{
 			var now = DateTime.UtcNow;
@@ -91,31 +90,62 @@ namespace MatchFixer.Core.Services
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.Include(e => e.LiveResult)
+				.Include(e => e.OddsBoosts)
 				.Where(e => e.LiveResult == null && e.IsCancelled != true && e.MatchDate > cutoff) // Only upcoming matches + result submitted yet + matches that are not already voided
 				.OrderBy(e => e.MatchDate)
 				.AsNoTracking()
 				.ToListAsync();
 
-			var viewModels = events.Select(e => new LiveEventViewModel
+			var viewModels = events.Select(e =>
 			{
-				Id = e.Id,
-				HomeTeam = e.HomeTeam.Name,
-				AwayTeam = e.AwayTeam.Name,
-				KickoffTime = DateTime.SpecifyKind(e.MatchDate, DateTimeKind.Utc),
-				HomeWinOdds = e.HomeOdds ?? 0,
-				DrawOdds = e.DrawOdds ?? 0,
-				AwayWinOdds = e.AwayOdds ?? 0,
-				HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
-				AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
-				IsDerby = e.IsDerby,
-				IsCancelled = e.IsCancelled,
-				UserTimeZone = user.TimeZone,
-				MatchStatus = e.IsCancelled
-					? "Cancelled"
-					: e.MatchDate <= now
-						? "Started"
-						: "Live"
+				var now = DateTime.UtcNow;
+
+				// pick the currently active boost, if any
+				var activeBoostEntity = e.OddsBoosts
+					.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
+					.FirstOrDefault();
+
+				return new LiveEventViewModel
+				{
+					Id = e.Id,
+					HomeTeam = e.HomeTeam.Name,
+					AwayTeam = e.AwayTeam.Name,
+					KickoffTime = DateTime.SpecifyKind(e.MatchDate, DateTimeKind.Utc),
+
+					HomeWinOdds = e.HomeOdds ?? 0,
+					DrawOdds = e.DrawOdds ?? 0,
+					AwayWinOdds = e.AwayOdds ?? 0,
+
+					EffectiveHomeWinOdds = activeBoostEntity != null ? (e.HomeOdds + activeBoostEntity.BoostValue) : e.HomeOdds,
+					EffectiveDrawOdds = activeBoostEntity != null ? (e.DrawOdds + activeBoostEntity.BoostValue) : e.DrawOdds,
+					EffectiveAwayWinOdds = activeBoostEntity != null ? (e.AwayOdds + activeBoostEntity.BoostValue) : e.AwayOdds,
+
+					ActiveBoost = activeBoostEntity,
+					BoostEndUtc = activeBoostEntity?.EndUtc,
+
+					BoostActive = activeBoostEntity != null ? new BoostViewModel
+					{
+						BoostValue = activeBoostEntity.BoostValue,
+						StartUtc = activeBoostEntity.StartUtc,
+						EndUtc = activeBoostEntity.EndUtc,
+						MaxStakePerBet = activeBoostEntity.MaxStakePerBet,
+						MaxUsesPerUser = activeBoostEntity.MaxUsesPerUser,
+						Note = activeBoostEntity.Note
+					} : null,
+
+					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
+					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
+					IsDerby = e.IsDerby,
+					UserTimeZone = user.TimeZone,
+					IsCancelled = e.IsCancelled,
+					MatchStatus = e.IsCancelled
+						? "Cancelled"
+						: e.MatchDate <= now
+							? "Started"
+							: "Live"
+				};
 			}).ToList();
+
 
 			return viewModels;
 		}
