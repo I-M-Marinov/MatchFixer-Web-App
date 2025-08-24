@@ -139,7 +139,7 @@
 				</div>
 
 				<div class="d-flex justify-content-center align-items-center row mb-3">
-					<div class="home-odds col">
+					<div class="home-odds col">										
 						<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
 						<input asp-for="HomeOdds" class="form-control"/>
 						<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
@@ -177,7 +177,7 @@
 							<th>Date & Time</th>
 							<th>Home Team</th>
 							<th>Away Team</th>
-							<th>Add a Boost</th>
+							<th>Boost</th>
 							<th>Update</th>
 						</tr>
 						</thead>
@@ -211,78 +211,90 @@
 									@ev.AwayTeam
 								</td>
 								<td>
-									<button type="button" class="btn btn-sm btn-warning create-boost-btn"
-									        data-bs-toggle="modal"
-									        data-bs-target="#createBoostModal"
-									        data-match-id="@ev.Id">
-										<i class="ri-fire-fill"></i>
-									</button>
+									@if (ev.BoostActive != null)
+									{
+										<div class="d-flex flex-column align-items-center boost-timer-row" 
+										     data-boost-end="@ev.BoostActive.EndUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")">
+											<span class="badge bg-success mb-1">Boost Active!</span>
+											<span class="boost-countdown fw-bold"></span>
+										</div>
+									}
+									else
+									{
+										<button type="button" class="btn btn-sm btn-warning create-boost-btn"
+										        data-bs-toggle="modal"
+										        data-bs-target="#createBoostModal"
+										        data-match-id="@ev.Id">
+											<i class="ri-fire-fill"></i>
+										</button>
+									}
 								</td>
-								<td style="max-width: 350px;">
-									<div class="d-flex justify-content-between align-items-start flex-wrap">
+									<td style="max-width: 350px;">
+										<div class="d-flex justify-content-between align-items-start flex-wrap">
 
-										<div class="d-flex flex-column gap-1">
-												
-											@{
-												var isDisabled = ev.MatchStatus == "Started" ? "disabled" : "";
-											}
+											<div class="d-flex flex-column gap-1">
+													
+												@{
+													var isDisabled = (ev.MatchStatus == "Started" || ev.ActiveBoost != null) ? "disabled" : "";
+												}
 
-											<div class="d-flex gap-2">
-												<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-												       value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home" @isDisabled />
-												<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-												       value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw" @isDisabled />
-												<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-												       value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away" @isDisabled />
 
+												<div class="d-flex gap-2">
+													<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+													       value="@ev.HomeWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Home" @isDisabled />
+													<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+													       value="@ev.DrawOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Draw" @isDisabled />
+													<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+													       value="@ev.AwayWinOdds" class="form-control form-control-sm" style="width: 80px;" placeholder="Away" @isDisabled />
+
+												</div>
+
+												<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
+												       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
+												       class="form-control form-control-sm" style="min-width: 240px;" @isDisabled />
 											</div>
 
-											<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
-											       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
-											       class="form-control form-control-sm" style="min-width: 240px;" @isDisabled />
+											<div class="d-flex flex-column gap-1 align-items-end">
+												@if (ev.MatchStatus != "Started" )
+												{			
+													<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="Id" value="@ev.Id"/>
+														<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
+														<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
+														<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
+														<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
+														<button type="submit" class="btn btn-success btn-sm update-event-btn">
+															<div class="icon">
+																<i class="bx bxs-save" title="Save event"></i>
+															</div>
+														</button>
+													</form>
+												}
+
+												@if (ev.IsCancelled != true)
+												{
+													<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="id" value="@ev.Id"/>
+
+														<button type="button" 
+														        class="btn btn-outline-danger btn-sm update-event-btn"
+														        data-bs-toggle="modal" 
+														        data-bs-target="#confirmCancelModal"
+														        data-event-id="@ev.Id">
+															<div class="icon">
+																<i class="ri-delete-bin-2-fill"></i>
+																<div class="label"></div>
+															</div>
+														</button>
+
+													</form>
+												}
+											</div>
+
 										</div>
-
-										<div class="d-flex flex-column gap-1 align-items-end">
-											@if (ev.MatchStatus != "Started")
-											{
-												<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
-													@Html.AntiForgeryToken()
-													<input type="hidden" name="Id" value="@ev.Id"/>
-													<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
-													<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
-													<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
-													<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
-													<button type="submit" class="btn btn-success btn-sm update-event-btn">
-														<div class="icon">
-															<i class="bx bxs-save" title="Save event"></i>
-														</div>
-													</button>
-												</form>
-											}
-
-											@if (ev.IsCancelled != true)
-											{
-												<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
-													@Html.AntiForgeryToken()
-													<input type="hidden" name="id" value="@ev.Id"/>
-
-													<button type="button" 
-													        class="btn btn-outline-danger btn-sm update-event-btn"
-													        data-bs-toggle="modal" 
-													        data-bs-target="#confirmCancelModal"
-													        data-event-id="@ev.Id">
-														<div class="icon">
-															<i class="ri-delete-bin-2-fill"></i>
-															<div class="label"></div>
-														</div>
-													</button>
-
-												</form>
-											}
-										</div>
-
-									</div>
-								</td>
+									</td>
 
 							</tr>
 						}
@@ -444,6 +456,32 @@
 				}
 			});
 		});
+
+
+		document.addEventListener("DOMContentLoaded", () => {
+			document.querySelectorAll(".boost-timer-row").forEach(row => {
+				const countdown = row.querySelector(".boost-countdown");
+				const endTime = new Date(row.dataset.boostEnd); // parsed as UTC
+
+				function update() {
+					const now = new Date(); // local browser time
+					const diff = endTime.getTime() - now.getTime();
+
+					if (diff <= 0) {
+						countdown.textContent = "Expired";
+						return clearInterval(interval);
+					}
+
+					const minutes = Math.floor(diff / 1000 / 60);
+					const seconds = Math.floor((diff / 1000) % 60);
+					countdown.textContent = `${minutes}m ${seconds}s`;
+				}
+
+				update();
+				const interval = setInterval(update, 1000);
+			});
+		});
+
 
 
 
