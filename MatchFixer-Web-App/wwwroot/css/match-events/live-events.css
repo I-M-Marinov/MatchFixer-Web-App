@@ -599,6 +599,7 @@ odds-up {
     background-size: 200% 100%;
     animation: pillShimmerBlue 4s linear infinite;
     color: #fff !important;
+    border-radius: 30%;
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
 }
 
@@ -608,6 +609,7 @@ odds-up {
     background-size: 200% 100%;
     animation: pillShimmerYellow 4s linear infinite;
     color: #111 !important;
+    border-radius: 30%;
     box-shadow: 0 0 12px rgba(250, 204, 21, 0.7);
 }
 
@@ -617,6 +619,7 @@ odds-up {
     background-size: 200% 100%;
     animation: pillShimmerGreen 4s linear infinite;
     color: #fff !important;
+    border-radius: 30%;
     box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
 }
 
@@ -727,8 +730,21 @@ odds-up {
 }
 
 .pill-boosted {
-    background: linear-gradient(90deg, #ff9a3c, #ff6b00);
+    background: linear-gradient(180deg, #ff9a3c, #ff6b00);
     color: white;
-    font-weight: 600;
+    font-weight: 900;
+}
+
+.old-odds {
+    text-decoration: line-through;
+    color: #c62727;
+    font-size: 0.70rem;
+    text-shadow: 1px 1px 3px #ff8686;
+}
+
+.boosted-odds {
+    color: white; /* boosted highlight (matches fire) */
+    font-weight: 900;
+    text-shadow: 1px 1px 1px black;
 }
 
