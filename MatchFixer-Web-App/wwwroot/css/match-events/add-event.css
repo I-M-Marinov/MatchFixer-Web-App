@@ -244,15 +244,85 @@ table.responsive-stack td {
     color: aqua !important;
 }
 
-#createBoostModal{
+#createBoostModal {
     margin-top: 5em;
+    font-size: 0.85rem;
 }
 
-.create-boost-btn{
+#createBoostModal .modal-dialog .row{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#createBoostModal .modal-body .row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+#createBoostModal .modal-body {
+    box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 25px 20px -20px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
+    padding: 4em;
+    background: #2A7B9B;
+    background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+}
+
+#createBoostModal .modal-header,
+#createBoostModal .modal-footer{
+    background-color: #2A7B9B;
+    color: white;
+    text-align: center; 
+}
+
+#createBoostModal .form-control {
+    text-align: center; 
+    height: 2.5rem; 
+    padding: 0; 
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+
+#createBoostModal .form-label {
+    color: white;
+    text-shadow: 0 1px 2px black;
+}
+
+#createBoostModal .modal-body .col-md-6 {
+    flex: 0 0 auto !important;
+    width: 50% !important;
+}
+
+#createBoostModal .modal-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#createBoostModal .btn-close{
+    font-size: 0.85em;
+    margin: 0.35em;
+}
+
+#createBoostModal .btn-primary {
+    align-self: center;
+    margin: 0.35em;
+}
+
+.create-boost-btn {
     border: 1px solid #daa208;
     background-color: white;
     color: tomato;
     font-size: 1.2em !important;
+}
+
+#createBoostModal .form-control {
+    height: 38px; /* adjust to your liking */
+    padding: 0.375rem 0.75rem; /* default Bootstrap padding */
+    display: flex;
+    align-items: center; /* vertical center */
 }
 
 
