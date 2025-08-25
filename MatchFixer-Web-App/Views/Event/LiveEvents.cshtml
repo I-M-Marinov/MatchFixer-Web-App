@@ -248,9 +248,14 @@
 																<i class="ri-fire-fill boost-fire-icon me-1"></i>
 																<span class="boost-countdown"> 00:00</span>
 															</span>
-															<small class="badge text-black fw-bold boost-max-stake">
+																<small class="badge text-white fw-bold boost-max-stake">
 																Max:<br/>
 																€@match.ActiveBoost?.MaxStakePerBet
+															</small>
+
+																<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+																x
+																@match.ActiveBoost?.MaxUsesPerUser
 															</small>
 															
 														</td>
