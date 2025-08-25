@@ -241,13 +241,17 @@
 												</tr>
 												@if (match.ActiveBoost != null)
 												{
-												<tr class="boost-timer-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
+													<tr class="boost-timer-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
 														<td colspan="3" class="text-center">
 														
 															<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
 																<i class="ri-fire-fill boost-fire-icon me-1"></i>
 																<span class="boost-countdown"> 00:00</span>
 															</span>
+															<small class="badge text-black fw-bold boost-max-stake">
+																Max:<br/>
+																€@match.ActiveBoost?.MaxStakePerBet
+															</small>
 															
 														</td>
 													</tr>
@@ -276,22 +280,19 @@
 </div>
 
 <script>
-		
-	document.addEventListener('DOMContentLoaded', function() {
 
-		// Select all table headers from all odds-tables
+			document.addEventListener('DOMContentLoaded', function() {
+
 		const allTableHeaders = document.querySelectorAll('.odds-table th');
 
 		allTableHeaders.forEach(header => {
 			header.addEventListener('mouseover', function() {
 
-				// Get the parent table of the hovered header
 				const parentTable = this.closest('.odds-table');
-				if (!parentTable) return; 
+				if (!parentTable) return;
 
 				const headersInThisTable = parentTable.querySelectorAll('th');
 				const columnIndex = Array.from(headersInThisTable).indexOf(this);
-
 				if (columnIndex === -1) return;
 
 				this.classList.add('highlighted-column');
@@ -299,6 +300,9 @@
 				const rowsInThisTable = parentTable.querySelectorAll('tbody tr');
 
 				rowsInThisTable.forEach(row => {
+					// Skip boost-timer-row
+					if (row.classList.contains('boost-timer-row')) return;
+
 					const cells = row.querySelectorAll('td');
 					if (cells[columnIndex]) {
 						cells[columnIndex].classList.add('highlighted-column');
@@ -313,7 +317,6 @@
 
 				const headersInThisTable = parentTable.querySelectorAll('th');
 				const columnIndex = Array.from(headersInThisTable).indexOf(this);
-
 				if (columnIndex === -1) return;
 
 				this.classList.remove('highlighted-column');
@@ -321,6 +324,9 @@
 				const rowsInThisTable = parentTable.querySelectorAll('tbody tr');
 
 				rowsInThisTable.forEach(row => {
+					// Skip boost-timer-row
+					if (row.classList.contains('boost-timer-row')) return;
+
 					const cells = row.querySelectorAll('td');
 					if (cells[columnIndex]) {
 						cells[columnIndex].classList.remove('highlighted-column');
@@ -329,6 +335,8 @@
 			});
 		});
 	});
+
+
 
 
 	document.querySelectorAll('.event-card').forEach(card => {
