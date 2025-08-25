@@ -740,6 +740,9 @@ odds-up {
     border-radius: 0.75em;
 }
 
+.boost-countdown {
+    text-shadow: 0 1px 2px black;
+}
 
 .old-odds {
     text-decoration: line-through;
@@ -762,6 +765,17 @@ odds-up {
 .boost-max-stake {
     position: absolute;
     top: 0.2em;
-    right: 0.2em;
+    right: 1.6em;
+    font-size: 0.70rem;
+    background: #0DAB76;
+    text-shadow: 0 1px 2px black;
 }
 
+.boost-max-uses {
+    text-shadow: 0 1px 2px black;
+    font-size: 0.70rem;
+    position: absolute;
+    top: 0.2em;
+    left: 2.2em;
+    background: #0d6efd;
+}
