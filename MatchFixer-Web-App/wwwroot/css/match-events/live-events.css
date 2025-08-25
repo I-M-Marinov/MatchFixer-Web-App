@@ -754,3 +754,14 @@ odds-up {
     text-shadow: 1px 1px 1px black;
 }
 
+.boost-timer-row {
+    position: relative;
+    border-color: #fff !important;
+}
+
+.boost-max-stake {
+    position: absolute;
+    top: 0.2em;
+    right: 0.2em;
+}
+
