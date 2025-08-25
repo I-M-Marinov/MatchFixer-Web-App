@@ -706,9 +706,10 @@ odds-up {
 
 
 .boost-fire-icon {
-    color: #ff6b00; 
+    color: #ff6b00;
     animation: fire-pulse 0.75s infinite alternate;
     font-size: 0.9rem;
+    text-shadow: 0px 0px 4px black;
 }
 
 /* subtle pulsing effect */
@@ -730,10 +731,15 @@ odds-up {
 }
 
 .pill-boosted {
-    background: linear-gradient(180deg, #ff9a3c, #ff6b00);
+    background: linear-gradient(270deg, #ff8c21, #ff6b00, #ff8c21);
+    background-size: 200% 100%;
+    animation: pillShimmer 3s linear infinite;
     color: white;
     font-weight: 900;
+    border: 2px solid #ff6b00;
+    border-radius: 0.75em;
 }
+
 
 .old-odds {
     text-decoration: line-through;
