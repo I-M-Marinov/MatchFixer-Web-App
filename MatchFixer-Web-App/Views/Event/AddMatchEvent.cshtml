@@ -232,12 +232,16 @@
 									}
 									else
 									{
-										<button type="button" class="btn btn-sm btn-warning create-boost-btn"
-										        data-bs-toggle="modal"
-										        data-bs-target="#createBoostModal"
-										        data-match-id="@ev.Id">
-											<i class="ri-fire-fill"></i>
-										</button>
+										<span class="custom-tooltip-wrapper">
+											<button type="button" class="btn btn-sm btn-warning create-boost-btn"
+											        data-bs-toggle="modal"
+											        data-bs-target="#createBoostModal"
+											        data-match-id="@ev.Id">
+												<i class="ri-fire-fill"></i>
+											</button>											
+											<span class="custom-tooltip">Add an odds boost for this game</span>
+										</span>
+										
 									}
 								</td>
 									<td style="max-width: 350px;">
@@ -275,11 +279,15 @@
 														<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
 														<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
 														<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
-														<button type="submit" class="btn btn-success btn-sm update-event-btn">
-															<div class="icon">
-																<i class="bx bxs-save" title="Save event"></i>
-															</div>
-														</button>
+														
+														<span class="custom-save-remove-tooltip-wrapper">
+															<button type="submit" class="btn btn-success btn-sm update-event-btn">
+																<div class="icon">
+																	<i class="bx bxs-save"></i>
+																</div>
+															</button>															
+															<span class="custom-save-remove-tooltip">Save the event</span>
+														</span>
 													</form>
 												}
 
@@ -288,17 +296,19 @@
 													<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@ev.Id"/>
-
-														<button type="button" 
-														        class="btn btn-outline-danger btn-sm update-event-btn"
-														        data-bs-toggle="modal" 
-														        data-bs-target="#confirmCancelModal"
-														        data-event-id="@ev.Id">
-															<div class="icon">
-																<i class="ri-delete-bin-2-fill"></i>
-																<div class="label"></div>
-															</div>
-														</button>
+														<span class="custom-save-remove-tooltip-wrapper">
+															<button type="button" 
+															        class="btn btn-outline-danger btn-sm update-event-btn"
+															        data-bs-toggle="modal" 
+															        data-bs-target="#confirmCancelModal"
+															        data-event-id="@ev.Id">
+																<div class="icon">
+																	<i class="ri-delete-bin-2-fill"></i>
+																	<div class="label"></div>
+																</div>
+															</button>
+															<span class="custom-save-remove-tooltip">Cancel this event</span>
+														</span>
 
 													</form>
 												}
