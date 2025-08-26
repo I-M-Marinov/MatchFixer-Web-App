@@ -162,7 +162,7 @@
 													<!-- Home Odds -->
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
 														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
-																		@(match.ActiveBoost != null ? "pill-boosted-blue" : "pill-brand-blue")"
+															@(match.ActiveBoost != null ? "pill-boosted-blue" : "pill-brand-blue")"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
 														      data-away="@match.AwayTeam"
@@ -425,7 +425,6 @@
 
 			if (searchQuery && (home === searchQuery || away === searchQuery)) {
 				exactMatchCard = card;
-				console.log(exactMatchCard);
 			}
 
 			card.closest('.col').style.display = matchesSearch ? '' : 'none';
@@ -560,30 +559,23 @@
 			const awayHeader = card.querySelector('thead th[data-option="Away"]');
 
 			const hasBoost = update.activeBoostId != null;
-			console.log(hasBoost);
 
 			if (!hasBoost) {
 				// No boost, just run original logic
-				if (homeOddsElement && homeHeader) {
-					homeOddsElement.textContent = update.homeOdds.toFixed(2);
-					homeOddsElement.dataset.lastOdds = update.homeOdds;
-					homeHeader.dataset.odds = update.homeOdds;
-					animateOddsChange(homeOddsElement, update.homeOdds);
-				}
+					if (homeOddsElement && homeHeader) {
+						homeHeader.dataset.odds = update.homeOdds;
+						animateOddsChange(homeOddsElement, update.homeOdds, update.matchEventId, "Home", false);
+					}
 
-				if (drawOddsElement && drawHeader) {
-					drawOddsElement.textContent = update.drawOdds.toFixed(2);
-					drawOddsElement.dataset.lastOdds = update.drawOdds;
-					drawHeader.dataset.odds = update.drawOdds;
-					animateOddsChange(drawOddsElement, update.drawOdds);
-				}
+					if (drawOddsElement && drawHeader) {
+						drawHeader.dataset.odds = update.drawOdds;
+						animateOddsChange(drawOddsElement, update.drawOdds, update.matchEventId, "Draw", false);
+					}
 
-				if (awayOddsElement && awayHeader) {
-					awayOddsElement.textContent = update.awayOdds.toFixed(2);
-					awayOddsElement.dataset.lastOdds = update.awayOdds;
-					awayHeader.dataset.odds = update.awayOdds;
-					animateOddsChange(awayOddsElement, update.awayOdds);
-				}
+					if (awayOddsElement && awayHeader) {
+						awayHeader.dataset.odds = update.awayOdds;
+						animateOddsChange(awayOddsElement, update.awayOdds, update.matchEventId, "Away", false);
+					}
 			} else {
 				// Boosted match logic
 				// Use effective odds and ensure boost prevails in the UI and localStorage
@@ -664,6 +656,7 @@
 		}
 		element.addEventListener('animationend', onEnd);
 	}
+
 
 
 	document.addEventListener("DOMContentLoaded", () => {
