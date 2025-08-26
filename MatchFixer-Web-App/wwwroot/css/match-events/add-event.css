@@ -319,10 +319,38 @@ table.responsive-stack td {
 }
 
 #createBoostModal .form-control {
-    height: 38px; /* adjust to your liking */
-    padding: 0.375rem 0.75rem; /* default Bootstrap padding */
+    height: 38px;
+    padding: 0.375rem 0.75rem;
     display: flex;
-    align-items: center; /* vertical center */
+    align-items: center;
+}
+
+.custom-save-remove-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-save-remove-tooltip {
+    visibility: hidden;
+    background-color: var(--secondary-color);
+    color: black;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 999;
+    bottom: 100%;
+    left: -1.8rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
+.custom-save-remove-tooltip-wrapper:hover .custom-save-remove-tooltip {
+    visibility: visible;
+    opacity: 1;
 }
 
 
