@@ -13,5 +13,14 @@ namespace MatchFixer.Core.Contracts
 			decimal? effectiveDrawOdds = null,
 			decimal? effectiveAwayOdds = null,
 			Guid? activeBoostId = null);
+
+		Task NotifyBoostStartedAsync(
+			Guid matchEventId,
+			decimal effectiveHomeOdds,
+			decimal effectiveDrawOdds,
+			decimal effectiveAwayOdds,
+			DateTime boostEndUtc,
+			decimal maxStake,
+			int maxUses);
 	}
 }
