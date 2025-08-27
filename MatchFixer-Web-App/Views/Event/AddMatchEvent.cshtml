@@ -424,7 +424,7 @@
 
 		});
 
-					document.addEventListener("DOMContentLoaded", () => {
+		document.addEventListener("DOMContentLoaded", () => {
 			const form = document.getElementById("createBoostForm");
 			const matchIdInput = document.getElementById("MatchEventId");
 
@@ -504,6 +504,82 @@
 		});
 
 
+		document.addEventListener("DOMContentLoaded", function () {
+			const connection = new signalR.HubConnectionBuilder()
+				.withUrl("/matchEventHub")
+				.withAutomaticReconnect()
+				.build();
+
+			connection.start()
+				.then(() => {
+					console.log("SignalR connected");
+					document.querySelectorAll('.event-card').forEach(card => {
+						const matchId = card.dataset.matchId;
+						console.log("Subscribing to match", matchId);
+						connection.invoke("SubscribeToEvent", matchId)
+							.then(() => console.log("Subscribed to", matchId))
+							.catch(err => console.error(`Failed to subscribe to match ${matchId}:`, err.toString()));
+					});
+			})
+
+			connection.on("MatchEventUpdated", function (update) {
+				const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
+				if (!card) return;
+
+				const homeOddsElement = card.querySelector('tbody span[data-option="Home"]');
+				const drawOddsElement = card.querySelector('tbody span[data-option="Draw"]');
+				const awayOddsElement = card.querySelector('tbody span[data-option="Away"]');
+
+				const homeHeader = card.querySelector('thead th[data-option="Home"]');
+				const drawHeader = card.querySelector('thead th[data-option="Draw"]');
+				const awayHeader = card.querySelector('thead th[data-option="Away"]');
+
+				const hasBoost = update.activeBoostId != null;
+
+				if (!hasBoost) {
+
+						if (homeOddsElement && homeHeader) {
+							homeHeader.dataset.odds = update.homeOdds;
+							animateOddsChange(homeOddsElement, update.homeOdds, update.matchEventId, "Home", false);
+						}
+
+						if (drawOddsElement && drawHeader) {
+							drawHeader.dataset.odds = update.drawOdds;
+							animateOddsChange(drawOddsElement, update.drawOdds, update.matchEventId, "Draw", false);
+						}
+
+						if (awayOddsElement && awayHeader) {
+							awayHeader.dataset.odds = update.awayOdds;
+							animateOddsChange(awayOddsElement, update.awayOdds, update.matchEventId, "Away", false);
+						}
+				} else {
+					animateOddsChange(homeOddsElement, update.effectiveHomeOdds, update.matchEventId, "Home", true);
+					animateOddsChange(drawOddsElement, update.effectiveDrawOdds, update.matchEventId, "Draw", true);
+					animateOddsChange(awayOddsElement, update.effectiveAwayOdds, update.matchEventId, "Away", true);
+
+					if (homeHeader) homeHeader.dataset.odds = update.effectiveHomeOdds.toFixed(2);
+					if (drawHeader) drawHeader.dataset.odds = update.effectiveDrawOdds.toFixed(2);
+					if (awayHeader) awayHeader.dataset.odds = update.effectiveAwayOdds.toFixed(2);
+				}
+			});
+
+		connection.on("BoostStarted", function(boostData) {
+			console.log("BoostStarted received:", boostData);
+
+			const card = document.querySelector(`[data-match-id="${boostData.matchEventId}"]`) ||
+			document.querySelector(`[data-match-id='${boostData.matchEventId.toString()}']`);
+
+			console.log("Matched card:", card);
+
+			if (!card) return;
+
+			const oddsRow = card.querySelector(".tw-divide-y .tw-divide-gray-200");
+			console.log("Odds row found:", oddsRow);
+
+			activateBoost(oddsRow, boostData);
+			});
+
+		});
 
 
 
