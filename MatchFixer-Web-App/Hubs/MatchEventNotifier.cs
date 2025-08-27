@@ -36,6 +36,30 @@ namespace MatchFixer_Web_App.Hubs
 					activeBoostId
 				});
 		}
+
+		public Task NotifyBoostStartedAsync(
+			Guid matchEventId,
+			decimal effectiveHomeOdds,
+			decimal effectiveDrawOdds,
+			decimal effectiveAwayOdds,
+			DateTime boostEndUtc,
+			decimal maxStake,
+			int maxUses)
+		{
+			return _hubContext.Clients
+				.Group(matchEventId.ToString())
+				.SendAsync("BoostStarted", new
+				{
+					matchEventId,
+					effectiveHomeOdds,
+					effectiveDrawOdds,
+					effectiveAwayOdds,
+					boostEndUtc,
+					maxStake,
+					maxUses
+				});
+		}
+
 	}
 
 }
