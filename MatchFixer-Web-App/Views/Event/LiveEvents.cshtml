@@ -546,6 +546,18 @@
 			.withAutomaticReconnect()
 			.build();
 
+		connection.start()
+			.then(() => {
+				console.log("SignalR connected");
+				document.querySelectorAll('.event-card').forEach(card => {
+					const matchId = card.dataset.matchId;
+					console.log("Subscribing to match", matchId);
+					connection.invoke("SubscribeToEvent", matchId)
+						.then(() => console.log("Subscribed to", matchId))
+						.catch(err => console.error(`Failed to subscribe to match ${matchId}:`, err.toString()));
+				});
+		})
+
 		connection.on("MatchEventUpdated", function (update) {
 			const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
 			if (!card) return;
@@ -589,20 +601,25 @@
 			}
 		});
 
+		connection.onclose(err => console.error("SignalR disconnected:", err));
 
-		connection.start()
-			.then(() => {
-				// After connected, subscribe to each match group
-				document.querySelectorAll('.event-card').forEach(card => {
-					const matchId = card.dataset.matchId;
-					connection.invoke("SubscribeToEvent", matchId)
-						.catch(err => console.error(`Failed to subscribe to match ${matchId}:`, err.toString()));
-				});
-			})
-			.catch(err => {
-				console.error('SignalR connection failed:', err.toString());
-			});
+		connection.onreconnected(id => console.log("SignalR reconnected with id:", id));
+
+		connection.on("BoostStarted", boostData => {
+			const card = document.querySelector(`[data-match-id="${boostData.matchEventId}"]`);
+			if (!card) return console.warn("No card found for match", boostData.matchEventId);
+
+			const oddsRow = card.querySelector("tbody tr:not(.boost-timer-row)");
+			if (!oddsRow) return console.warn("No odds row found in card", card);
+
+			activateBoost(oddsRow, boostData);
+		});
+
 	});
+
+
+
+	
 
 	function animateOddsChange(element, newOdds, matchId, option, isBoosted = false) {
 		if (!element) return;
@@ -657,8 +674,6 @@
 		element.addEventListener('animationend', onEnd);
 	}
 
-
-
 	document.addEventListener("DOMContentLoaded", () => {
 		document.querySelectorAll(".boost-timer-row").forEach(row => {
 			const countdownEl = row.querySelector(".boost-countdown");
@@ -706,7 +721,6 @@
 		});
 	});
 
-
 	function resetBoost(row) {
 		// 1. Find the enclosing card-body (container for background + options)
 		const cardBody = row.closest(".card-body");
@@ -742,25 +756,107 @@
 			pill.innerHTML = baseOdds;
 		});
 
-		// 4. Reset container background
 		cardBody.classList.remove("boosted-match-container-effects");
 		if (cardBody.dataset.isDerby === "true") {
 			cardBody.classList.add("derby-match-container-effects");
 		}
-
-		// 5. Remove the boost timer row
+	
 		row.remove();
 	}
 
+		function activateBoost(row, boostData) {
+		const cardBody = row.closest(".card-body");
+		if (!cardBody) return;
 
+		cardBody.classList.add("boosted-match-container-effects");
+		if (cardBody.dataset.isDerby === "true") {
+			cardBody.classList.remove("derby-match-container-effects");
+		}
 
+		cardBody.querySelectorAll(".bet-option").forEach(btn => btn.classList.add("boosted"));
 
+		cardBody.querySelectorAll(".bet-trigger .badge").forEach(pill => {
+			const option = pill.dataset.option;
+			let boostedOdds;
+			if (option === "Home") boostedOdds = boostData.effectiveHomeOdds;
+			else if (option === "Draw") boostedOdds = boostData.effectiveDrawOdds;
+			else if (option === "Away") boostedOdds = boostData.effectiveAwayOdds;
+			if (!boostedOdds) return;
 
+			pill.classList.remove("pill-brand-blue", "pill-brand-yellow", "pill-brand-green");
 
+			if (option === "Home") pill.classList.add("pill-boosted-blue");
+			if (option === "Draw") pill.classList.add("pill-boosted-yellow");
+			if (option === "Away") pill.classList.add("pill-boosted-green");
 
+			pill.dataset.hasBoost = "true";
+			pill.dataset.odds = boostedOdds;
 
+			let oldOddsNode = pill.querySelector(".old-odds");
+			let boostedOddsNode = pill.querySelector(".boosted-odds");
 
+			if (!oldOddsNode || !boostedOddsNode) {
+				const baseOdds = pill.textContent.trim();
+				pill.innerHTML = `
+					<div class="d-flex flex-column align-items-center justify-content-center">
+						<span class="old-odds">${baseOdds}</span>
+						<span class="boosted-odds">${boostedOdds}</span>
+					</div>`;
+			} else {
+				boostedOddsNode.textContent = boostedOdds;
+			}
+		});
 
+		const tableBody = cardBody.querySelector("tbody");
+		if (tableBody && !tableBody.querySelector(".boost-timer-row")) {
+			const timerRow = document.createElement("tr");
+			timerRow.classList.add("boost-timer-row");
+
+			// Make sure this is proper UTC ISO string
+			const boostEndIso = new Date(boostData.boostEndUtc).toISOString();
+			timerRow.dataset.boostEnd = boostEndIso;
+
+			timerRow.innerHTML = `
+				<td colspan="3" class="text-center">
+					<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs">
+						<i class="ri-fire-fill boost-fire-icon me-1"></i>
+						<span class="boost-countdown">00:00</span>
+					</span>
+					<small class="badge text-white fw-bold boost-max-stake">Max:<br/>€${boostData.maxStake}</small>
+					<small class="badge text-white fw-bold boost-max-uses">x${boostData.maxUses}</small>
+				</td>`;
+
+			tableBody.appendChild(timerRow);
+
+			const countdownEl = timerRow.querySelector(".boost-countdown");
+			const endTime = new Date(timerRow.dataset.boostEnd);
+
+			const update = () => {
+				const now = new Date();
+				let diff = endTime - now;
+
+				if (diff <= 0) {
+					clearInterval(interval);
+					countdownEl.textContent = "00:00";
+					resetBoost(timerRow);
+					return;
+				}
+
+				const hours = Math.floor(diff / 3600000);
+				diff %= 3600000;
+				const minutes = Math.floor(diff / 60000);
+				diff %= 60000;
+				const seconds = Math.floor(diff / 1000);
+
+				countdownEl.textContent = hours > 0
+					? `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`
+					: `${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`;
+			};
+
+			update();
+			const interval = setInterval(update, 1000);
+		}
+	}
 
 
 	
