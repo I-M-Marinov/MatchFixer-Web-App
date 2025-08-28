@@ -153,7 +153,7 @@ namespace MatchFixer_Web_App.Controllers
 					maxUsesPerUser: model.MaxUsesPerUser,
 					note: model.Note);
 
-				return Json(new { success = true, boost });
+				return Json(new { success = true, message = "Created successfully!" });
 			}
 			catch (Exception ex)
 			{
