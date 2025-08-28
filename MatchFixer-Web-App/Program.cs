@@ -81,7 +81,7 @@ builder.Services.AddSession(options =>
 {
 	options.Cookie.HttpOnly = true;
 	options.Cookie.IsEssential = true;
-	options.IdleTimeout = TimeSpan.FromMinutes(30); // session timeout 
+	options.IdleTimeout = TimeSpan.FromMinutes(60); // session timeout 
 });
 
 builder.Services.AddControllers().AddJsonOptions(options =>
