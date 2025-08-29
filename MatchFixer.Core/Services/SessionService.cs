@@ -109,7 +109,9 @@ namespace MatchFixer.Core.Services
 				existingBet.AwayTeam = item.AwayTeam;
 				existingBet.HomeLogoUrl = item.HomeLogoUrl;
 				existingBet.AwayLogoUrl = item.AwayLogoUrl;
-				existingBet.StartTimeUtc = item.StartTimeUtc;
+				existingBet.StartTimeUtc = item.StartTimeUtc.HasValue
+					? DateTime.SpecifyKind(item.StartTimeUtc.Value, DateTimeKind.Utc)
+					: null;
 			}
 			else
 			{
@@ -122,7 +124,9 @@ namespace MatchFixer.Core.Services
 					AwayTeam = item.AwayTeam,
 					HomeLogoUrl = item.HomeLogoUrl,
 					AwayLogoUrl = item.AwayLogoUrl,
-					StartTimeUtc = item.StartTimeUtc
+					StartTimeUtc = item.StartTimeUtc.HasValue
+						? DateTime.SpecifyKind(item.StartTimeUtc.Value, DateTimeKind.Utc)
+						: null
 				};
 
 				betSlip.Bets.Add(newBet);
