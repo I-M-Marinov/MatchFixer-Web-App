@@ -115,7 +115,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			try
 			{
-				betDto.StartTimeUtc = betDto.StartTimeUtc = match.MatchDate.ToUniversalTime();
+				betDto.StartTimeUtc = match.MatchDate;
 
 				await _sessionService.AddBetToSlipAsync(betDto);
 				return Ok();
