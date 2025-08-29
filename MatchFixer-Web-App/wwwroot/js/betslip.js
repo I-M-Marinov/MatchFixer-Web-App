@@ -145,7 +145,7 @@ function addBetToSession(betItem) {
         AwayLogoUrl: betItem.awayLogoUrl,
         SelectedOption: betItem.selectedOption,  // PascalCase
         Odds: betItem.odds,
-        StartTimeUtc: betItem.startTimeUtc
+        StartTimeUtc: betItem.KickoffTime
     };
 
     console.log("Sending payload to server:", payload);
@@ -522,27 +522,23 @@ function getAntiForgeryToken() {
     return input ? input.value : null;
 }
 function updateBetStatuses() {
-    const now = new Date();
-
+    const nowUtc = Date.now(); // UTC
 
     document.querySelectorAll('.bet-item').forEach(item => {
-        let startTimeStr = item.dataset.startTime;
 
+        let startTimeStr = item.dataset.startTime;
         if (!startTimeStr) return;
 
-        //if (!startTimeStr.endsWith('Z')) {
-        //    startTimeStr += 'Z';
-        //}
+        if (!startTimeStr.endsWith('Z')) startTimeStr += 'Z';
 
-        const startTime = new Date(startTimeStr);
-
+        const startTimeUtc = Date.parse(startTimeStr);
         const statusBadge = item.querySelector('.status-badge');
         const removeBtn = item.querySelector('#remove-bet-button');
 
-
         if (!statusBadge || !removeBtn) return;
+       
 
-        if (now >= startTime) {
+        if (nowUtc >= startTimeUtc) {
 
             statusBadge.textContent = 'Started';
             statusBadge.className = 'badge status-badge bg-danger animate__animated animate__headShake animate__slower animate__infinite';
@@ -570,7 +566,7 @@ function updateBetStatuses() {
 
 
         } else {
-            const diffMs = startTime - now;
+            const diffMs = startTimeUtc - nowUtc;
             const diffMinutes = Math.ceil(diffMs / 60000);
 
             if (diffMinutes < 60) {
