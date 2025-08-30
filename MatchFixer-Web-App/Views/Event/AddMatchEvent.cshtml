@@ -233,13 +233,24 @@
 									else
 									{
 										<span class="custom-tooltip-wrapper">
-											<button type="button" class="btn btn-sm btn-warning create-boost-btn"
-											        data-bs-toggle="modal"
-											        data-bs-target="#createBoostModal"
-											        data-match-id="@ev.Id">
-												<i class="ri-fire-fill"></i>
-											</button>											
-											<span class="custom-tooltip">Add an odds boost for this game</span>
+											@if(ev.MatchStatus == "Started")
+											{
+												<button type="button" class="btn btn-sm btn-outline-danger create-boost-btn text-muted"
+												        data-match-id="@ev.Id" disabled>
+													<i class="ri-fire-fill"></i>
+												</button>
+												<span class="custom-tooltip text-bg-info">Cannot add a boost to a game that already started!</span>
+											}
+											else
+											{
+												<button type="button" class="btn btn-sm btn-warning create-boost-btn"
+												        data-bs-toggle="modal"
+												        data-bs-target="#createBoostModal"
+												        data-match-id="@ev.Id">
+													<i class="ri-fire-fill"></i>
+												</button>
+												<span class="custom-tooltip text-bg-warning">Add an odds boost for this game</span>
+											}
 										</span>
 										
 									}
@@ -564,17 +575,12 @@
 			});
 
 		connection.on("BoostStarted", function(boostData) {
-			console.log("BoostStarted received:", boostData);
 
 			const card = document.querySelector(`[data-match-id="${boostData.matchEventId}"]`) ||
 			document.querySelector(`[data-match-id='${boostData.matchEventId.toString()}']`);
 
-			console.log("Matched card:", card);
-
 			if (!card) return;
-
 			const oddsRow = card.querySelector(".tw-divide-y .tw-divide-gray-200");
-			console.log("Odds row found:", oddsRow);
 
 			activateBoost(oddsRow, boostData);
 			});
