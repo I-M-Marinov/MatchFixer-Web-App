@@ -366,15 +366,12 @@ table.responsive-stack td {
 
 .home-odds-style {
     background-color: #0d6efd !important;
-    color: white;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important; 
+    caret-color: #fff !important;
     text-shadow: 1px 1px 2px black;
     text-align: center;
-}
-
-.home-odds-style.active,
-.home-odds-style.active:focus,
-.home-odds-style.active:focus-visible {
-    color: white !important;
+    border: 1px solid #124e86;
 }
 
 .draw-odds-style {
@@ -386,11 +383,46 @@ table.responsive-stack td {
 .away-odds-style {
     background-color: #0DAB76 !important;
     text-shadow: 1px 1px 2px black;
-    color: white;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important; 
+    caret-color: #fff !important;
     text-align: center;
 }
 
 .matchdate-style {
     text-align: center;
+    background-color: #124e86 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    text-shadow: 1px 1px 2px black;
+}
+
+.custom-add-match-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-add-match-tooltip {
+    visibility: hidden;
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 0.3rem 0.3rem;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 999;
+    bottom: 45%;
+    left: 15.5rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.80rem;
+}
+
+.custom-add-match-tooltip-wrapper:hover .custom-add-match-tooltip {
+    visibility: visible;
+    opacity: 1;
 }
 
