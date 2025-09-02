@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
-using MatchFixer.Common.Enums;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.GeneralConstants;
+using MatchFixer.Common.Identity;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
-using MatchFixer.Common.GeneralConstants;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using static MatchFixer.Common.Identity.Permissions;
 
 
 namespace MatchFixer.Infrastructure.SeedData
@@ -399,5 +402,87 @@ namespace MatchFixer.Infrastructure.SeedData
 
 			await footballApiService.FetchAndSaveTeamsAsync();
 		}
+
+		public static async Task SeedRolesAndAdminAsync(IServiceProvider sp)
+		{
+			var cfg = sp.GetRequiredService<IConfiguration>();
+
+			var email = cfg["Admin:Email"];
+			var password = cfg["Admin:Password"];
+			var firstName = cfg["Admin:FirstName"] ?? "Site";
+			var lastName = cfg["Admin:LastName"] ?? "Admin";
+			var country = cfg["Admin:Country"] ?? "BG";
+			var tz = cfg["Admin:TimeZone"] ?? "Europe/Sofia";
+			var dob = DateTime.TryParse(cfg["Admin:DateOfBirth"], out var dt)
+				? dt
+				: new DateTime(1990, 1, 1);
+
+			var roleMgr = sp.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+			var userMgr = sp.GetRequiredService<UserManager<ApplicationUser>>();
+
+			// Ensure roles exist
+			foreach (var role in new[] { Roles.Admin, Roles.Moderator })
+			{
+				if (!await roleMgr.RoleExistsAsync(role))
+				{
+					await roleMgr.CreateAsync(new IdentityRole<Guid>(role));
+				}
+			}
+			
+			// Ensure admin user exists
+			var admin = await userMgr.FindByEmailAsync(email);
+
+			if (admin == null)
+			{	// if it does not ---> add it 
+				admin = new ApplicationUser
+				{
+					Id = Guid.NewGuid(),
+					UserName = email,
+					Email = email,
+					FirstName = firstName,
+					LastName = lastName,
+					EmailConfirmed = true,
+					Country = country,
+					TimeZone = tz,
+					DateOfBirth = dob
+				};
+
+				var createResult = await userMgr.CreateAsync(admin, password);
+
+				if (!createResult.Succeeded)
+				{
+					throw new InvalidOperationException(string.Join("; ", createResult.Errors.Select(e => e.Description)));
+				}
+			}
+
+			// Ensure admin has the Admin role
+			if (!await userMgr.IsInRoleAsync(admin, Roles.Admin))
+			{
+				await userMgr.AddToRoleAsync(admin, Roles.Admin);
+			}
+
+			// Ensure claims
+			var existingClaims = await userMgr.GetClaimsAsync(admin);
+
+			var neededClaims = new[]
+			{
+				new Claim("permission", ManageUsers),
+				new Claim("permission", ManageWallets),
+				new Claim("permission", ManageMatchEvents),
+			};
+
+			// Add all permissions to the Admin role
+			foreach (var claim in neededClaims)
+			{
+				if (!existingClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+				{
+					await userMgr.AddClaimAsync(admin, claim);
+				}
+			}
+		}
+
+
+
+
 	}
 }
