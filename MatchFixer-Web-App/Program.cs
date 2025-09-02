@@ -115,7 +115,10 @@ using (var scope = app.Services.CreateScope())
 	// teams 
 	await SeedTeams(services);										 // Seed the Teams in the Teams Table
 	// match results
-	await SeedMatchResultsAsync(services);						   // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
+	await SeedMatchResultsAsync(services);                         // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
+	// seed the Admin & Moderator Roles
+	await SeedRolesAndAdminAsync(scope.ServiceProvider);		 // Seed the Roles ( Admin and Moderator ) and the Admin account
+
 }
 
 
