@@ -1,6 +1,8 @@
 ﻿@using MatchFixer.Infrastructure.Entities
 @using Microsoft.AspNetCore.Identity
+@using MatchFixer.Common.Identity
 @inject SignInManager<ApplicationUser> SignInManager
+
 
 
 <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
@@ -73,12 +75,15 @@
 						<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
 					</a>
 					<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
+					@if (User.IsInRole(Roles.Admin))
+					{
 						<li>
 							<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="AddMatchEvent">
 								<span class="add-event-text">Add an Event</span>
 							</a>
 						</li>
-						<li>
+					}
+					<li>
 							<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="LiveEvents">
 								<span class="events-board-text">Events Board</span>
 							</a>
@@ -88,11 +93,12 @@
 				<li class="nav-item">
 					<a class="nav-link text-dark" asp-area="" asp-controller="LogoQuiz" asp-action="LogoQuiz">LogoQuiz</a>
 				</li>	
-				
-				<li class="nav-item">
-					<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="LiveMatchResults">Add Match Results</a>
-				</li>	
-
+				@if (User.IsInRole(Roles.Admin))
+				{
+					<li class="nav-item">
+						<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="LiveMatchResults">Add Match Results</a>
+					</li>
+				}
 				<li class="nav-item d-lg-none">
 					<a class="nav-link" href="@Url.Action("Privacy", "Home")">
 						<i class="bi bi-info-circle"></i> Privacy
