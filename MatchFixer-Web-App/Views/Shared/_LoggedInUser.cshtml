@@ -92,13 +92,23 @@
 				</li>
 				<li class="nav-item">
 					<a class="nav-link text-dark" asp-area="" asp-controller="LogoQuiz" asp-action="LogoQuiz">LogoQuiz</a>
-				</li>	
-				@if (User.IsInRole(Roles.Admin))
-				{
-					<li class="nav-item">
-						<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="LiveMatchResults">Add Match Results</a>
-					</li>
-				}
+				</li>
+				<!-- Events Dropdown -->
+				<li class="nav-item dropdown">
+					<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<span class="dropdown-text">Results</span>
+						<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
+					</a>
+					<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
+						@if (User.IsInRole(Roles.Admin))
+						{
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="LiveMatchResults">Add Match Results</a>
+							</li>
+						}
+					</ul>
+				</li>
+				
 				<li class="nav-item d-lg-none">
 					<a class="nav-link" href="@Url.Action("Privacy", "Home")">
 						<i class="bi bi-info-circle"></i> Privacy
