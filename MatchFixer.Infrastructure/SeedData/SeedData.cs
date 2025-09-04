@@ -444,7 +444,8 @@ namespace MatchFixer.Infrastructure.SeedData
 					EmailConfirmed = true,
 					Country = country,
 					TimeZone = tz,
-					DateOfBirth = dob
+					DateOfBirth = dob,
+					ProfilePictureId = DefaultImageId, // add the default image to the admin user
 				};
 
 				var createResult = await userMgr.CreateAsync(admin, password);
