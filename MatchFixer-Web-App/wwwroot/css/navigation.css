@@ -227,12 +227,25 @@
 
 .navbar-nav .nav-item .dropdown-text,
 .dropdown-item.dropdown-item .events-board-text,
-.dropdown-item.dropdown-item .add-event-text {
+.dropdown-item.dropdown-item .add-event-text,
+.add-match-results-text {
     position: relative;
     font-family: "Orbitron", sans-serif !important;
     font-optical-sizing: auto !important;
     font-weight: 700 !important;
     font-style: normal !important;
+}
+
+.add-match-results-text {
+    font-size: 0.75em;
+    margin: 0 auto;
+}
+
+.navbar-nav .dropdown-menu .nav-link {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    text-align: center; 
 }
 
 .navbar-nav .nav-item .dropdown-text::after {
