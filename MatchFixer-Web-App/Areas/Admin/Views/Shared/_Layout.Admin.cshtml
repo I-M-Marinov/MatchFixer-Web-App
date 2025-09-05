@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Admin – @ViewData["Title"]</title>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+<header>
+	<nav>
+		<a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+		<a asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a>
+		<a asp-area="Admin" asp-controller="Wallets" asp-action="Index">Wallets</a>
+		<a asp-area="Admin" asp-controller="MatchEvents" asp-action="Index">Match Events</a>
+		<a asp-area="" asp-controller="Home" asp-action="Index">Back to Site</a>
+	</nav>
+</header>
+<main class="container">
+	@RenderBody()
+</main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminDashboardViewModel
+@{
+	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+	ViewData["Title"] = "Dashboard";
+}
+
+<h1>Admin Dashboard</h1>
+
+<div class="grid">
+	<div class="card">Users: <strong>@Model.TotalUsers</strong> (Active: @Model.ActiveUsers)</div>
+	<div class="card">Wallet Balance: <strong>@Model.TotalWalletBalance</strong></div>
+	<div class="card">Transactions: <strong>@Model.TotalTransactions</strong></div>
+	<div class="card">Bets: <strong>@Model.TotalBets</strong> 
+		(Pending: @Model.PendingBets, Won: @Model.WonBets, Lost: @Model.LostBets)
+	</div>
+</div>
