@@ -1,10 +1,13 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Identity;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Middlewares;
 using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
+using MatchFixer_Web_App.Areas.Admin.Services;
+using MatchFixer_Web_App.Areas.Admin.Services.MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Hubs;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -42,6 +45,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
 builder.Services.AddHttpClient();                                               // Add HTTP Client
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();    // Add the Admin Dashboard Service
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
 builder.Services.AddHostedService<UserCleanupService>();						// Add User Cleanup Service ( background service ) 
@@ -96,6 +100,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 	options.JsonSerializerOptions.PropertyNamingPolicy = null; // disables camelCase conversion
 });
 
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("AdminOnly", p => p.RequireRole(Roles.Admin));
+
+	// One policy per permission
+	options.AddPolicy(Permissions.ManageUsers, p => p.RequireClaim("permission", Permissions.ManageUsers));
+	options.AddPolicy(Permissions.ManageWallets, p => p.RequireClaim("permission", Permissions.ManageWallets));
+	options.AddPolicy(Permissions.ManageMatchEvents, p => p.RequireClaim("permission", Permissions.ManageMatchEvents));
+});
+
 
 var app = builder.Build();
 
@@ -111,13 +125,14 @@ using (var scope = app.Services.CreateScope())
 	await SeedAllTrophiesAsync(services);								  // Seed all trophies 
 	// profile pictures
 	await SeedDefaultProfilePicture(userManager, services);             // Seed the Default User Image
+	// deleted user's profile pictures
 	await SeedDeletedUsersProfilePicture(userManager, services);       // Seed the Deleted User Image ( when user deletes their profile ) 
 	// teams 
 	await SeedTeams(services);										 // Seed the Teams in the Teams Table
 	// match results
 	await SeedMatchResultsAsync(services);                         // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 	// seed the Admin & Moderator Roles
-	await SeedRolesAndAdminAsync(scope.ServiceProvider);		 // Seed the Roles ( Admin and Moderator ) and the Admin account
+	await SeedRolesAndAdminAsync(services);						// Seed the Roles ( Admin and Moderator ) and the Admin account
 
 }
 
@@ -153,6 +168,10 @@ app.UseEndpoints(endpoints =>
 	endpoints.MapControllers();
 	endpoints.MapHub<MatchEventHub>("/matchEventHub"); // 
 });
+
+app.MapControllerRoute(
+	name: "areas",
+	pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

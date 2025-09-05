@@ -37,6 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="wwwroot\images\football-pitch\" />
     <Folder Include="wwwroot\images\danger-zone\" />
     <Folder Include="wwwroot\images\add-match\" />
