@@ -1,16 +1,152 @@
 ﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminDashboardViewModel
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
-	ViewData["Title"] = "Dashboard";
+	ViewData["Title"] = "Admin Dashboard";
+
+	var activePct = Model.TotalUsers == 0 ? 0 : (int)Math.Round((double)Model.ActiveUsers * 100 / Model.TotalUsers);
+	var wonPct = Model.TotalBets == 0 ? 0 : (int)Math.Round((double)Model.WonBets * 100 / Model.TotalBets);
+	var lostPct = Model.TotalBets == 0 ? 0 : (int)Math.Round((double)Model.LostBets * 100 / Model.TotalBets);
+	var pendingPct = Model.TotalBets == 0 ? 0 : 100 - wonPct - lostPct;
 }
+
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
+
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
+
+</div>
+
+<div class="background-profile"></div>
 
 <h1>Admin Dashboard</h1>
 
-<div class="grid">
-	<div class="card">Users: <strong>@Model.TotalUsers</strong> (Active: @Model.ActiveUsers)</div>
-	<div class="card">Wallet Balance: <strong>@Model.TotalWalletBalance</strong></div>
-	<div class="card">Transactions: <strong>@Model.TotalTransactions</strong></div>
-	<div class="card">Bets: <strong>@Model.TotalBets</strong> 
-		(Pending: @Model.PendingBets, Won: @Model.WonBets, Lost: @Model.LostBets)
-	</div>
+<div class="border-0 rounded-4 p-4 flex-fill">
+    @if (TempData["SuccessMessage"] is string s)
+    {
+        <div class="alert alert-success shadow-sm mb-3" id="success-message">@s</div>
+    }
+    @if (TempData["ErrorMessage"] is string e)
+    {
+        <div class="alert alert-danger shadow-sm mb-3" id="error-message">@e</div>
+    }
 </div>
+
+
+<div class="table-responsive">
+    <table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 220px;">Metric</th>
+                <th>Main</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Users -->
+            <tr>
+                <td class="fw-bold">
+                    <i class="bi bi-people"></i> Users
+                </td>
+                <td>
+                    <span class="fs-5 fw-semibold">@Model.TotalUsers</span>
+                    <div>
+                        <span class="badge bg-success">Active: @Model.ActiveUsers</span>
+                        <span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-inline-flex align-items-center gap-2">
+                        <div class="progress" style="width:200px; height:10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width:@activePct%"></div>
+                        </div>
+                        <small class="text-muted">@activePct% active</small>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Wallets / Transactions -->
+            <tr>
+                <td class="fw-bold">
+                    <i class="bi bi-wallet2"></i> Wallets &amp; Tx
+                </td>
+                <td>
+                    <span class="fs-5 fw-semibold">@Model.TotalWalletBalance.ToString("C")</span>
+                    <div><span class="badge bg-info text-dark">Transactions: @Model.TotalTransactions</span></div>
+                </td>
+                <td class="text-muted">
+                    <small>Total wallet balance is a sum of all user wallets.</small>
+                </td>
+            </tr>
+
+            <!-- Bets -->
+            <tr>
+                <td class="fw-bold">
+                    <i class="bi bi-bar-chart-line"></i> Bets
+                </td>
+                <td>
+                    <span class="fs-5 fw-semibold">@Model.TotalBets</span>
+                    <div class="mt-1 d-flex flex-wrap gap-1 justify-content-center">
+                        <span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
+                        <span class="badge bg-success">Won: @Model.WonBets</span>
+                        <span class="badge bg-danger">Lost: @Model.LostBets</span>
+                    </div>
+                </td>
+                <td>
+                    <!-- tiny stacked bar -->
+                    <div class="mini-stacked d-inline-flex align-items-center">
+                        <div class="stack">
+                            <div class="seg seg-pending" style="width:@pendingPct%"></div>
+                            <div class="seg seg-won" style="width:@wonPct%"></div>
+                            <div class="seg seg-lost" style="width:@lostPct%"></div>
+                        </div>
+                        <small class="ms-2 text-muted">
+                            @pendingPct% pending • @wonPct% won • @lostPct% lost
+                        </small>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+	<style>
+        .responsive-stack td, .responsive-stack th {
+            vertical-align: middle;
+        }
+
+        .mini-stacked .stack {
+            width: 240px;
+            height: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            display: inline-flex;
+            background: #e9ecef;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+        }
+
+        .mini-stacked .seg {
+            height: 100%;
+        }
+
+        .mini-stacked .seg-pending {
+            background: #ffd966;
+        }
+        .mini-stacked .seg-won {
+            background: #5cb85c;
+        }
+        .mini-stacked .seg-lost {
+            background: #dc3545;
+        }
+    </style>
