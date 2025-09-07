@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@using MatchFixer.Core.Contracts
+@using MatchFixer.Infrastructure.Entities
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ISessionService sessionService
+
+
+@{
+	var betSlip = sessionService.GetBetSlipState();
+}
+
+
+<!DOCTYPE html>
 <html>
 
 	
@@ -11,6 +23,8 @@
 	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 	<script src="~/js/betslip.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
 
 
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -41,5 +55,7 @@
 <main class="container">
 	@RenderBody()
 </main>
+@await Html.PartialAsync("_BetSlipPartial", betSlip)
+
 </body>
 </html>
