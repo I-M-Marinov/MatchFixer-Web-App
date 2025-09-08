@@ -1,0 +1,62 @@
+﻿.admin-users-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(1deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 75%);
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    overflow: hidden;
+}
+
+#admin-users-form {
+    margin-top: 7em !important;
+    z-index: 1;
+    position: relative;
+}
+
+#admin-users-form{ position:relative; z-index:2; margin-top:7em !important; }
+.table-section{ position:relative; z-index:2; min-height:60vh; }
+.table-holder{ position:relative; z-index:2; min-height:200px; }
+.table-responsive{ position:relative; z-index:2; background:#fff; border-radius:.5rem; }
+
+.pager-holder{ position:relative; z-index:3; }
+.pagination{ position:static !important; top:auto !important; bottom:auto !important; }
+
+.table-section {
+    position: relative;
+    z-index: 1;
+    min-height: 60vh;
+}
+
+.table-holder {
+    position: relative;
+    z-index: 1;
+    min-height: 200px;
+}
+
+.table-responsive,
+.table-responsive table {
+    position: relative;
+    z-index: 1;
+}
+
+.table-responsive {
+    background: #fff;
+    border-radius: .5rem;
+}
+
+
+.admin-users-wrap{
+  position: relative;
+  min-height: 70vh;
+}
+
+.admin-users-background{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(1deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 75%);
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  overflow: hidden;
+}
