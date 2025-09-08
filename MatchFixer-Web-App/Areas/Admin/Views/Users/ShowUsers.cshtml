@@ -1,0 +1,221 @@
+﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminUsersListViewModel
+@using MatchFixer.Common.Identity
+@{
+    Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+    ViewData["Title"] = "Users";
+}
+
+<div class="border-0 rounded-4 p-3">
+    @if (TempData["SuccessMessage"] is string s)
+    {
+        <div class="alert alert-success shadow-sm mb-3">@s</div>
+    }
+    @if (TempData["ErrorMessage"] is string e)
+    {
+        <div class="alert alert-danger shadow-sm mb-3">@e</div>
+    }
+
+    <div class="admin-users-background"></div>
+
+<form id="admin-users-form" method="get" class="row g-2 mb-3">
+        <div class="col-sm-8 col-md-6">
+            <input name="query" value="@Model.Query" class="form-control" placeholder="Search by email or name..." />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+        </div>
+    </form>
+
+    @{
+        var pages = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+    }
+
+    <div class="table-section d-flex flex-column">
+        <div class="table-holder flex-grow-1">
+            <div class="table-responsive">
+                <table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Roles</th>
+                            <th>Wallet</th>
+                            <th>Bets</th>
+                            <th style="min-width:260px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Users.Count == 0)
+                        {
+                            <tr><td colspan="7" class="text-muted">No users found.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var u in Model.Users)
+                            {
+                                <tr>
+                                    <td class="text-start">
+                                        <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "")).Trim()</div>
+                                        <small class="text-muted">@u.Id</small>
+                                    </td>
+                                    <td class="text-break">@u.Email</td>
+                                    <td>
+                                        @if (u.EmailConfirmed)
+                                        {
+                                            <span class="badge bg-success">Email ✓</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-secondary">Unconfirmed</span>
+                                        }
+
+                                        @if (u.IsLockedOut)
+                                        {
+                                            <div><span class="badge bg-danger">Locked</span></div>
+                                            if (u.LockoutEnd is not null)
+                                            {
+                                                <small class="text-muted">until @u.LockoutEnd.Value.LocalDateTime:g</small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div><span class="badge bg-info text-dark">Active</span></div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (u.Roles?.Length > 0)
+                                        {
+                                            foreach (var r in u.Roles)
+                                            {
+                                                <span class="badge bg-dark me-1">@r</span>
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td>@(u.WalletBalance?.ToString("C") ?? "—")</td>
+                                    <td>@u.BetsCount</td>
+                                    <td class="text-nowrap">
+                                        <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                            @* actions (confirm/lock/etc.) unchanged *@
+                                            <!-- Confirm email -->
+                                            @if (!u.EmailConfirmed)
+                                            {
+                                                <form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@u.Id" />
+                                                    <button class="btn btn-outline-success btn-sm" title="Mark email confirmed">
+                                                        <i class="bi bi-check2-circle"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            <!-- Lock/Unlock -->
+                                            @if (!u.IsLockedOut)
+                                            {
+                                                <form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@u.Id" />
+                                                    <button class="btn btn-outline-danger btn-sm" title="Lock user">
+                                                        <i class="bi bi-lock"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@u.Id" />
+                                                    <button class="btn btn-outline-warning btn-sm" title="Unlock user">
+                                                        <i class="bi bi-unlock"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            <!-- Reset link -->
+                                            <form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@u.Id" />
+                                                <button class="btn btn-outline-primary btn-sm" title="Generate reset link">
+                                                    <i class="bi bi-link-45deg"></i>
+                                                </button>
+                                            </form>
+                                            <!-- Roles (Admin) -->
+                                            @if (!(u.Roles?.Contains(Roles.Admin) ?? false))
+                                            {
+                                                <form asp-area="Admin" asp-controller="Users" asp-action="AddRole" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@u.Id" />
+                                                    <input type="hidden" name="role" value="@Roles.Admin" />
+                                                    <button class="btn btn-outline-dark btn-sm" title="Make Admin">
+                                                        <i class="bi bi-person-gear"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-area="Admin" asp-controller="Users" asp-action="RemoveRole" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@u.Id" />
+                                                    <input type="hidden" name="role" value="@Roles.Admin" />
+                                                    <button class="btn btn-outline-secondary btn-sm" title="Remove Admin">
+                                                        <i class="bi bi-person-dash"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            <!-- Quick jumps -->
+                                            <a class="btn btn-outline-secondary btn-sm"
+                                               asp-area=""
+                                               asp-controller="UserBets"
+                                               asp-action="ByUser"
+                                               asp-route-id="@u.Id"
+                                               title="View bets">
+                                                <i class="bi bi-bar-chart"></i>
+                                            </a>
+                                            <a class="btn btn-outline-secondary btn-sm"
+                                               asp-area=""
+                                               asp-controller="Wallet"
+                                               asp-action="Details"
+                                               asp-route-userId="@u.Id"
+                                               title="View wallet">
+                                                <i class="bi bi-wallet2"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (pages > 1)
+        {
+            <nav aria-label="Users pages" class="pager-holder mt-2">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    @for (int p = 1; p <= pages; p++)
+                    {
+                        <li class="page-item @(p == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-area="Admin"
+                               asp-controller="Users"
+                               asp-action="Index"
+                               asp-route-query="@Model.Query"
+                               asp-route-page="@p"
+                               asp-route-pageSize="@Model.PageSize">
+                                @p
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+
+
+  
+</div>
