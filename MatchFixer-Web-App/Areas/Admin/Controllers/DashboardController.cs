@@ -1,5 +1,5 @@
 ﻿using MatchFixer.Infrastructure.Security;
-using MatchFixer_Web_App.Areas.Admin.Services;
+using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
