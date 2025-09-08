@@ -43,85 +43,85 @@
 
 
 <div class="table-responsive">
-    <table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th style="width: 220px;">Metric</th>
-                <th>Main</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Users -->
-            <tr>
-                <td class="fw-bold">
-                    <i class="bi bi-people"></i> Users
-                </td>
-                <td>
-                    <span class="fs-5 fw-semibold">@Model.TotalUsers</span>
-                    <div>
-                        <span class="badge bg-success">Active: @Model.ActiveUsers</span>
-                        <span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="d-inline-flex align-items-center gap-2">
-                        <div class="progress" style="width:200px; height:10px;">
-                            <div class="progress-bar bg-success" role="progressbar"
-                                 style="width:@activePct%"></div>
-                        </div>
-                        <small class="text-muted">@activePct% active</small>
-                    </div>
-                </td>
-            </tr>
+	<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
+		<thead class="table-dark">
+		<tr>
+			<th style="width: 220px;">Metric</th>
+			<th>Main</th>
+			<th>Details</th>
+		</tr>
+		</thead>
+		<tbody>
+		<!-- Users -->
+		<tr>
+			<td class="fw-bold">
+				<i class="bi bi-people"></i> Users
+			</td>
+			<td>
+				<span class="fs-5 fw-semibold">@Model.TotalUsers</span>
+				<div>
+					<span class="badge bg-success">Active: @Model.ActiveUsers</span>
+					<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+				</div>
+			</td>
+			<td>
+				<div class="d-inline-flex align-items-center gap-2">
+					<div class="progress" style="width:200px; height:10px;">
+						<div class="progress-bar bg-success" role="progressbar"
+						     style="width:@activePct%"></div>
+					</div>
+					<small class="text-muted">@activePct% active</small>
+				</div>
+			</td>
+		</tr>
 
-            <!-- Wallets / Transactions -->
-            <tr>
-                <td class="fw-bold">
-                    <i class="bi bi-wallet2"></i> Wallets &amp; Transactions
-                </td>
-                <td>
-                    <span class="fs-5 fw-semibold">@Model.TotalWalletBalance.ToString("C")</span>
-                    <div><span class="badge bg-info text-dark">Transactions: @Model.TotalTransactions</span></div>
-                </td>
-                <td class="text-muted">
-                    <small>Total wallet balance is a sum of all user wallets.</small>
-                </td>
-            </tr>
+		<!-- Wallets / Transactions -->
+		<tr>
+			<td class="fw-bold">
+				<i class="bi bi-wallet2"></i> Wallets &amp; Transactions
+			</td>
+			<td>
+				<span class="fs-5 fw-semibold">@Model.TotalWalletBalance.ToString("C")</span>
+				<div><span class="badge bg-info text-dark">Transactions: @Model.TotalTransactions</span></div>
+			</td>
+			<td class="text-muted">
+				<small>Total wallet balance is a sum of all user wallets.</small>
+			</td>
+		</tr>
 
-            <!-- Bets -->
-            <tr>
-                <td class="fw-bold">
-                    <i class="bi bi-bar-chart-line"></i> Bets
-                </td>
-                <td>
-                    <span class="fs-5 fw-semibold">@Model.TotalBets</span>
-                    <div class="mt-1 d-flex flex-wrap gap-1 justify-content-center">
-                        <span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
-                        <span class="badge bg-success">Won: @Model.WonBets</span>
-                        <span class="badge bg-danger">Lost: @Model.LostBets</span>
-                    </div>
-                </td>
-                <td>
-                    <!-- tiny stacked bar -->
-                    <div class="mini-stacked d-inline-flex align-items-center">
-                        <div class="stack">
-                            <div class="seg seg-pending" style="width:@pendingPct%"></div>
-                            <div class="seg seg-won" style="width:@wonPct%"></div>
-                            <div class="seg seg-lost" style="width:@lostPct%"></div>
-                        </div>
-                        <small class="ms-2 text-muted">
-                            @pendingPct% pending • @wonPct% won • @lostPct% lost
-                        </small>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+		<!-- Bets -->
+		<tr>
+			<td class="fw-bold">
+				<i class="bi bi-bar-chart-line"></i> Bets
+			</td>
+			<td>
+				<span class="fs-5 fw-semibold">@Model.TotalBets</span>
+				<div class="mt-1 d-flex flex-wrap gap-1 justify-content-center">
+					<span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
+					<span class="badge bg-success">Won: @Model.WonBets</span>
+					<span class="badge bg-danger">Lost: @Model.LostBets</span>
+				</div>
+			</td>
+			<td>
+				<!-- tiny stacked bar -->
+				<div class="mini-stacked d-inline-flex align-items-center">
+					<div class="stack">
+						<div class="seg seg-pending" style="width:@pendingPct%"></div>
+						<div class="seg seg-won" style="width:@wonPct%"></div>
+						<div class="seg seg-lost" style="width:@lostPct%"></div>
+					</div>
+					<small class="ms-2 text-muted">
+						@pendingPct% pending • @wonPct% won • @lostPct% lost
+					</small>
+				</div>
+			</td>
+		</tr>
+		</tbody>
+	</table>
 </div>
 
 
-	<style>
+<style>
         .responsive-stack td, .responsive-stack th {
             vertical-align: middle;
         }
