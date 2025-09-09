@@ -6,17 +6,18 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
 	[Route("Admin/Users")]
-	[AdminOnly] // admin role gate
+	[AdminOnly]
 	public class UsersController : Controller
 	{
 		private readonly IAdminUserService _svc;
 		public UsersController(IAdminUserService svc) => _svc = svc;
 
-		[HttpGet("")]
-		public async Task<IActionResult> ShowUsers(string? query, int page = 1, int pageSize = 4)
+		[HttpGet("")]                     
+		[HttpGet("[action]")]            
+        public async Task<IActionResult> ShowUsers(string? query, int page = 1, int pageSize = 4)
 		{
 			var vm = await _svc.GetUsersAsync(query, page, pageSize);
-			return View(vm);
+			return View(vm); 
 		}
 
 		[HttpPost("Lock")]
