@@ -1,4 +1,5 @@
 ﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminDashboardViewModel
+
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
 	ViewData["Title"] = "Admin Dashboard";
@@ -81,7 +82,7 @@
 				<i class="bi bi-wallet2"></i> Wallets &amp; Transactions
 			</td>
 			<td>
-				<span class="fs-5 fw-semibold">@Model.TotalWalletBalance.ToString("C")</span>
+				<span class="fs-5 fw-semibold">€@Model.TotalWalletBalance</span>
 				<div><span class="badge bg-info text-dark">Transactions: @Model.TotalTransactions</span></div>
 			</td>
 			<td class="text-muted">
@@ -106,13 +107,17 @@
 				<!-- tiny stacked bar -->
 				<div class="mini-stacked d-inline-flex align-items-center">
 					<div class="stack">
-						<div class="seg seg-pending" style="width:@pendingPct%"></div>
-						<div class="seg seg-won" style="width:@wonPct%"></div>
-						<div class="seg seg-lost" style="width:@lostPct%"></div>
+						<div class="seg seg-pending" style="width:@pendingPct%">
+							<small>@pendingPct% pending</small>
+						</div>
+						<div class="seg seg-won" style="width:@wonPct%">
+							<small>@wonPct% won</small>
+						</div>
+						<div class="seg seg-lost" style="width:@lostPct%">
+							<small>@lostPct% lost</small>
+						</div>
 					</div>
-					<small class="ms-2 text-muted">
-						@pendingPct% pending • @wonPct% won • @lostPct% lost
-					</small>
+					
 				</div>
 			</td>
 		</tr>
