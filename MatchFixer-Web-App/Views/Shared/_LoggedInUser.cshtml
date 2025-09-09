@@ -65,9 +65,22 @@
 				<li class="nav-item">
 					<a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Profile">Profile</a>
 				</li>
-				<li class="nav-item">
-					<a class="nav-link text-dark" asp-area="" asp-controller="Game" asp-action="Landing">MatchFix</a>
-				</li>				
+				
+				<li class="nav-item dropdown">
+					<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<span class="dropdown-text">Games</span>
+						<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
+					</a>
+					<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
+						<li class="nav-item game-text">
+							<a class="nav-link text-dark" asp-area="" asp-controller="Game" asp-action="Landing">MatchFix</a>
+						</li>
+						<li class="nav-item game-text">
+							<a class="nav-link text-dark" asp-area="" asp-controller="LogoQuiz" asp-action="LogoQuiz">LogoQuiz</a>
+						</li>
+					</ul>
+				</li>
+						
 				<!-- Events Dropdown -->
 				<li class="nav-item dropdown">
 					<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -89,9 +102,6 @@
 							</a>
 						</li>
 					</ul>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link text-dark" asp-area="" asp-controller="LogoQuiz" asp-action="LogoQuiz">LogoQuiz</a>
 				</li>
 				@if (User.IsInRole(Roles.Admin))
 				{
