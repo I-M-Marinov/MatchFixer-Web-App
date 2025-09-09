@@ -1,62 +1,46 @@
-﻿.admin-users-background {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(1deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 75%);
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-    overflow: hidden;
+﻿#admin-users-form {
+    margin-top: 10em !important; 
 }
 
-#admin-users-form {
-    margin-top: 7em !important;
-    z-index: 1;
-    position: relative;
+.admin-users-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #3292b8;
+    background: linear-gradient(71deg,rgba(50, 146, 184, 1) 0%, rgba(87, 199, 133, 1) 39%);
+    z-index: -1;
+    pointer-events: none !important;
 }
 
-#admin-users-form{ position:relative; z-index:2; margin-top:7em !important; }
-.table-section{ position:relative; z-index:2; min-height:60vh; }
-.table-holder{ position:relative; z-index:2; min-height:200px; }
-.table-responsive{ position:relative; z-index:2; background:#fff; border-radius:.5rem; }
-
-.pager-holder{ position:relative; z-index:3; }
-.pagination{ position:static !important; top:auto !important; bottom:auto !important; }
-
-.table-section {
-    position: relative;
-    z-index: 1;
-    min-height: 60vh;
+#admin-users-form,
+.table-section,
+.table-holder,
+.table-responsive.admin-user-table {
+    position: relative !important;
+    z-index: 1 !important;
 }
 
-.table-holder {
-    position: relative;
-    z-index: 1;
-    min-height: 200px;
+.pager-holder {
+    position: static !important; 
+    margin-top: .50rem !important;
+    display: flex !important;
+    justify-content: center !important;
+    z-index: auto !important; 
 }
 
-.table-responsive,
-.table-responsive table {
-    position: relative;
-    z-index: 1;
+.pagination {
+    display: flex !important;
 }
 
-.table-responsive {
-    background: #fff;
-    border-radius: .5rem;
+.pagination .page-item,
+.pagination .page-link {
+    position: static !important;
+    z-index: auto !important;
+    pointer-events: auto !important;
 }
 
-
-.admin-users-wrap{
-  position: relative;
-  min-height: 70vh;
-}
-
-.admin-users-background{
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: linear-gradient(1deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 75%);
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-  overflow: hidden;
+.table-responsive.admin-user-table {
+    overflow: visible !important;
 }
