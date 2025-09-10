@@ -12,5 +12,7 @@
 		public string[] Roles { get; set; } = Array.Empty<string>();
 		public decimal? WalletBalance { get; set; }
 		public int BetsCount { get; set; }
+		public bool IsActive { get; set; }
+		public bool IsDeleted { get; set; }
 	}
 }
