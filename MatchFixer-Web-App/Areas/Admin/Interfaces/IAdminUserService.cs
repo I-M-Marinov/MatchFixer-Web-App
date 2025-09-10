@@ -5,7 +5,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 {
 	public interface IAdminUserService
 	{
-		Task<AdminUsersListViewModel> GetUsersAsync(string? query, int page, int pageSize);
+		Task<AdminUsersListViewModel> GetUsersAsync(string? query, string? status, int page, int pageSize);
 
 		Task<bool> LockUserAsync(Guid userId);
 		Task<bool> UnlockUserAsync(Guid userId);
