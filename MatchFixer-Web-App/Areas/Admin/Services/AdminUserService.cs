@@ -31,7 +31,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				_roleManager = roleManager;
 			}
 
-			public async Task<AdminUsersListViewModel> GetUsersAsync(string? query, int page, int pageSize)
+			public async Task<AdminUsersListViewModel> GetUsersAsync(string? query, string? status, int page, int pageSize)
 			{
 				if (page <= 0) page = 1;
 				if (pageSize <= 0 || pageSize > 200) pageSize = 20;
@@ -45,6 +45,31 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						u.Email!.ToLower().Contains(q) ||
 						(u.FirstName != null && u.FirstName.ToLower().Contains(q)) ||
 						(u.LastName != null && u.LastName.ToLower().Contains(q)));
+				}
+
+				// --- STATUS FILTER ---
+				var now = DateTimeOffset.UtcNow;
+				switch ((status ?? "").ToLowerInvariant())
+				{
+					case "active":
+						usersQ = usersQ.Where(u =>
+							u.IsActive &&
+							!u.IsDeleted &&
+							(!u.LockoutEnd.HasValue || u.LockoutEnd <= now));
+						break;
+
+					case "locked":
+						usersQ = usersQ.Where(u => u.LockoutEnd.HasValue && u.LockoutEnd > now);
+						break;
+
+					case "deleted":
+						usersQ = usersQ.Where(u => u.IsDeleted);
+						break;
+
+					case "unconfirmed":
+						usersQ = usersQ.Where(u => !u.EmailConfirmed);
+						break;
+
 				}
 
 				var total = await usersQ.CountAsync();
@@ -61,13 +86,14 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						u.LastName,
 						u.EmailConfirmed,
 						u.LockoutEnd,
-						u.LockoutEnabled
+						u.LockoutEnabled,
+						u.IsActive,
+						u.IsDeleted
 					})
 					.ToListAsync();
 
 				var userIds = users.Select(u => u.Id).ToList();
 
-				// Roles (load per-user to respect Identity tables without hand-joining)
 				var rolesMap = new Dictionary<Guid, string[]>();
 				foreach (var u in users)
 				{
@@ -76,14 +102,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					rolesMap[u.Id] = roles.ToArray();
 				}
 
-				// Wallet balances (adjust entity/prop names as needed)
 				var walletBalances = await _db.Wallets
 					.Where(w => userIds.Contains(w.UserId))
 					.GroupBy(w => w.UserId)
 					.Select(g => new { UserId = g.Key, Balance = g.Sum(x => x.Balance) })
 					.ToDictionaryAsync(x => x.UserId, x => (decimal?)x.Balance);
 
-				// Bets count (adjust entity/prop names as needed)
 				var betsCount = await _db.Bets
 					.Where(b => userIds.Contains(b.BetSlip.UserId))
 					.GroupBy(b => b.BetSlip.UserId)
@@ -93,6 +117,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var vm = new AdminUsersListViewModel
 				{
 					Query = query,
+					Status = status, 
 					Page = page,
 					PageSize = pageSize,
 					Total = total,
@@ -103,16 +128,19 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						FirstName = u.FirstName,
 						LastName = u.LastName,
 						EmailConfirmed = u.EmailConfirmed,
-						IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd.Value > DateTimeOffset.UtcNow,
+						IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd.Value > now,
 						LockoutEnd = u.LockoutEnd,
 						Roles = rolesMap.TryGetValue(u.Id, out var r) ? r : Array.Empty<string>(),
 						WalletBalance = walletBalances.TryGetValue(u.Id, out var bal) ? bal : null,
-						BetsCount = betsCount.TryGetValue(u.Id, out var cnt) ? cnt : 0
+						BetsCount = betsCount.TryGetValue(u.Id, out var cnt) ? cnt : 0,
+						IsActive = u.IsActive,
+						IsDeleted = u.IsDeleted
 					}).ToList()
 				};
 
 				return vm;
 			}
+
 
 			public async Task<bool> LockUserAsync(Guid userId)
 			{
