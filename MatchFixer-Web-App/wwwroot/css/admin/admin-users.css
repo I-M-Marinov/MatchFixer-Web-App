@@ -1,5 +1,5 @@
 ﻿#admin-users-form {
-    margin-top: 10em !important; 
+    margin-top: 6em !important; 
 }
 
 .admin-users-background {
@@ -43,4 +43,9 @@
 
 .table-responsive.admin-user-table {
     overflow: visible !important;
+}
+
+.admin-users-filter {
+    width: 10em !important;
+    height: 3em !important;
 }
