@@ -25,13 +25,26 @@
           asp-action="ShowUsers"
           method="get"
           class="row g-2 mb-3">
-        <div class="col-sm-8 col-md-6">
-            <input name="query" value="@Model.Query" class="form-control" placeholder="Search by email or name..." />
-        </div>
-        <div class="col-auto">
-            <input type="hidden" name="pageSize" value="@Model.PageSize" />
-            <button class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
-        </div>
+
+	    <div class="col-sm-8 col-md-6">
+		    <input name="query" value="@Model.Query" class="form-control" placeholder="Search by email or name..." />
+	    </div>
+
+	    <div class="col-auto">
+		    <select name="status" class="form-select admin-users-filter">
+			    <option value="" selected="@(string.IsNullOrEmpty(Model.Status) ? "selected" : null)">All statuses</option>
+			    <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
+			    <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
+			    <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
+			    <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
+
+		    </select>
+	    </div>
+
+	    <div class="col-auto">
+		    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+		    <button class="btn btn-primary"><i class="bi bi-search"></i> Filter</button>
+	    </div>
     </form>
 
     <div class="table-section d-flex flex-column">
@@ -39,15 +52,16 @@
             <div class="table-responsive admin-user-table">
                 <table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
                     <thead class="table-dark">
-                        <tr>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Roles</th>
-                            <th>Wallet</th>
-                            <th>Bets</th>
-                            <th style="min-width:260px;">Actions</th>
-                        </tr>
+                    <tr>
+	                    <th>User Id</th>
+	                    <th>User</th>
+	                    <th>Email</th>
+	                    <th>Status</th>
+	                    <th>Roles</th>
+	                    <th>Wallet</th>
+	                    <th>Bets</th>
+	                    <th style="min-width:260px;">Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
                     @if (Model.Users.Count == 0)
@@ -59,9 +73,12 @@
 	                    foreach (var u in Model.Users)
 	                    {
 		                    <tr>
-			                    <td class="text-start">
-				                    <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "")).Trim()</div>
-				                    <small class="text-muted">@u.Id</small>
+
+			                    <td class="text-center">
+										<div style="font-size: 0.65em;">@u.Id</div>
+			                    </td>
+									<td class="text-center">
+				                    <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "").Trim())</div>
 			                    </td>
 			                    <td class="text-break">@u.Email</td>
 			                    <td>
@@ -82,7 +99,11 @@
 						                    <small class="text-muted">until @u.LockoutEnd.Value.LocalDateTime:g</small>
 					                    }
 				                    }
-				                    else
+				                    else if(u.IsDeleted)
+				                    {
+					                    <div><span class="badge bg-danger text-white">Deleted</span></div>
+				                    }
+				                    else if(u.IsActive)
 				                    {
 					                    <div><span class="badge bg-info text-dark">Active</span></div>
 				                    }
@@ -109,7 +130,7 @@
 					                    {
 						                    <form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
 							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id" />
+							                    <input type="hidden" name="id" value="@u.Id"/>
 							                    <button class="btn btn-outline-success btn-sm" title="Mark email confirmed">
 								                    <i class="bi bi-check2-circle"></i>
 							                    </button>
@@ -121,7 +142,7 @@
 					                    {
 						                    <form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
 							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id" />
+							                    <input type="hidden" name="id" value="@u.Id"/>
 							                    <button class="btn btn-outline-danger btn-sm" title="Lock user">
 								                    <i class="bi bi-lock"></i>
 							                    </button>
@@ -131,7 +152,7 @@
 					                    {
 						                    <form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
 							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id" />
+							                    <input type="hidden" name="id" value="@u.Id"/>
 							                    <button class="btn btn-outline-warning btn-sm" title="Unlock user">
 								                    <i class="bi bi-unlock"></i>
 							                    </button>
@@ -141,7 +162,7 @@
 					                    @* Reset link *@
 					                    <form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
 						                    @Html.AntiForgeryToken()
-						                    <input type="hidden" name="id" value="@u.Id" />
+						                    <input type="hidden" name="id" value="@u.Id"/>
 						                    <button class="btn btn-outline-primary btn-sm" title="Generate reset link">
 							                    <i class="bi bi-link-45deg"></i>
 						                    </button>
@@ -152,8 +173,8 @@
 					                    {
 						                    <form asp-area="Admin" asp-controller="Users" asp-action="AddRole" method="post" class="d-inline">
 							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id" />
-							                    <input type="hidden" name="role" value="@Roles.Admin" />
+							                    <input type="hidden" name="id" value="@u.Id"/>
+							                    <input type="hidden" name="role" value="@Roles.Admin"/>
 							                    <button class="btn btn-outline-dark btn-sm" title="Make Admin">
 								                    <i class="bi bi-person-gear"></i>
 							                    </button>
@@ -163,8 +184,8 @@
 					                    {
 						                    <form asp-area="Admin" asp-controller="Users" asp-action="RemoveRole" method="post" class="d-inline">
 							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id" />
-							                    <input type="hidden" name="role" value="@Roles.Admin" />
+							                    <input type="hidden" name="id" value="@u.Id"/>
+							                    <input type="hidden" name="role" value="@Roles.Admin"/>
 							                    <button class="btn btn-outline-secondary btn-sm" title="Remove Admin">
 								                    <i class="bi bi-person-dash"></i>
 							                    </button>
@@ -206,6 +227,7 @@
 				                   asp-controller="Users"
 				                   asp-action="ShowUsers"
 				                   asp-route-query="@Model.Query"
+				                   asp-route-status="@Model.Status"
 				                   asp-route-page="@p"
 				                   asp-route-pageSize="@Model.PageSize">
 					                @p
