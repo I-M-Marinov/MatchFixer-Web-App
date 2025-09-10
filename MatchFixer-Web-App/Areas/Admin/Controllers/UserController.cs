@@ -13,11 +13,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public UsersController(IAdminUserService svc) => _svc = svc;
 
 		[HttpGet("")]                     
-		[HttpGet("[action]")]            
-        public async Task<IActionResult> ShowUsers(string? query, int page = 1, int pageSize = 4)
+		[HttpGet("[action]")]
+		public async Task<IActionResult> ShowUsers(string? query, string? status, int page = 1, int pageSize = 5)
 		{
-			var vm = await _svc.GetUsersAsync(query, page, pageSize);
-			return View(vm); 
+			var vm = await _svc.GetUsersAsync(query, status, page, pageSize);
+			return View(vm);
 		}
 
 		[HttpPost("Lock")]
