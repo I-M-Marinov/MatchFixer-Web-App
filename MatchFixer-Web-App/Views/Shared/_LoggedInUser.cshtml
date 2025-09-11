@@ -62,10 +62,35 @@
 
 		<div class="navbar-collapse collapse" id="mainNavbar">
 			<ul class="navbar-nav">
+				@if (User.IsInRole(Roles.Admin))
+				{
+					<!-- Admin Dropdown -->
+					<li class="nav-item dropdown">
+						<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="dropdown-text">Admin</span>
+							<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
+						</a>
+						<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+									<span class="add-match-results-text text-center">Dashboard</span>
+
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="Admin" asp-controller="Users" asp-action="ShowUsers">
+									<span class="add-match-results-text text-center">Users</span>
+
+								</a>
+							</li>
+
+						</ul>
+					</li>
+				}
 				<li class="nav-item">
 					<a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Profile">Profile</a>
 				</li>
-				
+
 				<li class="nav-item dropdown">
 					<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						<span class="dropdown-text">Games</span>
@@ -80,7 +105,7 @@
 						</li>
 					</ul>
 				</li>
-						
+
 				<!-- Events Dropdown -->
 				<li class="nav-item dropdown">
 					<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -88,15 +113,15 @@
 						<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
 					</a>
 					<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
-					@if (User.IsInRole(Roles.Admin))
-					{
+						@if (User.IsInRole(Roles.Admin))
+						{
+							<li>
+								<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="AddMatchEvent">
+									<span class="add-event-text">Add an Event</span>
+								</a>
+							</li>
+						}
 						<li>
-							<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="AddMatchEvent">
-								<span class="add-event-text">Add an Event</span>
-							</a>
-						</li>
-					}
-					<li>
 							<a class="dropdown-item text-dark" asp-area="" asp-controller="Event" asp-action="LiveEvents">
 								<span class="events-board-text">Events Board</span>
 							</a>
@@ -105,7 +130,7 @@
 				</li>
 				@if (User.IsInRole(Roles.Admin))
 				{
-					<!-- Events Dropdown -->
+					<!-- Results Dropdown -->
 					<li class="nav-item dropdown">
 						<a class="nav-link no-caret custom-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 							<span class="dropdown-text">Results</span>
@@ -119,7 +144,7 @@
 
 								</a>
 							</li>
-							
+
 						</ul>
 					</li>
 				}
