@@ -131,71 +131,74 @@
 			                    <td>@u.BetsCount</td>
 			                    <td class="text-nowrap">
 				                    <div class="d-flex flex-wrap gap-1 justify-content-center">
-					                    @* Confirm email *@
-					                    @if (!u.EmailConfirmed)
+					                    @if (!u.IsDeleted)
 					                    {
-						                    <form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
-							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id"/>
-							                    <button class="btn btn-outline-success btn-sm" title="Mark email confirmed">
-								                    <i class="bi bi-check2-circle"></i>
-							                    </button>
-						                    </form>
-					                    }
+												@* Confirm email *@
+												@if (!u.EmailConfirmed)
+												{
+													<form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="id" value="@u.Id" />
+														<button class="btn btn-outline-success btn-sm" title="Mark email confirmed">
+															<i class="bi bi-check2-circle"></i>
+														</button>
+													</form>
+												}
 
-					                    @* Lock/Unlock *@
-					                    @if (!u.IsLockedOut)
-					                    {
-						                    <form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
-							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id"/>
-							                    <button class="btn btn-outline-danger btn-sm" title="Lock user">
-								                    <i class="bi bi-lock"></i>
-							                    </button>
-						                    </form>
-					                    }
-					                    else
-					                    {
-						                    <form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
-							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id"/>
-							                    <button class="btn btn-outline-warning btn-sm" title="Unlock user">
-								                    <i class="bi bi-unlock"></i>
-							                    </button>
-						                    </form>
-					                    }
+												@* Lock/Unlock *@
+												@if (!u.IsLockedOut)
+												{
+													<form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="id" value="@u.Id" />
+														<button class="btn btn-outline-danger btn-sm" title="Lock user">
+															<i class="bi bi-lock"></i>
+														</button>
+													</form>
+												}
+												else
+												{
+													<form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="id" value="@u.Id" />
+														<button class="btn btn-outline-warning btn-sm" title="Unlock user">
+															<i class="bi bi-unlock"></i>
+														</button>
+													</form>
+												}
 
-					                    @* Reset link *@
-					                    <form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
-						                    @Html.AntiForgeryToken()
-						                    <input type="hidden" name="id" value="@u.Id"/>
-						                    <button class="btn btn-outline-primary btn-sm" title="Generate reset link">
-							                    <i class="bi bi-link-45deg"></i>
-						                    </button>
-					                    </form>
+												@* Reset link *@
+												<form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="id" value="@u.Id" />
+													<button class="btn btn-outline-primary btn-sm" title="Generate reset link">
+														<i class="bi bi-link-45deg"></i>
+													</button>
+												</form>
 
-					                    @* Roles (Admin) *@
-					                    @if (!(u.Roles?.Contains(Roles.Admin) ?? false))
-					                    {
-						                    <form asp-area="Admin" asp-controller="Users" asp-action="AddRole" method="post" class="d-inline">
-							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id"/>
-							                    <input type="hidden" name="role" value="@Roles.Admin"/>
-							                    <button class="btn btn-outline-dark btn-sm" title="Make Admin">
-								                    <i class="bi bi-person-gear"></i>
-							                    </button>
-						                    </form>
-					                    }
-					                    else
-					                    {
-						                    <form asp-area="Admin" asp-controller="Users" asp-action="RemoveRole" method="post" class="d-inline">
-							                    @Html.AntiForgeryToken()
-							                    <input type="hidden" name="id" value="@u.Id"/>
-							                    <input type="hidden" name="role" value="@Roles.Admin"/>
-							                    <button class="btn btn-outline-secondary btn-sm" title="Remove Admin">
-								                    <i class="bi bi-person-dash"></i>
-							                    </button>
-						                    </form>
+												@* Roles (Admin) *@
+												@if (!(u.Roles?.Contains(Roles.Admin) ?? false))
+												{
+													<form asp-area="Admin" asp-controller="Users" asp-action="AddRole" method="post" class="d-inline">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="id" value="@u.Id" />
+														<input type="hidden" name="role" value="@Roles.Admin" />
+														<button class="btn btn-outline-dark btn-sm" title="Make Admin">
+															<i class="bi bi-person-gear"></i>
+														</button>
+													</form>
+												}
+												else
+												{
+													<form asp-area="Admin" asp-controller="Users" asp-action="RemoveRole" method="post" class="d-inline">
+														@Html.AntiForgeryToken()
+														<input type="hidden" name="id" value="@u.Id" />
+														<input type="hidden" name="role" value="@Roles.Admin" />
+														<button class="btn btn-outline-secondary btn-sm" title="Remove Admin">
+															<i class="bi bi-person-dash"></i>
+														</button>
+													</form>
+												}
 					                    }
 
 					                    @* Quick jumps *@
