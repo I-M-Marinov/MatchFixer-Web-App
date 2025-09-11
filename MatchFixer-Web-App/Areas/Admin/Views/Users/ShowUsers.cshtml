@@ -2,7 +2,7 @@
 @using MatchFixer.Common.Identity
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "Administrate Users";
     var pages = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
 }
 
@@ -27,7 +27,7 @@
           class="row g-2 mb-3">
 
 	    <div class="col-sm-8 col-md-6">
-		    <input name="query" value="@Model.Query" class="form-control" placeholder="Search by email or name..." />
+			<input name="query" value="@Model.Query" class="form-control admin-users-search" placeholder="Search by email or name..." />
 	    </div>
 
 	    <div class="col-auto">
@@ -43,7 +43,7 @@
 
 	    <div class="col-auto">
 		    <input type="hidden" name="pageSize" value="@Model.PageSize" />
-		    <button class="btn btn-primary"><i class="bi bi-search"></i> Filter</button>
+		    <button class="btn btn-primary filter-search-button"><i class="bi bi-search"></i> Filter</button>
 	    </div>
     </form>
 
@@ -57,7 +57,7 @@
 	                    <th>User</th>
 	                    <th>Email</th>
 	                    <th>Status</th>
-	                    <th>Roles</th>
+	                    <th>Role</th>
 	                    <th>Wallet</th>
 	                    <th>Bets</th>
 	                    <th style="min-width:260px;">Actions</th>
@@ -66,8 +66,11 @@
                     <tbody>
                     @if (Model.Users.Count == 0)
                     {
-	                    <tr><td colspan="7" class="text-muted">No users found.</td></tr>
-                    }
+	                    <tr>
+		                    <td colspan="8" class="text-muted">
+			                    No users with status '@(string.IsNullOrEmpty(Model.Status) ? "any" : Model.Status)' were found!
+		                    </td>
+	                    </tr>                    }
                     else
                     {
 	                    foreach (var u in Model.Users)
@@ -80,15 +83,18 @@
 									<td class="text-center">
 				                    <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "").Trim())</div>
 			                    </td>
-			                    <td class="text-break">@u.Email</td>
+									<td class="text-break" style="font-size: 0.66em;">@u.Email</td>
 			                    <td>
-				                    @if (u.EmailConfirmed)
+				                    @if (!u.IsDeleted)
 				                    {
-					                    <span class="badge bg-success">Email ✓</span>
-				                    }
-				                    else
-				                    {
-					                    <span class="badge bg-secondary">Unconfirmed</span>
+					                    @if (u.EmailConfirmed)
+					                    {
+						                    <span class="badge bg-success">Email ✓</span>
+					                    }
+					                    else
+					                    {
+						                    <span class="badge bg-secondary">Unconfirmed</span>
+					                    }
 				                    }
 
 				                    @if (u.IsLockedOut)
@@ -101,7 +107,7 @@
 				                    }
 				                    else if(u.IsDeleted)
 				                    {
-					                    <div><span class="badge bg-danger text-white">Deleted</span></div>
+					                    <div><span class="badge bg-danger text-white mt-1">Deleted</span></div>
 				                    }
 				                    else if(u.IsActive)
 				                    {
@@ -118,7 +124,7 @@
 				                    }
 				                    else
 				                    {
-					                    <span class="text-muted">—</span>
+					                    <span class="text-muted">N/A</span>
 				                    }
 			                    </td>
 			                    <td>€@(u.WalletBalance?.ToString() ?? "0")</td>
