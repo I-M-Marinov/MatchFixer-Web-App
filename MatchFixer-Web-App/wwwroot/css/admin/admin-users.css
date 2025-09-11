@@ -22,12 +22,18 @@
     z-index: 1 !important;
 }
 
+#admin-users-form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .pager-holder {
-    position: static !important; 
+    position: static !important;
     margin-top: .50rem !important;
     display: flex !important;
     justify-content: center !important;
-    z-index: auto !important; 
+    z-index: auto !important;
 }
 
 .pagination {
@@ -45,7 +51,13 @@
     overflow: visible !important;
 }
 
-.admin-users-filter {
-    width: 10em !important;
+.admin-users-filter{
+    width: 9.5em !important;
+    height: 3em !important;
+    text-align: start;
+}
+
+.admin-users-search,
+.filter-search-button {
     height: 3em !important;
 }
