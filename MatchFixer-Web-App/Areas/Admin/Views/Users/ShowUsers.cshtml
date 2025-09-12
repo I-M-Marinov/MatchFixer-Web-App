@@ -68,7 +68,7 @@
                     @if (Model.Users.Count == 0)
                     {
 	                    <tr>
-		                    <td colspan="8" class="text-muted">
+		                    <td colspan="9" class="text-muted">
 			                    No users with status '@(string.IsNullOrEmpty(Model.Status) ? "any" : Model.Status)' were found!
 		                    </td>
 	                    </tr>                    }
@@ -100,11 +100,10 @@
 					                    <img
 						                    src="@imgUrl"
 						                    alt="@($"{u.FirstName} {u.LastName}")"
-						                    class="avatar-img"
+						                    class="user-avatar-img"
 						                    loading="lazy"
 						                    decoding="async"
-						                    width="60" height="60"
-						                    onerror="this.onerror=null;this.src='@Url.Content("~/images/defaults/avatar.png")';" />
+						                    width="60" height="60"/>
 				                    </div>
 			                    </td>
 
