@@ -6,6 +6,7 @@
 		public string Email { get; set; } = "";
 		public string? FirstName { get; set; }
 		public string? LastName { get; set; }
+		public string? UserImage { get; set; }
 		public bool EmailConfirmed { get; set; }
 		public bool IsLockedOut { get; set; }
 		public DateTimeOffset? LockoutEnd { get; set; }
