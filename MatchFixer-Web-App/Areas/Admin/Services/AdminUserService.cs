@@ -75,6 +75,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var total = await usersQ.CountAsync();
 
 				var users = await usersQ
+					.Include(u => u.ProfilePicture)
 					.OrderBy(u => u.Email)
 					.Skip((page - 1) * pageSize)
 					.Take(pageSize)
@@ -84,6 +85,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						u.Email,
 						u.FirstName,
 						u.LastName,
+						u.ProfilePicture,
 						u.EmailConfirmed,
 						u.LockoutEnd,
 						u.LockoutEnabled,
@@ -128,6 +130,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						FirstName = u.FirstName,
 						LastName = u.LastName,
 						EmailConfirmed = u.EmailConfirmed,
+						UserImage = string.IsNullOrWhiteSpace(u.ProfilePicture?.ImageUrl)
+							? "N/A"
+							: u.ProfilePicture.ImageUrl,
 						IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd.Value > now,
 						LockoutEnd = u.LockoutEnd,
 						Roles = rolesMap.TryGetValue(u.Id, out var r) ? r : Array.Empty<string>(),
