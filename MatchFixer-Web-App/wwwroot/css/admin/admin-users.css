@@ -61,3 +61,8 @@
 .filter-search-button {
     height: 3em !important;
 }
+
+.user-avatar-img {
+    border: 1px white solid !important;
+    border-radius: 50% !important;
+}
