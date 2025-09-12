@@ -55,6 +55,7 @@
                     <tr>
 	                    <th>User Id</th>
 	                    <th>User</th>
+	                    <th>User Image</th>
 	                    <th>Email</th>
 	                    <th>Status</th>
 	                    <th>Role</th>
@@ -75,15 +76,42 @@
                     {
 	                    foreach (var u in Model.Users)
 	                    {
+
+		                    
+
 		                    <tr>
 
 			                    <td class="text-center">
-										<div style="font-size: 0.65em;">@u.Id</div>
+				                    <div style="font-size: 0.65em;">@u.Id</div>
 			                    </td>
-									<td class="text-center">
+
+			                    <td class="text-center">
 				                    <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "").Trim())</div>
 			                    </td>
-									<td class="text-break" style="font-size: 0.66em;">@u.Email</td>
+								
+			                    @{
+				                    var imgUrl = string.IsNullOrWhiteSpace(u.UserImage) || u.UserImage == "N/A"
+				                    ? Url.Content("~/images/default-user-image.png")
+				                    : u.UserImage;
+			                    }
+
+			                    <td class="align-middle">
+				                    <div class="avatar">
+					                    <img
+						                    src="@imgUrl"
+						                    alt="@($"{u.FirstName} {u.LastName}")"
+						                    class="avatar-img"
+						                    loading="lazy"
+						                    decoding="async"
+						                    width="60" height="60"
+						                    onerror="this.onerror=null;this.src='@Url.Content("~/images/defaults/avatar.png")';" />
+				                    </div>
+			                    </td>
+
+			                    <td class="text-break" style="font-size: 0.66em;">
+				                    @u.Email
+			                    </td>
+
 			                    <td>
 				                    @if (!u.IsDeleted)
 				                    {
