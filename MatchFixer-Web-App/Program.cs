@@ -7,6 +7,7 @@ using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
+using MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Areas.Admin.Services.MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Hubs;
 using Microsoft.AspNetCore.Authentication;
@@ -47,7 +48,9 @@ builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
 builder.Services.AddHttpClient();                                               // Add HTTP Client
 
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();    // Add the Admin Dashboard Service
-builder.Services.AddScoped<IAdminUserService, AdminUserService>();				// Add the Admin User Service
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();              // Add the Admin User Service
+builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();
+
 
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
