@@ -2,10 +2,13 @@
 {
 	public class WalletTransactionDto
 	{
+		public Guid Id { get; set; }
 		public DateTime CreatedUtc { get; set; }
+		public string? DisplayTime { get; set; }
 		public string Type { get; set; } = "";
 		public decimal Amount { get; set; }
-		public decimal BalanceAfter { get; set; }
+		public decimal? BalanceAfter { get; set; }
 		public string? Note { get; set; }
 	}
+
 }
