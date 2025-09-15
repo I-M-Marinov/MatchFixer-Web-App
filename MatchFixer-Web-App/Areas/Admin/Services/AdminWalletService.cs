@@ -1,5 +1,4 @@
-﻿using MatchFixer.Core.ViewModels.Wallet;
-using MatchFixer.Infrastructure;
+﻿using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Factories;
@@ -45,12 +44,52 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Select(u => new { u.UserName, u.Email })
 				.FirstOrDefaultAsync();
 
-			var historyClearedAt = wallet.HistoryClearedAt;
-			var txQuery = historyClearedAt.HasValue
-				? wallet.Transactions.Where(t => t.CreatedAt >= historyClearedAt.Value)
-				: wallet.Transactions;
+			var cutoff = wallet.HistoryClearedAt;
 
-			var vm = new AdminWalletViewModel
+			var txAsc = wallet.Transactions
+				.Where(t => !cutoff.HasValue || t.CreatedAt >= cutoff.Value)
+				.OrderBy(t => t.CreatedAt)
+				.Select(t => new
+				{
+					t.Id,
+					t.CreatedAt,
+					TypeText = t.TransactionType!.ToString(),
+					t.Amount,
+					t.Description
+
+				})
+				.ToList();
+
+			var debitTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+	{
+		"BetPlaced", "Withdrawal", "Withdraw", "AdminWithdrawal", "ManualWithdrawal"
+	};
+
+			decimal running = 0m;
+			var list = new List<WalletTransactionDto>(txAsc.Count);
+
+			foreach (var t in txAsc)
+			{
+				var type = (t.TypeText ?? string.Empty).Trim();
+
+				var absolute = Math.Abs(t.Amount);
+				var signed = debitTypes.Contains(type) ? -absolute : absolute;
+
+				running += signed;
+
+				list.Add(new WalletTransactionDto
+				{
+					Id = t.Id,
+					CreatedUtc = DateTime.SpecifyKind(t.CreatedAt, DateTimeKind.Utc),
+					DisplayTime = _timezoneService.FormatForUser(t.CreatedAt, timeZoneId, "en-US"),
+					Type = type,
+					Amount = signed,                 
+					BalanceAfter = running,         
+					Note = t.Description,
+				});
+			}
+
+			return new AdminWalletViewModel
 			{
 				UserId = userId,
 				UserName = user?.UserName,
@@ -58,21 +97,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				HasWallet = true,
 				Balance = wallet.Balance,
 				Currency = wallet.Currency,
-				Transactions = txQuery
-					.OrderByDescending(t => t.CreatedAt)
-					.Select(t => new WalletTransactionViewModel
-					{
-						CreatedAt = t.CreatedAt,
-						DisplayTime = _timezoneService.FormatForUser(t.CreatedAt, timeZoneId, "en-US"),
-						Amount = t.Amount,
-						Description = t.Description,
-						TransactionType = t.TransactionType
-					})
-					.ToList()
+				Transactions = list.OrderByDescending(x => x.CreatedUtc).ToList()
 			};
-
-			return vm;
 		}
+
 
 		public async Task<(bool Success, string Message)> CreateWalletForUserAsync(Guid userId, string currency = "EUR")
 		{
@@ -108,7 +136,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				? "Admin deposit"
 				: $"Admin deposit: {description}";
 
-			// If you have a dedicated factory for admin adjustments, swap this call accordingly.
 			var tx = WalletTransactionFactory.CreateDepositTransaction(wallet.Id, userId, amount, note);
 			await _dbContext.WalletTransactions.AddAsync(tx);
 
