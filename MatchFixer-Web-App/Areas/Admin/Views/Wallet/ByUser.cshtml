@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = $"Wallet · {Model.UserName ?? Model.Email}";
+    Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
     var hasBalanceAfter = Model.Transactions?.Any(t => t.BalanceAfter != null) == true;
 }
 
@@ -16,7 +17,7 @@
         <div class="alert alert-danger shadow-sm mb-3">@e</div>
     }
 
-    <div class="card shadow-sm border-0 rounded-4">
+    <div class="card shadow-sm border-0 rounded-4 admin-user-wallet-card">
         <div class="card-body">
             <h5 class="card-title mb-2">
                 Wallet: @Model.UserName (@Model.Email)
@@ -39,41 +40,43 @@
             else
             {
                 <div class="d-flex flex-wrap align-items-center justify-content-between my-3 gap-3">
-                    <div class="fs-5 mb-0">
-                        Balance: <strong>@Model.Balance.ToString("0.00")</strong> @Model.Currency
+                    <div class="fs-5 mb-0 badge bg-info2 p-4">
+                        Balance: <strong> € @Model.Balance.ToString("0.00")</strong>
                     </div>
 
                     @* Quick admin adjustments: deposit / withdraw *@
-                    <form asp-area="Admin" asp-controller="Wallet" asp-action="Adjust" method="post" class="d-flex gap-2 align-items-end">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.UserId" />
-                        <div class="form-floating">
-                            <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" placeholder="Amount" required />
-                            <label for="amount">Amount</label>
-                        </div>
-                        <div class="form-floating" style="min-width: 280px;">
-                            <input type="text" class="form-control" id="note" name="note" placeholder="Note (optional)" />
-                            <label for="note">Note (optional)</label>
-                        </div>
+                    <div class="d-flex justify-content-center flex-wrap align-items-center">
+                        <form asp-area="Admin" asp-controller="Wallet" asp-action="Adjust" method="post" class="d-flex gap-3">
+		                    @Html.AntiForgeryToken()
+		                    <input type="hidden" name="id" value="@Model.UserId" />
+		                    <div class="form-floating">
+			                    <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" placeholder="Amount" required />
+			                    <label for="amount">Amount</label>
+		                    </div>
+		                    <div class="form-floating" style="min-width: 280px;">
+			                    <input type="text" class="form-control" id="note" name="note" placeholder="Note (optional)" />
+			                    <label for="note">Note (optional)</label>
+		                    </div>
 
-                        <div class="btn-group">
-                            <button type="submit" name="withdraw" value="false" class="btn btn-success">
-                                <i class="bi bi-plus-circle me-1"></i>Deposit
-                            </button>
-                            <button type="submit" name="withdraw" value="true" class="btn btn-outline-danger">
-                                <i class="bi bi-dash-circle me-1"></i>Withdraw
-                            </button>
-                        </div>
-                    </form>
+                            <div class="btn-group d-flex justify-content-center flex-wrap align-items-center">
+                                <button type="submit" name="withdraw" value="false" class="btn btn-success">
+				                    <i class="bi bi-plus-circle"></i> Deposit
+			                    </button>
+                                <button type="submit" name="withdraw" value="true" class="btn btn-danger">
+				                    <i class="bi bi-dash-circle"></i> Withdraw
+			                    </button>
+		                    </div>
+	                    </form>
 
-                    @* Clear visible history *@
-                    <form asp-area="Admin" asp-controller="Wallet" asp-action="ClearHistory" method="post" class="ms-auto">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.UserId" />
-                        <button class="btn btn-outline-secondary">
-                            <i class="bi bi-eraser me-1"></i>Clear visible history
-                        </button>
-                    </form>
+	                    @* Clear visible history *@
+	                    <form asp-area="Admin" asp-controller="Wallet" asp-action="ClearHistory" method="post" class="ms-auto">
+		                    @Html.AntiForgeryToken()
+		                    <input type="hidden" name="id" value="@Model.UserId" />
+		                    <button class="btn btn-secondary m-3">
+			                    <i class="bi bi-eraser"></i> Clear visible history
+		                    </button>
+	                    </form>
+                    </div>
                 </div>
 
                 <div class="table-responsive mt-3">
