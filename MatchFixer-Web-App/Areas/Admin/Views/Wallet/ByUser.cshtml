@@ -6,6 +6,8 @@
     var hasBalanceAfter = Model.Transactions?.Any(t => t.BalanceAfter != null) == true;
 }
 
+<div class="background-profile"></div>
+
 <div class="border-0 rounded-4 p-3">
     @* flash messages *@
     @if (TempData["SuccessMessage"] is string s)
@@ -39,7 +41,7 @@
             }
             else
             {
-                <div class="d-flex flex-wrap align-items-center justify-content-between my-3 gap-3">
+                <div class="d-flex flex-wrap align-items-center justify-content-center my-3 gap-3">
                     <div class="fs-5 mb-0 badge bg-info2 p-4">
                         Balance: <strong> € @Model.Balance.ToString("0.00")</strong>
                     </div>
