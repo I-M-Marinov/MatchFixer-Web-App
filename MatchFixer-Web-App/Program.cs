@@ -49,7 +49,8 @@ builder.Services.AddHttpClient();                                               
 
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();    // Add the Admin Dashboard Service
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();              // Add the Admin User Service
-builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();
+builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();			// Add the Admin Wallet Service
+builder.Services.AddScoped<IAdminEmailService, AdminEmailService>();           // Add the Admin Email Service
 
 
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
