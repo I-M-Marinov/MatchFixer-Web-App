@@ -1,0 +1,147 @@
+﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Email
+@model MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand
+@{
+    Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+    ViewData["Title"] = "Email Blast";
+    var roles = (IEnumerable<string>)(ViewBag.Roles ?? Array.Empty<string>());
+    var count = ViewBag.RecipientCount as int?;
+    var previewHtml = ViewBag.PreviewHtml as string;
+}
+
+<div class="border-0 rounded-4 p-3">
+    @if (TempData["SuccessMessage"] is string s)
+    {
+        <div class="alert alert-success shadow-sm mb-3">@s</div>
+    }
+    @if (TempData["ErrorMessage"] is string e)
+    {
+        <div class="alert alert-danger shadow-sm mb-3">@e</div>
+    }
+
+    <div class="card shadow-sm border-0 rounded-4 admin-email-compose-card">
+        <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-megaphone me-2"></i>Email Blast</h5>
+
+            <form asp-area="Admin" asp-controller="Email" asp-action="Preview" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+
+                <div class="col-12">
+                    <label class="form-label">Audience</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="Mode" id="audAll" value="All" @(Model.Mode == EmailBlastCommand.RecipientMode.All ? "checked" : "") />
+                            <label class="form-check-label" for="audAll">All users</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="Mode" id="audRole" value="Role" @(Model.Mode == EmailBlastCommand.RecipientMode.Role ? "checked" : "") />
+                            <label class="form-check-label" for="audRole">By role</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="Mode" id="audStatus" value="Status" @(Model.Mode == EmailBlastCommand.RecipientMode.Status ? "checked" : "") />
+                            <label class="form-check-label" for="audStatus">By status</label>
+                        </div>
+                        @if (Model.UserId.HasValue)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="Mode" id="audSingle" value="Single" checked />
+                                <label class="form-check-label" for="audSingle">Single user</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.UserId.HasValue)
+                {
+                    <input type="hidden" name="UserId" value="@Model.UserId" />
+                }
+
+                <div class="col-md-4" id="roleWrap">
+                    <label class="form-label">Role (when ‘By role’)</label>
+                    <select class="form-select" name="Role">
+                        <option value="">-- choose role --</option>
+                        @foreach (var r in roles)
+                        {
+                            <option value="@r" selected="@(Model.Role == r ? "selected" : null)">@r</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-4" id="statusWrap">
+                    <label class="form-label">Status (when ‘By status’)</label>
+                    <select class="form-select" name="Status">
+                        <option value="">All</option>
+                        <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
+                        <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
+                        <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
+                        <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Only confirmed emails</label>
+                    <select class="form-select" name="OnlyConfirmed">
+                        <option value="true" selected="@(Model.OnlyConfirmed ? "selected" : null)">Yes</option>
+                        <option value="false" selected="@(!Model.OnlyConfirmed ? "selected" : null)">No (send anyway)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label">Subject</label>
+                    <input class="form-control" name="Subject" value="@Model.Subject" required />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Logo URL</label>
+                    <input class="form-control" name="LogoUrl" value="@Model.LogoUrl" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Body (HTML allowed)</label>
+                    <textarea class="form-control" name="BodyHtml" rows="8" required>@Model.BodyHtml</textarea>
+                    <div class="form-text">Tip: keep it short; links should be absolute.</div>
+                </div>
+
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-eye me-1"></i> Preview & count
+                    </button>
+
+                    <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post">
+                        @Html.AntiForgeryToken()
+                    </form>
+                </div>
+            </form>
+
+            @if (count.HasValue)
+            {
+                <div class="alert alert-info mt-3">
+                    Estimated recipients: <strong>@count.Value</strong>
+                </div>
+
+                <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post" class="mt-2">
+                    @Html.AntiForgeryToken()
+                    @* re-post the model *@
+                    <input type="hidden" name="Mode" value="@Model.Mode" />
+                    <input type="hidden" name="UserId" value="@Model.UserId" />
+                    <input type="hidden" name="Role" value="@Model.Role" />
+                    <input type="hidden" name="Status" value="@Model.Status" />
+                    <input type="hidden" name="OnlyConfirmed" value="@Model.OnlyConfirmed" />
+                    <input type="hidden" name="Subject" value="@Model.Subject" />
+                    <input type="hidden" name="BodyHtml" value="@Model.BodyHtml" />
+                    <input type="hidden" name="LogoUrl" value="@Model.LogoUrl" />
+                    <button class="btn btn-success"><i class="bi bi-send me-1"></i>Send now</button>
+                </form>
+
+                @if (!string.IsNullOrWhiteSpace(previewHtml))
+                {
+                    <div class="mt-4">
+                        <h6 class="text-muted">Preview</h6>
+                        <div class="border rounded p-2" style="background:#fff;">
+                            @Html.Raw(previewHtml)
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
