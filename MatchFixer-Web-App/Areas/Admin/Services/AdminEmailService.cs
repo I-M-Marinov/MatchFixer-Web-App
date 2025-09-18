@@ -1,5 +1,4 @@
-﻿// Areas/Admin/Services/AdminEmailService.cs
-using MatchFixer.Common.EmailTemplates;
+﻿using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
@@ -74,13 +73,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				switch (cmd.Status.ToLowerInvariant())
 				{
 					case "active":
-						users = users.Where(u => u.IsActive && !u.IsDeleted && !u.LockoutEnabled);
+						users = users.Where(u => u.IsActive && !u.IsDeleted && u.LockoutEnd == null);
 						break;
 					case "unconfirmed":
 						users = users.Where(u => !u.EmailConfirmed && !u.IsDeleted);
 						break;
 					case "locked":
-						users = users.Where(u => u.LockoutEnabled && !u.IsDeleted);
+						users = users.Where(u => u.LockoutEnd != null && !u.IsDeleted);
 						break;
 					case "deleted":
 						users = users.Where(u => u.IsDeleted);
