@@ -45,6 +45,16 @@
 		    <input type="hidden" name="pageSize" value="@Model.PageSize" />
 		    <button class="btn btn-primary filter-search-button"><i class="bi bi-search"></i> Filter</button>
 	    </div>
+	    <div class="col-auto">
+		    <a class="btn btn-warning" 
+		       asp-area="Admin" 
+		       asp-controller="Email" 
+		       asp-action="Compose" 
+		       title="Send email blast">
+			    <i class="bi bi-megaphone"></i> Email blast
+		    </a>
+	    </div>
+
     </form>
 
     <div class="table-section d-flex flex-column">
@@ -229,6 +239,14 @@
 					                    }
 
 					                    @* Quick jumps *@
+					                    <a class="btn btn-outline-secondary btn-sm"
+					                       asp-area="Admin"
+					                       asp-controller="Email"
+					                       asp-action="Compose"
+					                       asp-route-userId="@u.Id"
+					                       title="Email this user">
+						                    <i class="bi bi-envelope"></i>
+					                    </a>
 					                    <a class="btn btn-outline-secondary btn-sm"
 					                       asp-area="Admin"
 					                       asp-controller="Wallet"
