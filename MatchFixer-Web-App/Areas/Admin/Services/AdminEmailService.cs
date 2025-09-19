@@ -32,7 +32,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Select(u => new { u.Email, u.EmailConfirmed, u.IsDeleted })
 				.ToListAsync();
 
-			var html = EmailTemplates.BlastTemplate(cmd.LogoUrl, cmd.Subject, cmd.BodyHtml);
+			var html = EmailTemplates.BlastTemplate(cmd.Subject, cmd.BodyHtml);
 
 			int sent = 0, skipped = 0;
 
