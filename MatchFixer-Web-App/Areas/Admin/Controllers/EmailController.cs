@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand;
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+
 
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
@@ -29,7 +31,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				Mode = userId.HasValue ? RecipientMode.Single : RecipientMode.All,
 				UserId = userId,
 				OnlyConfirmed = true,
-				LogoUrl = Url.Content("~/images/logo.png")
+				LogoUrl = LogoUrl
 			};
 
 			ViewBag.Roles = await _db.Roles
@@ -55,7 +57,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			ViewBag.RecipientCount = count;
 
 			ViewBag.PreviewHtml = MatchFixer.Common.EmailTemplates.EmailTemplates
-				.BlastTemplate(model.LogoUrl, model.Subject, model.BodyHtml);
+				.BlastTemplate(model.Subject, model.BodyHtml);
 
 			ViewBag.Roles = await _db.Roles.AsNoTracking().OrderBy(r => r.Name).Select(r => r.Name).ToListAsync();
 
