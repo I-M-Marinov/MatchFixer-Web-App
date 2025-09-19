@@ -1,4 +1,54 @@
-﻿.admin-email-compose-card
-{
+﻿.admin-email-compose-card {
     margin-top: 5em;
+}
+
+.admin-email-compose-card .card-title {
+    border: 2px #3370a8 solid;
+    border-radius: 0.50em;
+    padding: 0.75em;
+    color: #ffffff;
+    background-color: #3370a8;
+    text-shadow: 2px 2px 2px #0dab76;
+}
+
+    .admin-email-compose-card .card-body {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        border: 2px #0dab76 solid;
+        border-radius: 0.75em;
+        mask-border-mode:luminance;
+    }
+
+#audience-form {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.audience-container {
+    border: 2px #3370a8 solid;
+    border-radius: 0.75em;
+    width: 450px;
+    
+}
+
+.audience-container .form-label {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.role-status-emails-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1em;
+}
+
+.role-status-emails-container .form-label {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
