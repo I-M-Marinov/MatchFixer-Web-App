@@ -8,6 +8,8 @@
     var previewHtml = ViewBag.PreviewHtml as string;
 }
 
+<div class="admin-users-background"></div>
+
 <div class="border-0 rounded-4 p-3">
     @if (TempData["SuccessMessage"] is string s)
     {
@@ -22,12 +24,12 @@
         <div class="card-body">
             <h5 class="card-title mb-3"><i class="bi bi-megaphone me-2"></i>Email Blast</h5>
 
-            <form asp-area="Admin" asp-controller="Email" asp-action="Preview" method="post" class="row g-3">
+            <form asp-area="Admin" asp-controller="Email" asp-action="Preview" method="post" class="row g-3" id="audience-form">
                 @Html.AntiForgeryToken()
 
-                <div class="col-12">
+                <div class="col-12 audience-container">
                     <label class="form-label">Audience</label>
-                    <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex flex-wrap gap-5 justify-content-center align-items-center">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="Mode" id="audAll" value="All" @(Model.Mode == EmailBlastCommand.RecipientMode.All ? "checked" : "") />
                             <label class="form-check-label" for="audAll">All users</label>
@@ -55,34 +57,36 @@
                     <input type="hidden" name="UserId" value="@Model.UserId" />
                 }
 
-                <div class="col-md-4" id="roleWrap">
-                    <label class="form-label">Role (when ‘By role’)</label>
-                    <select class="form-select" name="Role">
-                        <option value="">-- choose role --</option>
-                        @foreach (var r in roles)
-                        {
-                            <option value="@r" selected="@(Model.Role == r ? "selected" : null)">@r</option>
-                        }
-                    </select>
-                </div>
+                <div class="role-status-emails-container">
+	                <div class="col-md-3" id="roleWrap">
+		                <label class="form-label">Role (when ‘By role’)</label>
+		                <select class="form-select" name="Role">
+			                <option value="">-- choose role --</option>
+			                @foreach (var r in roles)
+			                {
+				                <option value="@r" selected="@(Model.Role == r ? "selected" : null)">@r</option>
+			                }
+		                </select>
+	                </div>
 
-                <div class="col-md-4" id="statusWrap">
-                    <label class="form-label">Status (when ‘By status’)</label>
-                    <select class="form-select" name="Status">
-                        <option value="">All</option>
-                        <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
-                        <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
-                        <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
-                        <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
-                    </select>
-                </div>
+	                <div class="col-md-3" id="statusWrap">
+		                <label class="form-label">Status (when ‘By status’)</label>
+		                <select class="form-select" name="Status">
+			                <option value="">All</option>
+			                <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
+			                <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
+			                <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
+			                <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
+		                </select>
+	                </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Only confirmed emails</label>
-                    <select class="form-select" name="OnlyConfirmed">
-                        <option value="true" selected="@(Model.OnlyConfirmed ? "selected" : null)">Yes</option>
-                        <option value="false" selected="@(!Model.OnlyConfirmed ? "selected" : null)">No (send anyway)</option>
-                    </select>
+	                <div class="col-md-3">
+		                <label class="form-label">Only confirmed emails</label>
+		                <select class="form-select" name="OnlyConfirmed">
+			                <option value="true" selected="@(Model.OnlyConfirmed ? "selected" : null)">Yes</option>
+			                <option value="false" selected="@(!Model.OnlyConfirmed ? "selected" : null)">No (send anyway)</option>
+		                </select>
+	                </div>
                 </div>
 
                 <div class="col-md-8">
