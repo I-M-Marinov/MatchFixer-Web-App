@@ -1,4 +1,5 @@
 ﻿using System.Text.Encodings.Web;
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 namespace MatchFixer.Common.EmailTemplates
 {
@@ -265,7 +266,7 @@ namespace MatchFixer.Common.EmailTemplates
 					    </body>
 					</html>";
 		}
-		public static string BlastTemplate(string logoUrl, string subject, string contentHtml)
+		public static string BlastTemplate(string subject, string contentHtml)
 		{
 			return $@"
 				<!DOCTYPE html>
@@ -277,7 +278,7 @@ namespace MatchFixer.Common.EmailTemplates
 				  <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;'>
 				    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 				      <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-				        <img src='{logoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
+				        <img src='{LogoUrl}' alt='MatchFixer Logo' style='height: 80px; margin-bottom: 10px;' />
 				      </div>
 				      <div style='padding: 30px;'>
 				        <h2 style='color: #333; text-align:center;'>{HtmlEncoder.Default.Encode(subject)}</h2>
