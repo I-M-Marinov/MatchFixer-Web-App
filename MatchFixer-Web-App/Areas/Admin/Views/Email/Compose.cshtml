@@ -6,6 +6,14 @@
     var roles = (IEnumerable<string>)(ViewBag.Roles ?? Array.Empty<string>());
     var count = ViewBag.RecipientCount as int?;
     var previewHtml = ViewBag.PreviewHtml as string;
+
+    bool showRole = Model.Mode == EmailBlastCommand.RecipientMode.Role;
+    bool showStatus = Model.Mode == EmailBlastCommand.RecipientMode.Status;
+
+    bool isAll    = Model.Mode == EmailBlastCommand.RecipientMode.All;
+    bool isRole   = Model.Mode == EmailBlastCommand.RecipientMode.Role;
+    bool isStatus = Model.Mode == EmailBlastCommand.RecipientMode.Status;
+    bool isSingle = Model.Mode == EmailBlastCommand.RecipientMode.Single;
 }
 
 <div class="admin-users-background"></div>
@@ -24,31 +32,30 @@
         <div class="card-body">
             <h5 class="card-title mb-3"><i class="bi bi-megaphone me-2"></i>Email Blast</h5>
 
+            <!-- MAIN FORM: Preview & count -->
             <form asp-area="Admin" asp-controller="Email" asp-action="Preview" method="post" class="row g-3" id="audience-form">
                 @Html.AntiForgeryToken()
 
                 <div class="col-12 audience-container">
-                    <label class="form-label">Audience</label>
-                    <div class="d-flex flex-wrap gap-5 justify-content-center align-items-center">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="Mode" id="audAll" value="All" @(Model.Mode == EmailBlastCommand.RecipientMode.All ? "checked" : "") />
-                            <label class="form-check-label" for="audAll">All users</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="Mode" id="audRole" value="Role" @(Model.Mode == EmailBlastCommand.RecipientMode.Role ? "checked" : "") />
-                            <label class="form-check-label" for="audRole">By role</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="Mode" id="audStatus" value="Status" @(Model.Mode == EmailBlastCommand.RecipientMode.Status ? "checked" : "") />
-                            <label class="form-check-label" for="audStatus">By status</label>
-                        </div>
-                        @if (Model.UserId.HasValue)
-                        {
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="Mode" id="audSingle" value="Single" checked />
-                                <label class="form-check-label" for="audSingle">Single user</label>
-                            </div>
-                        }
+                    <label class="form-label">Audience filter</label>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center pb-4">
+	                    <div class="btn-group flex-wrap" role="group" aria-label="Audience">
+		                    <input type="radio" class="btn-check" name="Mode" id="audAll" value="All" @(isAll ? "checked" : "") autocomplete="off">
+		                    <label class="btn btn-outline-success" for="audAll">All users</label>
+
+		                    <input type="radio" class="btn-check" name="Mode" id="audRole" value="Role" @(isRole ? "checked" : "") autocomplete="off">
+		                    <label class="btn btn-outline-success" for="audRole">By role</label>
+
+		                    <input type="radio" class="btn-check" name="Mode" id="audStatus" value="Status" @(isStatus ? "checked" : "") autocomplete="off">
+		                    <label class="btn btn-outline-success" for="audStatus">By status</label>
+
+		                    @if (Model.UserId.HasValue)
+		                    {
+			                    <input type="radio" class="btn-check" name="Mode" id="audSingle" value="Single" @(isSingle ? "checked" : "") autocomplete="off">
+			                    <label class="btn btn-outline-success" for="audSingle">Single user</label>
+		                    }
+	                    </div>
+                        
                     </div>
                 </div>
 
@@ -58,36 +65,44 @@
                 }
 
                 <div class="role-status-emails-container">
-	                <div class="col-md-3" id="roleWrap">
-		                <label class="form-label">Role (when ‘By role’)</label>
-		                <select class="form-select" name="Role">
-			                <option value="">-- choose role --</option>
-			                @foreach (var r in roles)
-			                {
-				                <option value="@r" selected="@(Model.Role == r ? "selected" : null)">@r</option>
-			                }
-		                </select>
-	                </div>
+                    <!-- Role dropdown -->
+                    <div id="roleWrap"
+                         class="col-md-3 @(showRole ? "" : "d-none")"
+                         aria-hidden="@(showRole ? "false" : "true")">
+                        <label class="form-label">Role (when ‘By role’)</label>
+                        <select class="form-select" name="Role" id="roleSelect" @(showRole ? "" : "disabled")>
+                            <option value="">-- choose role --</option>
+                            @foreach (var r in roles)
+                            {
+                                <option value="@r" selected="@(Model.Role == r ? "selected" : null)">@r</option>
+                            }
+                        </select>
+                    </div>
 
-	                <div class="col-md-3" id="statusWrap">
-		                <label class="form-label">Status (when ‘By status’)</label>
-		                <select class="form-select" name="Status">
-			                <option value="">All</option>
-			                <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
-			                <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
-			                <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
-			                <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
-		                </select>
-	                </div>
+                    <!-- Status dropdown -->
+                    <div id="statusWrap"
+                         class="col-md-3 @(showStatus ? "" : "d-none")"
+                         aria-hidden="@(showStatus ? "false" : "true")">
+                        <label class="form-label">Status (when ‘By status’)</label>
+                        <select class="form-select" name="Status" id="statusSelect" @(showStatus ? "" : "disabled")>
+                            <option value="">All</option>
+                            <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
+                            <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
+                            <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
+                            <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
+                        </select>
+                    </div>
 
-	                <div class="col-md-3">
-		                <label class="form-label">Only confirmed emails</label>
-		                <select class="form-select" name="OnlyConfirmed">
-			                <option value="true" selected="@(Model.OnlyConfirmed ? "selected" : null)">Yes</option>
-			                <option value="false" selected="@(!Model.OnlyConfirmed ? "selected" : null)">No (send anyway)</option>
-		                </select>
-	                </div>
+                    <!-- Confirmed toggle -->
+                    <div class="col-md-3 confirm-wrap">
+                        <label class="form-label">Only confirmed emails</label>
+                        <select class="form-select" name="OnlyConfirmed" id="onlyConfirmedSelect">
+                            <option value="true" selected="@(Model.OnlyConfirmed ? "selected" : null)">Yes</option>
+                            <option value="false" selected="@(!Model.OnlyConfirmed ? "selected" : null)">No (send anyway)</option>
+                        </select>
+                    </div>
                 </div>
+
 
                 <div class="col-md-8">
                     <label class="form-label">Subject</label>
@@ -109,10 +124,6 @@
                     <button type="submit" class="btn btn-outline-primary">
                         <i class="bi bi-eye me-1"></i> Preview & count
                     </button>
-
-                    <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post">
-                        @Html.AntiForgeryToken()
-                    </form>
                 </div>
             </form>
 
@@ -122,9 +133,9 @@
                     Estimated recipients: <strong>@count.Value</strong>
                 </div>
 
+                <!-- SEND FORM (separate form; avoid nesting forms) -->
                 <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post" class="mt-2">
                     @Html.AntiForgeryToken()
-                    @* re-post the model *@
                     <input type="hidden" name="Mode" value="@Model.Mode" />
                     <input type="hidden" name="UserId" value="@Model.UserId" />
                     <input type="hidden" name="Role" value="@Model.Role" />
@@ -149,3 +160,34 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+      const roleWrap     = document.getElementById('roleWrap');
+      const statusWrap   = document.getElementById('statusWrap');
+      const roleSelect   = document.getElementById('roleSelect');
+      const statusSelect = document.getElementById('statusSelect');
+
+      function toggleSection(showRole, showStatus) {
+        roleWrap.classList.toggle('d-none', !showRole);
+        statusWrap.classList.toggle('d-none', !showStatus);
+
+        roleWrap.setAttribute('aria-hidden', showRole ? 'false' : 'true');
+        statusWrap.setAttribute('aria-hidden', showStatus ? 'false' : 'true');
+
+        if (roleSelect)   roleSelect.disabled   = !showRole;
+        if (statusSelect) statusSelect.disabled = !showStatus;
+      }
+
+      function updateFromRadios() {
+        const mode = (document.querySelector('input[name="Mode"]:checked') || {}).value || 'All';
+        toggleSection(mode === 'Role', mode === 'Status');
+      }
+
+      document.querySelectorAll('input[name="Mode"]').forEach(r => {
+        r.addEventListener('change', updateFromRadios);
+      });
+
+      updateFromRadios(); // initial
+    })();
+</script>
