@@ -44,10 +44,10 @@
 		                    <label class="btn btn-outline-success" for="audAll">All users</label>
 
 		                    <input type="radio" class="btn-check" name="Mode" id="audRole" value="Role" @(isRole ? "checked" : "") autocomplete="off">
-		                    <label class="btn btn-outline-success" for="audRole">By role</label>
+		                    <label class="btn btn-outline-success" for="audRole">By Role</label>
 
 		                    <input type="radio" class="btn-check" name="Mode" id="audStatus" value="Status" @(isStatus ? "checked" : "") autocomplete="off">
-		                    <label class="btn btn-outline-success" for="audStatus">By status</label>
+		                    <label class="btn btn-outline-success" for="audStatus">By Status</label>
 
 		                    @if (Model.UserId.HasValue)
 		                    {
@@ -162,7 +162,7 @@
 </div>
 
 <script>
-    (function () {
+        (function () {
       const roleWrap     = document.getElementById('roleWrap');
       const statusWrap   = document.getElementById('statusWrap');
       const roleSelect   = document.getElementById('roleSelect');
@@ -171,12 +171,8 @@
       function toggleSection(showRole, showStatus) {
         roleWrap.classList.toggle('d-none', !showRole);
         statusWrap.classList.toggle('d-none', !showStatus);
-
-        roleWrap.setAttribute('aria-hidden', showRole ? 'false' : 'true');
-        statusWrap.setAttribute('aria-hidden', showStatus ? 'false' : 'true');
-
-        if (roleSelect)   roleSelect.disabled   = !showRole;
-        if (statusSelect) statusSelect.disabled = !showStatus;
+        roleSelect.disabled   = !showRole;
+        statusSelect.disabled = !showStatus;
       }
 
       function updateFromRadios() {
@@ -188,6 +184,6 @@
         r.addEventListener('change', updateFromRadios);
       });
 
-      updateFromRadios(); // initial
+      updateFromRadios();
     })();
 </script>
