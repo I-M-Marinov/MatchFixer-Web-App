@@ -11,15 +11,15 @@
     text-shadow: 2px 2px 2px #0dab76;
 }
 
-    .admin-email-compose-card .card-body {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        border: 2px #0dab76 solid;
-        border-radius: 0.75em;
-        mask-border-mode:luminance;
-    }
+.admin-email-compose-card .card-body {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border: 2px #0dab76 solid;
+    border-radius: 0.75em;
+    mask-border-mode:luminance;
+}
 
 #audience-form {
     display: flex !important;
