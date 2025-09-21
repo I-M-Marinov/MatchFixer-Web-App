@@ -68,8 +68,8 @@
                     <!-- Role dropdown -->
                     <div id="roleWrap"
                          class="col-md-3 @(showRole ? "" : "d-none")"
-                         aria-hidden="@(showRole ? "false" : "true")">
-                        <label class="form-label">Role (when ‘By role’)</label>
+                         aria-hidden="@(showRole ? "false" : "true")" />
+                    <label class="form-label">Select Role</label>
                         <select class="form-select" name="Role" id="roleSelect" @(showRole ? "" : "disabled")>
                             <option value="">-- choose role --</option>
                             @foreach (var r in roles)
@@ -83,7 +83,7 @@
                     <div id="statusWrap"
                          class="col-md-3 @(showStatus ? "" : "d-none")"
                          aria-hidden="@(showStatus ? "false" : "true")">
-                        <label class="form-label">Status (when ‘By status’)</label>
+                        <label class="form-label">Select Status</label>
                         <select class="form-select" name="Status" id="statusSelect" @(showStatus ? "" : "disabled")>
                             <option value="">All</option>
                             <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
@@ -133,29 +133,57 @@
                     Estimated recipients: <strong>@count.Value</strong>
                 </div>
 
-                <!-- SEND FORM (separate form; avoid nesting forms) -->
-                <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post" class="mt-2">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="Mode" value="@Model.Mode" />
-                    <input type="hidden" name="UserId" value="@Model.UserId" />
-                    <input type="hidden" name="Role" value="@Model.Role" />
-                    <input type="hidden" name="Status" value="@Model.Status" />
-                    <input type="hidden" name="OnlyConfirmed" value="@Model.OnlyConfirmed" />
-                    <input type="hidden" name="Subject" value="@Model.Subject" />
-                    <input type="hidden" name="BodyHtml" value="@Model.BodyHtml" />
-                    <input type="hidden" name="LogoUrl" value="@Model.LogoUrl" />
-                    <button class="btn btn-success"><i class="bi bi-send me-1"></i>Send now</button>
-                </form>
+                @* PREVIEW MODAL *@
+                <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+	                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="previewModalLabel">
+                                    Email preview
+                                    @if (count.HasValue)
+                                    {
+                                        <small class="text-muted ms-2">(estimated recipients: @count.Value)</small>
+                                    }
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
 
-                @if (!string.IsNullOrWhiteSpace(previewHtml))
-                {
-                    <div class="mt-4">
-                        <h6 class="text-muted">Preview</h6>
-                        <div class="border rounded p-2" style="background:#fff;">
-                            @Html.Raw(previewHtml)
+                            <div class="modal-body" style="background:#fff">
+                                @if (!string.IsNullOrWhiteSpace(previewHtml))
+                                {
+                                    @Html.Raw(previewHtml)
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No preview available.</div>
+                                }
+                            </div>
+
+                            <div class="modal-footer">
+                                @* Send right from the modal *@
+                                @if (count.HasValue && !string.IsNullOrWhiteSpace(previewHtml))
+                                {
+                                    <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Mode" value="@Model.Mode" />
+                                        <input type="hidden" name="UserId" value="@Model.UserId" />
+                                        <input type="hidden" name="Role" value="@Model.Role" />
+                                        <input type="hidden" name="Status" value="@Model.Status" />
+                                        <input type="hidden" name="OnlyConfirmed" value="@Model.OnlyConfirmed" />
+                                        <input type="hidden" name="Subject" value="@Model.Subject" />
+                                        <input type="hidden" name="BodyHtml" value="@Model.BodyHtml" />
+                                        <input type="hidden" name="LogoUrl" value="@Model.LogoUrl" />
+                                        <button class="btn btn-success">
+                                            <i class="bi bi-send me-1"></i> Send now
+                                        </button>
+                                    </form>
+                                }
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
-                }
+                </div>
+
             }
         </div>
     </div>
@@ -187,3 +215,16 @@
       updateFromRadios();
     })();
 </script>
+
+@* Auto-open preview modal when we have content *@
+@if (count.HasValue && !string.IsNullOrWhiteSpace(previewHtml))
+{
+	<script>
+        (function () {
+            var el = document.getElementById('previewModal');
+            if (!el) return;
+            var modal = new bootstrap.Modal(el);
+            modal.show();
+        })();
+    </script>
+}
