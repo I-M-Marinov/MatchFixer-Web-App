@@ -37,26 +37,26 @@
                 @Html.AntiForgeryToken()
 
                 <div class="col-12 audience-container">
-                    <label class="form-label">Audience filter</label>
-                    <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center pb-4">
-	                    <div class="btn-group flex-wrap" role="group" aria-label="Audience">
-		                    <input type="radio" class="btn-check" name="Mode" id="audAll" value="All" @(isAll ? "checked" : "") autocomplete="off">
-		                    <label class="btn btn-outline-success" for="audAll">All users</label>
+	                <label class="form-label">Audience filter</label>
+	                <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center pb-4">
+		                <div class="btn-group flex-wrap" role="group" aria-label="Audience">
+			                <input type="radio" class="btn-check" name="Mode" id="audAll" value="All" @(isAll ? "checked" : "") autocomplete="off">
+			                <label class="btn btn-outline-success" for="audAll">All users</label>
 
-		                    <input type="radio" class="btn-check" name="Mode" id="audRole" value="Role" @(isRole ? "checked" : "") autocomplete="off">
-		                    <label class="btn btn-outline-success" for="audRole">By Role</label>
+			                <input type="radio" class="btn-check" name="Mode" id="audRole" value="Role" @(isRole ? "checked" : "") autocomplete="off">
+			                <label class="btn btn-outline-success" for="audRole">By Role</label>
 
-		                    <input type="radio" class="btn-check" name="Mode" id="audStatus" value="Status" @(isStatus ? "checked" : "") autocomplete="off">
-		                    <label class="btn btn-outline-success" for="audStatus">By Status</label>
+			                <input type="radio" class="btn-check" name="Mode" id="audStatus" value="Status" @(isStatus ? "checked" : "") autocomplete="off">
+			                <label class="btn btn-outline-success" for="audStatus">By Status</label>
 
-		                    @if (Model.UserId.HasValue)
-		                    {
-			                    <input type="radio" class="btn-check" name="Mode" id="audSingle" value="Single" @(isSingle ? "checked" : "") autocomplete="off">
-			                    <label class="btn btn-outline-success" for="audSingle">Single user</label>
-		                    }
-	                    </div>
+			                @if (Model.UserId.HasValue)
+			                {
+				                <input type="radio" class="btn-check" name="Mode" id="audSingle" value="Single" @(isSingle ? "checked" : "") autocomplete="off">
+				                <label class="btn btn-outline-success" for="audSingle">Single user</label>
+			                }
+		                </div>
                         
-                    </div>
+	                </div>
                 </div>
 
                 @if (Model.UserId.HasValue)
@@ -68,7 +68,7 @@
                     <!-- Role dropdown -->
                     <div id="roleWrap"
                          class="col-md-3 @(showRole ? "" : "d-none")"
-                         aria-hidden="@(showRole ? "false" : "true")" />
+                         aria-hidden="@(showRole ? "false" : "true")">
                     <label class="form-label">Select Role</label>
                         <select class="form-select" name="Role" id="roleSelect" @(showRole ? "" : "disabled")>
                             <option value="">-- choose role --</option>
@@ -122,16 +122,14 @@
 
                 <div class="col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-eye me-1"></i> Preview & count
+                        <i class="bi bi-eye me-1"></i> Preview & Send
                     </button>
                 </div>
             </form>
 
             @if (count.HasValue)
             {
-                <div class="alert alert-info mt-3">
-                    Estimated recipients: <strong>@count.Value</strong>
-                </div>
+                
 
                 @* PREVIEW MODAL *@
                 <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
@@ -139,13 +137,17 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="previewModalLabel">
-                                    Email preview
-                                    @if (count.HasValue)
-                                    {
-                                        <small class="text-muted ms-2">(estimated recipients: @count.Value)</small>
-                                    }
+	                                Email preview
+									
+	                                @if (count.HasValue)
+	                                {
+		                                <div class="estimated-recepients alert alert-info mt-3 ">
+			                                <span>Users that will receive this email:</span>
+                                            <span><strong>@count.Value</strong></span>
+		                                </div>
+	                                }
                                 </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="preview-email-close-btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
                             <div class="modal-body" style="background:#fff">
