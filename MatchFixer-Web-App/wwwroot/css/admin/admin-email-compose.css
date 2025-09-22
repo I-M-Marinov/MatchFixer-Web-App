@@ -52,3 +52,35 @@
     justify-content: center !important;
     align-items: center !important;
 }
+
+.estimated-recepients {
+    position: absolute !important;
+    top: 0em !important;
+    left: 2em !important;
+    font-size: 0.75em;
+    max-width: 20em;
+    height: auto;
+    align-content: center;
+    justify-content: center;
+    padding: 0.3em;
+
+}
+
+#previewModal .preview-email-close-btn {
+    position: absolute !important;
+    top: 0.7em !important;
+    right: 0.7em !important;
+    font-size: 0.85em;
+}
+
+@media (max-width: 578px) {
+    .estimated-recepients > span:first-of-type {
+        display: none !important;
+    }
+
+    .estimated-recepients {
+        font-size: 1.2em;
+        padding: 0.75em;
+        top: -0.5em !important;
+    }
+}
