@@ -56,6 +56,6 @@
 	@RenderBody()
 </main>
 @await Html.PartialAsync("_BetSlipPartial", betSlip)
-
+	@RenderSection("Scripts", required: false)
 </body>
 </html>
