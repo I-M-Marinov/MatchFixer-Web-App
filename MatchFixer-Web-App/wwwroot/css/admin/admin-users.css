@@ -10,7 +10,7 @@
     height: 100%;
     background: #3292b8;
     background: linear-gradient(71deg,rgba(50, 146, 184, 1) 0%, rgba(87, 199, 133, 1) 39%);
-    z-index: -1;
+    z-index: -200;
     pointer-events: none !important;
 }
 
