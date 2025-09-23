@@ -104,65 +104,52 @@
                 </div>
 
 
-                <div class="col-md-8">
-                    <label class="form-label">Subject</label>
-                    <input class="form-control" name="Subject" value="@Model.Subject" required />
+                <div class="col-md-8 email-subject-container">
+	                <label class="form-label d-block text-center">Subject</label>
+	                <input class="form-control" name="Subject" value="@Model.Subject" required />
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Logo URL</label>
-                    <input class="form-control" name="LogoUrl" value="@Model.LogoUrl" />
+                <div class="col-md-4 email-logourl-container">
+	                <label class="form-label d-block text-center">Logo URL</label>
+	                <input class="form-control" name="LogoUrl" value="@Model.LogoUrl" />
                 </div>
 
-                <div class="col-12">
-                    <label class="form-label">Body (HTML allowed)</label>
+                <div class="col-12 email-body-container">
+                    <label class="form-label d-block text-center">Body (HTML allowed)</label>
                     <textarea class="form-control" name="BodyHtml" rows="8" required>@Model.BodyHtml</textarea>
-                    <div class="form-text">Tip: keep it short; links should be absolute.</div>
                 </div>
 
-                <div class="col-12 d-flex gap-2">
+                <div class="col-12 d-flex gap-2 justify-content-center">
                     <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-eye me-1"></i> Preview & Send
+                        <i class="bi bi-eye me-1"></i> Preview
                     </button>
                 </div>
             </form>
 
             @if (count.HasValue)
             {
-                
-
-                @* PREVIEW MODAL *@
-                <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-	                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true" data-bs-scroll="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="previewModalLabel">
-	                                Email preview
-									
-	                                @if (count.HasValue)
-	                                {
-		                                <div class="estimated-recepients alert alert-info mt-3 ">
-			                                <span>Users that will receive this email:</span>
+                                    Email preview
+                                    @if (count.HasValue)
+                                    {
+                                        <div class="estimated-recepients alert alert-info mt-3">
+                                            <span>Users that will receive this email:</span>
                                             <span><strong>@count.Value</strong></span>
-		                                </div>
-	                                }
+                                        </div>
+                                    }
                                 </h5>
                                 <button type="button" class="preview-email-close-btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
-                            <div class="modal-body" style="background:#fff">
-                                @if (!string.IsNullOrWhiteSpace(previewHtml))
-                                {
-                                    @Html.Raw(previewHtml)
-                                }
-                                else
-                                {
-                                    <div class="text-muted">No preview available.</div>
-                                }
+                            <div class="modal-body p-0" style="background:#fff;">
+                                <iframe id="emailPreview" class="w-100 border-0" style="min-height:60vh;"></iframe>
                             </div>
 
                             <div class="modal-footer">
-                                @* Send right from the modal *@
                                 @if (count.HasValue && !string.IsNullOrWhiteSpace(previewHtml))
                                 {
                                     <form asp-area="Admin" asp-controller="Email" asp-action="Send" method="post" class="d-inline">
@@ -175,9 +162,7 @@
                                         <input type="hidden" name="Subject" value="@Model.Subject" />
                                         <input type="hidden" name="BodyHtml" value="@Model.BodyHtml" />
                                         <input type="hidden" name="LogoUrl" value="@Model.LogoUrl" />
-                                        <button class="btn btn-success">
-                                            <i class="bi bi-send me-1"></i> Send now
-                                        </button>
+                                        <button class="btn btn-success"><i class="bi bi-send me-1"></i> Send now</button>
                                     </form>
                                 }
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -185,8 +170,8 @@
                         </div>
                     </div>
                 </div>
-
             }
+
         </div>
     </div>
 </div>
@@ -229,4 +214,14 @@
             modal.show();
         })();
     </script>
+}
+
+@section Scripts {
+	<script>
+    (function () {
+      const html = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(previewHtml ?? ""));
+      const frame = document.getElementById('emailPreview');
+      if (frame) frame.srcdoc = html;   // isolates email <body> styles inside the iframe
+    })();
+  </script>
 }
