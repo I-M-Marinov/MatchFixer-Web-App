@@ -81,18 +81,28 @@
                     </div>
                 </div>
 
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm align-middle">
+                <div class="table-responsive mt-3 wallet-tx-wrap">
+                    <table class="table table-sm table-hover table-striped align-middle wallet-tx-table mb-0">
+                        <colgroup>
+                            <col style="width: 16ch;">   @* When *@
+                            <col style="width: 12ch;">   @* Type *@
+                            <col style="width: 12ch;">   @* Amount *@
+                            @if (hasBalanceAfter)
+                            {
+                                <col style="width: 14ch;"> @* Balance After *@
+                            }
+                            <col>                        @* Note (flex) *@
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th>When</th>
-                                <th>Type</th>
+                                <th class="text-nowrap">When</th>
+                                <th class="type">Type</th>
                                 <th class="text-end">Amount</th>
                                 @if (hasBalanceAfter)
                                 {
                                     <th class="text-end">Balance After</th>
                                 }
-                                <th>Note</th>
+                                <th class="note">Note</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,20 +111,32 @@
                                 var when = t.DisplayTime ?? t.CreatedUtc.ToString("yyyy-MM-dd HH:mm");
                                 var amtText = (t.Amount >= 0 ? "+" : "") + t.Amount.ToString("0.00");
                                 var amtClass = t.Amount >= 0 ? "text-success" : "text-danger";
+
+                                // Color the type as a badge
+                                var typeLower = (t.Type ?? "").ToLowerInvariant();
+                                var typeBadge = typeLower switch
+                                {
+                                    "deposit" or "winnings" or "refund" or "bonus" => "bg-success-subtle text-success-emphasis border border-success-subtle",
+                                    "betplaced" or "withdrawal" or "withdraw" => "bg-danger-subtle text-danger-emphasis border border-danger-subtle",
+                                    _ => "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"
+                                };
                                 <tr>
-                                    <td>@when</td>
-                                    <td>@t.Type</td>
-                                    <td class="text-end @amtClass">@amtText</td>
+                                    <td class="text-nowrap">@when</td>
+                                    <td>
+                                        <span class="badge rounded-pill @typeBadge px-3 py-2 type">@t.Type</span>
+                                    </td>
+                                    <td class="text-end num @amtClass">@amtText</td>
                                     @if (hasBalanceAfter)
                                     {
-                                        <td class="text-end">@(t.BalanceAfter?.ToString("0.00") ?? "-")</td>
+                                        <td class="text-end num">@((t.BalanceAfter?.ToString("0.00")) ?? "-")</td>
                                     }
-                                    <td>@t.Note</td>
+                                    <td class="note">@t.Note</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
+
             }
         </div>
     </div>
