@@ -34,7 +34,7 @@
 
 .wallet-tx-table th.type,
 .wallet-tx-table td.type {
-	padding-left: 2.25rem; /* space between Type and When */
+	padding-left: 1.65rem; /* space between Type and When */
 }
 
 .wallet-tx-table thead th {
