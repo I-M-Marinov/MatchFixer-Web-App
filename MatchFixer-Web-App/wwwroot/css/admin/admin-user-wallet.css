@@ -11,3 +11,41 @@
 	background: #2A7B9B;
 	background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
 }
+
+.wallet-tx-table {
+	font-size: .92rem;
+}
+
+@media (max-width: 768px) {
+	.wallet-tx-table {
+		font-size: .80rem;
+	}
+}
+
+.wallet-tx-table .num {
+	font-variant-numeric: tabular-nums;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.wallet-tx-table th.note,
+.wallet-tx-table td.note {
+	padding-left: 1.25rem; /* space between Balance After and Note */
+}
+
+.wallet-tx-table th.type,
+.wallet-tx-table td.type {
+	padding-left: 2.25rem; /* space between Type and When */
+}
+
+.wallet-tx-table thead th {
+	background: #f8f9fa;
+	position: sticky;
+	top: 0;
+	z-index: 1; 
+}
+
+.wallet-tx-wrap {
+	border-radius: .75rem;
+	overflow: hidden;
+	box-shadow: 0 .25rem .75rem rgba(0,0,0,.06);
+}
