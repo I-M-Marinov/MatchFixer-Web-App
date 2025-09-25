@@ -116,15 +116,16 @@
                                 var typeLower = (t.Type ?? "").ToLowerInvariant();
                                 var typeBadge = typeLower switch
                                 {
-                                    "deposit" or "winnings" or "refund" or "bonus" or "birthdaybonus" => "bg-success-subtle text-success-emphasis border border-success-subtle",
-                                    "withdrawal" or "withdraw" => "bg-danger-subtle text-danger-emphasis border border-danger-subtle",
-                                    "betplaced" => "bg-warning-subtle text-warning-emphasis border border-warning-subtle",
+                                    "winnings" or "refund" or "bonus" or "birthdaybonus" => "bg-success-subtle text-success-emphasis border border-success-subtle",
+                                    "deposit"  => "bg-success text-success-bold border border-success-subtle",
+                                    "withdrawal" or "withdraw" => "bg-danger text-danger-bold border border-danger-subtle",
+                                    "betplaced" => "bg-warning text-warning-emphasis border border-warning-subtle",
                                     _ => "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"
                                 };
                                 <tr>
                                     <td class="text-nowrap">@when</td>
                                     <td class="type">
-                                        <span class="badge rounded-pill @typeBadge px-3 py-2">@t.Type</span>
+                                        <span class="text-bg-dark badge rounded-pill @typeBadge px-3 py-2 ">@t.Type</span>
                                     </td>
                                     <td class="text-center num @amtClass">@amtText</td>
                                     @if (hasBalanceAfter)
