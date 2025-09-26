@@ -49,3 +49,47 @@
 	overflow: hidden;
 	box-shadow: 0 .25rem .75rem rgba(0,0,0,.06);
 }
+
+
+.bg-info-admin-wallet {
+	background-color: #3370a8 !important;
+	color: white !important;
+	border: 2px black solid !important;
+	text-align: center !important;
+	padding: 0;
+	margin: 0.2em 0 1em 0 !important;
+}
+
+.bg-info-admin-wallet2 {
+	background-color: #00a0e0 !important;
+	color: black !important;
+	border: 2px black solid !important;
+	text-align: center !important;
+	padding: 0;
+	margin: 0.2em 0 1em 0 !important;
+}
+
+.bg-info-admin-wallet2 thead tr th {
+	color: black !important;
+}
+
+.bg-info-admin-wallet2 tbody tr td,
+.bg-info-admin-wallet2 thead tr th{
+	background-color: #00a0e0 !important;
+}
+
+.bg-info-admin-wallet2 tbody tr td{
+	font-size: 1.2em;
+	text-shadow: 1px 1px 1px black;
+}
+
+.bg-info-admin-wallet2 thead th + th,
+.bg-info-admin-wallet2 tbody td + td {
+	border-left: 2px solid rgba(0,0,0,.25); 
+}
+
+.bg-info-admin-wallet2 thead th,
+.bg-info-admin-wallet2 tbody td {
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
