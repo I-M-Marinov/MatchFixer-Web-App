@@ -1,4 +1,5 @@
-﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet.AdminWalletViewModel
+﻿@using System.Globalization
+@model MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet.AdminWalletViewModel
 
 @{
     ViewData["Title"] = $"Wallet · {Model.UserName ?? Model.Email}";
@@ -33,7 +34,7 @@
     <div class="card shadow-sm border-0 rounded-4 admin-user-wallet-card">
         <div class="card-body">
 	        <h5 class="card-title mb-2 text-center">
-		        Wallet: @Model.UserName (@Model.Email)
+		         @Model.Email
 		        <span class="badge text-bg-info ms-2">@Model.Currency</span>
 	        </h5>
 
@@ -68,8 +69,8 @@
 					                </thead>
 					                <tbody>
 					                <tr>
-						                <td class="fw-semibold text-success">+€@totalDeposited.ToString("0.00")</td>
-						                <td class="fw-semibold text-danger">−€@totalWithdrawn.ToString("0.00")</td>
+						                <td class="fw-semibold text-success">€@totalDeposited.ToString("0.00")</td>
+						                <td class="fw-semibold text-danger">€@totalWithdrawn.ToString("0.00")</td>
 					                </tr>
 					                </tbody>
 				                </table>
@@ -140,7 +141,12 @@
                         <tbody>
 	                        @foreach (var t in Model.Transactions.OrderByDescending(x => x.CreatedUtc))
 	                        {
-		                        var when = t.DisplayTime ?? t.CreatedUtc.ToString("yyyy-MM-dd HH:mm");
+		                        var tzId = ViewBag.TimeZoneId as string ?? "Europe/Sofia"; // example/fallback
+		                        var tz   = TimeZoneInfo.FindSystemTimeZoneById(tzId);
+
+		                        var local = TimeZoneInfo.ConvertTimeFromUtc(t.CreatedUtc, tz);
+		                        var when  = local.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+
 
 		                        var amountAbs = Math.Abs(t.Amount);
 		                        var amtSign = t.Amount >= 0 ? "+" : "−";
