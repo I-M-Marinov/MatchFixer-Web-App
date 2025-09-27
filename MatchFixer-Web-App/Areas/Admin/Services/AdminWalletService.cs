@@ -49,32 +49,36 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var txAsc = wallet.Transactions
 				.Where(t => !cutoff.HasValue || t.CreatedAt >= cutoff.Value)
 				.OrderBy(t => t.CreatedAt)
+				.ThenBy(t => t.Id)
 				.Select(t => new
 				{
 					t.Id,
 					t.CreatedAt,
 					TypeText = t.TransactionType!.ToString(),
 					t.Amount,
-					t.Description
-
+					t.Description,
 				})
 				.ToList();
 
 			var debitTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-	{
-		"BetPlaced", "Withdrawal", "Withdraw", "AdminWithdrawal", "ManualWithdrawal"
-	};
+			{
+				"BetPlaced", "Withdrawal", "Withdraw", "AdminWithdrawal", "ManualWithdrawal", "Fee"
+			};
 
-			decimal running = 0m;
+			decimal Signed(string type, decimal amount)
+			{
+				var abs = Math.Abs(amount);                 
+				return debitTypes.Contains((type ?? "").Trim()) ? -abs : +abs;
+			}
+
+			
+			var totalDelta = txAsc.Sum(t => Signed(t.TypeText, t.Amount));
+			decimal running = wallet.Balance - totalDelta;
+
 			var list = new List<WalletTransactionDto>(txAsc.Count);
-
 			foreach (var t in txAsc)
 			{
-				var type = (t.TypeText ?? string.Empty).Trim();
-
-				var absolute = Math.Abs(t.Amount);
-				var signed = debitTypes.Contains(type) ? -absolute : absolute;
-
+				var signed = Signed(t.TypeText, t.Amount);
 				running += signed;
 
 				list.Add(new WalletTransactionDto
@@ -82,9 +86,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					Id = t.Id,
 					CreatedUtc = DateTime.SpecifyKind(t.CreatedAt, DateTimeKind.Utc),
 					DisplayTime = _timezoneService.FormatForUser(t.CreatedAt, timeZoneId, "en-US"),
-					Type = type,
-					Amount = signed,                 
-					BalanceAfter = running,         
+					Type = t.TypeText ?? string.Empty,
+					Amount = signed,
+					BalanceAfter = running,
 					Note = t.Description,
 				});
 			}
@@ -100,6 +104,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				Transactions = list.OrderByDescending(x => x.CreatedUtc).ToList()
 			};
 		}
+
 
 
 		public async Task<(bool Success, string Message)> CreateWalletForUserAsync(Guid userId, string currency = "EUR")
