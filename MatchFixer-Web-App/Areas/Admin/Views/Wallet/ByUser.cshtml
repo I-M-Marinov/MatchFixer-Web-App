@@ -2,7 +2,7 @@
 @model MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet.AdminWalletViewModel
 
 @{
-    ViewData["Title"] = $"Wallet · {Model.UserName ?? Model.Email}";
+    ViewData["Title"] = $"Wallet for user - {Model.UserName ?? Model.Email}";
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
     var hasBalanceAfter = Model.Transactions?.Any(t => t.BalanceAfter != null) == true;
 
