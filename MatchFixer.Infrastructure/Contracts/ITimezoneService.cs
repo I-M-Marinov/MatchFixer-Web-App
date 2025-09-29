@@ -8,6 +8,7 @@ namespace MatchFixer.Infrastructure.Contracts
 		DateTime ConvertToUserTime(DateTime utcTime, string timeZoneId);
 		string FormatForUser(DateTime utcTime, string timeZoneId, string culture);
 		string FormatForUserBets(DateTime utcTime, string timeZoneId, string culture = "en-US");
+		string FormatForUserExact(DateTime utcTime, string timeZoneId, string format, IFormatProvider? provider = null); // Admin Area
 	}
 }
 
