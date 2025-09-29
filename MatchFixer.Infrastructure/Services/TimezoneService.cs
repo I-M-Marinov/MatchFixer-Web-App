@@ -78,6 +78,14 @@ namespace MatchFixer.Infrastructure.Services
 			return localTime.ToString("ddd, MMM d, hh:mm tt", CultureInfo.GetCultureInfo(culture));
 		}
 
+		// overload for the Admin Area 
+		public string FormatForUserExact(DateTime utcTime, string timeZoneId, string format, IFormatProvider? provider = null)
+		{
+			var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+			var local = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcTime, DateTimeKind.Utc), tz);
+			return local.ToString(format, provider ?? CultureInfo.InvariantCulture);
+		}
+
 	}
 
 }
