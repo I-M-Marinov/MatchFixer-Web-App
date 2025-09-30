@@ -1,4 +1,6 @@
-﻿namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Bets
+﻿using MatchFixer.Common.Enums;
+
+namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Bets
 {
 	public class AdminUserBetsColumnsViewModel
 	{
@@ -19,5 +21,13 @@
 
 		public decimal TotalStake => Pending.Sum(x => x.Stake) + Won.Sum(x => x.Stake) + LostOrVoided.Sum(x => x.Stake);
 		public decimal TotalReturns => (Won.Sum(x => x.WinAmount ?? 0m)); // only actual won money
+		public decimal TotalLost => LostOrVoided
+			.Where(x => x.SlipStatus == BetStatus.Lost)
+			.Sum(x => x.Stake);
+		public decimal TotalSettledStake =>
+			Won.Sum(x => x.Stake) +
+			LostOrVoided.Where(x => x.SlipStatus == BetStatus.Lost).Sum(x => x.Stake);
+		// Net profit over settled slips
+		public decimal NetProfit => TotalReturns - TotalSettledStake;
 	}
 }
