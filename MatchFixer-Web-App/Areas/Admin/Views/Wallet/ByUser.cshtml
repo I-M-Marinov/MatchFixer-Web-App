@@ -18,6 +18,8 @@
 	    .Sum(t => Math.Abs(t.Amount));
 }
 
+@await Html.PartialAsync("_BackToUsersButton", "Users")
+
 <div class="background-profile"></div>
 
 <div class="border-0 rounded-4 p-3">
@@ -32,157 +34,157 @@
     }
 
     <div class="card shadow-sm border-0 rounded-4 admin-user-wallet-card">
-        <div class="card-body">
-	        <h5 class="card-title mb-2 text-center">
-		         @Model.Email
-		        <span class="badge text-bg-info ms-2">@Model.Currency</span>
-	        </h5>
+	    <div class="card-body">
+		    <h5 class="card-title mb-2 text-center">
+			    @Model.Email
+			    <span class="badge text-bg-info ms-2">@Model.Currency</span>
+		    </h5>
 
-	        @if (!Model.HasWallet)
-            {
-                <div class="alert alert-warning d-flex align-items-center justify-content-between mt-3 mb-0">
-                    <div>This user hasn’t created a wallet yet.</div>
-                    <form asp-area="Admin" asp-controller="Wallet" asp-action="Create" method="post" class="ms-3">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.UserId" />
-                        <button class="btn btn-sm btn-primary">
-                            <i class="bi bi-wallet2 me-1"></i>Create wallet
-                        </button>
-                    </form>
-                </div>
-            }
-            else
-            {
-                <div class="d-flex flex-wrap align-items-center justify-content-center my-3 gap-3">
-					<div class="fs-5 mb-0 badge bg-info-admin-wallet p-4">
-		                Balance: <strong> €@Model.Balance.ToString("0.00")</strong>
-	                </div>
-	                <div class="card shadow-sm border-0 rounded-3 bg-info-admin-wallet2" style="max-width:680px;">
-		                <div class="card-body py-2 px-3">
-			                <div class="table-responsive">
-				                <table class="table table-sm table-borderless align-middle mb-0 text-center" style="font-size:1rem;">
-					                <thead>
-					                <tr>
-						                <th class="text-muted text-nowrap">Total deposited</th>
-						                <th class="text-muted text-nowrap">Total withdrawn</th>
-					                </tr>
-					                </thead>
-					                <tbody>
-					                <tr>
-						                <td class="fw-semibold text-success">€@totalDeposited.ToString("0.00")</td>
-						                <td class="fw-semibold text-danger">€@totalWithdrawn.ToString("0.00")</td>
-					                </tr>
-					                </tbody>
-				                </table>
-			                </div>
-		                </div>
-	                </div>
-
-
-	                @* Quick admin adjustments: deposit / withdraw *@
-                    <div class="d-flex justify-content-center flex-wrap align-items-center">
-                        <form asp-area="Admin" asp-controller="Wallet" asp-action="Adjust" method="post" class="d-flex gap-3">
-		                    @Html.AntiForgeryToken()
-		                    <input type="hidden" name="id" value="@Model.UserId" />
-		                    <div class="form-floating">
-			                    <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" placeholder="Amount" required />
-			                    <label for="amount">Amount</label>
-		                    </div>
-		                    <div class="form-floating" style="min-width: 280px;">
-			                    <input type="text" class="form-control" id="note" name="note" placeholder="Note (optional)" />
-			                    <label for="note">Note (optional)</label>
-		                    </div>
-
-                            <div class="btn-group d-flex justify-content-center flex-wrap align-items-center">
-                                <button type="submit" name="withdraw" value="false" class="btn btn-success">
-				                    <i class="bi bi-plus-circle"></i> Deposit
-			                    </button>
-                                <button type="submit" name="withdraw" value="true" class="btn btn-danger">
-				                    <i class="bi bi-dash-circle"></i> Withdraw
-			                    </button>
-		                    </div>
-	                    </form>
-
-	                    @* Clear visible history *@
-	                    <form asp-area="Admin" asp-controller="Wallet" asp-action="ClearHistory" method="post" class="ms-auto">
-		                    @Html.AntiForgeryToken()
-		                    <input type="hidden" name="id" value="@Model.UserId" />
-		                    <button class="btn btn-secondary m-3">
-			                    <i class="bi bi-eraser"></i> Clear visible history
-		                    </button>
-	                    </form>
-                    </div>
-                </div>
-
-                <div class="table-responsive mt-3 wallet-tx-wrap">
-                    <table class="table table-sm table-hover table-striped align-middle wallet-tx-table mb-0">
-                        <colgroup>
-                            <col style="width: 16ch;">   @* When *@
-                            <col style="width: 12ch;">   @* Type *@
-                            <col style="width: 12ch;">   @* Amount *@
-                            @if (hasBalanceAfter)
-                            {
-                                <col style="width: 14ch;"> @* Balance After *@
-                            }
-                            <col>                        @* Note (flex) *@
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th class="text-nowrap">When</th>
-                                <th class="type">Type</th>
-                                <th class="text-center">Amount</th>
-                                @if (hasBalanceAfter)
-                                {
-                                    <th class="text-center">Balance After</th>
-                                }
-                                <th class="note">Note</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-	                        @foreach (var t in Model.Transactions.OrderByDescending(x => x.CreatedUtc))
-	                        {
-		                        var tzId = ViewBag.TimeZoneId as string ?? "Europe/Sofia"; // example/fallback
-		                        var tz   = TimeZoneInfo.FindSystemTimeZoneById(tzId);
-
-		                        var local = TimeZoneInfo.ConvertTimeFromUtc(t.CreatedUtc, tz);
-		                        var when  = local.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+		    @if (!Model.HasWallet)
+		    {
+			    <div class="alert alert-warning d-flex align-items-center justify-content-between mt-3 mb-0">
+				    <div>This user hasn’t created a wallet yet.</div>
+				    <form asp-area="Admin" asp-controller="Wallet" asp-action="Create" method="post" class="ms-3">
+					    @Html.AntiForgeryToken()
+					    <input type="hidden" name="id" value="@Model.UserId"/>
+					    <button class="btn btn-sm btn-primary">
+						    <i class="bi bi-wallet2 me-1"></i>Create wallet
+					    </button>
+				    </form>
+			    </div>
+		    }
+		    else
+		    {
+			    <div class="d-flex flex-wrap align-items-center justify-content-center my-3 gap-3">
+				    <div class="fs-5 mb-0 badge bg-info-admin-wallet p-4">
+					    Balance: <strong> €@Model.Balance.ToString("0.00")</strong>
+				    </div>
+				    <div class="card shadow-sm border-0 rounded-3 bg-info-admin-wallet2" style="max-width:680px;">
+					    <div class="card-body py-2 px-3">
+						    <div class="table-responsive">
+							    <table class="table table-sm table-borderless align-middle mb-0 text-center" style="font-size:1rem;">
+								    <thead>
+								    <tr>
+									    <th class="text-muted text-nowrap">Total deposited</th>
+									    <th class="text-muted text-nowrap">Total withdrawn</th>
+								    </tr>
+								    </thead>
+								    <tbody>
+								    <tr>
+									    <td class="fw-semibold text-success">€@totalDeposited.ToString("0.00")</td>
+									    <td class="fw-semibold text-danger">€@totalWithdrawn.ToString("0.00")</td>
+								    </tr>
+								    </tbody>
+							    </table>
+						    </div>
+					    </div>
+				    </div>
 
 
-		                        var amountAbs = Math.Abs(t.Amount);
-		                        var amtSign = t.Amount >= 0 ? "+" : "−";
-		                        var amtText = $"{amtSign}€{amountAbs:0.00}";
-		                        var amtClass = t.Amount >= 0 ? "text-success" : "text-danger";
+				    @* Quick admin adjustments: deposit / withdraw *@
+				    <div class="d-flex justify-content-center flex-wrap align-items-center">
+					    <form asp-area="Admin" asp-controller="Wallet" asp-action="Adjust" method="post" class="d-flex gap-3">
+						    @Html.AntiForgeryToken()
+						    <input type="hidden" name="id" value="@Model.UserId"/>
+						    <div class="form-floating">
+							    <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" placeholder="Amount" required/>
+							    <label for="amount">Amount</label>
+						    </div>
+						    <div class="form-floating" style="min-width: 280px;">
+							    <input type="text" class="form-control" id="note" name="note" placeholder="Note (optional)"/>
+							    <label for="note">Note (optional)</label>
+						    </div>
 
-		                        var typeLower = (t.Type ?? "").ToLowerInvariant();
-		                        var typeBadge = typeLower switch
-		                        {
-									"winnings" or "refund" or "bonus" or "birthdaybonus" => "bg-info text-info-emphasis border border-info-subtle",
-			                        "deposit"                                            => "bg-success text-success-bold border border-success-subtle",
-			                        "withdrawal" or "withdraw"                           => "bg-danger text-danger-bold border border-danger-subtle",
-			                        "betplaced"                                          => "bg-warning text-warning-emphasis border border-warning-subtle",
-			                        _                                                    => "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"
-		                        };
+						    <div class="btn-group d-flex justify-content-center flex-wrap align-items-center">
+							    <button type="submit" name="withdraw" value="false" class="btn btn-success">
+								    <i class="bi bi-plus-circle"></i> Deposit
+							    </button>
+							    <button type="submit" name="withdraw" value="true" class="btn btn-danger">
+								    <i class="bi bi-dash-circle"></i> Withdraw
+							    </button>
+						    </div>
+					    </form>
 
-		                        var balanceText = t.BalanceAfter.HasValue ? $"€{t.BalanceAfter.Value:0.00}" : "-";
-		                        <tr>
-			                        <td class="text-nowrap">@when</td>
-			                        <td class="type">
-				                        <span class="text-bg-dark badge rounded-pill @typeBadge px-3 py-2">@t.Type</span>
-			                        </td>
-			                        <td class="text-center num @amtClass">@amtText</td>
-			                        @if (hasBalanceAfter)
-			                        {
-				                        <td class="text-center num">@balanceText</td>
-			                        }
-			                        <td class="note text-wrap">@t.Note</td>
-		                        </tr>
-	                        }
-                        </tbody>
+					    @* Clear visible history *@
+					    <form asp-area="Admin" asp-controller="Wallet" asp-action="ClearHistory" method="post" class="ms-auto">
+						    @Html.AntiForgeryToken()
+						    <input type="hidden" name="id" value="@Model.UserId"/>
+						    <button class="btn btn-secondary m-3">
+							    <i class="bi bi-eraser"></i> Clear visible history
+						    </button>
+					    </form>
+				    </div>
+			    </div>
 
-                    </table>
-                </div>
+			    <div class="table-responsive mt-3 wallet-tx-wrap">
+				    <table class="table table-sm table-hover table-striped align-middle wallet-tx-table mb-0">
+					    <colgroup>
+						    <col style="width: 16ch;"> @* When *@
+						    <col style="width: 12ch;"> @* Type *@
+						    <col style="width: 12ch;"> @* Amount *@
+						    @if (hasBalanceAfter)
+						    {
+							    <col style="width: 14ch;"> @* Balance After *@
+						    }
+						    <col> @* Note (flex) *@
+					    </colgroup>
+					    <thead>
+					    <tr>
+						    <th class="text-nowrap">When</th>
+						    <th class="type">Type</th>
+						    <th class="text-center">Amount</th>
+						    @if (hasBalanceAfter)
+						    {
+							    <th class="text-center">Balance After</th>
+						    }
+						    <th class="note">Note</th>
+					    </tr>
+					    </thead>
+					    <tbody>
+					    @foreach (var t in Model.Transactions.OrderByDescending(x => x.CreatedUtc))
+					    {
+						    var tzId = ViewBag.TimeZoneId as string ?? "Europe/Sofia"; // example/fallback
+						    var tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
 
-            }
-        </div>
+						    var local = TimeZoneInfo.ConvertTimeFromUtc(t.CreatedUtc, tz);
+						    var when = local.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+
+
+						    var amountAbs = Math.Abs(t.Amount);
+						    var amtSign = t.Amount >= 0 ? "+" : "−";
+						    var amtText = $"{amtSign}€{amountAbs:0.00}";
+						    var amtClass = t.Amount >= 0 ? "text-success" : "text-danger";
+
+						    var typeLower = (t.Type ?? "").ToLowerInvariant();
+						    var typeBadge = typeLower switch
+						    {
+							    "winnings" or "refund" or "bonus" or "birthdaybonus" => "bg-info text-info-emphasis border border-info-subtle",
+							    "deposit" => "bg-success text-success-bold border border-success-subtle",
+							    "withdrawal" or "withdraw" => "bg-danger text-danger-bold border border-danger-subtle",
+							    "betplaced" => "bg-warning text-warning-emphasis border border-warning-subtle",
+							    _ => "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"
+						    };
+
+						    var balanceText = t.BalanceAfter.HasValue ? $"€{t.BalanceAfter.Value:0.00}" : "-";
+						    <tr>
+							    <td class="text-nowrap">@when</td>
+							    <td class="type">
+								    <span class="text-bg-dark badge rounded-pill @typeBadge px-3 py-2">@t.Type</span>
+							    </td>
+							    <td class="text-center num @amtClass">@amtText</td>
+							    @if (hasBalanceAfter)
+							    {
+								    <td class="text-center num">@balanceText</td>
+							    }
+							    <td class="note text-wrap">@t.Note</td>
+						    </tr>
+					    }
+					    </tbody>
+
+				    </table>
+			    </div>
+
+		    }
+	    </div>
     </div>
 </div>
