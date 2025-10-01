@@ -4,16 +4,19 @@
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
     ViewData["Title"] = "Administrate Users";
     var pages = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+
+	// Default to "active" if nothing is specified
+	var currentStatus = string.IsNullOrWhiteSpace(Model.Status) ? "active" : Model.Status;
 }
 
-<div class="border-0 rounded-4 p-3">
+<div class="border-0 rounded-4 p-3 mt-4 ">
     @if (TempData["SuccessMessage"] is string s)
     {
-        <div class="alert alert-success shadow-sm mb-3">@s</div>
+		<div class="alert success-message" id="success-message" >@s</div>
     }
     @if (TempData["ErrorMessage"] is string e)
     {
-        <div class="alert alert-danger shadow-sm mb-3">@e</div>
+		<div class="alert error-message" id="error-message">@e</div>
     }
 
     <div class="admin-users-background"></div>
@@ -32,12 +35,11 @@
 
 	    <div class="col-auto">
 		    <select name="status" class="form-select admin-users-filter">
-			    <option value="" selected="@(string.IsNullOrEmpty(Model.Status) ? "selected" : null)">All statuses</option>
-			    <option value="active" selected="@(Model.Status == "active" ? "selected" : null)">Active</option>
-			    <option value="unconfirmed" selected="@(Model.Status == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
-			    <option value="locked" selected="@(Model.Status == "locked" ? "selected" : null)">Locked</option>
-			    <option value="deleted" selected="@(Model.Status == "deleted" ? "selected" : null)">Deleted</option>
-
+			    <option value=""           selected="@(currentStatus == "" ? "selected" : null)">All statuses</option>
+			    <option value="active"     selected="@(currentStatus == "active" ? "selected" : null)">Active</option>
+			    <option value="unconfirmed"selected="@(currentStatus == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
+			    <option value="locked"     selected="@(currentStatus == "locked" ? "selected" : null)">Locked</option>
+			    <option value="deleted"    selected="@(currentStatus == "deleted" ? "selected" : null)">Deleted</option>
 		    </select>
 	    </div>
 
@@ -176,7 +178,7 @@
 													<form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@u.Id" />
-														<button class="btn btn-outline-success btn-sm" title="Mark email confirmed">
+														<button class="btn btn-success btn-sm" title="Mark email confirmed">
 															<i class="bi bi-check2-circle"></i>
 														</button>
 													</form>
@@ -188,7 +190,7 @@
 													<form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@u.Id" />
-														<button class="btn btn-outline-danger btn-sm" title="Lock user">
+														<button class="btn btn-danger btn-sm" title="Lock user">
 															<i class="bi bi-lock"></i>
 														</button>
 													</form>
@@ -198,7 +200,7 @@
 													<form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@u.Id" />
-														<button class="btn btn-outline-warning btn-sm" title="Unlock user">
+														<button class="btn btn-warning btn-sm" title="Unlock user">
 															<i class="bi bi-unlock"></i>
 														</button>
 													</form>
@@ -208,7 +210,7 @@
 												<form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
 													@Html.AntiForgeryToken()
 													<input type="hidden" name="id" value="@u.Id" />
-													<button class="btn btn-outline-primary btn-sm" title="Generate reset link">
+													<button class="btn btn-primary btn-sm" title="Generate reset link">
 														<i class="bi bi-link-45deg"></i>
 													</button>
 												</form>
@@ -220,7 +222,7 @@
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@u.Id" />
 														<input type="hidden" name="role" value="@Roles.Admin" />
-														<button class="btn btn-outline-dark btn-sm" title="Make Admin">
+														<button class="btn btn-purple btn-sm" title="Make Admin">
 															<i class="bi bi-person-gear"></i>
 														</button>
 													</form>
@@ -231,14 +233,14 @@
 														@Html.AntiForgeryToken()
 														<input type="hidden" name="id" value="@u.Id" />
 														<input type="hidden" name="role" value="@Roles.Admin" />
-														<button class="btn btn-outline-secondary btn-sm" title="Remove Admin">
+														<button class="btn btn-outline-purple btn-sm" title="Remove Admin">
 															<i class="bi bi-person-dash"></i>
 														</button>
 													</form>
 												}
 
 
-											<a class="btn btn-outline-secondary btn-sm"
+											<a class="btn btn-warning btn-sm"
 											   asp-area="Admin"
 											   asp-controller="Email"
 											   asp-action="Compose"
@@ -247,7 +249,7 @@
 												<i class="bi bi-envelope"></i>
 											</a>
 					                    }
-					                    <a class="btn btn-outline-secondary btn-sm"
+											<a class="btn btn-mint btn-sm"
 					                       asp-area="Admin"
 					                       asp-controller="Wallet"
 					                       asp-action="ByUser"
@@ -256,7 +258,7 @@
 						                    <i class="bi bi-wallet2"></i>
 					                    </a>
 
-					                    <a class="btn btn-outline-secondary btn-sm"
+											<a class="btn btn-ocean btn-sm"
 					                       asp-area="Admin"
 					                       asp-controller="AdminUserBets"
 					                       asp-action="Details"
