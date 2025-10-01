@@ -7,8 +7,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 	{
 		Task<AdminUsersListViewModel> GetUsersAsync(string? query, string? status, int page, int pageSize);
 
-		Task<bool> LockUserAsync(Guid userId);
-		Task<bool> UnlockUserAsync(Guid userId);
+		Task<(bool Ok, string Message)> LockUserAsync(Guid actorId, Guid targetUserId);
+		Task<(bool Ok, string Message)> UnlockUserAsync(Guid actorId, Guid targetUserId);
+
 		Task<bool> MarkEmailConfirmedAsync(Guid userId);
 
 		Task<(bool ok, string? resetLink)> GenerateResetPasswordLinkAsync(Guid userId, IUrlHelper url);
