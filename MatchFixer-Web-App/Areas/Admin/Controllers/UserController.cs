@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Infrastructure.Security; 
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
@@ -16,16 +17,30 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[HttpGet("[action]")]
 		public async Task<IActionResult> ShowUsers(string? query, string? status, int page = 1, int pageSize = 5)
 		{
+
+			if (string.IsNullOrWhiteSpace(status))
+			{
+				return RedirectToAction(nameof(ShowUsers), new { query, status = "active", page, pageSize });
+			}
+			
 			var vm = await _svc.GetUsersAsync(query, status, page, pageSize);
 			return View(vm);
+
 		}
 
 		[HttpPost("Lock")]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Lock(Guid id)
 		{
-			var ok = await _svc.LockUserAsync(id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "User locked." : "Failed to lock user.";
+			var me = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (!Guid.TryParse(me, out var actorId))
+			{
+				TempData["ErrorMessage"] = "Unable to resolve your user id.";
+				return RedirectToAction(nameof(ShowUsers));
+			}
+
+			var (ok, msg) = await _svc.LockUserAsync(actorId, id);
+			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
@@ -33,8 +48,15 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Unlock(Guid id)
 		{
-			var ok = await _svc.UnlockUserAsync(id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "User unlocked." : "Failed to unlock user.";
+			var me = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (!Guid.TryParse(me, out var actorId))
+			{
+				TempData["ErrorMessage"] = "Unable to resolve your user id.";
+				return RedirectToAction(nameof(ShowUsers));
+			}
+
+			var (ok, msg) = await _svc.UnlockUserAsync(actorId, id);
+			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
