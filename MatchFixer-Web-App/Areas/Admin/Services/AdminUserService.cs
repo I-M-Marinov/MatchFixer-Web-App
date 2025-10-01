@@ -36,41 +36,36 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				if (page <= 0) page = 1;
 				if (pageSize <= 0 || pageSize > 200) pageSize = 20;
 
+				status = string.IsNullOrWhiteSpace(status) ? "active" : status.ToLowerInvariant();
+
 				var usersQ = _db.Users.AsNoTracking();
 
 				if (!string.IsNullOrWhiteSpace(query))
 				{
 					var q = query.Trim().ToLower();
 					usersQ = usersQ.Where(u =>
-						u.Email!.ToLower().Contains(q) ||
-						(u.FirstName != null && u.FirstName.ToLower().Contains(q)) ||
-						(u.LastName != null && u.LastName.ToLower().Contains(q)));
+						(u.Email ?? "").ToLower().Contains(q) ||
+						((u.FirstName ?? "").ToLower().Contains(q)) ||
+						((u.LastName ?? "").ToLower().Contains(q)));
 				}
 
 				// --- STATUS FILTER ---
 				var now = DateTimeOffset.UtcNow;
-				switch ((status ?? "").ToLowerInvariant())
+				usersQ = status switch
 				{
-					case "active":
-						usersQ = usersQ.Where(u =>
-							u.IsActive &&
-							!u.IsDeleted &&
-							(!u.LockoutEnd.HasValue || u.LockoutEnd <= now));
-						break;
+					"active" => usersQ.Where(u =>
+						u.IsActive &&
+						!u.IsDeleted &&
+						(!u.LockoutEnd.HasValue || u.LockoutEnd <= now)),
 
-					case "locked":
-						usersQ = usersQ.Where(u => u.LockoutEnd.HasValue && u.LockoutEnd > now);
-						break;
+					"unconfirmed" => usersQ.Where(u => !u.EmailConfirmed && !u.IsDeleted),
 
-					case "deleted":
-						usersQ = usersQ.Where(u => u.IsDeleted);
-						break;
+					"locked" => usersQ.Where(u => u.LockoutEnd.HasValue && u.LockoutEnd > now && !u.IsDeleted),
 
-					case "unconfirmed":
-						usersQ = usersQ.Where(u => !u.EmailConfirmed);
-						break;
+					"deleted" => usersQ.Where(u => u.IsDeleted),
 
-				}
+					"all" or _ => usersQ.Where(u => !u.IsDeleted) // fallback
+				};
 
 				var total = await usersQ.CountAsync();
 
@@ -119,7 +114,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var vm = new AdminUsersListViewModel
 				{
 					Query = query,
-					Status = status, 
+					Status = status, // add the active status to the model
 					Page = page,
 					PageSize = pageSize,
 					Total = total,
@@ -130,9 +125,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						FirstName = u.FirstName,
 						LastName = u.LastName,
 						EmailConfirmed = u.EmailConfirmed,
-						UserImage = string.IsNullOrWhiteSpace(u.ProfilePicture?.ImageUrl)
-							? "N/A"
-							: u.ProfilePicture.ImageUrl,
+						UserImage = string.IsNullOrWhiteSpace(u.ProfilePicture?.ImageUrl) ? "N/A" : u.ProfilePicture.ImageUrl,
 						IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd.Value > now,
 						LockoutEnd = u.LockoutEnd,
 						Roles = rolesMap.TryGetValue(u.Id, out var r) ? r : Array.Empty<string>(),
@@ -147,33 +140,45 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			}
 
 
-			public async Task<bool> LockUserAsync(Guid userId)
-			{
-				var user = await _userManager.FindByIdAsync(userId.ToString());
-				if (user == null) return false;
 
-				if (!user.LockoutEnabled)
+			public async Task<(bool Ok, string Message)> LockUserAsync(Guid actorId, Guid targetUserId)
+			{
+				if (actorId == targetUserId)
+					return (false, "You cannot lock your own account.");
+
+				var user = await _userManager.FindByIdAsync(targetUserId.ToString());
+				if (user is null) return (false, "User not found.");
+
+				// Ensure lockout is enabled
+				if (!await _userManager.GetLockoutEnabledAsync(user))
 				{
-					user.LockoutEnabled = true; // ensure lockout works
+					var en = await _userManager.SetLockoutEnabledAsync(user, true);
+					if (!en.Succeeded) return (false, "Failed to enable lockout for this user.");
 				}
 
-				// Lock for 100 years (essentially permanent until manually unlocked)
+				// Already locked 
+				var currentEnd = await _userManager.GetLockoutEndDateAsync(user);
+				if (currentEnd.HasValue && currentEnd.Value > DateTimeOffset.UtcNow)
+					return (true, $"User is already locked until {currentEnd.Value:yyyy-MM-dd HH:mm} UTC.");
 
-				user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
-
-				var result = await _userManager.UpdateAsync(user);
-				return result.Succeeded;
+				// Effectively permanent lock (666 years)
+				var end = DateTimeOffset.UtcNow.AddYears(666);
+				var res = await _userManager.SetLockoutEndDateAsync(user, end);
+				return res.Succeeded
+					? (true, "User locked.")
+					: (false, "Failed to lock user.");
 			}
 
-			public async Task<bool> UnlockUserAsync(Guid userId)
+			public async Task<(bool Ok, string Message)> UnlockUserAsync(Guid actorId, Guid targetUserId)
 			{
-				var user = await _userManager.FindByIdAsync(userId.ToString());
-				if (user == null) return false;
+				var user = await _userManager.FindByIdAsync(targetUserId.ToString());
+				if (user is null) return (false, "User not found.");
 
-				user.LockoutEnd = null;
+				var res1 = await _userManager.SetLockoutEndDateAsync(user, null);
+				if (!res1.Succeeded) return (false, "Failed to clear lockout end date.");
 
-				var result = await _userManager.UpdateAsync(user);
-				return result.Succeeded;
+				await _userManager.ResetAccessFailedCountAsync(user);
+				return (true, "User unlocked.");
 			}
 
 			public async Task<bool> MarkEmailConfirmedAsync(Guid userId)
