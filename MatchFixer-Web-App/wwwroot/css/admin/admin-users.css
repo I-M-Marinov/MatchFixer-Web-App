@@ -66,3 +66,90 @@
     border: 1px white solid !important;
     border-radius: 50% !important;
 }
+
+
+/*----------------------------------------------------------------
+|      USING BOOTSTRAP TO STYLE THE BUTTONS, JUST ADD COLOURS     |
+-----------------------------------------------------------------*/
+
+.btn-mint {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #0DAB76;
+    --bs-btn-border-color: #0DAB76;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #0a8c60;
+    --bs-btn-hover-border-color: #0a8c60;
+    --bs-btn-focus-shadow-rgb: 13,171,118;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #087552;
+    --bs-btn-active-border-color: #087552;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #0DAB76;
+    --bs-btn-disabled-border-color: #0DAB76;
+}
+
+.btn-ocean {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #3370a8;
+    --bs-btn-border-color: #3370a8;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #2b5f8b;
+    --bs-btn-hover-border-color: #2b5f8b;
+    --bs-btn-focus-shadow-rgb: 51,112,168;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #244f72;
+    --bs-btn-active-border-color: #244f72;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #3370a8;
+    --bs-btn-disabled-border-color: #3370a8;
+}
+
+.btn-purple {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #7700e1;
+    --bs-btn-border-color: #7700e1;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #6500bf; 
+    --bs-btn-hover-border-color: #6500bf;
+    --bs-btn-focus-shadow-rgb: 119,0,225;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #5400a0; 
+    --bs-btn-active-border-color: #5400a0;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #7700e1;
+    --bs-btn-disabled-border-color: #7700e1;
+}
+
+.btn-outline-purple {
+    color: #7700e1;
+    background-color: transparent;
+    border: 1px solid #7700e1 !important; 
+    --bs-btn-focus-shadow-rgb: 119,0,225;
+}
+
+.btn-outline-purple,
+.btn-outline-purple.btn-sm,
+.btn-outline-purple.btn-lg {
+    --bs-btn-border-width: 1px;
+}
+
+.btn-outline-purple:hover,
+.btn-outline-purple:focus {
+    color: #fff;
+    background-color: #7700e1;
+    border-color: #7700e1;
+}
+
+.btn-outline-purple:active {
+    color: #fff;
+    background-color: #6500bf;
+    border-color: #6500bf;
+}
+
+.btn-outline-purple:disabled,
+.btn-outline-purple.disabled {
+    color: #7700e1;
+    background-color: transparent;
+    border-color: #7700e1;
+    opacity: .65;
+}
