@@ -125,6 +125,140 @@
 	</table>
 </div>
 
+@{
+    var ev = Model.Events;
+    var denom = ev.TotalEvents == 0 ? 1 : ev.TotalEvents;
+    var upPct = (int)Math.Round(ev.Upcoming * 100.0 / denom);
+    var livePct = (int)Math.Round(ev.Live * 100.0 / denom);
+    var finPct = (int)Math.Round(ev.Finished * 100.0 / denom);
+}
+
+<div class="mt-4 card shadow-sm border-0 rounded-3">
+    <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi bi-calendar2-event me-1"></i> Match Events</h5>
+
+        <div class="row g-3 align-items-center mb-3">
+            <div class="col-md-3">
+                <div class="p-3 rounded bg-light text-center">
+                    <div class="small text-muted">Total</div>
+                    <div class="fs-5 fw-semibold">@ev.TotalEvents</div>
+                    <div class="small text-muted">Today: @ev.Today · Last 7d: @ev.Last7Days</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mini-stacked d-inline-flex align-items-center">
+                    <div class="stack" style="width:100%;">
+                        <div class="seg" style="width:@upPct%; background:#0d6efd;">
+                            <small>@upPct% upcoming</small>
+                        </div>
+                        <div class="seg" style="width:@livePct%; background:#ffc107;">
+                            <small>@livePct% live</small>
+                        </div>
+                        <div class="seg" style="width:@finPct%; background:#198754;">
+                            <small>@finPct% finished</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    @if (ev.Canceled > 0)
+                    {
+                        <span class="badge bg-danger">Canceled: @ev.Canceled</span>
+                    }
+                    @if (ev.Postponed > 0)
+                    {
+                        <span class="badge bg-secondary">Postponed: @ev.Postponed</span>
+                    }
+                    @if (ev.EventsWithVoidedBets > 0)
+                    {
+                        <span class="badge bg-dark">Voided bets on: @ev.EventsWithVoidedBets</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width: 18ch;">Match (UTC)</th>
+                        <th>Teams</th>
+                        <th>Status</th>
+                        <th class="text-nowrap">Updated (UTC)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ev.RecentUpdated.Count == 0)
+                    {
+                        <tr><td colspan="4" class="text-muted">No recent updates.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var r in ev.RecentUpdated)
+                        {
+                            <tr>
+                                <td>@r.MatchUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    <div class="fw-semibold">@r.HomeTeam</div>
+                                    <div class="text-muted small">vs @r.AwayTeam @if(!string.IsNullOrWhiteSpace(r.League)){
+                                    <span>· @r.League</span>
+                                }
+    </div>
+                            </td>
+                            <td>
+                                @{
+                                    var badge = r.Status switch
+                                    {
+                                        "Finished" => "bg-success",
+                                        "Live" => "bg-warning text-dark",
+                                        "Upcoming" => "bg-primary",
+                                        "Canceled" => "bg-danger",
+                                        "Postponed" => "bg-secondary",
+                                        _ => "bg-light text-dark"
+                                    };
+                                }
+                                <span class="badge @badge">@r.Status</span>
+                            </td>
+                            <td class="text-nowrap">@((r.UpdatedUtc ?? r.MatchUtc).ToString("yyyy-MM-dd HH:mm"))</td>
+                        </tr>
+                    }
+                                        }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mini-stacked .stack {
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        display: inline-flex;
+        background: #e9ecef;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .mini-stacked .seg {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .mini-stacked .seg small {
+            color: rgba(255,255,255,.95);
+            font-size: 10px;
+            line-height: 1;
+        }
+</style>
+
+
 
 <style>
         .responsive-stack td, .responsive-stack th {
