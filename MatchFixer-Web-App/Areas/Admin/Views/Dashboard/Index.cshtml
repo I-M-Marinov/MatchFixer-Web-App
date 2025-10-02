@@ -31,18 +31,6 @@
 
 <h1>Admin Dashboard</h1>
 
-<div class="border-0 rounded-4 p-4 flex-fill">
-    @if (TempData["SuccessMessage"] is string s)
-    {
-        <div class="alert alert-success shadow-sm mb-3" id="success-message">@s</div>
-    }
-    @if (TempData["ErrorMessage"] is string e)
-    {
-        <div class="alert alert-danger shadow-sm mb-3" id="error-message">@e</div>
-    }
-</div>
-
-
 <div class="table-responsive">
 	<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
 		<thead class="table-dark">
@@ -126,11 +114,26 @@
 </div>
 
 @{
-    var ev = Model.Events;
-    var denom = ev.TotalEvents == 0 ? 1 : ev.TotalEvents;
-    var upPct = (int)Math.Round(ev.Upcoming * 100.0 / denom);
-    var livePct = (int)Math.Round(ev.Live * 100.0 / denom);
-    var finPct = (int)Math.Round(ev.Finished * 100.0 / denom);
+	var ev = Model.Events;
+	var denom = ev.TotalEvents == 0 ? 1 : ev.TotalEvents;
+	var upPct   = (int)Math.Round(ev.Upcoming * 100.0 / denom);
+	var livePct = (int)Math.Round(ev.Live     * 100.0 / denom);
+	var finPct  = (int)Math.Round(ev.Finished * 100.0 / denom);
+
+	// ensure they sum to 100 (fix rounding drift)
+	var sum = upPct + livePct + finPct;
+	if (sum != 100)
+	{
+		var diff = 100 - sum;
+		// add remainder to the largest slice (stable look)
+		if (finPct >= livePct && finPct >= upPct) finPct += diff;
+		else if (livePct >= upPct)                livePct += diff;
+		else                                      upPct += diff;
+	}
+
+	bool showUp   = upPct   >= 12;  // hide labels if slice too narrow
+	bool showLive = livePct >= 12;
+	bool showFin  = finPct  >= 12;
 }
 
 <div class="mt-4 card shadow-sm border-0 rounded-3">
@@ -147,19 +150,19 @@
             </div>
 
             <div class="col-md-6">
-                <div class="mini-stacked d-inline-flex align-items-center">
-                    <div class="stack" style="width:100%;">
-                        <div class="seg" style="width:@upPct%; background:#0d6efd;">
-                            <small>@upPct% upcoming</small>
-                        </div>
-                        <div class="seg" style="width:@livePct%; background:#ffc107;">
-                            <small>@livePct% live</small>
-                        </div>
-                        <div class="seg" style="width:@finPct%; background:#198754;">
-                            <small>@finPct% finished</small>
-                        </div>
-                    </div>
-                </div>
+	            <div class="mini-stacked d-inline-flex align-items-center w-100">
+		            <div class="stack">
+			            <div class="seg" style="width:@upPct%; background:#0d6efd;">
+				            @if (showUp) { <small>@upPct% upcoming</small> }
+			            </div>
+			            <div class="seg" style="width:@livePct%; background:#ffc107;">
+				            @if (showLive) { <small>@livePct% live</small> }
+			            </div>
+			            <div class="seg" style="width:@finPct%; background:#198754;">
+				            @if (showFin) { <small>@finPct% finished</small> }
+			            </div>
+		            </div>
+	            </div>
             </div>
 
             <div class="col-md-3 text-center">
@@ -215,7 +218,7 @@
                                         "Finished" => "bg-success",
                                         "Live" => "bg-warning text-dark",
                                         "Upcoming" => "bg-primary",
-                                        "Canceled" => "bg-danger",
+                                        "Cancelled" => "bg-danger",
                                         "Postponed" => "bg-secondary",
                                         _ => "bg-light text-dark"
                                     };
@@ -232,60 +235,62 @@
     </div>
 </div>
 
+
 <style>
+    .responsive-stack td, .responsive-stack th {
+        vertical-align: middle;
+    }
+
     .mini-stacked .stack {
-        height: 12px;
+        width: 240px;
+        height: 10px;
         border-radius: 6px;
         overflow: hidden;
         display: inline-flex;
         background: #e9ecef;
         box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-        width: 100%;
-        max-width: 420px;
     }
 
     .mini-stacked .seg {
         height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
-        .mini-stacked .seg small {
-            color: rgba(255,255,255,.95);
-            font-size: 10px;
-            line-height: 1;
-        }
+    .mini-stacked .seg-pending {
+        background: #ffd966;
+    }
+    .mini-stacked .seg-won {
+        background: #5cb85c;
+    }
+    .mini-stacked .seg-lost {
+        background: #dc3545;
+    }
+
+    .mini-stacked .stack {
+        display: flex;
+        width: 100%;
+        height: 22px; /* taller so text fits */
+        border-radius: 12px;
+        overflow: hidden;
+        background: #e9ecef;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+    }
+
+    .mini-stacked .seg {
+        position: relative;
+        height: 100%;
+        flex: 0 0 auto; /* width comes from style="width:..%" */
+    }
+
+    .mini-stacked .seg small {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        color: #000; /* dark text on light bg; adjust per color */
+        font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+        pointer-events: none;
+        text-shadow: 0 1px 2px rgba(255,255,255,.6);
+    }
 </style>
-
-
-
-<style>
-        .responsive-stack td, .responsive-stack th {
-            vertical-align: middle;
-        }
-
-        .mini-stacked .stack {
-            width: 240px;
-            height: 10px;
-            border-radius: 6px;
-            overflow: hidden;
-            display: inline-flex;
-            background: #e9ecef;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-        }
-
-        .mini-stacked .seg {
-            height: 100%;
-        }
-
-        .mini-stacked .seg-pending {
-            background: #ffd966;
-        }
-        .mini-stacked .seg-won {
-            background: #5cb85c;
-        }
-        .mini-stacked .seg-lost {
-            background: #dc3545;
-        }
-    </style>
