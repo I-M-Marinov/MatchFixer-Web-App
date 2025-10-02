@@ -1,4 +1,6 @@
-﻿namespace MatchFixer_Web_App.Areas.Admin.ViewModels
+﻿using MatchFixer_Web_App.Areas.Admin.ViewModels.MatchEvents;
+
+namespace MatchFixer_Web_App.Areas.Admin.ViewModels
 {
 	public class AdminDashboardViewModel
 	{
@@ -12,5 +14,7 @@
 		public int PendingBets { get; set; }
 		public int WonBets { get; set; }
 		public int LostBets { get; set; }
+		public AdminEventsSummaryViewModel Events { get; set; } = new();
+
 	}
 }
