@@ -1,4 +1,5 @@
-﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminDashboardViewModel
+﻿@using System.Globalization
+@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminDashboardViewModel
 
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -202,31 +203,38 @@
                     {
                         foreach (var r in ev.RecentUpdated)
                         {
-                            <tr>
-                                <td>@r.MatchUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>
-                                    <div class="fw-semibold">@r.HomeTeam</div>
-                                    <div class="text-muted small">vs @r.AwayTeam @if(!string.IsNullOrWhiteSpace(r.League)){
-                                    <span>· @r.League</span>
-                                }
-    </div>
-                            </td>
-                            <td>
-                                @{
-                                    var badge = r.Status switch
-                                    {
-                                        "Finished" => "bg-success",
-                                        "Live" => "bg-warning text-dark",
-                                        "Upcoming" => "bg-primary",
-                                        "Cancelled" => "bg-danger",
-                                        "Postponed" => "bg-secondary",
-                                        _ => "bg-light text-dark"
-                                    };
-                                }
-                                <span class="badge @badge">@r.Status</span>
-                            </td>
-                            <td class="text-nowrap">@((r.UpdatedUtc ?? r.MatchUtc).ToString("yyyy-MM-dd HH:mm"))</td>
-                        </tr>
+	                        <tr>
+								@{
+									var matchStartUtc = r.MatchUtc.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+								}
+								
+
+								<td>@matchStartUtc</td>
+		                        <td>
+			                        <div class="fw-semibold">@r.HomeTeam</div>
+			                        <div class="text-muted small">vs @r.AwayTeam
+				                        @if (!string.IsNullOrWhiteSpace(r.League))
+				                        {
+					                        <span>· @r.League</span>
+				                        }
+			                        </div>
+		                        </td>
+		                        <td>
+			                        @{
+				                        var badge = r.Status switch
+				                        {
+					                        "Finished" => "bg-success",
+					                        "Live" => "bg-warning text-dark",
+					                        "Upcoming" => "bg-primary",
+					                        "Cancelled" => "bg-danger",
+					                        "Postponed" => "bg-secondary",
+					                        _ => "bg-light text-dark"
+				                        };
+			                        }
+			                        <span class="badge @badge">@r.Status</span>
+		                        </td>
+								<td class="text-nowrap">@((r.UpdatedUtc ?? r.MatchUtc).ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture))</td>
+	                        </tr>
                     }
                                         }
                 </tbody>
