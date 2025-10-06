@@ -51,7 +51,12 @@
 				<span class="fs-5 fw-semibold">@Model.TotalUsers</span>
 				<div>
 					<span class="badge bg-success">Active: @Model.ActiveUsers</span>
-					<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+					<div class="d-flex justify-content-center gap-1 mt-2">
+						<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+						<span class="badge bg-warning">Locked: @Model.LockedUsers</span>
+						<span class="badge bg-black">Deleted: @Model.DeletedUsers</span>
+						<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
+					</div>
 				</div>
 			</td>
 			<td>
