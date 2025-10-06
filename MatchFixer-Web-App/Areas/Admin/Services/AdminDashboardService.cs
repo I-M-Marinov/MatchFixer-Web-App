@@ -21,8 +21,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			public async Task<AdminDashboardViewModel> GetDashboardAsync()
 			{
+				var now = DateTime.UtcNow;
+
 				var totalUsers = await _dbContext.Users.CountAsync();
-				var activeUsers = await _dbContext.Users.CountAsync(u => u.EmailConfirmed);
+				var activeUsers = await _dbContext.Users.CountAsync(u => u.EmailConfirmed && !u.IsDeleted);
+				var deletedUsers = await _dbContext.Users.CountAsync(u => u.IsDeleted);
+				var lockedUsers = await _dbContext.Users.CountAsync(u => u.LockoutEnd > now);
+				var bannedUsers = await _dbContext.Users.CountAsync(u => !u.IsActive && u.WasDeactivatedByAdmin);
 
 				var totalWalletBalance = await _dbContext.Wallets.SumAsync(w => (decimal?)w.Balance) ?? 0m;
 				var totalTransactions = await _dbContext.WalletTransactions.CountAsync();
@@ -38,6 +43,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{
 					TotalUsers = totalUsers,
 					ActiveUsers = activeUsers,
+					DeletedUsers = deletedUsers,
+					LockedUsers = lockedUsers,
+					BannedUsers = bannedUsers,
 					TotalWalletBalance = totalWalletBalance,
 					TotalTransactions = totalTransactions,
 					TotalBets = totalBets,
