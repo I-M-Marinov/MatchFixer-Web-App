@@ -6,6 +6,9 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels
 	{
 		public int TotalUsers { get; set; }
 		public int ActiveUsers { get; set; }
+		public int DeletedUsers { get; set; }
+		public int LockedUsers { get; set; }
+		public int BannedUsers { get; set; }
 
 		public decimal TotalWalletBalance { get; set; }
 		public decimal TotalTransactions { get; set; }
