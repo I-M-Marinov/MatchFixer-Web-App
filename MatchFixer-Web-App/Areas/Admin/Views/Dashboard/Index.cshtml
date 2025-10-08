@@ -9,6 +9,9 @@
 	var wonPct = Model.TotalBets == 0 ? 0 : (int)Math.Round((double)Model.WonBets * 100 / Model.TotalBets);
 	var lostPct = Model.TotalBets == 0 ? 0 : (int)Math.Round((double)Model.LostBets * 100 / Model.TotalBets);
 	var pendingPct = Model.TotalBets == 0 ? 0 : 100 - wonPct - lostPct;
+
+	var inactivePct = Math.Clamp(100 - activePct, 0, 100);
+
 }
 
 <div class="border-0 rounded-4 p-4 flex-fill">
@@ -48,12 +51,12 @@
 				<i class="bi bi-people"></i> Users
 			</td>
 			<td>
-				<span class="fs-5 fw-semibold">@Model.TotalUsers</span>
+				<span class="fs-5 fw-bold badge bg-primary-subtle mb-3" id="total-users-count">Total Users: @Model.TotalUsers</span>
 				<div>
 					<span class="badge bg-success">Active: @Model.ActiveUsers</span>
 					<div class="d-flex justify-content-center gap-1 mt-2">
 						<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
-						<span class="badge bg-warning">Locked: @Model.LockedUsers</span>
+						<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
 						<span class="badge bg-black">Deleted: @Model.DeletedUsers</span>
 						<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
 					</div>
@@ -61,11 +64,19 @@
 			</td>
 			<td>
 				<div class="d-inline-flex align-items-center gap-2">
-					<div class="progress" style="width:200px; height:10px;">
-						<div class="progress-bar bg-success" role="progressbar"
-						     style="width:@activePct%"></div>
+					<div class="progress position-relative rounded-pill" style="width:260px; height:30px;">
+						<!-- active segment -->
+						<div class="progress-bar bg-success" style="width:@activePct%"></div>
+						<!-- inactive segment (fills the rest) -->
+						<div class="progress-bar bg-danger text-white" style="width:@inactivePct%"></div>
+
+						<!-- overlay labels (sit on top of both bars) -->
+						<div class="position-absolute top-50 start-0 translate-middle-y w-100 d-flex justify-content-between px-2"
+						     style="pointer-events:none; font-size:.75rem;">
+							<span class="text-white fw-bold">@activePct% active</span>
+							<span class="text-white fw-bold">@inactivePct% inactive</span>
+						</div>
 					</div>
-					<small class="text-muted">@activePct% active</small>
 				</div>
 			</td>
 		</tr>
