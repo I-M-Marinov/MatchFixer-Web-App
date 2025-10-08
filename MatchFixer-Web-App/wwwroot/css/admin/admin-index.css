@@ -38,3 +38,9 @@
 .seg-lost:hover {
     transform: scale(1.2);
 }
+
+#total-users-count {
+    border: 2px solid black;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.05);
+    color: #00038f; 
+}
