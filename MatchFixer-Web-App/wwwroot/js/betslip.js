@@ -252,7 +252,7 @@ function renderBetSlip() {
 
         // Team Logos
         const teamsDiv = document.createElement("div");
-        teamsDiv.classList.add("flex", "items-center", "mb-2", "text-white");
+        teamsDiv.classList.add("flex", "items-center", "mb-2", "mt-2", "text-white");
 
         const homeLogo = document.createElement("img");
         homeLogo.src = bet.homeLogoUrl;
@@ -260,7 +260,7 @@ function renderBetSlip() {
         homeLogo.title = `${bet.homeTeam}`;
         homeLogo.classList.add("rounded-full", "mr-4", "object-cover");
         homeLogo.style.width = "auto";
-        homeLogo.style.height = "60px";
+        homeLogo.style.height = "50px";
         homeLogo.style.marginLeft = "0.2em";
 
         const versus = document.createElement("img");
@@ -277,7 +277,7 @@ function renderBetSlip() {
         awayLogo.title = `${bet.awayTeam}`;
         awayLogo.classList.add("rounded-full", "ml-2", "object-cover");
         awayLogo.style.width = "auto";
-        awayLogo.style.height = "60px";
+        awayLogo.style.height = "50px";
 
         teamsDiv.appendChild(homeLogo);
         teamsDiv.appendChild(versus);
