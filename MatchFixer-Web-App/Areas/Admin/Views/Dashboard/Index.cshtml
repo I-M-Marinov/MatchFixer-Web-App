@@ -88,7 +88,7 @@
 			</td>
 			<td>
 				<span class="fs-5 fw-semibold">€@Model.TotalWalletBalance</span>
-				<div><span class="badge bg-info text-dark">Transactions: @Model.TotalTransactions</span></div>
+				<div><span class="badge bg-info text-dark" style="width: 7em; margin: 0 auto;">Transactions: @Model.TotalTransactions</span></div>
 			</td>
 			<td class="text-muted">
 				<small>Total wallet balance is a sum of all user wallets.</small>
@@ -162,7 +162,16 @@
                 <div class="p-3 rounded bg-light text-center">
                     <div class="small text-muted">Total</div>
                     <div class="fs-5 fw-semibold">@ev.TotalEvents</div>
-                    <div class="small text-muted">Today: @ev.Today · Last 7d: @ev.Last7Days</div>
+                    <div class="small text-muted">
+	                    Today:
+	                    <span class="@(ev.Today == 0 ? "text-danger" : "text-primary")">
+		                    @ev.Today
+	                    </span>
+	                    · Last 7d: 
+	                    <span class="@(ev.Last7Days == 0 ? "text-danger" : "text-primary")">
+		                    @ev.Last7Days
+	                    </span>
+                    </div>          
                 </div>
             </div>
 
