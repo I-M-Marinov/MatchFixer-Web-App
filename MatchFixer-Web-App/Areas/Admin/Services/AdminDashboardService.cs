@@ -109,6 +109,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						League = null, 
 						HomeTeam = m.HomeTeam.Name,
 						AwayTeam = m.AwayTeam.Name,
+						HomeTeamLogo = m.HomeTeam.LogoUrl,
+						AwayTeamLogo = m.AwayTeam.LogoUrl,
 						MatchUtc = m.MatchDate,
 						Status = m.IsCancelled
 										? "Cancelled"
