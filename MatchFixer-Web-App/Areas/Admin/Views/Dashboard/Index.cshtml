@@ -35,7 +35,7 @@
 
 <h1>Admin Dashboard</h1>
 
-<div class="table-responsive">
+<div class="table-responsive users-wallets-bets-table">
 	<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
 		<thead class="table-dark">
 		<tr>
@@ -55,10 +55,12 @@
 				<div>
 					<span class="badge bg-success">Active: @Model.ActiveUsers</span>
 					<div class="d-flex justify-content-center gap-1 mt-2">
-						<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
-						<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
-						<span class="badge bg-black">Deleted: @Model.DeletedUsers</span>
-						<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
+						<span class="badge bg-secondary d-flex justify-content-center align-items-center">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+						<div class="total-inactive-users">
+							<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
+							<span class="badge bg-black">Deleted: @Model.DeletedUsers</span>
+							<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
+						</div>
 					</div>
 				</div>
 			</td>
@@ -87,8 +89,8 @@
 				<i class="bi bi-wallet2"></i> Wallets &amp; Transactions
 			</td>
 			<td>
-				<span class="fs-5 fw-semibold">€@Model.TotalWalletBalance</span>
-				<div><span class="badge bg-info text-dark" style="width: 7em; margin: 0 auto;">Transactions: @Model.TotalTransactions</span></div>
+				<span class="fs-5 fw-semibold"> Total wallets balance: €@Model.TotalWalletBalance</span>
+				<div><span class="badge bg-info text-dark" style="width: 8em; margin: 0 auto;">Transactions: @Model.TotalTransactions</span></div>
 			</td>
 			<td class="text-muted">
 				<small>Total wallet balance is a sum of all user wallets.</small>
@@ -101,7 +103,7 @@
 				<i class="bi bi-bar-chart-line"></i> Bets
 			</td>
 			<td>
-				<span class="fs-5 fw-semibold">@Model.TotalBets</span>
+				<span class="fs-5 fw-semibold badge bg-primary-subtle mb-3" id="total-bets-count">Total Bets Placed: @Model.TotalBets</span>
 				<div class="mt-1 d-flex flex-wrap gap-1 justify-content-center">
 					<span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
 					<span class="badge bg-success">Won: @Model.WonBets</span>
@@ -211,17 +213,19 @@
 
         <div class="table-responsive">
             <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="table-light upcoming-table-headers">
                     <tr>
-                        <th style="max-width: 5ch;">Match (UTC)</th>
-                        <th>Teams</th>
-                        <th>Status</th>
+                        <th>Match Start (UTC)</th>
+                        <th>Home Team</th>
+                        <th>    </th>
+                        <th>Away Team</th>
+						<th class="text-center status-header">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (ev.RecentUpdated.Count == 0)
                     {
-                        <tr><td colspan="4" class="text-muted">No recent updates.</td></tr>
+                        <tr><td colspan="5" class="text-muted">No recent updates.</td></tr>
                     }
                     else
                     {
@@ -234,22 +238,24 @@
 								
 
 								<td>@matchStartUtc</td>
-		                        <td class="d-flex justify-content-start align-items-center gap-3">
-			                        <div class="fw-semibold">
-										<img src="@r.HomeTeamLogo" style="width: 45px; height: 40px;" />
-			                        </div>
-			                        <div class="fw-semibold">
-										<img src="\images\live-events\versus.png" style="width: 20px; height: auto;" />
-			                        </div>
+
+								
+								<td class="logo-cell">
+									<div class="logo-box">
+										<img src="@r.HomeTeamLogo" alt="@r.HomeTeam" title="@r.HomeTeam" />
+									</div>
+								</td>
+								<td class="logo-cell">
 									<div class="fw-semibold">
-										<img src="@r.AwayTeamLogo" style="width: 45px; height: 40px;" />
-				                        @if (!string.IsNullOrWhiteSpace(r.League))
-				                        {
-					                        <span>· @r.League</span>
-				                        }
-			                        </div>
-		                        </td>
-		                        <td>
+										<img src="\images\live-events\versus.png" style="width: 25px; height: auto;" />
+									</div>
+								</td>
+								<td class="logo-cell">
+									<div class="logo-box">
+										<img src="@r.AwayTeamLogo" alt="@r.AwayTeam" title="@r.AwayTeam" />
+									</div>
+								</td>
+								<td class="d-flex justify-content-center align-items-center" >
 			                        @{
 				                        var badge = r.Status switch
 				                        {
@@ -258,10 +264,10 @@
 					                        "Upcoming" => "bg-primary",
 					                        "Cancelled" => "bg-danger",
 					                        "Postponed" => "bg-secondary",
-					                        _ => "bg-light text-dark"
+					                        _ => "bg-info text-dark"
 				                        };
 			                        }
-			                        <span class="badge @badge">@r.Status</span>
+									<span class="badge status-box @badge">@r.Status </span>
 		                        </td>
 	                        </tr>
 						}
@@ -272,62 +278,3 @@
     </div>
 </div>
 
-
-<style>
-    .responsive-stack td, .responsive-stack th {
-        vertical-align: middle;
-    }
-
-    .mini-stacked .stack {
-        width: 240px;
-        height: 10px;
-        border-radius: 6px;
-        overflow: hidden;
-        display: inline-flex;
-        background: #e9ecef;
-        box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-    }
-
-    .mini-stacked .seg {
-        height: 100%;
-    }
-
-    .mini-stacked .seg-pending {
-        background: #ffd966;
-    }
-    .mini-stacked .seg-won {
-        background: #5cb85c;
-    }
-    .mini-stacked .seg-lost {
-        background: #dc3545;
-    }
-
-    .mini-stacked .stack {
-        display: flex;
-        width: 100%;
-        height: 22px; /* taller so text fits */
-        border-radius: 12px;
-        overflow: hidden;
-        background: #e9ecef;
-        box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-    }
-
-    .mini-stacked .seg {
-        position: relative;
-        height: 100%;
-        flex: 0 0 auto; /* width comes from style="width:..%" */
-    }
-
-    .mini-stacked .seg small {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%,-50%);
-        color: #000; /* dark text on light bg; adjust per color */
-        font-size: 12px;
-        line-height: 1;
-        white-space: nowrap;
-        pointer-events: none;
-        text-shadow: 0 1px 2px rgba(255,255,255,.6);
-    }
-</style>
