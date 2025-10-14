@@ -1,0 +1,150 @@
+﻿.users-wallets-bets-table table tbody tr td {
+    font-size: 0.75em;
+}
+
+.stack {
+    display: flex;
+    width: 360px !important;
+    height: 30px !important;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #e9ecef;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+}
+
+.stack .seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: black;
+    text-shadow: 1px 1px 2px white;
+    font-size: 0.90rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.seg-pending {
+    background: #ffd966;
+    color: #000;
+}
+
+.seg-won {
+    background: #5cb85c;
+}
+
+.seg-lost {
+    background: #dc3545;
+}
+
+.seg-pending:hover,
+.seg-won:hover,
+.seg-lost:hover {
+    transform: scale(1.2);
+}
+
+#total-users-count,
+#total-bets-count {
+    border: 2px solid black;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.05);
+    color: #00038f;
+}
+
+.responsive-stack td, .responsive-stack th {
+    vertical-align: middle;
+}
+
+.mini-stacked .stack {
+    width: 240px;
+    height: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: inline-flex;
+    background: #e9ecef;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+}
+
+.mini-stacked .seg {
+    height: 100%;
+}
+
+.mini-stacked .seg-pending {
+    background: #ffd966;
+}
+
+.mini-stacked .seg-won {
+    background: #5cb85c;
+}
+
+.mini-stacked .seg-lost {
+    background: #dc3545;
+}
+
+.mini-stacked .stack {
+    display: flex;
+    width: 100%;
+    height: 22px; 
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e9ecef;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+}
+
+.mini-stacked .seg {
+    position: relative;
+    height: 100%;
+    flex: 0 0 auto; 
+}
+
+.mini-stacked .seg small {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    color: #000;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(255,255,255,.6);
+}
+
+
+.upcoming-table-headers {
+    height: 60px !important;
+}
+
+.logo-cell {
+    width: 100px;
+}
+
+.logo-box {
+    width: 55px; 
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; 
+}
+
+.status-box{
+    width: auto;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block; 
+}
+
+.total-inactive-users {
+    border: 2px solid rgba(108,117,125,1)!important;
+    padding: 0.5rem;
+    border-radius: 0.5em;
+}
