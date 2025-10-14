@@ -114,7 +114,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						MatchUtc = m.MatchDate,
 						Status = m.IsCancelled
 										? "Cancelled"
-										: (m.LiveResult != null ? "Finished" : (m.MatchDate <= now ? "Live" : "Upcoming")),
+										: (m.LiveResult != null ? $"{m.LiveResult.HomeScore} : {m.LiveResult.AwayScore}" : (m.MatchDate <= now ? "Live" : "Upcoming")),
 						UpdatedUtc = null
 					})
 					.ToListAsync();
