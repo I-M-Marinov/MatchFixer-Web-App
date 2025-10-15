@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
+using static MatchFixer.Common.Admin.AdminUserServiceConstants;
+
 namespace MatchFixer_Web_App.Areas.Admin.Services
 {
 
@@ -144,41 +146,41 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			public async Task<(bool Ok, string Message)> LockUserAsync(Guid actorId, Guid targetUserId)
 			{
 				if (actorId == targetUserId)
-					return (false, "You cannot lock your own account.");
+					return (false, CannotLockOwnAccount);
 
 				var user = await _userManager.FindByIdAsync(targetUserId.ToString());
-				if (user is null) return (false, "User not found.");
+				if (user is null) return (false, UserWasNotFound);
 
 				// Ensure lockout is enabled
 				if (!await _userManager.GetLockoutEnabledAsync(user))
 				{
 					var en = await _userManager.SetLockoutEnabledAsync(user, true);
-					if (!en.Succeeded) return (false, "Failed to enable lockout for this user.");
+					if (!en.Succeeded) return (false, FailedToEnableLockForUser);
 				}
 
 				// Already locked 
 				var currentEnd = await _userManager.GetLockoutEndDateAsync(user);
 				if (currentEnd.HasValue && currentEnd.Value > DateTimeOffset.UtcNow)
-					return (true, $"User is already locked until {currentEnd.Value:yyyy-MM-dd HH:mm} UTC.");
+					return (true, UserLockedUntil(currentEnd));
 
 				// Effectively permanent lock (666 years)
 				var end = DateTimeOffset.UtcNow.AddYears(666);
 				var res = await _userManager.SetLockoutEndDateAsync(user, end);
 				return res.Succeeded
-					? (true, "User locked.")
-					: (false, "Failed to lock user.");
+					? (true, UserLocked)
+					: (false, FailedToLockUser);
 			}
 
 			public async Task<(bool Ok, string Message)> UnlockUserAsync(Guid actorId, Guid targetUserId)
 			{
 				var user = await _userManager.FindByIdAsync(targetUserId.ToString());
-				if (user is null) return (false, "User not found.");
+				if (user is null) return (false, UserWasNotFound);
 
 				var res1 = await _userManager.SetLockoutEndDateAsync(user, null);
-				if (!res1.Succeeded) return (false, "Failed to clear lockout end date.");
+				if (!res1.Succeeded) return (false, FailedTotoClearLockOut);
 
 				await _userManager.ResetAccessFailedCountAsync(user);
-				return (true, "User unlocked.");
+				return (true, UserUnlocked);
 			}
 
 			public async Task<bool> MarkEmailConfirmedAsync(Guid userId)
