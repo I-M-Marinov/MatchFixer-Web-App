@@ -41,13 +41,13 @@ namespace MatchFixer.Core.Services
 			decimal boostValue,
 			TimeSpan duration,
 			Guid createdByUserId,
-			DateTime? startUtc = null,         
+			DateTime? startUtc = null,
 			decimal? maxStakePerBet = null,
 			int? maxUsesPerUser = null,
 			string? note = null,
 			CancellationToken ct = default)
 		{
-			var start = startUtc ?? DateTime.UtcNow;
+			var start = (startUtc?.ToUniversalTime()) ?? DateTime.UtcNow;
 			var end = start.Add(duration);
 
 			// Validate input
@@ -72,6 +72,7 @@ namespace MatchFixer.Core.Services
 
 			if (overlapExists)
 				throw new InvalidOperationException("An active boost already overlaps with this timeframe.");
+
 			var boost = new OddsBoost
 			{
 				Id = Guid.NewGuid(),
@@ -86,17 +87,22 @@ namespace MatchFixer.Core.Services
 				Note = note
 			};
 
-			await _dbContext.OddsBoosts.AddAsync(boost);
+			await _dbContext.OddsBoosts.AddAsync(boost, ct);
 			await _dbContext.SaveChangesAsync(ct);
+
+			var effHome = Math.Round((match.HomeOdds ?? 0m) + boostValue, 2, MidpointRounding.AwayFromZero);
+			var effDraw = Math.Round((match.DrawOdds ?? 0m) + boostValue, 2, MidpointRounding.AwayFromZero);
+			var effAway = Math.Round((match.AwayOdds ?? 0m) + boostValue, 2, MidpointRounding.AwayFromZero);
 
 			await _notifier.NotifyBoostStartedAsync(
 				matchEventId,
-				(match.HomeOdds ?? 0m) + boostValue,
-				(match.DrawOdds ?? 0m) + boostValue,
-				(match.AwayOdds ?? 0m) + boostValue,
-				end,
-				maxStakePerBet ?? 0m,
-				maxUsesPerUser ?? 0
+				effHome,
+				effDraw,
+				effAway,
+				startUtc: start,          
+				boostEndUtc: end,           
+				maxStake: maxStakePerBet ?? 0m,
+				maxUses: maxUsesPerUser ?? 0
 			);
 
 			return boost;
