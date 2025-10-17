@@ -286,7 +286,7 @@
 
 <script>
 
-			document.addEventListener('DOMContentLoaded', function() {
+	document.addEventListener('DOMContentLoaded', function() {
 
 		const allTableHeaders = document.querySelectorAll('.odds-table th');
 
@@ -340,9 +340,6 @@
 			});
 		});
 	});
-
-
-
 
 	document.querySelectorAll('.event-card').forEach(card => {
 		const userTimeZone = card.dataset.userTz;
@@ -404,7 +401,6 @@
 			el.classList.add('mask-rotated');
 		});
 	});
-
 
 	function filterMatches() {
 		const searchInput = document.getElementById('matchSearch');
@@ -589,6 +585,7 @@
 						animateOddsChange(awayOddsElement, update.awayOdds, update.matchEventId, "Away", false);
 					}
 			} else {
+
 				// Boosted match logic
 				// Use effective odds and ensure boost prevails in the UI and localStorage
 				animateOddsChange(homeOddsElement, update.effectiveHomeOdds, update.matchEventId, "Home", true);
@@ -605,21 +602,28 @@
 
 		connection.onreconnected(id => console.log("SignalR reconnected with id:", id));
 
-		connection.on("BoostStarted", boostData => {
+		connection.on("BoostStarted", (boostData) => {
+
 			const card = document.querySelector(`[data-match-id="${boostData.matchEventId}"]`);
-			if (!card) return console.warn("No card found for match", boostData.matchEventId);
+			if (!card) {
+				console.warn("[Boost] No card for match", boostData.matchEventId);
+				return;
+			}
 
-			const oddsRow = card.querySelector("tbody tr:not(.boost-timer-row)");
-			if (!oddsRow) return console.warn("No odds row found in card", card);
+			const oddsRow = card.querySelector("tbody tr:not(.boost-timer-row)")
+						 || card.querySelector("tbody tr");
+			if (!oddsRow) {
+				console.warn("[Boost] No odds row found in card", boostData.matchEventId);
+				return;
+			}
 
-			activateBoost(oddsRow, boostData);
+			scheduleBoost(oddsRow, boostData);
 		});
+
 
 	});
 
-
-
-	
+	const boostTimers = new Map();
 
 	function animateOddsChange(element, newOdds, matchId, option, isBoosted = false) {
 		if (!element) return;
@@ -764,7 +768,7 @@
 		row.remove();
 	}
 
-		function activateBoost(row, boostData) {
+	function activateBoost(row, boostData) {
 		const cardBody = row.closest(".card-body");
 		if (!cardBody) return;
 
@@ -856,6 +860,52 @@
 			update();
 			const interval = setInterval(update, 1000);
 		}
+	}
+
+	function scheduleBoost(row, boostData) {
+
+	  const now = Date.now();
+	  const start = Date.parse(boostData.startUtc);           
+	  let end = boostData.endUtc ? Date.parse(boostData.endUtc) : null;
+	  if (!end && boostData.durationSeconds) end = start + boostData.durationSeconds * 1000;
+
+	  if (!Number.isFinite(start)) return;
+	  if (end && end <= now) return; // already expired
+
+	  const key = boostData.matchEventId.toString();
+	  const prev = boostTimers.get(key);
+	  if (prev) { clearTimeout(prev.start); clearTimeout(prev.stop); }
+
+	  const timers = { start: null, stop: null };
+
+	  const doStart = () => {
+
+		const payload = {
+		  ...boostData,
+		  boostEndUtc: end ? new Date(end).toISOString() : undefined
+		};
+
+		activateBoost(row, payload);
+
+		if (end) {
+		  timers.stop = setTimeout(() => {
+			const timerRow = row.parentElement.querySelector(".boost-timer-row");
+			if (timerRow) resetBoost(timerRow);
+			boostTimers.delete(key);
+		  }, Math.max(0, end - Date.now()));
+		}
+	  };
+
+	  if (start <= now) {
+
+		doStart();
+
+	  } else {
+
+		timers.start = setTimeout(doStart, start - now); 
+	  }
+
+	  boostTimers.set(key, timers);
 	}
 
 
