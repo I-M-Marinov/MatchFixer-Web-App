@@ -19,6 +19,7 @@ namespace MatchFixer.Core.Contracts
 			decimal effectiveHomeOdds,
 			decimal effectiveDrawOdds,
 			decimal effectiveAwayOdds,
+			DateTime startUtc,
 			DateTime boostEndUtc,
 			decimal maxStake,
 			int maxUses);
