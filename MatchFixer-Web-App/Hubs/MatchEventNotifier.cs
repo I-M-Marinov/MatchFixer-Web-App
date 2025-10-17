@@ -42,19 +42,26 @@ namespace MatchFixer_Web_App.Hubs
 			decimal effectiveHomeOdds,
 			decimal effectiveDrawOdds,
 			decimal effectiveAwayOdds,
+			DateTime startUtc,
 			DateTime boostEndUtc,
 			decimal maxStake,
 			int maxUses)
 		{
+
+			var startUtcFixed = DateTime.SpecifyKind(startUtc, DateTimeKind.Utc);
+			var endUtcFixed = DateTime.SpecifyKind(boostEndUtc, DateTimeKind.Utc);
+			
+
 			return _hubContext.Clients
 				.Group(matchEventId.ToString())
 				.SendAsync("BoostStarted", new
 				{
-					matchEventId,
+					matchEventId = matchEventId.ToString(),
+					startUtc = startUtcFixed,
+					endUtc = endUtcFixed,
 					effectiveHomeOdds,
 					effectiveDrawOdds,
 					effectiveAwayOdds,
-					boostEndUtc,
 					maxStake,
 					maxUses
 				});
