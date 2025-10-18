@@ -59,9 +59,15 @@ public class BettingService : IBettingService
 
 		foreach (var betDto in betSlipDto.Bets)
 		{
-			var matchEvent = await _dbContext.MatchEvents.FindAsync(betDto.MatchId);
+			var matchEvent = await _dbContext.MatchEvents
+				.AsTracking()
+				.FirstOrDefaultAsync(x => x.Id == betDto.MatchId); 
+			
 			if (matchEvent == null)
 				return ($"Match with ID {betDto.MatchId} not found.", false);
+
+			if (!IsEventOpenForBetting(matchEvent))
+				return (EventOrEventsCancelledInSlip, false);
 
 			if (DateTime.UtcNow >= matchEvent.MatchDate)
 				return (EventAlreadyStartedInSlip, false);
@@ -350,7 +356,21 @@ public class BettingService : IBettingService
 	}
 
 
+	private static bool IsEventOpenForBetting(MatchEvent ev)
+	{
+		var nowUtc = DateTime.UtcNow;
 
+		// if event was not found return false
+		if (ev == null) return false;
+
+		// if event is cancelled return false
+		if (ev.IsCancelled) return false;
+
+		// if that event already has a result recorded in the database return false
+		if (ev.LiveResult != null) return false;
+
+		return true;
+	}
 
 
 }
