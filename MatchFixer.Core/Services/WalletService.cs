@@ -189,7 +189,7 @@ namespace MatchFixer.Core.Services
 			var transaction = WalletTransactionFactory.CreateBetPlacedTransaction(wallet.Id, userId, amount);
 
 			await _dbContext.WalletTransactions.AddAsync(transaction);
-
+			// intentionally does not save changes when adding the transaction, that is handled in the betting service only if all legs are valid 
 			return (true, AmountDeductedForTheBet);
 		}
 
