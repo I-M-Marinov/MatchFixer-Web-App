@@ -73,7 +73,7 @@ public class BettingService : IBettingService
 				return (EventAlreadyStartedInSlip, false);
 
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
-				return ($"Invalid pick option '{betDto.SelectedOption}'.", false);
+				return (InvalidPickOption(betDto.SelectedOption), false);
 
 			// Use the shared odds calculator
 			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
@@ -95,7 +95,7 @@ public class BettingService : IBettingService
 			{
 				// Enforce max stake
 				if (boost.MaxStakePerBet.HasValue && betSlipDto.Amount > boost.MaxStakePerBet.Value)
-					return ($"Max stake per bet is {boost.MaxStakePerBet.Value}", false);
+					return (MaxStakePerBetIs(boost.MaxStakePerBet.Value), false);
 
 				// Enforce max uses per user
 				if (boost.MaxUsesPerUser.HasValue)
@@ -106,7 +106,7 @@ public class BettingService : IBettingService
 										 x.OddsBoostId == boost.Id);
 
 					if (used >= boost.MaxUsesPerUser.Value)
-						return ($"Boost already used maximum times for this event.", false);
+						return (BoostAlreadyUsedMaximumTimesForEvent, false);
 				}
 			}
 
