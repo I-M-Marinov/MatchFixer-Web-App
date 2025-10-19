@@ -8,5 +8,18 @@
 		public const string EventOrEventsCancelledInSlip = "An event or events in your slip was cancelled ! Choose other events to bet on.";
 		public const string BetSlipSubmittedSuccessfully = "Your betting slip was successfully submitted! Good Luck!";
 
+		public const string BoostAlreadyUsedMaximumTimesForEvent = "Boost already used maximum times for this event.";
+
+		public static string MaxStakePerBetIs(decimal? maxStakePerBet)
+		{
+			return $"Max stake per bet is {maxStakePerBet}.";
+		}	
+		public static string InvalidPickOption(string selectedOption)
+		{
+			return $"Invalid pick option '{selectedOption}'.";
+		}
+
+
+
 	}
 }
