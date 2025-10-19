@@ -18,6 +18,10 @@
 		{
 			return $"Invalid pick option '{selectedOption}'.";
 		}
+		public static string InvalidMatchId(Guid matchId)
+		{
+			return $"Match with ID {matchId} not found.";
+		}
 
 
 
