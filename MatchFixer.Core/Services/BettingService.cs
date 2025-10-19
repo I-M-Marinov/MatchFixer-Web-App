@@ -64,7 +64,7 @@ public class BettingService : IBettingService
 				.FirstOrDefaultAsync(x => x.Id == betDto.MatchId); 
 			
 			if (matchEvent == null)
-				return ($"Match with ID {betDto.MatchId} not found.", false);
+				return (InvalidMatchId(betDto.MatchId), false);
 
 			if (!IsEventOpenForBetting(matchEvent))
 				return (EventOrEventsCancelledInSlip, false);
