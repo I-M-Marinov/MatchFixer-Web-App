@@ -22,8 +22,5 @@
 		{
 			return $"Match with ID {matchId} not found.";
 		}
-
-
-
 	}
 }
