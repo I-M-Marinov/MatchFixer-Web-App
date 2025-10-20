@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<MatchFixer.Core.DTOs.Bets.UserBetSlipDTO>
 
 @{
+	ViewData["Title"] = "My Betslips";
+
 	var pending = Model.Where(x => x.Status == "Pending").ToList();
 	var won = Model.Where(x => x.Status == "Won").ToList();
 	var lost = Model.Where(x => x.Status == "Lost").ToList();
