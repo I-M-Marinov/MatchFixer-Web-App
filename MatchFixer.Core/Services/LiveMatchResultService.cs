@@ -35,7 +35,7 @@ namespace MatchFixer.Core.Services
 				.Include(m => m.AwayTeam)
 				.FirstOrDefaultAsync(m => m.Id == matchEventId);
 
-			if (match == null || match.LiveResult != null)
+			if (match == null || match.LiveResult != null || match.IsCancelled) 
 				return false;
 
 			// Save result
