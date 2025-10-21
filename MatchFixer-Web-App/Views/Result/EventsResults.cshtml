@@ -1,0 +1,105 @@
+﻿@using MatchFixer.Core.ViewModels.EventsResults;
+@model IReadOnlyList<EventsResults>
+
+@{
+    ViewData["Title"] = "Latest Results";
+
+    // Split into two halves (5 & 5)
+    var half = (int)Math.Ceiling(Model.Count / 2.0);
+    var firstHalf = Model.Take(half).ToList();
+    var secondHalf = Model.Skip(half).ToList();
+}
+
+<div class="background-profile"></div>
+
+<div class="container mt-4">
+    <h3 class="mb-4 text-center">Latest results are just in:</h3>
+
+    <div class="row justify-content-center g-4">
+        <div class="col-md-6">
+            <div class="table-responsive past-results-table">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>Home</th>
+                            <th style="width:10ch;">FT</th>
+                            <th>Away</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!firstHalf.Any())
+                        {
+                            <tr><td colspan="3" class="text-muted text-center">No recent results.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var r in firstHalf)
+                            {
+	                            <tr>
+		                            <td>
+			                            <div class="d-flex align-items-center justify-content-center gap-2" title="@r.HomeTeam">
+				                            <span class="logo-box" title="@r.HomeTeam"><img src="@r.HomeLogoUrl" alt="@r.HomeTeam" /></span>
+				                            <span class="text-truncate">@r.HomeTeam</span>
+			                            </div>
+		                            </td>
+		                            <td class="ft-cell badge status-box bg-info text-dark">
+			                            <span class="score-pill">@r.HomeScore&nbsp;–&nbsp;@r.AwayScore</span>
+		                            </td>                                    
+		                            <td>
+			                            <div class="d-flex align-items-center justify-content-center gap-2">
+				                            <span class="logo-box" title="@r.AwayTeam"><img src="@r.AwayLogoUrl" alt="@r.AwayTeam" /></span>
+				                            <span class="text-truncate">@r.AwayTeam</span>
+			                            </div>
+		                            </td>
+	                            </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="table-responsive past-results-table">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>Home</th>
+                            <th style="width:10ch;">FT</th>
+                            <th>Away</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!secondHalf.Any())
+                        {
+                            <tr><td colspan="3" class="text-muted text-center">No more results.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var r in secondHalf)
+                            {
+	                            <tr>
+		                            <td>
+                                        <div class="d-flex align-items-center justify-content-center gap-2" title="@r.HomeTeam">
+                                            <span class="logo-box" title="@r.HomeTeam"><img src="@r.HomeLogoUrl" alt="@r.HomeTeam" /></span>
+				                            <span class="text-truncate">@r.HomeTeam</span>
+			                            </div>
+		                            </td>
+		                            <td class="ft-cell badge status-box bg-info text-dark">
+			                            <span class="score-pill">@r.HomeScore&nbsp;–&nbsp;@r.AwayScore</span>
+		                            </td>                                    
+		                            <td>
+			                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                            <span class="logo-box" title="@r.AwayTeam"><img src="@r.AwayLogoUrl" alt="@r.AwayTeam" /></span>
+				                            <span class="text-truncate">@r.AwayTeam</span>
+			                            </div>
+		                            </td>
+	                            </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
