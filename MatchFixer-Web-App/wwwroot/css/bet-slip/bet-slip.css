@@ -175,6 +175,34 @@
     transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
+@media (min-width: 1650px) and (max-width: 1900px) {
+
+    .clear-all-bets {
+        bottom: 19.50%;
+    }
+}
+
+@media (min-width: 1400px) and (max-width: 1650px) {
+
+    .clear-all-bets {
+        bottom: 22.50%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1400px) {
+
+    .clear-all-bets {
+        bottom: 22.75%;
+    }
+}
+
+@media (min-width: 250px) and (max-width: 767px) {
+
+    .clear-all-bets {
+        bottom: 19.5%;
+    }
+}
+
 .clear-all-bets:hover {
     color: #a71d2a;
     text-shadow: 1px 1px 1px black;
