@@ -59,3 +59,18 @@
         display: none; /* hide the back button to Users View when on smaller screens */
     }
 }
+
+@media (min-width: 1280px) and (max-width: 1900px) {
+    
+    .back-to-all-users-btn a{
+        left: 0.2em;
+        margin-right: 1em;
+    }
+
+    .admin-user-bets-card,
+    .admin-user-wallet-card,
+    .admin-email-compose-card {
+        margin-left: 5.75em !important;
+    }
+
+}
