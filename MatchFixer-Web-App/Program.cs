@@ -80,6 +80,9 @@ builder.Services.AddScoped<IBettingService, BettingService>();                  
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      // Add the Events Results Service
 
+builder.Services.AddScoped<IBoostQueryService, BoostQueryService>();
+
+
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
