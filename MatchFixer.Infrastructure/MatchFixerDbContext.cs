@@ -103,6 +103,10 @@ namespace MatchFixer.Infrastructure
 				entity.Property(e => e.MaxStakePerBet)
 					.HasPrecision(18, 2);
 			});
+
+
+			builder.Entity<OddsBoost>()
+				.HasIndex(b => new { b.MatchEventId, b.IsActive, b.StartUtc, b.EndUtc }); // Index for speed ! 
 		}
 	}
 }
