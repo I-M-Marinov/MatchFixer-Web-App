@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MatchFixer.Core.Contracts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MatchFixer_Web_App.Hubs
 {
+	[AllowAnonymous]
 	public class MatchEventNotifier : IMatchEventNotifier
 	{
 		private readonly IHubContext<MatchEventHub> _hubContext;
