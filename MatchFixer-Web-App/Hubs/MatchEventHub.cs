@@ -1,42 +1,85 @@
 ﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.ViewModels.DTO;
 using Microsoft.AspNetCore.SignalR;
 
 namespace MatchFixer_Web_App.Hubs
 {
-	public class MatchEventHub: Hub
+	public class MatchEventHub : Hub
 	{
-		public async Task SubscribeToEvent(Guid matchEventId)
-		{
-			await Groups.AddToGroupAsync(Context.ConnectionId, matchEventId.ToString());
-		}
-
 		private readonly IBoostQueryService _boosts;
 
+		public MatchEventHub(IBoostQueryService boosts)
+		{
+			_boosts = boosts;
+		}
 
-		public Task JoinMatch(Guid matchEventId) =>
+		public override async Task OnConnectedAsync()
+		{
+			await base.OnConnectedAsync();
+		}
+
+		public override async Task OnDisconnectedAsync(Exception? ex)
+		{
+			await base.OnDisconnectedAsync(ex);
+		}
+
+		public Task SubscribeToEvent(Guid matchEventId) =>
 			Groups.AddToGroupAsync(Context.ConnectionId, matchEventId.ToString());
 
-		public Task LeaveMatch(Guid matchEventId) =>
-			Groups.RemoveFromGroupAsync(Context.ConnectionId, matchEventId.ToString());
-
-		public async Task<IEnumerable<BoostDto>> GetActiveBoosts(IEnumerable<Guid> matchEventIds)
+		public Task JoinMatch(string matchEventId)
 		{
-			var active = await _boosts.GetActiveBoostsAsync(matchEventIds);
-			return active.Select(a => new BoostDto
+			if (!Guid.TryParse(matchEventId, out var id))
 			{
-				MatchEventId = a.MatchEventId,
-				EffectiveHomeOdds = a.EffectiveHomeOdds,
-				EffectiveDrawOdds = a.EffectiveDrawOdds,
-				EffectiveAwayOdds = a.EffectiveAwayOdds,
-				StartUtc = a.StartUtc,
-				EndUtc = a.EndUtc,
-				MaxStake = a.MaxStake,
-				MaxUses = a.MaxUses,
-				Label = a.Label,
-				HomeName = a.HomeTeamName,
-				AwayName = a.AwayTeamName
-			});
+				return Task.CompletedTask;
+			}
+			return Groups.AddToGroupAsync(Context.ConnectionId, id.ToString());
 		}
+
+		public Task LeaveMatch(string matchEventId)
+		{
+			if (!Guid.TryParse(matchEventId, out var id))
+			{
+				return Task.CompletedTask;
+			}
+			return Groups.RemoveFromGroupAsync(Context.ConnectionId, id.ToString());
+		}
+
+		public async Task<IEnumerable<BoostDto>> GetActiveBoosts(List<string>? matchEventIds)
+		{
+			try
+			{
+
+				var ids = new List<Guid>();
+				
+
+				IReadOnlyList<ActiveBoost> active =
+					ids.Count == 0
+						? await _boosts.GetAllActiveBoostsAsync(limit: 20)  
+						: await _boosts.GetActiveBoostsAsync(ids);
+
+
+				return active.Select(a => new BoostDto
+				{
+					MatchEventId = a.MatchEventId,
+					EffectiveHomeOdds = a.EffectiveHomeOdds,
+					EffectiveDrawOdds = a.EffectiveDrawOdds,
+					EffectiveAwayOdds = a.EffectiveAwayOdds,
+					StartUtc = DateTime.SpecifyKind(a.StartUtc, DateTimeKind.Utc),
+					EndUtc = DateTime.SpecifyKind(a.EndUtc, DateTimeKind.Utc),
+					MaxStake = a.MaxStake,
+					MaxUses = a.MaxUses,
+					Label = a.Label,
+					HomeName = a.HomeTeamName,
+					AwayName = a.AwayTeamName
+				});
+			}
+			catch (Exception ex)
+			{
+				return Array.Empty<BoostDto>();
+			}
+		}
+
+		public Task<string> Ping() => Task.FromResult($"ok {DateTime.UtcNow:o}");
 
 		public sealed class BoostDto
 		{
@@ -52,6 +95,5 @@ namespace MatchFixer_Web_App.Hubs
 			public string? HomeName { get; set; }
 			public string? AwayName { get; set; }
 		}
-
 	}
 }
