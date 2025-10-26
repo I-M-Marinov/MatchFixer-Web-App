@@ -37,6 +37,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			TempData["SuccessMessage"] = message;
 			return RedirectToAction("LiveEvents", "Event");
+		
 		}
 
 	}
