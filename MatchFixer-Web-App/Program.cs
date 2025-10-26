@@ -22,8 +22,6 @@ using static MatchFixer.Infrastructure.SeedData.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSignalR();
-
 // Configuration for the password of the application 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -80,7 +78,6 @@ builder.Services.AddScoped<IBettingService, BettingService>();                  
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      // Add the Events Results Service
 
-builder.Services.AddScoped<IBoostQueryService, BoostQueryService>();
 
 
 
@@ -102,15 +99,30 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-	options.JsonSerializerOptions.PropertyNamingPolicy = null;
+	options.JsonSerializerOptions.PropertyNamingPolicy = null; // disables camelCase conversion
 });
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+// SignalR (single registration, with detailed errors)
+builder.Services.AddSignalR(o =>
 {
-	options.JsonSerializerOptions.PropertyNamingPolicy = null; // disables camelCase conversion
+	o.EnableDetailedErrors = true;
+	o.KeepAliveInterval = TimeSpan.FromSeconds(15);
+	o.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
 });
+
+// CORS (for SignalR)
+builder.Services.AddCors(o =>
+{
+	o.AddPolicy("SignalRCors", p => p
+		.AllowAnyHeader()
+		.AllowAnyMethod()
+		.AllowCredentials()
+		.SetIsOriginAllowed(_ => true));
+});
+
+builder.Services.AddScoped<IBoostQueryService, BoostQueryService>();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -122,8 +134,8 @@ builder.Services.AddAuthorization(options =>
 	options.AddPolicy(Permissions.ManageMatchEvents, p => p.RequireClaim("permission", Permissions.ManageMatchEvents));
 });
 
-
 var app = builder.Build();
+
 
 app.UseResponseCaching();
 
@@ -169,17 +181,15 @@ app.UseSession();
 
 app.UseRouting();
 
+app.MapHub<MatchEventHub>("/matchEventHub");
+app.UseCors("SignalRCors");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 // custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
 
-app.UseEndpoints(endpoints =>
-{
-	endpoints.MapControllers();
-	endpoints.MapHub<MatchEventHub>("/matchEventHub"); // 
-});
 
 app.MapAreaControllerRoute(
 	name: "admin",
