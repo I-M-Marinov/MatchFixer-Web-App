@@ -1,0 +1,566 @@
+﻿
+
+<div class="boost-carousel" style="margin-top: 0.5rem; margin-bottom: 2rem; z-index: 999;" aria-label="Active boosts">
+	<div class="boost-track" id="boostTrack">
+	</div>
+</div>
+
+<script>
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    
+    (function () {
+      const HUB_URL = "/matchEventHub";
+
+      const DBG = "[BoostCarousel]";
+      const log  = (...a) => console.log(DBG, ...a);
+      const warn = (...a) => console.warn(DBG, ...a);
+      const err  = (...a) => console.error(DBG, ...a);
+
+      function el(tag, opts = {}, children = []) {
+        const node = document.createElement(tag);
+        if (opts.id) node.id = opts.id;
+        if (opts.className) node.className = opts.className;
+        if (opts.dataset) for (const [k,v] of Object.entries(opts.dataset)) node.dataset[k] = v;
+        if (opts.attrs) for (const [k,v] of Object.entries(opts.attrs)) node.setAttribute(k, v);
+        if (opts.text != null) node.textContent = String(opts.text);
+        for (const child of children) {
+          if (child == null) continue;
+          node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+        }
+        return node;
+      }
+      const fmtOdds = v => Number(v).toFixed(2);
+      const toId    = v => String(v);
+      const cardSelector = matchEventId => `[data-match-id='${toId(matchEventId)}']`;
+      const getTrack      = () => document.getElementById("boostTrack");
+      const toUtcDate = (s) => (typeof s === "string" && /[zZ]|[+\-]\d{2}:\d{2}$/.test(s)) ? new Date(s) : new Date(String(s) + "Z");
+
+      const activeOriginalIds = new Set();
+
+      // ---------- MAIN CARD UPDATERS ----------
+      function updateMainCardOnBoostStarted(msg) {
+        const sel = cardSelector(msg.matchEventId);
+        const card = document.querySelector(sel);
+        if (!card) { log("No main card for", msg.matchEventId); return; }
+
+        const home = card.querySelector("[data-odds='home']");
+        const draw = card.querySelector("[data-odds='draw']");
+        const away = card.querySelector("[data-odds='away']");
+        if (home) home.textContent = fmtOdds(msg.effectiveHomeOdds);
+        if (draw) draw.textContent = fmtOdds(msg.effectiveDrawOdds);
+        if (away) away.textContent = fmtOdds(msg.effectiveAwayOdds);
+
+        card.classList.add("boosted-match-container-effects");
+
+        let badge = card.querySelector(".boost-badge");
+        if (!badge) {
+          badge = el("div", { className: "boost-badge" });
+          (card.querySelector(".card-body") || card).appendChild(badge);
+        }
+        const end = toUtcDate(msg.endUtc);
+        badge.textContent = `Boost active · ends ${end.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+      }
+
+      function updateMainCardOnMatchUpdated(msg) {
+        const sel = cardSelector(msg.matchEventId);
+        const card = document.querySelector(sel);
+        if (!card) { log("No main card for update", msg.matchEventId); return; }
+
+        const home = card.querySelector("[data-odds='home']");
+        const draw = card.querySelector("[data-odds='draw']");
+        const away = card.querySelector("[data-odds='away']");
+        const eh = msg.effectiveHomeOdds ?? msg.homeOdds;
+        const ed = msg.effectiveDrawOdds ?? msg.drawOdds;
+        const ea = msg.effectiveAwayOdds ?? msg.awayOdds;
+        if (home && eh != null) home.textContent = fmtOdds(eh);
+        if (draw && ed != null) draw.textContent = fmtOdds(ed);
+        if (away && ea != null) away.textContent = fmtOdds(ea);
+
+        if (msg.activeBoostId) {
+          card.classList.add("boosted-match-container-effects");
+        } else {
+          card.classList.remove("boosted-match-container-effects");
+          const b = card.querySelector(".boost-badge");
+          if (b) b.remove();
+        }
+      }
+
+      // ---------- BOOST CAROUSEL ----------
+      const boosts   = new Map(); // id -> { timerId, endUtc }
+      let emptyCard  = null;      // only when 0 boosts
+      let infoCard   = null;      // only when ≥1 boost
+
+      function removeNode(n){ if (n && n.parentElement) n.parentElement.removeChild(n); }
+
+      function getOriginalBoostCards(){
+        const track = getTrack();
+        if (!track) return [];
+        return Array.from(track.querySelectorAll(".boost-card[data-kind='boost']"))
+          .filter(n => n.dataset.dup !== "1");
+      }
+
+      function ensureEmptyState() {
+        const track = getTrack();
+        if (!track) return;
+        if (getOriginalBoostCards().length > 0) { removeNode(emptyCard); emptyCard = null; return; }
+
+
+        const oddsLightning = document.createElement('i');
+        oddsLightning.classList.add('bi', 'bi-lightning-charge-fill', 'lightning-icon');
+        oddsLightning.style.color = '#ffd300';
+        oddsLightning.style.textShadow = '0px 2px 2px black';
+
+        if (!emptyCard) {
+          emptyCard = el("div", { className: "boost-card", dataset:{ dup:"0", kind:"empty" }}, [
+            el("div", { className: "teams", text: "No active boosts right now" }),
+            el("div", { className: "odds"  }, [
+              el("span", { className:"odds-chip odds-chip-text", text:"Home: —" }),
+              el("span", { className:"odds-chip odds-chip-text", text:"Draw: —" }),
+              el("span", { className:"odds-chip odds-chip-text", text:"Away: —" })
+            ]),
+            el("div", { className: "meta"  }, [
+              // el("span", { className:"boost-pill", text:"+ Live Boost" }),
+                  el("span", {}, ["⏳ ", el("b", { className:"time-left", text:"--:--" })])
+            ]),
+            el("div", { className: "badge"}, [
+                     el(oddsLightning)
+            ])
+          ]);
+          track.appendChild(emptyCard);
+        }
+      }
+
+      function clearEmptyState(){ removeNode(emptyCard); emptyCard = null; }
+
+        function ensureInfoCard(text) {
+            const track = getTrack();
+            if (!track) return;
+
+            if (!infoCard) {
+            const infoBadge = document.createElement("i");
+            infoBadge.classList.add("ri", "ri-information-line");
+            infoBadge.style.color = "#0DAB76";
+            infoBadge.style.textShadow = "0px 2px 2px black";
+
+            infoCard = el("div", { className: "boost-card", dataset: { kind: "info" } }, [
+                el("div", { className: "teams", text }),
+
+                el("div", { className: "odds" }, [
+                el("span", {
+                    className: "odds-chip odds-chip-text",
+                    text: "Create an account to bet on events!",
+                }),
+                ]),
+
+                el("div", { className: "meta d-flex justify-content-center gap-2 mt-2" }, [
+                // REGISTER link
+                el("a", {
+                    className: "boost-pill btn btn-success text-decoration-none",
+                    attrs: { href: "/Identity/Account/Register", target: "_self" },
+                    text: "Register",
+                }),
+
+                // LOGIN link
+                el("a", {
+                    className: "boost-pill btn btn-outline-light text-decoration-none",
+                    attrs: { href: "/Identity/Account/Login", target: "_self" },
+                    text: "Login",
+                }),
+                ]),
+
+                infoBadge,
+            ]);
+
+            track.appendChild(infoCard);
+            } else {
+            const t = infoCard.querySelector(".teams");
+            if (t) t.textContent = text;
+            }
+        }
+
+
+      function clearInfoCard(){ removeNode(infoCard); infoCard = null; }
+
+      const carouselCardId = id => `boost-card-${id}`;
+
+      function buildCarouselCard(id) {
+        const track = getTrack();
+        if (!track) { warn("No #boostTrack"); return null; }
+
+        const card = el("div", { id: carouselCardId(id), className: "boost-card",
+          dataset:{ boostId: id, kind:"boost", dup:"0" } });
+
+        const teams = el("div", { className: "teams" }, [
+          el("span", { className: "home-name" }),
+          el("span", {}, [" vs "]),
+          el("span", { className: "away-name" })
+        ]);
+
+        const odds = el("div", { className: "odds" }, [
+          el("span", { className: "odds-chip odds-chip-text" }, ["Home: ", el("b", { className: "odds-home", text: "—" })]),
+          el("span", { className: "odds-chip odds-chip-text" }, ["Draw: ", el("b", { className: "odds-draw", text: "—" })]),
+          el("span", { className: "odds-chip odds-chip-text" }, ["Away: ", el("b", { className: "odds-away", text: "—" })])
+        ]);
+
+        const meta = el("div", { className: "meta" }, [
+                  // el("span", { className:"boost-pill", text:"+ Live Boost" }),
+              el("span", {}, ["⏳ ", el("b", { className: "time-left", text: "--:--" })]),
+              el("span", { className: "limits badge home-page-pill-boosted" })
+        ]);
+
+        const oddsLightning = document.createElement('i');
+        oddsLightning.classList.add('bi', 'bi-lightning-charge-fill', 'lightning-icon');
+        oddsLightning.style.color = '#ffd300';
+        oddsLightning.style.textShadow = '0px 2px 2px black';
+
+        const badge = oddsLightning;
+
+        card.appendChild(teams);
+        card.appendChild(odds);
+        card.appendChild(meta);
+        card.appendChild(badge);
+        track.appendChild(card);
+
+        activeOriginalIds.add(String(id));
+        return card;
+      }
+
+      function ensureCarouselCard(msg){
+        const id = toId(msg.matchEventId);
+
+        let card = document.getElementById(carouselCardId(id));
+        if (card && card.dataset.dup === "1") card = null; // ignore clones
+
+        if (!card) {
+          clearEmptyState();
+          clearInfoCard();
+          card = buildCarouselCard(id);
+        }
+
+        const matchCard = document.querySelector(cardSelector(id));
+        const homeName = msg.homeName || matchCard?.querySelector(".home-team-name")?.textContent || "";
+        const awayName = msg.awayName || matchCard?.querySelector(".away-team-name")?.textContent || "";
+        const hn = card?.querySelector(".home-name");
+        const an = card?.querySelector(".away-name");
+        if (hn) hn.textContent = homeName;
+        if (an) an.textContent = awayName;
+
+        const label = msg.label || "BOOST";
+        const b = card?.querySelector(".badge");
+        if (b) b.textContent = label;
+
+        return card;
+      }
+
+      function updateCarouselOdds(card, msg){
+        if (!card) return;
+        const eh = msg.effectiveHomeOdds ?? msg.homeOdds;
+        const ed = msg.effectiveDrawOdds ?? msg.drawOdds;
+        const ea = msg.effectiveAwayOdds ?? msg.awayOdds;
+        const h = card.querySelector(".odds-home");
+        const d = card.querySelector(".odds-draw");
+        const a = card.querySelector(".odds-away");
+        if (eh != null && h) h.textContent = fmtOdds(eh);
+        if (ed != null && d) d.textContent = fmtOdds(ed);
+        if (ea != null && a) a.textContent = fmtOdds(ea);
+      }
+
+      function updateCarouselLimits(card, msg){
+        if (!card) return;
+        const lim = card.querySelector(".limits");
+        if (!lim) return;
+        const parts = [];
+        if (typeof msg.maxStake !== "undefined" && msg.maxStake !== null) parts.push(`€${Number(msg.maxStake).toFixed(0)} max`);
+        if (typeof msg.maxUses  !== "undefined" && msg.maxUses  !== null) parts.push(`${msg.maxUses} per user`);
+            lim.textContent = parts.join(" • ");
+      }
+
+      function mmssLeft(endUtc){
+        const ms = Math.max(0, toUtcDate(endUtc).getTime() - Date.now());
+        const s = Math.floor(ms/1000), m = Math.floor(s/60), ss = String(s%60).padStart(2,"0");
+        return `${m}:${ss}`;
+      }
+
+      function startCountdown(id, endUtc){
+        stopCountdown(id);
+        const card = document.getElementById(carouselCardId(id));
+        if (!card) return;
+        const absoluteEnd = toUtcDate(endUtc).getTime();
+        const tl = card.querySelector(".time-left");
+        const tick = () => {
+          if (tl) tl.textContent = mmssLeft(endUtc);
+          if (absoluteEnd - Date.now() <= 0) removeBoost(id);
+        };
+        tick();
+        const timerId = setInterval(tick, 1000);
+        boosts.set(id, { timerId, endUtc });
+      }
+
+      function stopCountdown(id){
+        const b = boosts.get(id);
+        if (b?.timerId) clearInterval(b.timerId);
+      }
+
+      function removeBoost(id){
+        const sid = String(id);
+        stopCountdown(sid);
+        boosts.delete(sid);
+        activeOriginalIds.delete(sid);
+
+        const track = getTrack();
+        const real = document.getElementById(carouselCardId(sid));
+        if (real && track && real.parentElement === track) real.remove();
+
+        if (track){
+          Array.from(track.querySelectorAll(`.boost-card[data-kind='boost'][data-dup='1']`))
+            .filter(n => n.dataset.boostId === sid)
+            .forEach(n => n.remove());
+        }
+
+        enforceCarouselLayout();
+      }
+
+      // Enable/disable scroll when we do/do not clone
+
+      function setScrollEnabled(enabled){
+        const track = getTrack();
+        if (!track) return;
+        if (enabled) {
+          track.style.animationPlayState = "running";
+          track.style.removeProperty("animation"); // use CSS rule
+        } else {
+          track.style.animationPlayState = "paused";
+          track.style.animation = "none";
+        }
+      }
+
+      // Keep at most 2 originals + info (if boosts) OR 1 empty (if none)
+        function enforceCarouselLayout(){
+          const track = getTrack();
+          if (!track) return;
+
+          // strip clones
+          Array.from(track.children).forEach(c => { if (c.dataset.dup === "1") c.remove(); });
+
+          // de-dupe originals
+          const originals = getOriginalBoostCards();
+          const seen = new Set();
+          for (const n of originals) {
+            const bid = n.dataset.boostId;
+            if (seen.has(bid)) {
+              n.remove();
+              activeOriginalIds.delete(bid);
+            } else {
+              seen.add(bid);
+            }
+          }
+
+          // cap to 2 originals
+          let curr = getOriginalBoostCards();
+          if (curr.length > 2) {
+            for (let i = curr.length - 1; i >= 2; i--) {
+              activeOriginalIds.delete(curr[i].dataset.boostId);
+              curr[i].remove();
+            }
+          }
+
+          curr = getOriginalBoostCards();
+
+          // --- CHANGED LOGIC STARTS HERE ---
+          // Always show the info card; text depends on count
+
+          clearEmptyState(); 
+
+          if (curr.length === 0) {
+            setInfoCardText("No boosted events right now !");
+            setScrollEnabled(false); 
+            return;
+          } else if (curr.length === 1) {
+            setInfoCardText("A boost's a boost, but it won't be lonely for a long time !");
+            setScrollEnabled(false); 
+          } else {
+                setInfoCardText("Register or Log in to take advantage of these boosts !");
+            setScrollEnabled(true);  // you can enable scroll if you later re-enable cloning
+          }
+          // keep info card at the end
+          // if (infoCard && infoCard.parentElement === track) track.appendChild(infoCard);
+
+
+         if (infoCard && track) {
+          const boostCards = getOriginalBoostCards();
+
+          // If exactly 2 boost cards -> insert infoCard between them
+          if (boostCards.length === 2) {
+            boostCards[0].after(infoCard);
+          }
+          // If only 1 or 0 -> put it at the end (normal fallback)
+          else {
+            track.appendChild(infoCard);
+          }
+        }
+
+        // --------- CLONE RULE ---------- 
+        // Only clone when there are **≥ 2** originals (prevents showing the same event twice)
+        // if (curr.length >= 2) {
+        //   // create one clone of each original
+        //   curr.forEach(it => {
+        //     const clone = it.cloneNode(true);
+        //     clone.dataset.dup = "1";
+        //     clone.removeAttribute("id"); // never keep id on clones
+        //     track.appendChild(clone);
+        //   });
+        //   setScrollEnabled(true);
+        // } else {
+        //   // exactly one original -> NO CLONES, NO SCROLL
+        //   setScrollEnabled(false);
+        // }
+      }
+
+
+        function setInfoCardText(text){
+          ensureInfoCard(text);
+          const track = getTrack();
+          if (infoCard && track && infoCard.parentElement !== track) track.appendChild(infoCard);
+        }
+
+      // ---------- SHARED HANDLERS ----------
+      function handleBoostStarted(msg){
+        const id = String(msg.matchEventId);
+        if (activeOriginalIds.has(id)) {
+          const card = document.getElementById(carouselCardId(id));
+          updateMainCardOnBoostStarted(msg);
+          updateCarouselOdds(card, msg);
+          updateCarouselLimits(card, msg);
+          if (msg.endUtc) startCountdown(id, msg.endUtc);
+          enforceCarouselLayout();
+          return;
+        }
+
+        updateMainCardOnBoostStarted(msg);
+        const card = ensureCarouselCard(msg);
+        updateCarouselOdds(card, msg);
+        updateCarouselLimits(card, msg);
+        if (msg.endUtc) startCountdown(id, msg.endUtc);
+        enforceCarouselLayout();
+      }
+
+      function handleMatchEventUpdated(msg){
+        const id = String(msg.matchEventId);
+        updateMainCardOnMatchUpdated(msg);
+
+        if (msg.activeBoostId) {
+          const card = document.getElementById(carouselCardId(id)) || ensureCarouselCard(msg);
+          updateCarouselOdds(card, msg);
+        } else {
+          removeBoost(id);
+        }
+        enforceCarouselLayout();
+      }
+
+      // ---------- SIGNALR ----------
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl(HUB_URL)
+        .withAutomaticReconnect()
+        .build();
+
+      connection.onclose(e => warn("connection closed", e));
+      connection.onreconnecting(e => warn("reconnecting...", e));
+      connection.onreconnected(id => log("reconnected with new id", id));
+
+      async function joinAllVisibleMatches() {
+        const cards = document.querySelectorAll("[data-match-id]");
+        log("joinAllVisibleMatches: found", cards.length);
+        for (const el of cards) {
+          const id = el.getAttribute("data-match-id");
+          try { await connection.invoke("JoinMatch", id); log("Joined group", id); }
+          catch (e) { warn("JoinMatch failed", id, e); }
+        }
+      }
+
+      async function getVisibleMatchIds(){
+        return Array.from(document.querySelectorAll("[data-match-id]"))
+          .map(el => el.getAttribute("data-match-id"))
+          .filter(Boolean);
+      }
+
+      async function joinGroupsForBoosts(boostsArr){
+        for (const b of boostsArr) {
+          try { await connection.invoke("JoinMatch", b.matchEventId); log("Joined group (from hydrate)", b.matchEventId); }
+          catch (e) { warn("JoinMatch (hydrate) failed", b.matchEventId, e); }
+        }
+      }
+
+      async function hydrateActiveBoosts(){
+        try {
+          const ids = await getVisibleMatchIds();
+          log("hydrateActiveBoosts: visible ids =", ids);
+          const payload = ids.length ? ids.map(String) : null;
+          log("hydrateActiveBoosts: sending payload =", payload);
+
+          const active = await connection.invoke("GetActiveBoosts", payload);
+          log("hydrateActiveBoosts: received", Array.isArray(active) ? active.length : active, "items", active);
+
+          if (!active || !active.length) {
+            enforceCarouselLayout(); // will show empty
+            return;
+          }
+
+          // render up to 3 uniques
+          const seen = new Set();
+          const toRender = [];
+          for (const a of active) {
+            const id = String(a.matchEventId);
+            if (!seen.has(id)) {
+              seen.add(id);
+              toRender.push(a);
+            }
+            if (toRender.length === 3) break;
+          }
+
+          for (const msg of toRender) handleBoostStarted(msg);
+          await joinGroupsForBoosts(toRender);
+          enforceCarouselLayout();
+        } catch (e) {
+          warn("HydrateActiveBoosts failed:", e);
+          enforceCarouselLayout();
+        }
+      }
+
+      // Live events
+      connection.on("BoostStarted", handleBoostStarted);
+      connection.on("MatchEventUpdated", handleMatchEventUpdated);
+
+      // Start + hydrate
+      connection.start()
+        .then(async () => {
+          log("connection started");
+          try {
+            const pong = await connection.invoke("Ping");
+            log("Ping ->", pong);
+          } catch (e) {
+            warn("Ping failed:", e);
+          }
+
+          await joinAllVisibleMatches();
+          await hydrateActiveBoosts();
+        })
+        .catch(e => err("SignalR connect failed:", e));
+
+      connection.onreconnected(async () => {
+        await joinAllVisibleMatches();
+        await hydrateActiveBoosts();
+      });
+
+      // initial layout
+      enforceCarouselLayout();
+
+      // debug helpers
+      window.boostDebug = {
+        ping: async () => connection.invoke("Ping"),
+        hydrate: hydrateActiveBoosts
+      };
+    })();
+});
+</script>
