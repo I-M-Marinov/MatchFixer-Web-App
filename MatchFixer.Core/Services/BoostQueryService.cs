@@ -81,7 +81,7 @@ namespace MatchFixer.Core.Services
 					EndUtc = b.EndUtc,
 					MaxStake = b.MaxStakePerBet,
 					MaxUses = b.MaxUsesPerUser,
-					Label = string.IsNullOrWhiteSpace(b.Note) ? "BOOST" : b.Note,
+					Label = string.IsNullOrWhiteSpace(b.Note) ? "" : b.Note,
 					HomeTeamName = m?.HomeTeamName,
 					AwayTeamName = m?.AwayTeamName
 				};
@@ -145,7 +145,7 @@ namespace MatchFixer.Core.Services
 					EndUtc = b.EndUtc,
 					MaxStake = b.MaxStakePerBet,
 					MaxUses = b.MaxUsesPerUser,
-					Label = string.IsNullOrWhiteSpace(b.Note) ? "BOOST" : b.Note,
+					Label = string.IsNullOrWhiteSpace(b.Note) ? "BOOSTED" : b.Note,
 					HomeTeamName = m?.HomeTeamName,
 					AwayTeamName = m?.AwayTeamName
 				};
