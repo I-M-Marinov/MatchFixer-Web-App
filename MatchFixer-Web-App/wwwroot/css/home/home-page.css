@@ -696,63 +696,62 @@ border: 2px #0DAB76 solid;
     margin-top: 0.5em;
     padding: 0.5em;
     border-radius: 0.75rem;
-    background: rgba(13,171,118,0.10);
+    background: none;
     position: relative;
-    z-index: 9999;
+    z-index: 999;
 }
 
 .boost-track {
     display: flex;
-    height: 100px;
+    height: 120px;
+    justify-content: center;
     gap: 1rem;
     align-items: stretch;
     padding: .75rem 1rem;
-/*    animation: boost-scroll 10s linear infinite;
-*/    will-change: transform;
+    will-change: transform;
 }
 
 .boost-carousel:hover .boost-track {
     animation-play-state: paused;
 }
 
-@keyframes boost-scroll {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-50%);
-    }
-}
 
 /* Card look */
 .boost-card {
-    flex: 0 0 320px;
+    flex: 0 0 370px;
     display: grid;
+    min-height: 200px;
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
-        "teams teams badge"
-        "odds  odds  badge"
-        "meta  meta  badge";
+        "badge teams teams"
+        "badge odds  odds"
+        "badge meta  meta";
     gap: .25rem .5rem;
     padding: .75rem;
     border-radius: .75rem;
     background: #1f1f1f;
     color: #fff;
-    box-shadow: 0 6px 20px rgba(0,0,0,.25);
-    position: relative;
+    box-shadow: 1px 2px 3px rgba(0,0,0,.25);
 }
 
 .boost-card .teams {
     grid-area: teams;
     font-weight: 700;
+    text-align: center;
 }
 
 .boost-card .odds {
     grid-area: odds;
     display: flex;
-    gap: .75rem;
+    justify-content: center !important;
+    align-items: center;
+    gap: .85rem;
     font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.odds-chip-text{
+    font-size: 0.80rem;
 }
 
 .boost-card .meta {
@@ -760,17 +759,18 @@ border: 2px #0DAB76 solid;
     font-size: .85rem;
     color: #bbb;
     display: flex;
-    gap: .75rem;
+    gap: 1.25rem;
     align-items: center;
+    justify-content:center;
 }
 
 .boost-card .badge {
     grid-area: badge;
     align-self: start;
-    justify-self: end;
+    justify-self: center;
     background: #ffe08a;
     color: #000;
-    font-weight: 800;
+    font-weight: 900;
     padding: .25rem .5rem;
     border-radius: .5rem;
     font-size: .75rem;
@@ -781,17 +781,34 @@ border: 2px #0DAB76 solid;
     display: inline-block;
     padding: .1rem .4rem;
     border-radius: .4rem;
+    border: 1px solid #3370A8;
     background: #0DAB76;
     color: #00130c;
     font-weight: 700;
     font-size: .75rem;
 }
 
+.boost-pill:hover {
+    background: #0ee49c;
+    color: black;
+    text-decoration: none;
+}
+
 .odds-chip {
-    padding: .15rem .4rem;
+    color: black;
+    margin-top: 0.25em !important;
+    padding: .20rem .4rem;
     border-radius: .35rem;
-    background: #2b2b2b;
+    background: #3370A8;
     border: 1px solid rgba(255,255,255,.08);
+    text-shadow: 1px 2px 1px #0DAB76;
+}
+
+.odds-chip .odds-home,
+.odds-chip .odds-away,
+.odds-chip .odds-draw {
+    font-size: 0.95rem;
+    word-break:break-all;
 }
 
 .boost-badge {
@@ -804,6 +821,15 @@ border: 2px #0DAB76 solid;
     border-radius: .5rem;
     background: #ffe08a;
     color: #000;
+}
+
+.home-page-pill-boosted {
+    margin-bottom: -10em !important;
+    background: linear-gradient(270deg, #ff8c21, #ff6b00, #ff8c21);
+    color: white;
+    font-weight: 900;
+    border: 2px solid #ff6b00;
+    border-radius: 0.75em;
 }
 
 @media (max-width: 768px) {
