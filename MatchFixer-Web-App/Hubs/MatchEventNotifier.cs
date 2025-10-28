@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using static MatchFixer.Core.Contracts.IMatchEventNotifier;
 
 namespace MatchFixer_Web_App.Hubs
 {
+
 	[AllowAnonymous]
 	public class MatchEventNotifier : IMatchEventNotifier
 	{
 		private readonly IHubContext<MatchEventHub> _hubContext;
+
 
 		public MatchEventNotifier(IHubContext<MatchEventHub> hubContext)
 		{
@@ -67,6 +70,31 @@ namespace MatchFixer_Web_App.Hubs
 					maxStake,
 					maxUses
 				});
+		}
+
+		public async Task BroadcastBoostStartedAsync(BoostRealtimeMessage msg, CancellationToken ct = default)
+		{
+			var dto = new MatchEventHub.BoostDto
+			{
+				MatchEventId = msg.MatchEventId,
+				EffectiveHomeOdds = msg.EffectiveHomeOdds,
+				EffectiveDrawOdds = msg.EffectiveDrawOdds,
+				EffectiveAwayOdds = msg.EffectiveAwayOdds,
+				StartUtc = msg.StartUtc,
+				EndUtc = msg.EndUtc,
+				MaxStake = msg.MaxStake,
+				MaxUses = msg.MaxUses,
+				Label = msg.Label,
+				HomeName = msg.HomeName,
+				AwayName = msg.AwayName
+			};
+
+			await Task.WhenAll(
+				_hubContext.Clients.Group(MatchEventHub.BoostWatchers)
+					.SendAsync("BoostStarted", dto, ct),
+				_hubContext.Clients.Group(msg.MatchEventId.ToString())
+					.SendAsync("BoostStarted", dto, ct)
+			);
 		}
 
 	}
