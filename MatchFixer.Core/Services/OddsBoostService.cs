@@ -1,7 +1,9 @@
 ﻿using MatchFixer.Core.Contracts;
-using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using static MatchFixer.Core.Contracts.IMatchEventNotifier;
 
 namespace MatchFixer.Core.Services
 {
@@ -9,6 +11,7 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IMatchEventNotifier _notifier;
+
 
 		public OddsBoostService(MatchFixerDbContext dbContext, IMatchEventNotifier notifier)
 		{
@@ -58,6 +61,9 @@ namespace MatchFixer.Core.Services
 				throw new ArgumentException("Duration must be greater than zero.", nameof(duration));
 
 			var match = await _dbContext.MatchEvents
+				.AsNoTracking()
+				.Include(m => m.HomeTeam)
+				.Include(m => m.AwayTeam)
 				.FirstOrDefaultAsync(m => m.Id == matchEventId, ct);
 
 			if (match == null)
@@ -93,6 +99,26 @@ namespace MatchFixer.Core.Services
 			var effHome = Math.Round((match.HomeOdds ?? 0m) + boostValue, 2, MidpointRounding.AwayFromZero);
 			var effDraw = Math.Round((match.DrawOdds ?? 0m) + boostValue, 2, MidpointRounding.AwayFromZero);
 			var effAway = Math.Round((match.AwayOdds ?? 0m) + boostValue, 2, MidpointRounding.AwayFromZero);
+
+			var now = DateTime.UtcNow;
+			if (boost.IsActive && start <= now && end > now)
+			{
+				await _notifier.BroadcastBoostStartedAsync(new BoostRealtimeMessage
+				{
+					MatchEventId = matchEventId,
+					EffectiveHomeOdds = effHome,
+					EffectiveDrawOdds = effDraw,
+					EffectiveAwayOdds = effAway,
+					StartUtc = DateTime.SpecifyKind(start, DateTimeKind.Utc),
+					EndUtc = DateTime.SpecifyKind(end, DateTimeKind.Utc),
+					MaxStake = maxStakePerBet,
+					MaxUses = maxUsesPerUser,
+					Label = string.IsNullOrWhiteSpace(note) ? "BOOST" : note,
+					HomeName = match.HomeTeam.Name,
+					AwayName = match.AwayTeam.Name
+				}, ct);
+			}
+
 
 			await _notifier.NotifyBoostStartedAsync(
 				matchEventId,
