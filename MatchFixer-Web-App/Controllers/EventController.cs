@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Services;
 using MatchFixer.Core.ViewModels.LiveEvents;
+using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpGet]
 		[Authorize]
+		[AdminOnly]
 		public async Task<IActionResult> AddMatchEvent()
 		{
 			var model = new MatchEventFormModel
@@ -37,6 +39,7 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpPost]
 		[Authorize]
+		[AdminOnly]
 		public async Task<IActionResult> AddMatchEvent(MatchEventFormModel model)
 		{
 			if (!ModelState.IsValid)
@@ -79,6 +82,8 @@ namespace MatchFixer_Web_App.Controllers
 			return View(events);
 		}
 
+		[Authorize]
+		[AdminOnly]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> EditMatchEvent(Guid id, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime matchDate)
@@ -102,6 +107,8 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
+		[Authorize]
+		[AdminOnly]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> CancelMatchEvent(Guid id)
@@ -118,6 +125,7 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken] 
 		public async Task<IActionResult> GetLatestOdds([FromBody] Guid[] matchIds)
@@ -125,6 +133,8 @@ namespace MatchFixer_Web_App.Controllers
 			var odds = await _matchEventService.GetOddsForMatchesAsync(matchIds);
 			return Json(odds);
 		}
+
+		[AdminOnly]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> CreateOddsBoost(CreateOddsBoostViewModel model)
