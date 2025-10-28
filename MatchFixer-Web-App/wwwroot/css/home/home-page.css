@@ -431,10 +431,10 @@
     text-decoration: none;
 }
 
-    .contact-info a:hover {
-        text-decoration: underline;
-        color: #0a8b60;
-    }
+.contact-info a:hover {
+    text-decoration: underline;
+    color: #0a8b60;
+}
 
 .fade-in {
     opacity: 0;
@@ -711,11 +711,6 @@ border: 2px #0DAB76 solid;
     will-change: transform;
 }
 
-.boost-carousel:hover .boost-track {
-    animation-play-state: paused;
-}
-
-
 /* Card look */
 .boost-card {
     flex: 0 0 370px;
@@ -731,16 +726,35 @@ border: 2px #0DAB76 solid;
     border-radius: .75rem;
     background: #1f1f1f;
     color: #fff;
-    box-shadow: 1px 2px 3px rgba(0,0,0,.25);
+    box-shadow: 1px 2px 3px black;
 }
 
-.boost-card .teams {
+.info-boost-card {
+    flex: 0 0 375px;
+    display: grid;
+    min-height: 185px;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+        "teams teams badge"
+        "odds odds  badge"
+        "meta meta  badge";
+    gap: .25rem .5rem;
+    padding: .75rem;
+    border-radius: .75rem;
+    background: #1b7bb0;
+    color: #fff;
+    box-shadow: 1px 2px 3px black;
+}
+
+.boost-card .teams,
+.info-boost-card .teams {
     grid-area: teams;
     font-weight: 700;
     text-align: center;
 }
 
-.boost-card .odds {
+.boost-card .odds,
+.info-boost-card .odds {
     grid-area: odds;
     display: flex;
     justify-content: center !important;
@@ -754,17 +768,20 @@ border: 2px #0DAB76 solid;
     font-size: 0.80rem;
 }
 
-.boost-card .meta {
+.boost-card .meta,
+.info-boost-card .meta {
     grid-area: meta;
     font-size: .85rem;
     color: #bbb;
     display: flex;
     gap: 1.25rem;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
+    justify-items: center;
 }
 
-.boost-card .badge {
+.boost-card .badge,
+.info-boost-card .badge {
     grid-area: badge;
     align-self: start;
     justify-self: center;
@@ -837,3 +854,41 @@ border: 2px #0DAB76 solid;
         flex-basis: 260px;
     }
 }
+
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    80% {
+        transform: rotate(180deg);
+    }
+
+    90% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(180deg);
+    }
+
+    90% {
+        transform: rotate(180deg);
+    }
+
+    80% {
+        transform: rotate(180deg);
+    }
+
+    0% {
+        transform: rotate(0deg);
+    }
+}
+
+.spinning-clock {
+    display: inline-block;
+    margin-right: 0.20em !important;
+    animation: spin 1.75s linear infinite;
+}
+
