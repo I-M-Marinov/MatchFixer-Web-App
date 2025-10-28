@@ -1,4 +1,5 @@
-﻿
+﻿<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+
 
 <div class="boost-carousel" style="margin-top: 0.5rem; margin-bottom: 2rem; z-index: 999;" aria-label="Active boosts">
 	<div class="boost-track" id="boostTrack">
@@ -108,9 +109,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const oddsLightning = document.createElement('i');
-        oddsLightning.classList.add('bi', 'bi-lightning-charge-fill', 'lightning-icon');
+        oddsLightning.classList.add(
+            'bi',
+            'bi-lightning-charge-fill',
+            'lightning-icon',
+            'animate__animated',
+            'animate__tada',
+            'animate__infinite',
+            'animate__slower',
+        );
         oddsLightning.style.color = '#ffd300';
         oddsLightning.style.textShadow = '0px 2px 2px black';
+
 
         if (!emptyCard) {
           emptyCard = el("div", { className: "boost-card", dataset:{ dup:"0", kind:"empty" }}, [
@@ -180,6 +190,46 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
+            function ensureInfoCardOnly(text) {
+                const track = getTrack();
+                if (!track) return;
+
+                if (!infoCard) {
+
+                const infoBadge = document.createElement("i");
+                infoBadge.classList.add("ri", "ri-information-line");
+                infoBadge.style.color = "#0DAB76";
+                infoBadge.style.textShadow = "0px 2px 2px black";
+
+                infoCard = el("div", { className: "boost-card", dataset: { kind: "info" } }, [
+                    el("div", { className: "teams", text }),
+
+                    el("div", { className: "odds" }, [
+                    el("span", {
+                        className: "odds-chip odds-chip-text",
+                        text: "Don't wait, register you account, so you will be ready for the boost!",
+                    }),
+                    ]),
+
+                    el("div", { className: "meta d-flex justify-content-center gap-2 mt-2" }, [
+                    // REGISTER link
+                    el("a", {
+                        className: "boost-pill btn btn-success text-decoration-none",
+                        attrs: { href: "/Identity/Account/Register", target: "_self" },
+                        text: "Register",
+                    }), 
+                    ]),
+
+                    infoBadge,
+                ]);
+
+                track.appendChild(infoCard);
+                } else {
+                const t = infoCard.querySelector(".teams");
+                if (t) t.textContent = text;
+                }
+            }
+
 
       function clearInfoCard(){ removeNode(infoCard); infoCard = null; }
 
@@ -194,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const teams = el("div", { className: "teams" }, [
           el("span", { className: "home-name" }),
-          el("span", {}, [" vs "]),
+              el("span", {style: "color: red;"}, [" vs "]),
           el("span", { className: "away-name" })
         ]);
 
@@ -204,14 +254,28 @@ document.addEventListener("DOMContentLoaded", function () {
           el("span", { className: "odds-chip odds-chip-text" }, ["Away: ", el("b", { className: "odds-away", text: "—" })])
         ]);
 
+        const sandClock = "⏳  ";
+
         const meta = el("div", { className: "meta" }, [
-                  // el("span", { className:"boost-pill", text:"+ Live Boost" }),
-              el("span", {}, ["⏳ ", el("b", { className: "time-left", text: "--:--" })]),
-              el("span", { className: "limits badge home-page-pill-boosted" })
+            el("span", {}, [
+            el("span", {
+                className: "spinning-clock",
+            }, [ sandClock ]),
+            el("b", { className: "time-left", text: "--:--" })
+            ]),
+            el("span", { className: "limits badge home-page-pill-boosted" })
         ]);
 
         const oddsLightning = document.createElement('i');
-        oddsLightning.classList.add('bi', 'bi-lightning-charge-fill', 'lightning-icon');
+        oddsLightning.classList.add(
+            'bi',
+            'bi-lightning-charge-fill',
+            'lightning-icon',
+            'animate__animated',
+            'animate__tada',
+            'animate__infinite',
+            'animate__slower',
+        );
         oddsLightning.style.color = '#ffd300';
         oddsLightning.style.textShadow = '0px 2px 2px black';
 
@@ -374,7 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
           clearEmptyState(); 
 
           if (curr.length === 0) {
-            setInfoCardText("No boosted events right now !");
+            setInfoCardOnlyText("No boosted events right now !");
             setScrollEnabled(false); 
             return;
           } else if (curr.length === 1) {
@@ -423,6 +487,12 @@ document.addEventListener("DOMContentLoaded", function () {
           ensureInfoCard(text);
           const track = getTrack();
           if (infoCard && track && infoCard.parentElement !== track) track.appendChild(infoCard);
+        }
+
+        function setInfoCardOnlyText(text){
+            ensureInfoCardOnly(text);
+            const track = getTrack();
+            if (infoCard && track && infoCard.parentElement !== track) track.appendChild(infoCard);
         }
 
       // ---------- SHARED HANDLERS ----------
@@ -542,6 +612,8 @@ document.addEventListener("DOMContentLoaded", function () {
           } catch (e) {
             warn("Ping failed:", e);
           }
+
+          connection.invoke("JoinBoostChannel");
 
           await joinAllVisibleMatches();
           await hydrateActiveBoosts();
