@@ -13,6 +13,9 @@ namespace MatchFixer_Web_App.Hubs
 			_boosts = boosts;
 		}
 
+		public const string BoostWatchers = "boost-watchers";
+
+		
 		public override async Task OnConnectedAsync()
 		{
 			await base.OnConnectedAsync();
@@ -34,6 +37,7 @@ namespace MatchFixer_Web_App.Hubs
 			}
 			return Groups.AddToGroupAsync(Context.ConnectionId, id.ToString());
 		}
+		public Task JoinBoostChannel() => Groups.AddToGroupAsync(Context.ConnectionId, BoostWatchers);
 
 		public Task LeaveMatch(string matchEventId)
 		{
