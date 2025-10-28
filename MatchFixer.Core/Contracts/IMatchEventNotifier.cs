@@ -23,5 +23,23 @@ namespace MatchFixer.Core.Contracts
 			DateTime boostEndUtc,
 			decimal maxStake,
 			int maxUses);
+
+
+		Task BroadcastBoostStartedAsync(BoostRealtimeMessage msg, CancellationToken ct = default);
+
+		public sealed class BoostRealtimeMessage
+		{
+			public Guid MatchEventId { get; init; }
+			public decimal EffectiveHomeOdds { get; init; }
+			public decimal EffectiveDrawOdds { get; init; }
+			public decimal EffectiveAwayOdds { get; init; }
+			public DateTime StartUtc { get; init; }
+			public DateTime EndUtc { get; init; }
+			public decimal? MaxStake { get; init; }
+			public int? MaxUses { get; init; }
+			public string? Label { get; init; }
+			public string? HomeName { get; init; }
+			public string? AwayName { get; init; }
+		}
 	}
 }
