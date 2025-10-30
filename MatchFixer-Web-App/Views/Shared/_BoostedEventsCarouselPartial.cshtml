@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
             infoBadge.style.color = "#0DAB76";
             infoBadge.style.textShadow = "0px 2px 2px black";
 
-            infoCard = el("div", { className: "boost-card", dataset: { kind: "info" } }, [
+                    infoCard = el("div", { className: "boost-card animate__animated animate__fadeInUp", dataset: { kind: "info" } }, [
                 el("div", { className: "teams", text }),
 
                 el("div", { className: "odds" }, [
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 infoBadge.style.color = "#0DAB76";
                 infoBadge.style.textShadow = "0px 2px 2px black";
 
-                infoCard = el("div", { className: "info-boost-card", dataset: { kind: "info" } }, [
+                    infoCard = el("div", { className: "info-boost-card animate__animated animate__zoomIn", dataset: { kind: "info" } }, [
                     el("div", { className: "teams", text }),
 
                     el("div", { className: "odds" }, [
@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const track = getTrack();
         if (!track) { warn("No #boostTrack"); return null; }
 
-        const card = el("div", { id: carouselCardId(id), className: "boost-card",
+              const card = el("div", { id: carouselCardId(id), className: "boost-card animate__animated animate__zoomIn",
           dataset:{ boostId: id, kind:"boost", dup:"0" } });
 
         const teams = el("div", { className: "teams" }, [
@@ -249,9 +249,9 @@ document.addEventListener("DOMContentLoaded", function () {
         ]);
 
         const odds = el("div", { className: "odds" }, [
-                el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-1s animate__faster" }, ["Home ", el("b", { className: "odds-home", text: "—" })]),
-                el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-2s animate__faster" }, ["Draw ", el("b", { className: "odds-draw", text: "—" })]),
-                el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-3s animate__faster" }, ["Away ", el("b", { className: "odds-away", text: "—" })])
+            el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-1s animate__faster" }, ["Home ", el("b", { className: "odds-home", text: "—" })]),
+            el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-1-5s animate__faster" }, ["Draw ", el("b", { className: "odds-draw", text: "—" })]),
+            el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-2s animate__faster" }, ["Away ", el("b", { className: "odds-away", text: "—" })])
         ]);
 
         const sandClock = "⏳  ";
