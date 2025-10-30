@@ -816,12 +816,13 @@ border: 2px #0DAB76 solid;
 
 .odds-chip {
     color: black;
-    margin-top: 0.25em !important;
-    padding: .55rem 1.4rem;
-    border-radius: .35rem;
+    margin-top: 0.15em !important;
+    padding: .40rem 1.25rem;
+    border-radius: .65rem;
     background: #00db6b;
     border: 1px solid rgba(255,255,255,.08);
     text-shadow: 1px 1px 2px white;
+    box-shadow: 1px 1px 2px black;
 }
 
 
@@ -927,5 +928,17 @@ border: 2px #0DAB76 solid;
     display: inline-block;
     margin-right: 0.20em !important;
     animation: spin 1.75s linear infinite;
+}
+
+.animate__delay-05s {
+    animation-delay: 0.5s;
+}
+
+.animate__delay-1-5s {
+    animation-delay: 1.5s;
+}
+
+.animate__delay-2-5s {
+    animation-delay: 2.5s;
 }
 
