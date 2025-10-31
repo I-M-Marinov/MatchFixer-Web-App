@@ -5,6 +5,7 @@ namespace MatchFixer.Core.ViewModels.DTO
 	public class ActiveBoost
 	{
 		public Guid MatchEventId { get; init; }
+		public decimal? BoostAmount { get; set; } = null;
 		public decimal EffectiveHomeOdds { get; init; }
 		public decimal EffectiveDrawOdds { get; init; }
 		public decimal EffectiveAwayOdds { get; init; }
