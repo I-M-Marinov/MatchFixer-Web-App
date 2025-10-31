@@ -942,3 +942,12 @@ border: 2px #0DAB76 solid;
     animation-delay: 2.5s;
 }
 
+.boost-value {
+    color: white;
+    position: absolute !important;
+    left: -0.2rem !important;
+    bottom: -0.2rem !important;
+    font-size: 0.65em !important;
+    background-color: #7d07b4 !important;
+    color: white !important;
+}
