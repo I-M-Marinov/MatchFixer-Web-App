@@ -19,6 +19,7 @@ namespace MatchFixer.Core.Contracts
 			decimal effectiveHomeOdds,
 			decimal effectiveDrawOdds,
 			decimal effectiveAwayOdds,
+			decimal? boostValue,
 			DateTime startUtc,
 			DateTime boostEndUtc,
 			decimal maxStake,
@@ -33,6 +34,7 @@ namespace MatchFixer.Core.Contracts
 			public decimal EffectiveHomeOdds { get; init; }
 			public decimal EffectiveDrawOdds { get; init; }
 			public decimal EffectiveAwayOdds { get; init; }
+			public decimal? BoostValue { get; init; }
 			public DateTime StartUtc { get; init; }
 			public DateTime EndUtc { get; init; }
 			public decimal? MaxStake { get; init; }
