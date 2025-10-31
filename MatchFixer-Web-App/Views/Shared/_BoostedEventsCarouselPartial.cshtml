@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const home = card.querySelector("[data-odds='home']");
         const draw = card.querySelector("[data-odds='draw']");
         const away = card.querySelector("[data-odds='away']");
+        const boostValue = card.querySelector(".boost-value");
+
         if (home) home.textContent = fmtOdds(msg.effectiveHomeOdds);
         if (draw) draw.textContent = fmtOdds(msg.effectiveDrawOdds);
         if (away) away.textContent = fmtOdds(msg.effectiveAwayOdds);
@@ -75,6 +77,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const eh = msg.effectiveHomeOdds ?? msg.homeOdds;
         const ed = msg.effectiveDrawOdds ?? msg.drawOdds;
         const ea = msg.effectiveAwayOdds ?? msg.awayOdds;
+
+        boostValue.textContent = msg.boostAmount;
         if (home && eh != null) home.textContent = fmtOdds(eh);
         if (draw && ed != null) draw.textContent = fmtOdds(ed);
         if (away && ea != null) away.textContent = fmtOdds(ea);
@@ -207,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     el("div", { className: "odds" }, [
                     el("span", {
                         className: "odds-chip odds-chip-text",
-                        text: "Don't wait, register you account, so you will be ready for the boost!",
+                        text: "Don't wait, register your account, so you will be ready for the boost!",
                     }),
                     ]),
 
@@ -248,6 +252,8 @@ document.addEventListener("DOMContentLoaded", function () {
           el("span", { className: "away-name" })
         ]);
 
+        const boostValue = el("div", { className: "boost-value badge" });
+
         const odds = el("div", { className: "odds" }, [
             el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-1s animate__faster" }, ["Home ", el("b", { className: "odds-home", text: "—" })]),
             el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-1-5s animate__faster" }, ["Draw ", el("b", { className: "odds-draw", text: "—" })]),
@@ -282,6 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const badge = oddsLightning;
 
         card.appendChild(teams);
+        card.appendChild(boostValue);
         card.appendChild(odds);
         card.appendChild(meta);
         card.appendChild(badge);
@@ -496,25 +503,39 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
       // ---------- SHARED HANDLERS ----------
-      function handleBoostStarted(msg){
-        const id = String(msg.matchEventId);
-        if (activeOriginalIds.has(id)) {
-          const card = document.getElementById(carouselCardId(id));
-          updateMainCardOnBoostStarted(msg);
-          updateCarouselOdds(card, msg);
-          updateCarouselLimits(card, msg);
-          if (msg.endUtc) startCountdown(id, msg.endUtc);
-          enforceCarouselLayout();
-          return;
-        }
+          function handleBoostStarted(msg) {
+      const id = String(msg.matchEventId);
 
+      if (activeOriginalIds.has(id)) {
+        const card = document.getElementById(carouselCardId(id));
         updateMainCardOnBoostStarted(msg);
-        const card = ensureCarouselCard(msg);
         updateCarouselOdds(card, msg);
         updateCarouselLimits(card, msg);
+
+        const boostValue = card?.querySelector(".boost-value");
+        if (boostValue && typeof msg.boostAmount !== "undefined") {
+          boostValue.textContent = `+${msg.boostAmount}`;
+        }
+
         if (msg.endUtc) startCountdown(id, msg.endUtc);
         enforceCarouselLayout();
+        return;
       }
+
+      updateMainCardOnBoostStarted(msg);
+      const card = ensureCarouselCard(msg);
+      updateCarouselOdds(card, msg);
+      updateCarouselLimits(card, msg);
+
+      const boostValue = card?.querySelector(".boost-value");
+      if (boostValue && typeof msg.boostAmount !== "undefined") {
+        boostValue.textContent = `+${msg.boostAmount}`;
+      }
+
+      if (msg.endUtc) startCountdown(id, msg.endUtc);
+      enforceCarouselLayout();
+    }
+
 
       function handleMatchEventUpdated(msg){
         const id = String(msg.matchEventId);
