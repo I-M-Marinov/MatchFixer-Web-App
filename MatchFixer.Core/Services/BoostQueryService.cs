@@ -74,6 +74,7 @@ namespace MatchFixer.Core.Services
 				return new ActiveBoost
 				{
 					MatchEventId = b.MatchEventId,
+					BoostAmount = b.BoostValue,
 					EffectiveHomeOdds = baseHome + b.BoostValue,
 					EffectiveDrawOdds = baseDraw + b.BoostValue,
 					EffectiveAwayOdds = baseAway + b.BoostValue,
@@ -138,6 +139,7 @@ namespace MatchFixer.Core.Services
 				return new ActiveBoost
 				{
 					MatchEventId = b.MatchEventId,
+					BoostAmount = b.BoostValue,
 					EffectiveHomeOdds = baseHome + b.BoostValue,
 					EffectiveDrawOdds = baseDraw + b.BoostValue,
 					EffectiveAwayOdds = baseAway + b.BoostValue,
