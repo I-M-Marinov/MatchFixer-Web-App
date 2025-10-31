@@ -65,6 +65,7 @@ namespace MatchFixer_Web_App.Hubs
 				return active.Select(a => new BoostDto
 				{
 					MatchEventId = a.MatchEventId,
+					BoostAmount = a.BoostAmount,
 					EffectiveHomeOdds = a.EffectiveHomeOdds,
 					EffectiveDrawOdds = a.EffectiveDrawOdds,
 					EffectiveAwayOdds = a.EffectiveAwayOdds,
@@ -88,6 +89,7 @@ namespace MatchFixer_Web_App.Hubs
 		public sealed class BoostDto
 		{
 			public Guid MatchEventId { get; set; }
+			public decimal? BoostAmount { get; set; }
 			public decimal EffectiveHomeOdds { get; set; }
 			public decimal EffectiveDrawOdds { get; set; }
 			public decimal EffectiveAwayOdds { get; set; }
