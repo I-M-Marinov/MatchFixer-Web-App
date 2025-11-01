@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
             infoBadge.style.color = "#0DAB76";
             infoBadge.style.textShadow = "0px 2px 2px black";
 
-                    infoCard = el("div", { className: "boost-card animate__animated animate__fadeInUp", dataset: { kind: "info" } }, [
+                                infoCard = el("div", { className: "boost-card animate__animated animate__zoomIn", dataset: { kind: "info" } }, [
                 el("div", { className: "teams", text }),
 
                 el("div", { className: "odds" }, [
@@ -252,7 +252,26 @@ document.addEventListener("DOMContentLoaded", function () {
           el("span", { className: "away-name" })
         ]);
 
-        const boostValue = el("div", { className: "boost-value badge" });
+        // const teams = el("div", { className: "teams" }, [
+        //   el("div", { className: "team-block text-center" }, [
+        //     el("img", {
+        //       className: "team-logo home-logo",
+        //           attrs: { src: msg.homeName || "/images/default-home.png", alt: msg.homeName }
+        //     }),
+        //     el("div", { className: "team-name", text: msg.homeName || "" })
+        //   ]),
+        //   el("span", { className: "vs-text fw-bold", text: "vs" }),
+        //   el("div", { className: "team-block text-center" }, [
+        //     el("img", {
+        //       className: "team-logo away-logo",
+        //           attrs: { src: msg.awayName || "/images/default-away.png", alt: msg.awayName }
+        //     }),
+        //     el("div", { className: "team-name", text: msg.awayName || "" })
+        //   ])
+        // ]);
+
+        const boostValue = el("div",
+            { className: "boost-value badge animate__animated animate__tada animate__infinite animate__slower animate__delay-3s" });
 
         const odds = el("div", { className: "odds" }, [
             el("span", { className: "odds-chip odds-chip-text animate__animated animate__flipInX animate__delay-1s animate__faster" }, ["Home ", el("b", { className: "odds-home", text: "—" })]),
