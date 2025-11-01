@@ -138,6 +138,7 @@ namespace MatchFixer.Core.Services
 				.Include(m => m.LiveResult)
 				.Where(m => m.LiveResult == null)
 				.Where(m => m.MatchDate <= cutoffTime) // Only matches that started more than two and a half hours ago 
+				.Where(m => m.IsCancelled != true)
 				.OrderBy(m => m.MatchDate)
 				.ToListAsync();
 
