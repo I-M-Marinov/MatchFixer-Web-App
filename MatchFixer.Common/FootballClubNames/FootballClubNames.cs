@@ -70,7 +70,7 @@
 			["Wolves"] = "Wolverhampton Wanderers FC",
 			["Fulham"] = "Fulham F.C.",
 			["Luton"] = "Luton Town F.C.",
-			["Bournemouth"] = "A.F.C. Bournemouth",
+			["Bournemouth"] = "AFC Bournemouth",
 
 			// Italian clubs
 
