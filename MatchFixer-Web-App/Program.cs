@@ -43,14 +43,15 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
 builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
-builder.Services.AddHttpClient();												// Add HTTP Client
+builder.Services.AddHttpClient();                                               // Add HTTP Client
 
-builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();	// Add the Admin Dashboard Service
-builder.Services.AddScoped<IAdminUserService, AdminUserService>();				// Add the Admin User Service
-builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();			// Add the Admin Wallet Service
-builder.Services.AddScoped<IAdminEmailService, AdminEmailService>();			// Add the Admin Email Service
-builder.Services.AddScoped<IAdminUserBetsService, AdminUserBetsService>();		// Add the Admin User Bets Service
 
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();    // Add the Admin Dashboard Service
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();              // Add the Admin User Service
+builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();          // Add the Admin Wallet Service
+builder.Services.AddScoped<IAdminEmailService, AdminEmailService>();            // Add the Admin Email Service
+builder.Services.AddScoped<IAdminUserBetsService, AdminUserBetsService>();      // Add the Admin User Bets Service
+builder.Services.AddScoped<IAdminTeamsService, AdminTeamsService>();            // Add the Admin Teams Service
 
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
@@ -77,7 +78,6 @@ builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// A
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      // Add the Events Results Service
-
 
 
 
@@ -190,6 +190,14 @@ app.UseAuthorization();
 // custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
 
+
+app.Use(async (ctx, next) =>
+{
+	if (ctx.Request.Path.Equals("/Account/Login", StringComparison.OrdinalIgnoreCase))
+		ctx.Response.Redirect("/Identity/Account/Login" + ctx.Request.QueryString);
+	else
+		await next();
+});
 
 app.MapAreaControllerRoute(
 	name: "admin",
