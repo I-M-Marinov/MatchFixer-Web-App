@@ -1,0 +1,153 @@
+﻿@model Tuple<MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.TeamSearchVm,
+	MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.PaginatedTeamsList<
+		MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.TeamListRow>>
+
+@{
+    Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+    ViewData["Title"] = "Add a missing Team";
+
+    var vm = Model.Item1;
+    var leagues = vm.Leagues ?? new Dictionary<int, string>();
+    var existing = Model.Item2;
+
+}
+
+<div class="background-profile"></div>
+
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message">@TempData["SuccessMessage"]</div>
+	}
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message">@TempData["ErrorMessage"]</div>
+	}
+</div>
+
+
+<div class="admin-teams-container">
+    <div class="row g-4 ">
+        <div class="col-12 col-xl-6">
+            <div class="card p-3">
+                <h3 class="h5 mb-3">Existing Teams</h3>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr><th>Logo</th><th>Name</th><th>API Id</th><th>League</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in existing.Items)
+                            {
+                                <tr>
+                                    <td style="width:40px"><img src="@t.LogoUrl" alt="" style="width:28px;height:28px;object-fit:contain" /></td>
+                                    <td>@t.Name</td>
+                                    <td>@t.ApiTeamId</td>
+                                    <td>@t.LeagueName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav class="teams-pages">
+                    <ul class="pagination mb-0">
+                        @{
+                            int p = existing.Page, total = existing.TotalPages;
+                            string link(int i) => Url.Action("TeamsIndex", "AdminTeams", new { area = "Admin", page = i })!;
+                        }
+                        <li class="page-item @(p == 1 ? "disabled" : null)">
+                            <a class="page-link" href="@(p == 1 ? "#" : link(p - 1))">Prev</a>
+                        </li>
+                        @for (int i = 1; i <= total; i++)
+                        {
+                            <li class="page-item @(i == p ? "active" : null)">
+                                <a class="page-link" href="@link(i)">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(p == total ? "disabled" : null)">
+                            <a class="page-link" href="@(p == total ? "#" : link(p + 1))">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card p-3">
+                <h3 class="h5 mb-3">Search & Add</h3>
+
+                <form asp-area="Admin" asp-controller="AdminTeams" asp-action="Search" method="post" class="d-flex flex-wrap gap-2 align-items-end">
+	                @Html.AntiForgeryToken()
+	                <div>
+		                <label class="form-label">Team name</label>
+		                <input name="Query" value="@vm.Query" class="form-control" placeholder="e.g., Manchester United" required />
+	                </div>
+	                <button class="btn btn-primary">Search</button>
+                </form>
+
+                @if (vm.Results.Any())
+                {
+                    <div class="d-flex align-items-center gap-2 mt-3">
+                        <label class="form-label m-0">Assign to league:</label>
+                        <select id="assignLeague" class="form-select form-select-sm" style="width:auto">
+                            @foreach (var kv in leagues)
+                            {
+                                <option value="@kv.Key">@kv.Value</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="table-responsive mt-3">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="width:48px">Logo</th>
+                                    <th>Name</th>
+                                    <th>API Id</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in vm.Results)
+                                {
+                                    <tr>
+                                        <td><img src="@r.LogoUrl" alt="" style="width:32px;height:32px;object-fit:contain" /></td>
+                                        <td>@r.Name</td>
+                                        <td>@r.ApiTeamId</td>
+                                        <td class="text-end">
+                                            <form asp-action="Add" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="apiTeamId" value="@r.ApiTeamId" />
+                                                <input type="hidden" name="name" value="@r.Name" />
+                                                <input type="hidden" name="logoUrl" value="@r.LogoUrl" />
+                                                <input type="hidden" name="leagueId" value="@r.LeagueId" data-bind-league />
+                                                <button class="btn btn-success btn-sm">Add</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <script>
+                        // Bind selected league to every Add form
+                        (function(){
+                            const sel = document.getElementById('assignLeague');
+                            function sync() {
+                                document.querySelectorAll('input[data-bind-league]').forEach(i => i.value = sel.value);
+                            }
+                            sel.addEventListener('change', sync);
+                            sync();
+                        })();
+                    </script>
+                }
+                else if (!string.IsNullOrWhiteSpace(vm.Query))
+                {
+                    <p class="text-muted mt-3">No results for “@vm.Query”. Try exact name spelling or a shorter search.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
