@@ -67,10 +67,12 @@
 			["Arsenal"] = "Arsenal F.C.",
 			["Manchester City"] = "Manchester City F.C.",
 			["West Ham"] = "West Ham United F.C.",
-			["Wolves"] = "Wolverhampton Wanderers FC",
+			["Wolves"] = "Wolverhampton Wanderers F.C.",
 			["Fulham"] = "Fulham F.C.",
 			["Luton"] = "Luton Town F.C.",
 			["Bournemouth"] = "AFC Bournemouth",
+			["Sunderland"] = "Sunderland A.F.C.",
+			["Leeds"] = "Leeds United F.C.",
 
 			// Italian clubs
 
@@ -204,6 +206,10 @@
 			["ŁKS Łódź"] = "ŁKS Łódź",
 			["Gornik Zabrze"] = "Górnik Zabrze",
 			["Slask Wroclaw"] = "Śląsk Wrocław",
+
+			// Bulgarian clubs
+			["Levski Sofia"] = "PFC Levski Sofia",
+			["CSKA Sofia"] = "PFC CSKA Sofia",
 		};
 
 		public static string GetOfficialName(string commonName)
