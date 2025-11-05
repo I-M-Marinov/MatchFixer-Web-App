@@ -45,26 +45,26 @@
 <div class="admin-teams-container">
     <div class="row g-4 ">
         <div class="col-16 col-xl-6">
-            <div class="card p-3">
+			<div class="card p-3 d-flex justify-content-center align-items-center">
                 <h3 class="h5 mb-3">Existing Teams</h3>
                 <div class="table-responsive existing-teams-table">
 	                <table class="table align-middle">
 		                <thead>
 			                <tr>
-				                <th>Logo</th>
-				                <th>Name</th>
-				                <th>API Id</th>
-				                <th>League</th>
+				                <th class="text-center">Logo</th>
+								<th class="text-center">Name</th>
+								<th class="text-center">API Id</th>
+				                <th class="text-center">League</th>
 			                </tr>
 		                </thead>
 		                <tbody>
 		                @foreach (var t in existing.Items)
 		                {
 			                <tr>
-				                <td style="width:40px"><img src="@t.LogoUrl" alt="" style="width:32px;height:32px;object-fit:contain" title="@t.Name" /></td>
-				                <td>@t.Name</td>
-				                <td>@t.ApiTeamId</td>
-								<td>
+								<td class="text-center" style="width:40px"><img src="@t.LogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name" /></td>
+								<td class="text-center">@t.Name</td>
+								<td class="text-center badge">@t.ApiTeamId</td>
+								<td class="text-center">
 					                @{
 						                string flag = leagueFlags.TryGetValue(t.LeagueName, out var url)
 							                ? url
@@ -154,13 +154,13 @@
         </div>
 
         <div class="col-12 col-xl-6">
-            <div class="card p-3">
+            <div class="card p-3 d-flex justify-content-center align-items-center">
                 <h3 class="h5 mb-3">Search & Add</h3>
 
                 <form asp-area="Admin" asp-controller="AdminTeams" asp-action="Search" method="post" class="d-flex flex-wrap gap-2 align-items-end">
 	                @Html.AntiForgeryToken()
-	                <div>
-		                <label class="form-label">Team name</label>
+					<div class="d-flex flex-column justify-content-center align-items-center">
+		                <label class="form-label text-center">Team name</label>
 		                <input name="Query" value="@vm.Query" class="form-control" placeholder="e.g., Manchester United" required />
 	                </div>
 	                <button class="btn btn-primary">Search</button>
