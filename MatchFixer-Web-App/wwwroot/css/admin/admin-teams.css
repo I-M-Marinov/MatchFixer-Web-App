@@ -1,8 +1,20 @@
 ﻿.admin-teams-container{
-    margin-top: 6em;
+    margin-top: 5em;
 }
 
-.teams-pages{
-    margin-top: 5.5em;
-    z-index: 100;
+.teams-pages {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden; 
+    padding-top: 0.5rem;
+}
+
+.teams-pages .pagination {
+    flex-wrap: wrap; 
+    margin: 0;
+}
+
+.existing-teams-table{
+    font-size: 0.85em;
 }
