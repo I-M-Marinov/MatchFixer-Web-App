@@ -1,5 +1,5 @@
 ﻿.admin-teams-container{
-    margin-top: 5em;
+    margin-top: 3.75em;
 }
 
 .teams-pages {
@@ -17,4 +17,14 @@
 
 .existing-teams-table{
     font-size: 0.85em;
+}
+
+.existing-teams-table table tbody tr td:nth-of-type(3) {
+    font-size: 0.80em;
+    left:50%;
+    top: 50%;
+}
+
+.existing-teams-table table tbody tr td:nth-of-type(4){
+    font-size: 0.80em;
 }
