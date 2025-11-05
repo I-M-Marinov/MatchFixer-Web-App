@@ -10,6 +10,22 @@
     var leagues = vm.Leagues ?? new Dictionary<int, string>();
     var existing = Model.Item2;
 
+    var leagueFlags = new Dictionary<string, string>
+    {
+	    { "Premier League", "https://media.api-sports.io/flags/gb.svg" },
+	    { "La Liga",        "https://media.api-sports.io/flags/es.svg" },
+	    { "Bundesliga",     "https://media.api-sports.io/flags/de.svg" },
+	    { "Serie A",        "https://media.api-sports.io/flags/it.svg" },
+	    { "Ligue 1",        "https://media.api-sports.io/flags/fr.svg" },
+	    { "Eredivisie",     "https://media.api-sports.io/flags/nl.svg" },
+	    { "Liga Portugal",  "https://media.api-sports.io/flags/pt.svg" },
+	    { "Ekstraklasa",    "https://media.api-sports.io/flags/pl.svg" },
+	    { "Swiss Super League", "https://media.api-sports.io/flags/ch.svg" },
+	    { "Parva Liga", "https://media.api-sports.io/flags/bg.svg" },
+		{ "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
+		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
+    };
+
 }
 
 <div class="background-profile"></div>
@@ -28,48 +44,112 @@
 
 <div class="admin-teams-container">
     <div class="row g-4 ">
-        <div class="col-12 col-xl-6">
+        <div class="col-16 col-xl-6">
             <div class="card p-3">
                 <h3 class="h5 mb-3">Existing Teams</h3>
-                <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr><th>Logo</th><th>Name</th><th>API Id</th><th>League</th></tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var t in existing.Items)
-                            {
-                                <tr>
-                                    <td style="width:40px"><img src="@t.LogoUrl" alt="" style="width:28px;height:28px;object-fit:contain" /></td>
-                                    <td>@t.Name</td>
-                                    <td>@t.ApiTeamId</td>
-                                    <td>@t.LeagueName</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div class="table-responsive existing-teams-table">
+	                <table class="table align-middle">
+		                <thead>
+			                <tr>
+				                <th>Logo</th>
+				                <th>Name</th>
+				                <th>API Id</th>
+				                <th>League</th>
+			                </tr>
+		                </thead>
+		                <tbody>
+		                @foreach (var t in existing.Items)
+		                {
+			                <tr>
+				                <td style="width:40px"><img src="@t.LogoUrl" alt="" style="width:32px;height:32px;object-fit:contain" title="@t.Name" /></td>
+				                <td>@t.Name</td>
+				                <td>@t.ApiTeamId</td>
+								<td>
+					                @{
+						                string flag = leagueFlags.TryGetValue(t.LeagueName, out var url)
+							                ? url
+							                : "https://media.api-sports.io/flags/eu.svg"; // fallback flag (European Union ... yeah right )
+					                }
+					                <img src="@flag"
+					                     alt="@t.LeagueName flag"
+					                     title="@t.LeagueName"
+					                     style="width:18px;height:12px;object-fit:contain;margin-right:6px;vertical-align:middle" />
+					                @t.LeagueName
+				                </td>
+			                </tr>
+		                }
+		                </tbody>
+						
+		                <tfoot>
+		                <tr>
+			                <td colspan="4">
+				                <div class="teams-pages">
+					                <ul class="pagination mb-0">
+
+						                @{
+							                var p = existing.Page;
+							                var total = existing.TotalPages;
+							                const int window = 10;
+
+							                var start = ((p - 1) / window) * window + 1;         
+							                var end = Math.Min(start + window - 1, total);       
+
+							                string Link(int i) => Url.Action("TeamsIndex", "AdminTeams", new { area = "Admin", page = i })!;
+							                int prevWindowStart = Math.Max(1, start - window);
+							                int nextWindowStart = Math.Min(((total - 1) / window) * window + 1, start + window);
+						                }
+
+						                <ul class="pagination mb-0">
+							                <!-- First / Prev -->
+							                <li class="page-item @(p == 1 ? "disabled" : null)">
+								                <a class="page-link" href="@(p == 1 ? "#" : Link(1))" aria-label="First">&laquo;</a>
+							                </li>
+							                <li class="page-item @(p == 1 ? "disabled" : null)">
+								                <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))" aria-label="Previous">&lsaquo;</a>
+							                </li>
+
+							                <!-- Jump back a window -->
+							                @if (start > 1)
+							                {
+								                <li class="page-item">
+									                <a class="page-link" href="@Link(prevWindowStart)" title="Previous 10">…</a>
+								                </li>
+							                }
+
+							                <!-- Window pages -->
+							                @for (var i = start; i <= end; i++)
+							                {
+								                <li class="page-item @(i == p ? "active" : null)">
+									                <a class="page-link" href="@Link(i)">@i</a>
+								                </li>
+							                }
+
+							                <!-- Jump forward a window -->
+							                @if (end < total)
+							                {
+								                <li class="page-item">
+									                <a class="page-link" href="@Link(nextWindowStart)" title="Next 10">…</a>
+								                </li>
+							                }
+
+							                <!-- Next / Last -->
+							                <li class="page-item @(p == total ? "disabled" : null)">
+								                <a class="page-link" href="@(p == total ? "#" : Link(p + 1))" aria-label="Next">&rsaquo;</a>
+							                </li>
+							                <li class="page-item @(p == total ? "disabled" : null)">
+								                <a class="page-link" href="@(p == total ? "#" : Link(total))" aria-label="Last">&raquo;</a>
+							                </li>
+						                </ul>
+
+					                </ul>
+				                </div>
+			                </td>
+		                </tr>
+		                </tfoot>
+	                </table>
                 </div>
 
-                <nav class="teams-pages">
-                    <ul class="pagination mb-0">
-                        @{
-                            int p = existing.Page, total = existing.TotalPages;
-                            string link(int i) => Url.Action("TeamsIndex", "AdminTeams", new { area = "Admin", page = i })!;
-                        }
-                        <li class="page-item @(p == 1 ? "disabled" : null)">
-                            <a class="page-link" href="@(p == 1 ? "#" : link(p - 1))">Prev</a>
-                        </li>
-                        @for (int i = 1; i <= total; i++)
-                        {
-                            <li class="page-item @(i == p ? "active" : null)">
-                                <a class="page-link" href="@link(i)">@i</a>
-                            </li>
-                        }
-                        <li class="page-item @(p == total ? "disabled" : null)">
-                            <a class="page-link" href="@(p == total ? "#" : link(p + 1))">Next</a>
-                        </li>
-                    </ul>
-                </nav>
+               
             </div>
         </div>
 
@@ -112,7 +192,7 @@
                                 @foreach (var r in vm.Results)
                                 {
                                     <tr>
-                                        <td><img src="@r.LogoUrl" alt="" style="width:32px;height:32px;object-fit:contain" /></td>
+                                        <td><img src="@r.LogoUrl" alt="" style="width:35px;height:35px;object-fit:contain" /></td>
                                         <td>@r.Name</td>
                                         <td>@r.ApiTeamId</td>
                                         <td class="text-end">
@@ -132,7 +212,7 @@
                     </div>
 
                     <script>
-                        // Bind selected league to every Add form
+
                         (function(){
                             const sel = document.getElementById('assignLeague');
                             function sync() {
