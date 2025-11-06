@@ -1,6 +1,8 @@
 ﻿@model Tuple<MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.TeamSearchVm,
 	MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.PaginatedTeamsList<
 		MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.TeamListRow>>
+@using System.Text.RegularExpressions
+
 
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -26,6 +28,8 @@
 		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
     };
 
+    var selectedIds = new HashSet<int>(vm.SelectedLeagueIds ?? Array.Empty<int>());
+
 }
 
 <div class="background-profile"></div>
@@ -44,113 +48,159 @@
 
 <div class="admin-teams-container">
     <div class="row g-4 ">
-        <div class="col-16 col-xl-6">
-			<div class="card p-3 d-flex justify-content-center align-items-center">
-                <h3 class="h5 mb-3">Existing Teams</h3>
-                <div class="table-responsive existing-teams-table">
-	                <table class="table align-middle">
-		                <thead>
-			                <tr>
-				                <th class="text-center">Logo</th>
-								<th class="text-center">Name</th>
-								<th class="text-center">API Id</th>
-				                <th class="text-center">League</th>
-			                </tr>
-		                </thead>
-		                <tbody>
-		                @foreach (var t in existing.Items)
-		                {
-			                <tr>
-								<td class="text-center" style="width:40px"><img src="@t.LogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name" /></td>
-								<td class="text-center">@t.Name</td>
-								<td class="text-center badge">@t.ApiTeamId</td>
-								<td class="text-center">
-					                @{
-						                string flag = leagueFlags.TryGetValue(t.LeagueName, out var url)
-							                ? url
-							                : "https://media.api-sports.io/flags/eu.svg"; // fallback flag (European Union ... yeah right )
-					                }
-					                <img src="@flag"
-					                     alt="@t.LeagueName flag"
-					                     title="@t.LeagueName"
-					                     style="width:18px;height:12px;object-fit:contain;margin-right:6px;vertical-align:middle" />
-					                @t.LeagueName
-				                </td>
-			                </tr>
-		                }
-		                </tbody>
-						
-		                <tfoot>
-		                <tr>
-			                <td colspan="4">
-				                <div class="teams-pages">
-					                <ul class="pagination mb-0">
+        <div class="col-12 col-xl-6">
+	        <div class="card p-3">
+		        @functions{
+			        string Slug(string s) => Regex.Replace((s ?? "").ToLowerInvariant(), "[^a-z0-9]+", "-").Trim('-');
+		        }
 
-						                @{
-							                var p = existing.Page;
-							                var total = existing.TotalPages;
-							                const int window = 10;
+		        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+			        <div class="league-btn-group flex-wrap gap-2" role="group" aria-label="League filters">
+				        @foreach (var kv in leagues.OrderBy(x => x.Value))
+				        {
+					        var id = kv.Key;
+					        var name = kv.Value;
+					        var inputId = $"pill-{id}";
+					        var flagUrl = leagueFlags.TryGetValue(name, out var f)
+						        ? f
+						        : "https://media.api-sports.io/flags/eu.svg";
 
-							                var start = ((p - 1) / window) * window + 1;         
-							                var end = Math.Min(start + window - 1, total);       
+					        <input class="league-pill" id="@inputId" type="checkbox"
+					               value="@id" @(selectedIds.Contains(id) ? "checked" : null) />
+					        <label class="flag-pill" for="@inputId"
+					               title="@name" style="--flag:url('@flagUrl')">
 
-							                string Link(int i) => Url.Action("TeamsIndex", "AdminTeams", new { area = "Admin", page = i })!;
-							                int prevWindowStart = Math.Max(1, start - window);
-							                int nextWindowStart = Math.Min(((total - 1) / window) * window + 1, start + window);
-						                }
+					        </label>
+				        }
+			        </div>
 
-						                <ul class="pagination mb-0">
-							                <!-- First / Prev -->
-							                <li class="page-item @(p == 1 ? "disabled" : null)">
-								                <a class="page-link" href="@(p == 1 ? "#" : Link(1))" aria-label="First">&laquo;</a>
-							                </li>
-							                <li class="page-item @(p == 1 ? "disabled" : null)">
-								                <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))" aria-label="Previous">&lsaquo;</a>
-							                </li>
+			        <button type="button" class="btn btn-light btn-sm ms-1" id="leagueClear">Clear</button>
+			        <button type="button" class="btn btn-light btn-sm" id="leagueSelectAll">Select all</button>
+		        </div>
+		        <h3 class="h5 mb-3">Existing Teams</h3>
+		        <div class="table-responsive existing-teams-table">
+			        <table class="table align-middle table-fixed w-100">
+				        <colgroup>
+					        <col style="width:80px" />
+					        <col style="width:100%" />
+					        <col style="width:100px" />
+					        <col style="width:160px" />
+				        </colgroup>
+				        <thead>
+				        <tr>
+					        <th class="text-center">Logo</th>
+					        <th class="text-center">Name</th>
+					        <th class="text-center">API Id</th>
+					        <th class="text-center">League</th>
+				        </tr>
+				        </thead>
+				        <tbody>
+				        @foreach (var t in existing.Items)
+				        {
+					        <tr data-league-slug="@Slug(t.LeagueName)">
+						        <td class="text-center" style="width:40px"><img src="@t.LogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name"/></td>
+						        <td class="text-center">@t.Name</td>
+						        <td class="text-center align-middle">
+							        <span class="badge bg-info d-inline-flex align-items-center justify-content-center"
+							              style="min-width:45px; height:24px;">
+								        @t.ApiTeamId
+							        </span>
+						        </td>
+						        <td class="text-center">
+							        @{
+								        string flag = leagueFlags.TryGetValue(t.LeagueName, out var url)
+									        ? url
+									        : "https://media.api-sports.io/flags/eu.svg";
+							        }
+							        <img src="@flag"
+							             alt="@t.LeagueName flag"
+							             title="@t.LeagueName"
+							             style="width:18px;height:12px;object-fit:contain;margin-right:6px;vertical-align:middle"/>
+							        @t.LeagueName
+						        </td>
+					        </tr>
+				        }
 
-							                <!-- Jump back a window -->
-							                @if (start > 1)
-							                {
-								                <li class="page-item">
-									                <a class="page-link" href="@Link(prevWindowStart)" title="Previous 10">…</a>
-								                </li>
-							                }
+				        </tbody>
 
-							                <!-- Window pages -->
-							                @for (var i = start; i <= end; i++)
-							                {
-								                <li class="page-item @(i == p ? "active" : null)">
-									                <a class="page-link" href="@Link(i)">@i</a>
-								                </li>
-							                }
+				        <tfoot>
+				        <tr>
+					        <td colspan="4">
+						        <div class="teams-pages">
+							        <ul class="pagination mb-0">
 
-							                <!-- Jump forward a window -->
-							                @if (end < total)
-							                {
-								                <li class="page-item">
-									                <a class="page-link" href="@Link(nextWindowStart)" title="Next 10">…</a>
-								                </li>
-							                }
+								        @{
+									        var p = existing.Page;
+									        var total = existing.TotalPages;
+									        const int window = 10;
 
-							                <!-- Next / Last -->
-							                <li class="page-item @(p == total ? "disabled" : null)">
-								                <a class="page-link" href="@(p == total ? "#" : Link(p + 1))" aria-label="Next">&rsaquo;</a>
-							                </li>
-							                <li class="page-item @(p == total ? "disabled" : null)">
-								                <a class="page-link" href="@(p == total ? "#" : Link(total))" aria-label="Last">&raquo;</a>
-							                </li>
-						                </ul>
+									        var start = ((p - 1) / window) * window + 1;
+									        var end = Math.Min(start + window - 1, total);
 
-					                </ul>
-				                </div>
-			                </td>
-		                </tr>
-		                </tfoot>
-	                </table>
-                </div>
+									        var selectedIdsArr = vm.SelectedLeagueIds ?? Array.Empty<int>();
 
-               
-            </div>
+									        string Link(int i) => Url.Action(
+										        "TeamsIndex",
+										        "AdminTeams",
+										        new { area = "Admin", page = i, leagueIds = selectedIdsArr } // <- pass the array
+									        )!;
+
+									        int prevWindowStart = Math.Max(1, start - window);
+									        int nextWindowStart = Math.Min(((total - 1) / window) * window + 1, start + window);
+								        }
+
+								        <ul class="pagination mb-0">
+									        <!-- First / Prev -->
+									        <li class="page-item @(p == 1 ? "disabled" : null)">
+										        <a class="page-link" href="@(p == 1 ? "#" : Link(1))" aria-label="First">&laquo;</a>
+									        </li>
+									        <li class="page-item @(p == 1 ? "disabled" : null)">
+										        <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))" aria-label="Previous">&lsaquo;</a>
+									        </li>
+
+									        <!-- Jump back a window -->
+									        @if (start > 1)
+									        {
+										        <li class="page-item">
+											        <a class="page-link" href="@Link(prevWindowStart)" title="Previous 10">…</a>
+										        </li>
+									        }
+
+									        <!-- Window pages -->
+									        @for (var i = start; i <= end; i++)
+									        {
+										        <li class="page-item @(i == p ? "active" : null)">
+											        <a class="page-link" href="@Link(i)">@i</a>
+										        </li>
+									        }
+
+									        <!-- Jump forward a window -->
+									        @if (end < total)
+									        {
+										        <li class="page-item">
+											        <a class="page-link" href="@Link(nextWindowStart)" title="Next 10">…</a>
+										        </li>
+									        }
+
+									        <!-- Next / Last -->
+									        <li class="page-item @(p == total ? "disabled" : null)">
+										        <a class="page-link" href="@(p == total ? "#" : Link(p + 1))" aria-label="Next">&rsaquo;</a>
+									        </li>
+									        <li class="page-item @(p == total ? "disabled" : null)">
+										        <a class="page-link" href="@(p == total ? "#" : Link(total))" aria-label="Last">&raquo;</a>
+									        </li>
+								        </ul>
+
+							        </ul>
+						        </div>
+					        </td>
+				        </tr>
+				        </tfoot>
+			        </table>
+		        </div>
+
+
+	        </div>
         </div>
 
         <div class="col-12 col-xl-6">
@@ -231,3 +281,40 @@
         </div>
     </div>
 </div>
+
+								
+<script>
+	(function () {
+	  const pills = Array.from(document.querySelectorAll('.league-pill'));
+	  const btnClear = document.getElementById('leagueClear');
+	  const btnAll   = document.getElementById('leagueSelectAll');
+
+	  const baseUrl = '@Url.Action("TeamsIndex", "AdminTeams", new { area = "Admin" })';
+
+	  function goToFiltered(ids){
+		const qs = new URLSearchParams();
+		qs.set('page', '1');                 
+		(ids || []).forEach(id => qs.append('leagueIds', id));
+		window.location.href = `${baseUrl}?${qs.toString()}`;
+	  }
+
+	  function currentSelection(){
+		return pills.filter(p => p.checked).map(p => p.value);
+	  }
+
+	  pills.forEach(p => p.addEventListener('change', () => {
+		goToFiltered(currentSelection());
+	  }));
+
+	  btnClear?.addEventListener('click', () => {
+		pills.forEach(p => p.checked = false);
+		goToFiltered([]);
+	  });
+
+	  btnAll?.addEventListener('click', () => {
+		pills.forEach(p => p.checked = true);
+		goToFiltered(currentSelection());
+	  });
+	})();
+</script>
+
