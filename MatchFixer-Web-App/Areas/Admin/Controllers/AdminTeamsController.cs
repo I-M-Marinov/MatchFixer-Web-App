@@ -21,29 +21,41 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> TeamsIndex(int page = 1, int pageSize = DefaultPageSize, CancellationToken ct = default)
+		public async Task<IActionResult> TeamsIndex(
+			int page = 1,
+			[FromQuery] int[]? leagueIds = null,
+			CancellationToken ct = default)
 		{
-			var leagues = AdminTeamsService.LeagueMap;
-			var searchVm = new TeamSearchVm { Leagues = leagues, Results = Array.Empty<TeamSearchResult>() };
-			var existing = await _svc.GetTeamsPageAsync(page, pageSize, ct);
+			var selected = leagueIds ?? Array.Empty<int>();
 
-			var model = Tuple.Create(searchVm, existing);
-			return View(model);
+			var leagues = await _svc.GetAllLeaguesAsync(ct);
+			var existing = await _svc.GetTeamsPageAsync(page, DefaultPageSize, selected, ct);
+
+			var searchVm = new TeamSearchVm
+			{
+				Leagues = leagues,                 
+				SelectedLeagueIds = selected,      
+				Results = Array.Empty<TeamSearchResult>(), 
+				Query = string.Empty
+			};
+
+			return View(Tuple.Create(searchVm, existing));
 		}
+
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Search(TeamSearchVm searchVm, CancellationToken ct)
 		{
-			searchVm.Leagues = AdminTeamsService.LeagueMap;
+			searchVm.Leagues = await _svc.GetAllLeaguesAsync(ct);
+
 			searchVm.Results = string.IsNullOrWhiteSpace(searchVm.Query)
 				? Array.Empty<TeamSearchResult>()
 				: await _svc.SearchTeamsAsync(searchVm.Query!, ct);
 
-			var existing = await _svc.GetTeamsPageAsync(1, DefaultPageSize, ct);
+			var existing = await _svc.GetTeamsPageAsync(1, DefaultPageSize, null, ct);
 
-			var model = Tuple.Create(searchVm, existing);
-			return View("TeamsIndex", model);
+			return View("TeamsIndex", Tuple.Create(searchVm, existing));
 		}
 
 		[HttpPost]
