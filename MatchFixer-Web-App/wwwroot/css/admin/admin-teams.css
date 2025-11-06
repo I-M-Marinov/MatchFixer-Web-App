@@ -1,4 +1,6 @@
-﻿.admin-teams-container{
+﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Orbitron:wght@400..900&family=Special+Gothic+Expanded+One&display=swap');
+
+.admin-teams-container{
     margin-top: 3.75em;
 }
 
@@ -21,10 +23,103 @@
 
 .existing-teams-table table tbody tr td:nth-of-type(3) {
     font-size: 0.80em;
-    left:50%;
-    top: 50%;
+}
+
+.existing-teams-table table tbody tr td span {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
 }
 
 .existing-teams-table table tbody tr td:nth-of-type(4){
     font-size: 0.80em;
+}
+
+.league-pill + label {
+    border-radius: 9999px;
+    padding: .25rem .6rem;
+    margin-top: 0.25rem;
+}
+
+.table-fixed {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0.35em 0.7em;
+}
+
+.table-fixed th,
+.table-fixed td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.table-fixed td:nth-child(2) {
+    max-width: 260px;
+}
+
+.badge.api-id {
+    min-width: 56px;
+    display: inline-flex;
+    justify-content: center;
+}
+
+.existing-teams-table {
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .table-fixed td:nth-child(2) {
+        max-width: 140px;
+    }
+
+}
+
+
+
+.league-pill {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.flag-pill {
+    --size: 40px; 
+    position: relative;
+    display: inline-block;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 100%;
+    background-image: var(--flag);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 2px solid transparent;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 1px 3px rgba(0,0,0,.25);
+    cursor: pointer;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.flag-pill:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px rgba(255,255,255,.3), 0 2px 6px rgba(0,0,0,.35);
+}
+
+.league-pill:checked + .flag-pill {
+    transform: scale(1.12);
+    border-color: #f1d302;
+    box-shadow: 0 0 10px 2px #f1d302, 0 0 0 2px rgba(255,255,255,.6);
+}
+
+.league-pill:checked + .flag-pill:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 6px 1px #f1d302, 0 0 0 2px rgba(255,255,255,.4);
+}
+
+.league-pill:focus-visible + .flag-pill {
+    outline: 3px solid #65feb3;
+    outline-offset: 2px;
 }
