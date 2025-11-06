@@ -76,20 +76,46 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			return parsed?.Response ?? new List<SearchTeamResponseItem>();
 		}
 
-
 		public async Task<PaginatedTeamsList<TeamListRow>> GetTeamsPageAsync(
-			int page, int pageSize, CancellationToken ct = default)
+			int page,
+			int pageSize,
+			int[]? leagueIds = null,
+			CancellationToken ct = default)
 		{
-			if (page < 1) page = 1;
-			if (pageSize < 1) pageSize = 10;
+			page = Math.Max(1, page);
+			pageSize = Math.Clamp(pageSize, 5, 200);
 
-			var q = _db.Teams.AsNoTracking()
-				.OrderBy(t => t.LeagueName)
-				.ThenBy(t => t.Name);
+			HashSet<string>? leagueNamesFilter = null;
+			if (leagueIds is { Length: > 0 })
+			{
+				leagueNamesFilter = new HashSet<string>(
+					leagueIds.Where(id => _leagueMap.ContainsKey(id))
+							 .Select(id => _leagueMap[id]),
+					StringComparer.OrdinalIgnoreCase);
+
+				if (leagueNamesFilter.Count == 0)
+				{
+					return new PaginatedTeamsList<TeamListRow>
+					{
+						Items = new List<TeamListRow>(),
+						Page = 1,
+						PageSize = pageSize,
+						TotalCount = 0
+					};
+				}
+			}
+
+			IQueryable<Team> q = _db.Teams.AsNoTracking();
+
+			if (leagueNamesFilter is not null)
+				q = q.Where(t => leagueNamesFilter.Contains(t.LeagueName));
+
+			q = q.OrderBy(t => t.LeagueName).ThenBy(t => t.Name);
 
 			var total = await q.CountAsync(ct);
 
-			var items = await q.Skip((page - 1) * pageSize)
+			var items = await q
+				.Skip((page - 1) * pageSize)
 				.Take(pageSize)
 				.Select(t => new TeamListRow
 				{
@@ -110,9 +136,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			};
 		}
 
-
-		public async Task<bool> AddTeamFromSearchAsync(
-			int apiTeamId, string name, string logoUrl, int leagueId, CancellationToken ct = default)
+		public async Task<bool> AddTeamFromSearchAsync(int apiTeamId, string name, string logoUrl, int leagueId, CancellationToken ct = default)
 		{
 			var exists = await _db.Teams.AnyAsync(t => t.TeamId == apiTeamId, ct);
 			if (exists) return false;
@@ -131,6 +155,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			await _db.Teams.AddAsync(team, ct);
 			await _db.SaveChangesAsync(ct);
 			return true;
+		}
+
+		public Task<Dictionary<int, string>> GetAllLeaguesAsync(CancellationToken ct = default)
+		{
+			var dict = _leagueMap.OrderBy(kv => kv.Value)
+				.ToDictionary(kv => kv.Key, kv => kv.Value);
+			return Task.FromResult(dict);
 		}
 	}
 
