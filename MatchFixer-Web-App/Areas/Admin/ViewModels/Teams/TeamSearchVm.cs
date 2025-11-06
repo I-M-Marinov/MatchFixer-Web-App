@@ -7,6 +7,8 @@
 		public int Season { get; set; }
 		public IReadOnlyDictionary<int, string>? Leagues { get; set; }
 		public IReadOnlyList<TeamSearchResult> Results { get; set; } = Array.Empty<TeamSearchResult>();
+		public int[] SelectedLeagueIds { get; set; } = Array.Empty<int>();
+
 	}
 }
 
