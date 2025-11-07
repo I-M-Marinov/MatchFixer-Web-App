@@ -47,15 +47,15 @@
 
 
 <div class="admin-teams-container">
-    <div class="row g-4 ">
+    <div class="row g-2">
         <div class="col-12 col-xl-6">
-	        <div class="card p-3">
+	        <div class="card">
 		        @functions{
 			        string Slug(string s) => Regex.Replace((s ?? "").ToLowerInvariant(), "[^a-z0-9]+", "-").Trim('-');
 		        }
 
-		        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-			        <div class="league-btn-group flex-wrap gap-2" role="group" aria-label="League filters">
+				<div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-2">
+					<div class="league-btn-group d-flex flex-wrap gap-3 align-items-center justify-content-center" role="group" aria-label="League filters">
 				        @foreach (var kv in leagues.OrderBy(x => x.Value))
 				        {
 					        var id = kv.Key;
@@ -74,17 +74,20 @@
 				        }
 			        </div>
 
+			       
+		        </div>
+		        <div class="d-flex justify-content-center align-items-center">
 			        <button type="button" class="btn btn-light btn-sm ms-1" id="leagueClear">Clear</button>
 			        <button type="button" class="btn btn-light btn-sm" id="leagueSelectAll">Select all</button>
 		        </div>
-		        <h3 class="h5 mb-3">Existing Teams</h3>
+				<h3 class="h5 mb-1 mt-1 text-center">Existing Teams</h3>
 		        <div class="table-responsive existing-teams-table">
 			        <table class="table align-middle table-fixed w-100">
 				        <colgroup>
 					        <col style="width:80px" />
-					        <col style="width:100%" />
+					        <col style="width:60%" />
 					        <col style="width:100px" />
-					        <col style="width:160px" />
+							<col style="width:200px" />
 				        </colgroup>
 				        <thead>
 				        <tr>
@@ -204,7 +207,7 @@
         </div>
 
         <div class="col-12 col-xl-6">
-            <div class="card p-3 d-flex justify-content-center align-items-center">
+            <div class="card p-2 d-flex justify-content-center align-items-center">
                 <h3 class="h5 mb-3">Search & Add</h3>
 
                 <form asp-area="Admin" asp-controller="AdminTeams" asp-action="Search" method="post" class="d-flex flex-wrap gap-2 align-items-end">
