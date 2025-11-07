@@ -210,6 +210,8 @@
 			// Bulgarian clubs
 			["Levski Sofia"] = "PFC Levski Sofia",
 			["CSKA Sofia"] = "PFC CSKA Sofia",
+			["Septemvri Sofia"] = "PFC Septemvri Sofia",
+			["Spartak Varna"] = "FC Spartak Varna",
 		};
 
 		public static string GetOfficialName(string commonName)
