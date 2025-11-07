@@ -1,29 +1,41 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Orbitron:wght@400..900&family=Special+Gothic+Expanded+One&display=swap');
 
 .admin-teams-container{
-    margin-top: 3.75em;
+    margin-top: 2.55em;
+}
+
+.admin-teams-container .card {
+    padding: 1rem 0.5rem 0rem 0.5rem;
 }
 
 .teams-pages {
     display: flex;
     justify-content: center;
     width: 100%;
-    overflow: hidden; 
+    overflow: hidden;
     padding-top: 0.5rem;
 }
 
-.teams-pages .pagination {
-    flex-wrap: wrap; 
+.teams-pages .pagination .pagination {
+    flex-wrap: wrap;
     margin: 0;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
 }
 
-.existing-teams-table{
-    font-size: 0.85em;
+.existing-teams-table {
+    font-size: 0.77em;
 }
 
-.existing-teams-table table tbody tr td:nth-of-type(3) {
-    font-size: 0.80em;
+.existing-teams-table table {
+    padding: 0.1rem 0.1rem !important;
+    border-color: #007aa1;
+    border-style: solid;
+    border-width: 0;
 }
+
 
 .existing-teams-table table tbody tr td span {
     font-family: "Orbitron", sans-serif !important;
@@ -39,14 +51,14 @@
 .league-pill + label {
     border-radius: 9999px;
     padding: .25rem .6rem;
-    margin-top: 0.25rem;
+    margin-right: 0.25rem;
 }
 
 .table-fixed {
     table-layout: fixed;
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0.35em 0.7em;
+    border-spacing: 0.01em 0.01em;
 }
 
 .table-fixed th,
@@ -87,19 +99,19 @@
 }
 
 .flag-pill {
-    --size: 40px; 
+    --size: 37px;
     position: relative;
     display: inline-block;
     width: var(--size);
     height: var(--size);
-    border-radius: 100%;
+    border-radius: 50% !important;
     background-image: var(--flag);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border: 2px solid transparent;
-    box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 1px 3px rgba(0,0,0,.25);
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
     cursor: pointer;
+    transform: scale(1.12);
     transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
 
@@ -109,17 +121,17 @@
 }
 
 .league-pill:checked + .flag-pill {
-    transform: scale(1.12);
+    transform: scale(1.15);
     border-color: #f1d302;
-    box-shadow: 0 0 10px 2px #f1d302, 0 0 0 2px rgba(255,255,255,.6);
+    box-shadow: 0 0 6px 2px #007aa1, 0 0 0 3px rgba(255,255,255,.4)
 }
 
 .league-pill:checked + .flag-pill:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 6px 1px #f1d302, 0 0 0 2px rgba(255,255,255,.4);
+    box-shadow: 0 0 6px 2px #007aa1, 0 0 0 3px rgba(255,255,255,.4)
 }
 
 .league-pill:focus-visible + .flag-pill {
-    outline: 3px solid #65feb3;
+    outline: 3px solid #01c382;
     outline-offset: 2px;
 }
