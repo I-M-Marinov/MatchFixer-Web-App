@@ -37,12 +37,18 @@
 <div class="border-0 rounded-4 p-4 flex-fill">
 	@if (TempData["SuccessMessage"] != null)
 	{
-		<div class="alert success-message">@TempData["SuccessMessage"]</div>
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
 	}
+
 	@if (TempData["ErrorMessage"] != null)
 	{
-		<div class="alert error-message">@TempData["ErrorMessage"]</div>
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
 	}
+
 </div>
 
 
@@ -76,11 +82,11 @@
 
 			       
 		        </div>
-		        <div class="d-flex justify-content-center align-items-center">
-			        <button type="button" class="btn btn-light btn-sm ms-1" id="leagueClear">Clear</button>
-			        <button type="button" class="btn btn-light btn-sm" id="leagueSelectAll">Select all</button>
+		        <div class="d-flex justify-content-center align-items-center gap-2 mt-2">
+			        <button type="button" class="btn btn-primary btn-sm ms-1" id="leagueClear">Clear</button>
+					<button type="button" class="btn btn-primary btn-sm" id="leagueSelectAll">Select all</button>
 		        </div>
-				<h3 class="h5 mb-1 mt-1 text-center">Existing Teams</h3>
+				<h3 class="h5 mb-1 mt-1 text-center text-white">Existing Teams</h3>
 		        <div class="table-responsive existing-teams-table">
 			        <table class="table align-middle table-fixed w-100">
 				        <colgroup>
@@ -104,7 +110,7 @@
 						        <td class="text-center" style="width:40px"><img src="@t.LogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name"/></td>
 						        <td class="text-center">@t.Name</td>
 						        <td class="text-center align-middle">
-							        <span class="badge bg-info d-inline-flex align-items-center justify-content-center"
+										<span class="badge api-id d-inline-flex align-items-center justify-content-center"
 							              style="min-width:45px; height:24px;">
 								        @t.ApiTeamId
 							        </span>
@@ -130,7 +136,7 @@
 				        <tr>
 					        <td colspan="4">
 						        <div class="teams-pages">
-							        <ul class="pagination mb-0">
+										<ul class="pagination pagination-ivm mb-0">
 
 								        @{
 									        var p = existing.Page;
@@ -208,12 +214,12 @@
 
         <div class="col-12 col-xl-6">
             <div class="card p-2 d-flex justify-content-center align-items-center">
-                <h3 class="h5 mb-3">Search & Add</h3>
+				<h3 class="h5 mb-3 text-white">Search & Add</h3>
 
                 <form asp-area="Admin" asp-controller="AdminTeams" asp-action="Search" method="post" class="d-flex flex-wrap gap-2 align-items-end">
 	                @Html.AntiForgeryToken()
 					<div class="d-flex flex-column justify-content-center align-items-center">
-		                <label class="form-label text-center">Team name</label>
+		                <label class="form-label text-center text-white">Team name</label>
 		                <input name="Query" value="@vm.Query" class="form-control" placeholder="e.g., Manchester United" required />
 	                </div>
 	                <button class="btn btn-primary">Search</button>
