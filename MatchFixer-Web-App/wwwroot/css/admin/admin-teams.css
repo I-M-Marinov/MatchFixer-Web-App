@@ -6,6 +6,8 @@
 
 .admin-teams-container .card {
     padding: 1rem 0.5rem 0rem 0.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.5em 0.95em;
 }
 
 .teams-pages {
@@ -90,8 +92,6 @@
 
 }
 
-
-
 .league-pill {
     position: absolute;
     opacity: 0;
@@ -134,4 +134,92 @@
 .league-pill:focus-visible + .flag-pill {
     outline: 3px solid #01c382;
     outline-offset: 2px;
+}
+
+/* PAGINATION STYLING */
+
+.api-id {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #007aa1 !important;
+    color: #ebf3f6 !important;
+    border: 2px #808080 solid !important;
+    text-align: center !important;
+    padding: 0.2em 0.2em;
+    white-space: normal;
+}
+
+
+.pagination-ivm {
+    --pg-bg: #4993ff; 
+    --pg-text: #ebf3f6;
+    --pg-border: hsla(0,0%,100%,.08);
+    --pg-hover: #01c382;
+    --pg-active1: #01c382; 
+    --pg-active2: #3d8bfd; 
+    --pg-focus: 0 0 0 .18rem rgba(110,168,254,.35);
+    --pg-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    --pg-radius: 999px;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pagination-ivm .page-item {
+    display: inline-flex;
+}
+
+.pagination-ivm .page-link {
+    border: 1px solid var(--pg-border);
+    background: var(--pg-bg);
+    color: var(--pg-text);
+    padding: .45rem .6rem;
+    line-height: 1;
+    min-width: 2.25rem;
+    text-align: center;
+    backdrop-filter: saturate(110%) blur(6px);
+    transition: background-color .2s ease, transform .12s ease, box-shadow .2s ease;
+    box-shadow: var(--pg-shadow);
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+}
+
+.pagination-ivm .page-link:hover {
+    background: var(--pg-hover);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.pagination-ivm .page-item.active .page-link {
+    border-color: transparent;
+    color: black;
+    background: linear-gradient(135deg, var(--pg-active1), var(--pg-active2));
+}
+
+.pagination-ivm .page-item.disabled .page-link {
+    opacity: .75;
+    pointer-events: none;
+    filter: grayscale(.2);
+}
+
+.pagination-ivm .page-link:focus {
+    outline: 0;
+    box-shadow: var(--pg-focus);
+}
+
+.pagination-ivm .page-link:is(:has(> .ellipsis), :not([href])) {
+    cursor: default;
+}
+
+@media (max-width: 420px) {
+    .teams-pages {
+        overflow-x: auto;
+    }
+
+    .pagination-ivm {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
 }
