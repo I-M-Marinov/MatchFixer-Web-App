@@ -53,6 +53,21 @@
 			// Swiss Super League
 			(Math.Min(565, 1013), Math.Max(565, 1013)), // Young Boys vs Grasshoppers
 			(Math.Min(1011, 783), Math.Max(1011, 783)), // FC St. Gallen vs FC Zurich
+
+			// Parva Liga (Bulgaria)
+			(Math.Min(853, 646), Math.Max(853, 646)),   // CSKA Sofia vs Levski Sofia (Eternal Derby)
+			(Math.Min(853, 566), Math.Max(853, 566)),   // CSKA Sofia vs Ludogorets (title rivalry)
+			(Math.Min(646, 566), Math.Max(646, 566)),   // Levski Sofia vs Ludogorets
+			(Math.Min(646, 854), Math.Max(646, 854)),   // Levski Sofia vs Slavia Sofia (Old Sofia Derby)
+			(Math.Min(853, 854), Math.Max(853, 854)),   // CSKA Sofia vs Slavia Sofia (Sofia Derby)
+			(Math.Min(634, 858), Math.Max(634, 858)),   // Botev Plovdiv vs Lokomotiv Plovdiv (Plovdiv Derby)
+			(Math.Min(566, 634), Math.Max(566, 634)),   // Ludogorets vs Botev Plovdiv
+			(Math.Min(566, 858), Math.Max(566, 858)),   // Ludogorets vs Lokomotiv Plovdiv
+			(Math.Min(646, 634), Math.Max(646, 634)),   // Levski Sofia vs Botev Plovdiv
+			(Math.Min(646, 858), Math.Max(646, 858)),   // Levski Sofia vs Lokomotiv Plovdiv
+			(Math.Min(853, 634), Math.Max(853, 634)),   // CSKA Sofia vs Botev Plovdiv
+			(Math.Min(853, 858), Math.Max(853, 858)),   // CSKA Sofia vs Lokomotiv Plovdiv
+
 		};
 
 
