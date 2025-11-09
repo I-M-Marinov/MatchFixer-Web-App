@@ -208,10 +208,25 @@
 			["Slask Wroclaw"] = "Śląsk Wrocław",
 
 			// Bulgarian clubs
+
 			["Levski Sofia"] = "PFC Levski Sofia",
 			["CSKA Sofia"] = "PFC CSKA Sofia",
+			["CSKA 1948"] = "FC CSKA 1948 Sofia",
 			["Septemvri Sofia"] = "PFC Septemvri Sofia",
+			["Lokomotiv Sofia"] = "FC Lokomotiv 1929 Sofia",
+			["Slavia Sofia"] = "PFC Slavia Sofia",
+			["Botev Plovdiv"] = "Botev Plovdiv",
+			["Lokomotiv Plovdiv"] = "PFC Lokomotiv Plovdiv",
 			["Spartak Varna"] = "FC Spartak Varna",
+			["Cherno More Varna"] = "PFC Cherno More Varna",
+			["Beroe"] = "PFC Beroe Stara Zagora",
+			["Ludogorets"] = "PFC Ludogorets Razgrad",
+			["FK Minyor Pernik"] = "FC Minyor Pernik",
+			["Dobrudzha"] = "FC Dobrudzha Dobrich",
+			["Arda Kardzhali"] = "FC Arda Kardzhali",
+			["Botev Vratsa"] = "POFC Botev Vratsa",
+			["Montana"] = "FC Montana",
+
 		};
 
 		public static string GetOfficialName(string commonName)
