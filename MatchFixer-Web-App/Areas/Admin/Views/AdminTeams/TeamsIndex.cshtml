@@ -228,7 +228,7 @@
                 @if (vm.Results.Any())
                 {
                     <div class="d-flex align-items-center gap-2 mt-3">
-                        <label class="form-label m-0">Assign to league:</label>
+						<label class="form-label m-0 text-white">Assign to league:</label>
                         <select id="assignLeague" class="form-select form-select-sm" style="width:auto">
                             @foreach (var kv in leagues)
                             {
@@ -237,37 +237,43 @@
                         </select>
                     </div>
 
-                    <div class="table-responsive mt-3">
-                        <table class="table align-middle">
-                            <thead>
-                                <tr>
-                                    <th style="width:48px">Logo</th>
-                                    <th>Name</th>
-                                    <th>API Id</th>
-                                    <th class="text-end"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var r in vm.Results)
-                                {
-                                    <tr>
-                                        <td><img src="@r.LogoUrl" alt="" style="width:35px;height:35px;object-fit:contain" /></td>
-                                        <td>@r.Name</td>
-                                        <td>@r.ApiTeamId</td>
-                                        <td class="text-end">
-                                            <form asp-action="Add" method="post" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="apiTeamId" value="@r.ApiTeamId" />
-                                                <input type="hidden" name="name" value="@r.Name" />
-                                                <input type="hidden" name="logoUrl" value="@r.LogoUrl" />
-                                                <input type="hidden" name="leagueId" value="@r.LeagueId" data-bind-league />
-                                                <button class="btn btn-success btn-sm">Add</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                    <div class="table-responsive mt-3 d-flex justify-content-center align-items-center">
+	                    <table class="table align-middle table-fixed w-75">
+		                    <colgroup>
+			                    <col style="width:80px" />
+			                    <col style="width:40%" />
+			                    <col style="width:100px" />
+			                    <col style="width:100px" />
+		                    </colgroup>
+		                    <thead>
+		                    <tr>
+			                    <th style="width:48px">Logo</th>
+			                    <th>Name</th>
+			                    <th>API Id</th>
+			                    <th class="text-end"></th>
+		                    </tr>
+		                    </thead>
+		                    <tbody>
+		                    @foreach (var r in vm.Results)
+		                    {
+			                    <tr>
+				                    <td><img src="@r.LogoUrl" alt="" style="width:35px;height:35px;object-fit:contain"/></td>
+				                    <td>@r.Name</td>
+				                    <td>@r.ApiTeamId</td>
+				                    <td class="text-end">
+					                    <form asp-action="Add" method="post" class="d-inline">
+						                    @Html.AntiForgeryToken()
+						                    <input type="hidden" name="apiTeamId" value="@r.ApiTeamId"/>
+						                    <input type="hidden" name="name" value="@r.Name"/>
+						                    <input type="hidden" name="logoUrl" value="@r.LogoUrl"/>
+						                    <input type="hidden" name="leagueId" value="@r.LeagueId" data-bind-league/>
+						                    <button class="btn btn-success btn-sm">Add</button>
+					                    </form>
+				                    </td>
+			                    </tr>
+		                    }
+		                    </tbody>
+	                    </table>
                     </div>
 
                     <script>
