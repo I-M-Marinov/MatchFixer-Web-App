@@ -1,0 +1,91 @@
+﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Events
+@model PaginatedEventList<EventBetStatsRow>
+@{
+    Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+    ViewData["Title"] = "Events — Bet Spread";
+}
+
+<div class="background-profile"></div>
+
+
+<div class="card events-spread-card p-3">
+    <h3 class="h5 mb-3">Upcoming Events — Bet Distribution</h3>
+
+    @if (!Model.Items.Any())
+    {
+        <p class="text-muted">No upcoming events.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-nowrap">Kickoff</th>
+                        <th>Event</th>
+                        <th>League</th>
+                        <th class="text-end">Total Bets</th>
+                        <th style="min-width:280px">H / D / A</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-nowrap">@r.KickoffUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@r.HomeTeam <span class="text-muted">vs</span> @r.AwayTeam</td>
+                            <td>@r.LeagueName</td>
+                            <td class="text-end fw-semibold">@r.TotalBets</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height:14px;">
+                                        <div class="progress-bar bg-success" style="width:@r.HomePct%"></div>
+                                        <div class="progress-bar bg-secondary" style="width:@r.DrawPct%"></div>
+                                        <div class="progress-bar bg-danger" style="width:@r.AwayPct%"></div>
+                                    </div>
+                                    <small class="text-nowrap">
+                                        <span class="text-success">H @r.HomePct%</span> /
+                                        <span class="text-muted">D @r.DrawPct%</span> /
+                                        <span class="text-danger">A @r.AwayPct%</span>
+                                    </small>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="5">
+                            @{
+                                var p = Model.Page;
+                                var total = Model.TotalPages;
+                                string Link(int i) => Url.Action("EventsSpread", "AdminInsights", new { area = "Admin", page = i })!;
+                            }
+                            <ul class="pagination pagination-ivm mb-0 d-flex justify-content-center">
+                                <li class="page-item @(p == 1 ? "disabled" : null)">
+                                    <a class="page-link" href="@(p == 1 ? "#" : Link(1))">&laquo;</a>
+                                </li>
+                                <li class="page-item @(p == 1 ? "disabled" : null)">
+                                    <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))">&lsaquo;</a>
+                                </li>
+                                @for (var i = Math.Max(1, p - 3); i <= Math.Min(total, p + 3); i++)
+                                {
+                                    <li class="page-item @(i == p ? "active" : null)">
+                                        <a class="page-link" href="@Link(i)">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(p == total ? "disabled" : null)">
+                                    <a class="page-link" href="@(p == total ? "#" : Link(p + 1))">&rsaquo;</a>
+                                </li>
+                                <li class="page-item @(p == total ? "disabled" : null)">
+                                    <a class="page-link" href="@(p == total ? "#" : Link(total))">&raquo;</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>
