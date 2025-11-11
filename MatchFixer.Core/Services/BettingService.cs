@@ -17,6 +17,7 @@ public class BettingService : IBettingService
 	private readonly IWalletService _walletService;
 	private readonly ITrophyService _trophyService;
 	private readonly IOddsBoostService _oddsBoostService;
+	private readonly IAdminInsightsNotifier _notifier;
 
 
 	public BettingService(MatchFixerDbContext dbContext, 
@@ -24,7 +25,9 @@ public class BettingService : IBettingService
 		ITimezoneService timezoneService,
 		IWalletService walletService,
 		ITrophyService trophyService,
-		IOddsBoostService oddsBoostService)
+		IOddsBoostService oddsBoostService,
+		IAdminInsightsNotifier notifier
+		)
 	{
 		_dbContext = dbContext;
 		_sessionService = sessionService;
@@ -32,10 +35,11 @@ public class BettingService : IBettingService
 		_walletService = walletService;
 		_trophyService = trophyService;
 		_oddsBoostService = oddsBoostService;
+		_notifier = notifier;
 
 	}
 
-	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl)
+	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default)
 	{
 		if (betSlipDto == null || betSlipDto.Bets == null || !betSlipDto.Bets.Any())
 			return (NoBetsProvided, false);
@@ -56,6 +60,8 @@ public class BettingService : IBettingService
 		var (success, message) = await _walletService.DeductForBetAsync(userId, betSlipDto.Amount);
 		if (!success)
 			return (message, false);
+
+		var affectedEventIds = new HashSet<Guid>();
 
 		foreach (var betDto in betSlipDto.Bets)
 		{
@@ -122,10 +128,14 @@ public class BettingService : IBettingService
 			};
 
 			betSlip.Bets.Add(bet);
+			affectedEventIds.Add(matchEvent.Id);
+
 		}
 
 		await _dbContext.BetSlips.AddAsync(betSlip);
 		await _dbContext.SaveChangesAsync();
+
+		await PublishBetMixForEventsAsync(affectedEventIds, ct);
 
 		await _trophyService.EvaluateTrophiesAsync(userId, profileUrl);
 
@@ -370,6 +380,42 @@ public class BettingService : IBettingService
 		if (ev.LiveResult != null) return false;
 
 		return true;
+	}
+
+
+	private async Task PublishBetMixForEventsAsync(IEnumerable<Guid> eventIds, CancellationToken ct)
+	{
+		foreach (var eventId in eventIds.Distinct())
+		{
+			var q = _dbContext.Bets.AsNoTracking()
+				.Where(b => b.MatchEventId == eventId && b.Status == BetStatus.Pending);
+
+			var total = await q.CountAsync(ct);
+			var h = await q.CountAsync(b => b.Pick == MatchPick.Home, ct);
+			var d = await q.CountAsync(b => b.Pick == MatchPick.Draw, ct);
+			var a = await q.CountAsync(b => b.Pick == MatchPick.Away, ct);
+
+			decimal hp = 0, dp = 0, ap = 0;
+			if (total > 0)
+			{
+				hp = Math.Round(100m * h / total, 2);
+				dp = Math.Round(100m * d / total, 2);
+				ap = Math.Round(100m * a / total, 2);
+
+				var drift = 100m - (hp + dp + ap);
+
+				if (drift != 0)
+				{
+					if (hp >= dp && hp >= ap) hp += drift;
+					else if (dp >= ap) dp += drift;
+					else ap += drift;
+				}
+			}
+
+			await _notifier.PublishBetMixAsync(
+				new BetMixUpdateDto(eventId, total, hp, dp, ap),
+				ct);
+		}
 	}
 
 
