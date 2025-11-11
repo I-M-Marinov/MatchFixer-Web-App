@@ -1,4 +1,5 @@
-﻿using MatchFixer.Common.Identity;
+﻿using MatchFixer_Web_App.Areas.Admin.Hubs;
+using MatchFixer.Common.Identity;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Middlewares;
 using MatchFixer.Core.Services;
@@ -123,6 +124,9 @@ builder.Services.AddCors(o =>
 		.SetIsOriginAllowed(_ => true));
 });
 
+// Admin Insights Notifier 
+builder.Services.AddScoped<IAdminInsightsNotifier, AdminInsightsNotifier>();
+
 builder.Services.AddScoped<IBoostQueryService, BoostQueryService>();
 
 builder.Services.AddAuthorization(options =>
@@ -183,6 +187,8 @@ app.UseSession();
 app.UseRouting();
 
 app.MapHub<MatchEventHub>("/matchEventHub");
+app.MapHub<AdminInsightsHub>("/hubs/admin-insights");
+
 app.UseCors("SignalRCors");
 
 app.UseAuthentication();
