@@ -50,45 +50,34 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var r in Model.Items)
-                    {
-                        <tr>
-	                        <td>@r.HomeTeam <span class="text-muted">vs</span> @r.AwayTeam</td>
-	                        @{
-		                        string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
-			                        ? url
-			                        : "https://media.api-sports.io/flags/eu.svg";
-	                        }
-
-                            <td class="league-name d-flex align-items-center justify-content-start gap-2">
-		                        <img src="@flag"
-		                             alt="@r.LeagueName flag"
-		                             title="@r.LeagueName"
-		                             style="width:25px;height:16px;object-fit:contain;"/>
-		                        <span class="mb-0">
-			                        @r.LeagueName
-		                        </span>
-	                        </td>
-	                        <td class="text-center fw-semibold @(r.TotalBets == 0 ? "text-danger" : "text-dark")">
-		                        @r.TotalBets
-	                        </td>
-                            <td>
-	                            <div class="d-flex align-items-center gap-2">
-		                            <div class="progress flex-grow-1" style="height: 20px; font-size: 0.75rem;">
-			                            <div class="progress-bar progress-home text-center" style="width:@r.HomePct%">
-				                            @(r.HomePct > 5 ? $"{r.HomePct}%" : "")
-			                            </div>
-			                            <div class="progress-bar progress-draw text-center" style="width:@r.DrawPct%">
-				                            @(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")
-			                            </div>
-			                            <div class="progress-bar progress-away text-center" style="width:@r.AwayPct%">
-				                            @(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")
-			                            </div>
-		                            </div>
-	                            </div>
-                            </td>
-                        </tr>
-                    }
+                @foreach (var r in Model.Items)
+                {
+	                <tr data-event-id="@r.EventId">
+		                <td>@r.HomeTeam <span class="text-muted">vs</span> @r.AwayTeam</td>
+		                @{
+			                string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
+				                ? url
+				                : "https://media.api-sports.io/flags/eu.svg";
+		                }
+		                <td class="league-name d-flex align-items-center justify-content-start gap-2">
+			                <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName"
+			                     style="width:25px;height:16px;object-fit:contain;"/>
+			                <span class="mb-0">@r.LeagueName</span>
+		                </td>
+		                <td class="text-center fw-semibold @(r.TotalBets == 0 ? "text-danger" : "text-dark")">
+			                @r.TotalBets
+		                </td>
+		                <td>
+			                <div class="d-flex align-items-center gap-2">
+				                <div class="progress flex-grow-1" style="height: 25px; font-size: 0.75rem;">
+					                <div class="progress-bar progress-home text-center"  style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
+					                <div class="progress-bar progress-draw text-center"  style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
+					                <div class="progress-bar progress-away text-center"  style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
+				                </div>
+			                </div>
+		                </td>
+	                </tr>
+                }
                 </tbody>
 
                 <tfoot>
@@ -126,3 +115,66 @@
         </div>
     }
 </div>
+
+									
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+<script>
+    (function(){
+      const hubUrl = "/hubs/admin-insights";
+
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl(hubUrl)
+        .withAutomaticReconnect()
+        .build();
+
+      function rowFor(eventId) {
+        return document.querySelector(`tr[data-event-id="${eventId}"]`);
+      }
+
+      function setPctBar(el, pct) {
+        if (!el) return;
+        const v = Number(pct) || 0;
+        el.style.width = v + "%";
+
+        el.textContent = v > 5 ? (v.toFixed(2) + "%") : "";
+      }
+
+      function setTotalCell(row, total) {
+
+        const cell = row.querySelector("td.text-center.fw-semibold");
+        if (!cell) return;
+        cell.textContent = total;
+
+        cell.classList.toggle("text-danger", total == 0);
+        cell.classList.toggle("text-dark", total != 0);
+
+      }
+
+      connection.on("BetMixUpdated", function (m) {
+        const row = rowFor(m.eventId);
+        if (!row) return;
+
+        setPctBar(row.querySelector(".progress-home"), m.homePct);
+        setPctBar(row.querySelector(".progress-draw"), m.drawPct);
+        setPctBar(row.querySelector(".progress-away"), m.awayPct);
+        setTotalCell(row, m.totalBets);
+      });
+
+      connection.start().then(function(){
+
+        document.querySelectorAll("tr[data-event-id]").forEach(tr => {
+          const id = tr.getAttribute("data-event-id");
+          if (id) connection.invoke("JoinEvent", id);
+        });
+      }).catch(err => console.error("[AdminInsightsHub] connect error", err));
+
+
+      window.addEventListener("beforeunload", function(){
+        document.querySelectorAll("tr[data-event-id]").forEach(tr => {
+          const id = tr.getAttribute("data-event-id");
+          if (id) connection.invoke("LeaveEvent", id);
+        });
+      });
+    })();
+</script>
