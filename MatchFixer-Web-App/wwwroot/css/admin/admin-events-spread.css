@@ -1,3 +1,25 @@
 ﻿.events-spread-card {
     margin-top: 5.55em;
 }
+
+.progress-home {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.progress-draw {
+    background-color: var(--accent-color);
+    color: black;
+}
+
+.progress-away {
+    background-color: var(--secondary-color);
+    color: black;
+}
+
+@media (max-width: 768px) {
+    th.league-name,
+    td.league-name {
+        display: none !important;
+    }
+}
