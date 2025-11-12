@@ -390,6 +390,15 @@ public class BettingService : IBettingService
 			var q = _dbContext.Bets.AsNoTracking()
 				.Where(b => b.MatchEventId == eventId && b.Status == BetStatus.Pending);
 
+			
+			var weighted = q.Select(b => new
+			{
+				b.Pick,
+				Amount = b.BetSlip.Amount /
+				         _dbContext.Bets.Count(x => x.BetSlipId == b.BetSlipId)
+			});
+
+			var totalStake = await weighted.SumAsync(x => (decimal?)x.Amount, ct) ?? 0m;
 			var total = await q.CountAsync(ct);
 			var h = await q.CountAsync(b => b.Pick == MatchPick.Home, ct);
 			var d = await q.CountAsync(b => b.Pick == MatchPick.Draw, ct);
@@ -413,7 +422,7 @@ public class BettingService : IBettingService
 			}
 
 			await _notifier.PublishBetMixAsync(
-				new BetMixUpdateDto(eventId, total, hp, dp, ap),
+				new BetMixUpdateDto(eventId, total, totalStake, hp, dp, ap),
 				ct);
 		}
 	}
