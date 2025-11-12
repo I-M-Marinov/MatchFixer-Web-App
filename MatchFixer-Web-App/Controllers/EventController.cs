@@ -40,6 +40,7 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpPost]
 		[Authorize]
 		[AdminOnly]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddMatchEvent(MatchEventFormModel model)
 		{
 			if (!ModelState.IsValid)
