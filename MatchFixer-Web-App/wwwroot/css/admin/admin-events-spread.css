@@ -17,6 +17,19 @@
     color: black;
 }
 
+.projected-home {
+    background-color: #004c99;
+    color: #e6e6e6;
+}
+.projected-draw {
+    background-color: #b38f00;
+    color: #f5f5f5;
+}
+.projected-away {
+    background-color: #8b0000;
+    color: #f5f5f5;
+}
+
 @media (max-width: 768px) {
     th.league-name,
     td.league-name {
