@@ -387,18 +387,20 @@ public class BettingService : IBettingService
 	{
 		foreach (var eventId in eventIds.Distinct())
 		{
-			var q = _dbContext.Bets.AsNoTracking()
+			var q = _dbContext.Bets
+				.AsNoTracking()
 				.Where(b => b.MatchEventId == eventId && b.Status == BetStatus.Pending);
 
-			
-			var weighted = q.Select(b => new
-			{
-				b.Pick,
-				Amount = b.BetSlip.Amount /
-				         _dbContext.Bets.Count(x => x.BetSlipId == b.BetSlipId)
-			});
+			var perSlip = await q
+				.GroupBy(b => b.BetSlipId)
+				.Select(g => new
+				{
+					PerLeg = g.Select(x => x.BetSlip.Amount).FirstOrDefault() / (decimal)g.Count()
+				})
+				.ToListAsync(ct);
 
-			var totalStake = await weighted.SumAsync(x => (decimal?)x.Amount, ct) ?? 0m;
+			var totalStake = perSlip.Sum(x => x.PerLeg); // in-memory sum (safe)
+
 			var total = await q.CountAsync(ct);
 			var h = await q.CountAsync(b => b.Pick == MatchPick.Home, ct);
 			var d = await q.CountAsync(b => b.Pick == MatchPick.Draw, ct);
@@ -412,7 +414,6 @@ public class BettingService : IBettingService
 				ap = Math.Round(100m * a / total, 2);
 
 				var drift = 100m - (hp + dp + ap);
-
 				if (drift != 0)
 				{
 					if (hp >= dp && hp >= ap) hp += drift;
@@ -422,10 +423,11 @@ public class BettingService : IBettingService
 			}
 
 			await _notifier.PublishBetMixAsync(
-				new BetMixUpdateDto(eventId, total, totalStake, hp, dp, ap),
+				new BetMixUpdateDto { EventId = eventId, TotalBets = total, TotalStake = totalStake, HomePct = hp, DrawPct = dp, AwayPct = ap },
 				ct);
 		}
 	}
+
 
 
 }
