@@ -41,7 +41,7 @@
                         <th class="league-name">League</th>
                         <th class="text-center">Total Stake</th>
                         <th class="text-center">Total Bets</th>
-                        <th class="text-center"  style="min-width:220px">
+                        <th class="text-center" style="min-width:220px">
                             <span class="progress-home badge"> Home </span>
                             /
                             <span class="progress-draw badge"> Draw </span>
@@ -65,13 +65,15 @@
 			                     style="width:25px;height:16px;object-fit:contain;"/>
 			                <span class="mb-0">@r.LeagueName</span>
 		                </td>
-		                <td class="text-center fw-semibold">@r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))</td>
-		                <td class="text-center fw-semibold @(r.TotalBets == 0 ? "text-danger" : "text-dark")">
-			                @r.TotalBets
-		                </td>
+			                <td class="text-center fw-semibold" data-role="total-stake">
+				                @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
+			                </td>
+	                        <td class="text-center fw-semibold @(r.TotalBets == 0 ? "text-danger" : "text-dark")" data-role="total-bets">
+								@r.TotalBets
+			                </td>
 		                <td>
 			                <div class="d-flex align-items-center gap-2">
-				                <div class="progress flex-grow-1" style="height: 25px; font-size: 0.75rem;">
+				                <div class="progress flex-grow-1" style="height: 25px; font-size: 0.65rem;">
                                     @if (r.TotalStake == 0)
                                     {
 	                                    <div class="progress-bar projected-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
@@ -153,25 +155,22 @@
       }
 
         function setTotalStake(row, totalStake) {
-            const cell = row.querySelector("td.text-center.fw-semibold");
-            if (!cell) return;
+          const cell = row.querySelector('[data-role="total-stake"]');
+          if (!cell) return;
 
-      
-            cell.textContent = totalStake;
-            cell.classList.toggle("text-danger", totalStake <= 0);
-            cell.classList.toggle("text-dark", totalStake > 0);
+
+          cell.textContent = `€${Number(totalStake).toFixed(2)}`;
+          cell.classList.toggle("text-danger", (totalStake || 0) <= 0);
+          cell.classList.toggle("text-dark", (totalStake || 0) > 0);
         }
 
-      function setTotalCell(row, total) {
-
-        const cell = row.querySelector("td.text-center.fw-semibold");
-        if (!cell) return;
-        cell.textContent = total;
-
-        cell.classList.toggle("text-danger", total == 0);
-        cell.classList.toggle("text-dark", total != 0);
-
-      }
+        function setTotalCell(row, total) {
+          const cell = row.querySelector('[data-role="total-bets"]');
+          if (!cell) return;
+          cell.textContent = total;
+          cell.classList.toggle("text-danger", total == 0);
+          cell.classList.toggle("text-dark",   total != 0);
+        }
 
       connection.on("BetMixUpdated", function (m) {
         const row = rowFor(m.eventId);
