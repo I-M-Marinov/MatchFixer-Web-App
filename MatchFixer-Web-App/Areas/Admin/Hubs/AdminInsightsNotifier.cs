@@ -15,6 +15,7 @@ namespace MatchFixer.Core.Services
 				.SendAsync("BetMixUpdated", new
 				{
 					eventId = m.EventId,
+					totalStake = m.TotalStake,
 					totalBets = m.TotalBets,
 					homePct = m.HomePct,
 					drawPct = m.DrawPct,
