@@ -63,7 +63,8 @@
 				@foreach (var match in Model)
 				{
 					<div class="col">
-						<div class="event-card position-relative" data-match-id="@match.Id" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone">
+						<div class="event-card position-relative" data-match-id="@match.Id" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone" data-has-boost="@(match.ActiveBoost != null ? "true" : "false")">
+
 
 								<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
 									<div class="card-body d-flex flex-column justify-content-around 
@@ -464,6 +465,21 @@
 
 		container.appendChild(allBtn);
 
+		const hasBoosted = document.querySelector('.event-card[data-has-boost="true"]') !== null;
+		if (hasBoosted) {
+			const boostBtn = document.createElement('button');
+			boostBtn.className = 'custom-date-pill me-2';
+			boostBtn.dataset.date = 'boosted';
+
+			const icon = document.createElement('i');
+			icon.className = 'ri-fire-fill boost-fire-icon me-1';
+			boostBtn.appendChild(icon);
+
+			boostBtn.appendChild(document.createTextNode('Boosted'));
+
+			container.appendChild(boostBtn);
+		}
+
 		getUniqueEventDates().forEach(date => {
 			const btn = document.createElement('button');
 			const dateObj = new Date(date);
@@ -516,17 +532,29 @@
 		}
 	}
 
-	document.addEventListener('click', function (e) {
+		document.addEventListener('click', function (e) {
 		if (e.target.matches('#datePillContainer button')) {
-			const selectedDate = e.target.dataset.date;
+			const selected = e.target.dataset.date;
 
+			// toggle active class
 			document.querySelectorAll('#datePillContainer button').forEach(btn =>
 				btn.classList.remove('active'));
 			e.target.classList.add('active');
 
+			// apply filter
 			document.querySelectorAll('.event-card').forEach(card => {
 				const kickoffDate = card.dataset.kickoff.split('T')[0];
-				const matches = (selectedDate === 'all') || (kickoffDate === selectedDate);
+				const isBoosted = card.dataset.hasBoost === 'true';
+
+				let matches;
+				if (selected === 'all') {
+					matches = true;
+				} else if (selected === 'boosted') {
+					matches = isBoosted;
+				} else {
+					matches = (kickoffDate === selected);
+				}
+
 				card.closest('.col').style.display = matches ? '' : 'none';
 			});
 		}
@@ -609,6 +637,8 @@
 				console.warn("[Boost] No card for match", boostData.matchEventId);
 				return;
 			}
+
+			card.dataset.hasBoost = "true";
 
 			const oddsRow = card.querySelector("tbody tr:not(.boost-timer-row)")
 						 || card.querySelector("tbody tr");
@@ -763,6 +793,11 @@
 		cardBody.classList.remove("boosted-match-container-effects");
 		if (cardBody.dataset.isDerby === "true") {
 			cardBody.classList.add("derby-match-container-effects");
+		}
+
+		const card = cardBody.closest(".event-card");
+		if (card) {
+			card.dataset.hasBoost = "false";
 		}
 	
 		row.remove();
