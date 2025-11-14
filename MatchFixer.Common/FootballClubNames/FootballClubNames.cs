@@ -170,6 +170,8 @@
 			["NAC Breda"] = "NAC Breda",
 			["FC Volendam"] = "FC Volendam",
 			["Emmen"] = "FC Emmen",
+			["Groningen"] = "FC Groningen",
+			["Telstar"] = "SC Telstar",
 
 			
 			// Swiss clubs
