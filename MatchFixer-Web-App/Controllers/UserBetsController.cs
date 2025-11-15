@@ -18,6 +18,7 @@ namespace MatchFixer_Web_App.Controllers
 			_bettingService = bettingService;
 		}
 
+		[HttpGet]
 		public async Task<IActionResult> UserBets()
 		{
 			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
