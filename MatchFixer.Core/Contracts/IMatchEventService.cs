@@ -1,7 +1,6 @@
 ﻿using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Threading.Tasks;
 
 namespace MatchFixer.Core.Contracts
 {

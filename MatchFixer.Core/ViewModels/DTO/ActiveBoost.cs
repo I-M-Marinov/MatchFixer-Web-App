@@ -1,6 +1,4 @@
-﻿
-
-namespace MatchFixer.Core.ViewModels.DTO
+﻿namespace MatchFixer.Core.ViewModels.DTO
 {
 	public class ActiveBoost
 	{
