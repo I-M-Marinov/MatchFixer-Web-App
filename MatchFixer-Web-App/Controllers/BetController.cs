@@ -2,9 +2,11 @@
 using MatchFixer.Core.DTOs.Bets;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MatchFixer_Web_App.Controllers
 {
+	[Authorize]
 	public class BetController : Controller
 	{
 
