@@ -3,7 +3,7 @@ using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Email;
-using Microsoft.AspNetCore.Identity.UI.Services; // if you use IEmailSender
+using Microsoft.AspNetCore.Identity.UI.Services; 
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand;
 
@@ -12,7 +12,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 	public class AdminEmailService : IAdminEmailService
 	{
 		private readonly MatchFixerDbContext _db;
-		private readonly IEmailSender _email; // or your own abstraction
+		private readonly IEmailSender _email; 
 
 		public AdminEmailService(MatchFixerDbContext db, IEmailSender email)
 		{
@@ -117,7 +117,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					break;
 			}
 
-			// Keep counts consistent with Send: only confirmed + has email (optional, but recommended)
+			// Keep counts consistent with Send: only confirmed + has email
 			if (cmd.OnlyConfirmed)
 				users = users.Where(u => u.EmailConfirmed);
 
