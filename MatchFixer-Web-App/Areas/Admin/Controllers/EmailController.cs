@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Common.Identity;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Email;
+using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Authorize(Roles = Roles.Admin)]
+	[AdminOnly]
 	public class EmailController : Controller
 	{
 		private readonly IAdminEmailService _emailService;
