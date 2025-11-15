@@ -1,6 +1,6 @@
 ﻿using MatchFixer.Core.ViewModels.EventsResults;
 
-namespace MatchFixer_Web_App.Areas.Admin.Interfaces
+namespace MatchFixer.Core.Contracts
 {
 	public interface IEventsResultsService
 	{
