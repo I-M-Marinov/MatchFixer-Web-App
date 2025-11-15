@@ -1,5 +1,4 @@
 ﻿using MatchFixer.Core.Contracts;
-using MatchFixer.Core.Services;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
