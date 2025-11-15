@@ -1,9 +1,8 @@
-﻿using MatchFixer_Web_App.Areas.Admin.Hubs;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using Microsoft.AspNetCore.SignalR;
 
-namespace MatchFixer.Core.Services
+namespace MatchFixer_Web_App.Areas.Admin.Hubs
 {
 	public sealed class AdminInsightsNotifier : IAdminInsightsNotifier
 	{
