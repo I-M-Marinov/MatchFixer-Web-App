@@ -1,12 +1,14 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.MatchResults;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.GeneralConstants.MatchResultConstants;
 
 namespace MatchFixer_Web_App.Controllers
 {
+	[Authorize]
 	public class ResultController : Controller
 	{
 		private readonly ILiveMatchResultService _resultService;
