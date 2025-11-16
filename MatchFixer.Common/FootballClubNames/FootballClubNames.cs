@@ -144,6 +144,8 @@
 			["Clermont Foot"] = "Clermont Foot 63",
 			["Saint Etienne"] = "AS Saint-Étienne",
 			["Stade Brestois 29"] = "Stade Brestois 29",
+			["Paris FC"] = "Paris FC",
+			["Angers"] = "Angers SCO",
 
 			// Dutch clubs
 
@@ -189,6 +191,7 @@
 			["Yverdon Sport"] = "Yverdon-Sport FC",
 			["FC Thun"] = "FC Thun",
 			["Stade Lausanne-Ouchy"] = "FC Stade Lausanne Ouchy",
+			["FC Sion"] = "FC Sion",
 
 			// Polish clubs
 
