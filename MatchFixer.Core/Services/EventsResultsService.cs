@@ -1,4 +1,4 @@
-﻿using MatchFixer_Web_App.Areas.Admin.Interfaces;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure;
 using MatchFixer.Core.ViewModels.EventsResults;
 using Microsoft.EntityFrameworkCore;
