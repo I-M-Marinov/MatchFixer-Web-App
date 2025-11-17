@@ -4,7 +4,9 @@
 	{
 		public Guid EventId { get; set; }
 		public string HomeTeam { get; set; } = "";
-		public string AwayTeam { get; set; } = "";
+		public string AwayTeam { get; set; } = "";	
+		public string HomeTeamLogoUrl { get; set; } = "";
+		public string AwayTeamLogoUrl { get; set; } = "";
 		public string LeagueName { get; set; } = "";
 		public DateTime KickoffUtc { get; set; }
 
