@@ -24,8 +24,8 @@
 <div class="background-profile"></div>
 
 
-<div class="card events-spread-card p-3">
-    <h3 class="h5 mb-3 text-center">Upcoming Events — Bet Distribution</h3>
+<div class="card events-spread-card p-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
+    <h3 class="h5 mb-3 text-center text-black">Upcoming Events — Bet Distribution</h3>
 
     @if (!Model.Items.Any())
     {
@@ -54,23 +54,27 @@
                 @foreach (var r in Model.Items)
                 {
 	                <tr data-event-id="@r.EventId">
-		                <td>@r.HomeTeam <span class="text-uppercase text-primary">vs</span> @r.AwayTeam</td>
+                        <td>
+                                <img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam" />
+                                <img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
+                                <img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam" />
+		                </td>
 		                @{
 			                string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
 				                ? url
 				                : "https://media.api-sports.io/flags/eu.svg";
 		                }
-		                <td class="league-name d-flex align-items-center justify-content-start gap-2">
-			                <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName"
-			                     style="width:25px;height:16px;object-fit:contain;"/>
+		                <td class="league-name d-flex align-items-center justify-content-start gap-2 p-3">
+			                <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;" />
 			                <span class="mb-0">@r.LeagueName</span>
 		                </td>
                             <td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
 				                @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
 			                </td>
-                            <td class="text-center fw-semibold @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-bets">
-                                @(@r.TotalBets == 0 ? "current odds" : @r.TotalBets)
-			                </td>
+		                <td class="text-center fw-semibold @(r.TotalBets == 0 ? "current-odds-cell text-primary" : "text-black")"
+		                    data-role="total-bets">
+			                @(r.TotalBets == 0 ? "current odds" : r.TotalBets)
+		                </td>
 		                <td>
 			                <div class="d-flex align-items-center gap-2">
 				                <div class="progress flex-grow-1" style="height: 25px; font-size: 0.65rem;">
@@ -95,35 +99,45 @@
                 </tbody>
 
                 <tfoot>
-                    <tr>
-                        <td colspan="5">
-                            @{
-                                var p = Model.Page;
-                                var total = Model.TotalPages;
-                                string Link(int i) => Url.Action("EventsSpread", "AdminInsights", new { area = "Admin", page = i })!;
-                            }
-                            <ul class="pagination pagination-ivm mb-0 d-flex justify-content-center">
-                                <li class="page-item @(p == 1 ? "disabled" : null)">
-                                    <a class="page-link" href="@(p == 1 ? "#" : Link(1))">&laquo;</a>
-                                </li>
-                                <li class="page-item @(p == 1 ? "disabled" : null)">
-                                    <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))">&lsaquo;</a>
-                                </li>
-                                @for (var i = Math.Max(1, p - 3); i <= Math.Min(total, p + 3); i++)
-                                {
-                                    <li class="page-item @(i == p ? "active" : null)">
-                                        <a class="page-link" href="@Link(i)">@i</a>
-                                    </li>
-                                }
-                                <li class="page-item @(p == total ? "disabled" : null)">
-                                    <a class="page-link" href="@(p == total ? "#" : Link(p + 1))">&rsaquo;</a>
-                                </li>
-                                <li class="page-item @(p == total ? "disabled" : null)">
-                                    <a class="page-link" href="@(p == total ? "#" : Link(total))">&raquo;</a>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
+                <tr>
+	                <td colspan="5">
+		                @{
+			                var p = Model.Page;
+			                var total = Model.TotalPages;
+			                string Link(int i) => Url.Action("EventsSpread", "AdminInsights", new { area = "Admin", page = i })!;
+		                }
+		                <ul class="pagination pagination-ivm mb-0 d-flex justify-content-center">
+			                <li class="page-item @(p == 1 ? "disabled" : null)">
+				                <a class="page-link" href="@(p == 1 ? "#" : Link(1))">&laquo;</a>
+			                </li>
+			                <li class="page-item @(p == 1 ? "disabled" : null)">
+				                <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))">&lsaquo;</a>
+			                </li>
+			                @for (var i = Math.Max(1, p - 3); i <= Math.Min(total, p + 3); i++)
+			                {
+				                <li class="page-item @(i == p ? "active" : null)">
+					                <a class="page-link" href="@Link(i)">@i</a>
+				                </li>
+			                }
+			                <li class="page-item @(p == total ? "disabled" : null)">
+				                <a class="page-link" href="@(p == total ? "#" : Link(p + 1))">&rsaquo;</a>
+			                </li>
+			                <li class="page-item @(p == total ? "disabled" : null)">
+				                <a class="page-link" href="@(p == total ? "#" : Link(total))">&raquo;</a>
+			                </li>
+		                </ul>
+	                </td>
+                </tr>
+                <div class="odds-color-map">
+	                <span class="me-2 text-primary" style="font-size: 0.65em;">
+		                odds: 
+	                </span> 
+	                <span class="projected-home badge"> Home </span>
+	                |
+	                <span class="projected-draw badge"> Draw </span>
+	                |
+	                <span class="projected-away badge"> Away </span>
+                </div>
                 </tfoot>
             </table>
         </div>
