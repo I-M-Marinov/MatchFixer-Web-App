@@ -19,6 +19,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var now = DateTime.UtcNow;
 
 			var baseQ = _db.MatchEvents
+				.Include(e => e.HomeTeam)
+				.Include(e => e.AwayTeam)
 				.AsNoTracking()
 				.Where(e => e.MatchDate > now && !e.IsCancelled);
 
@@ -33,6 +35,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					e.Id,
 					HomeTeam = e.HomeTeam.Name,
 					AwayTeam = e.AwayTeam.Name,
+					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
+					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					LeagueName = !string.IsNullOrEmpty(e.HomeTeam.LeagueName) ? e.HomeTeam.LeagueName
 							   : !string.IsNullOrEmpty(e.AwayTeam.LeagueName) ? e.AwayTeam.LeagueName
 							   : "Unknown",
@@ -58,6 +62,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					EventId = x.Id,
 					HomeTeam = x.HomeTeam,
 					AwayTeam = x.AwayTeam,
+					HomeTeamLogoUrl = x.HomeTeamLogoUrl,
+					AwayTeamLogoUrl = x.AwayTeamLogoUrl,
 					LeagueName = x.LeagueName,
 					KickoffUtc = x.KickoffUtc,
 					TotalBets = x.TotalBets,
