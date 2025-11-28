@@ -122,6 +122,7 @@
 			["Cadiz"] = "Cádiz CF",
 			["Real Sociedad"] = "Real Sociedad",
 			["Levante"] = "Levante UD",
+			["Elche"] = "Elche CF",
 
 			// French clubs
 
