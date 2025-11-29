@@ -20,6 +20,7 @@ namespace MatchFixer.Infrastructure.Entities
 		[MaxLength(3)]
 		public string Currency { get; set; } = "EUR"; // default currently Euro
 		public DateTime? HistoryClearedAt { get; set; } // history clear time in UTC 
+		public DateTime? HistoryClearedFromAdminAt { get; set; } // history clear time in UTC if the admin did it 
 
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // create time in UTC 
 
