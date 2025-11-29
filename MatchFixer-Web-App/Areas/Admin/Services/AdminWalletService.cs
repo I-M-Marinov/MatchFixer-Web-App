@@ -44,7 +44,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Select(u => new { u.UserName, u.Email })
 				.FirstOrDefaultAsync();
 
-			var cutoff = wallet.HistoryClearedAt;
+			var cutoff = wallet.HistoryClearedFromAdminAt;
 
 			var txAsc = wallet.Transactions
 				.Where(t => !cutoff.HasValue || t.CreatedAt >= cutoff.Value)
@@ -178,7 +178,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			if (wallet == null) return (false, WalletNotFound);
 
-			var historyClearedAt = wallet.HistoryClearedAt;
+			var historyClearedAt = wallet.HistoryClearedFromAdminAt;
+
 			var visible = historyClearedAt.HasValue
 				? wallet.Transactions.Where(t => t.CreatedAt >= historyClearedAt.Value)
 				: wallet.Transactions;
