@@ -10,6 +10,7 @@
 			(Math.Min(49, 50), Math.Max(49, 50)), // Chelsea vs Manchester City
 			(Math.Min(42, 47), Math.Max(42, 47)), // Arsenal vs Tottenham
 			(Math.Min(39, 48), Math.Max(39, 48)), // Wolves vs West Ham (London derby)
+			(Math.Min(49, 42), Math.Max(49, 42)), // Chelsea vs Arsenal (The real London derby)
 			(Math.Min(44, 45), Math.Max(44, 45)), // Burnley vs Everton (Northwest derby)
 			(Math.Min(34, 39), Math.Max(34, 39)), // Newcastle vs Wolves
 
