@@ -26,5 +26,15 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			}
 			return View(vm);
 		}
+
+
+		[HttpGet]
+		public async Task<IActionResult> GetSlipDetails(Guid id)
+		{
+			var vm = await _svc.GetSlipDetailsAsync(id);
+			if (vm == null) return NotFound();
+
+			return PartialView("_SlipDetailsPartial", vm);
+		}
 	}
 }
