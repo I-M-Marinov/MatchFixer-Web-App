@@ -26,207 +26,224 @@
 <div class="background-profile"></div>
 
 <div class="border-0 rounded-4 p-3">
-    @if (TempData["SuccessMessage"] is string s)
-    {
-        <div class="alert alert-success shadow-sm mb-3">@s</div>
-    }
-    @if (TempData["ErrorMessage"] is string e)
-    {
-        <div class="alert alert-danger shadow-sm mb-3">@e</div>
-    }
+	@if (TempData["SuccessMessage"] is string s)
+	{
+		<div class="alert alert-success shadow-sm mb-3">@s</div>
+	}
+	@if (TempData["ErrorMessage"] is string e)
+	{
+		<div class="alert alert-danger shadow-sm mb-3">@e</div>
+	}
 
-    <div class="card shadow-sm border-0 rounded-4 admin-user-bets-card">
+	<div class="card shadow-sm border-0 rounded-4 admin-user-bets-card">
 
-	    <div class="card-body">
+		<div class="card-body">
 
-		    <h5 class="card-title mb-3 text-center">
-			    Bets for @Model.UserName
-		    </h5>
+			<h5 class="card-title mb-3 text-center">
+				Bets for @Model.UserName
+			</h5>
 
-		    <!-- Quick totals -->
-		    <div class="row g-2 mb-3">
-			    <div class="col-6 col-md-3">
-				    <div class="p-3 rounded bg-light text-center">
-					    <div class="small text-muted">Pending</div>
-					    <div class="fs-5 fw-semibold">@Model.CountPending</div>
-				    </div>
-			    </div>
-			    <div class="col-6 col-md-3">
-				    <div class="p-3 rounded bg-light text-center">
-					    <div class="small text-muted">Won</div>
-					    <div class="fs-5 fw-semibold text-success">@Model.CountWon</div>
-				    </div>
-			    </div>
-			    <div class="col-6 col-md-3">
-				    <div class="p-3 rounded bg-light text-center">
-					    <div class="small text-muted">Lost / Voided</div>
-					    <div class="fs-5 fw-semibold text-danger">@Model.CountLostOrVoided</div>
-				    </div>
-			    </div>
-			    <div class="col-6 col-md-3">
-				    <div class="p-3 rounded bg-light text-center">
-					    <div class="small text-muted">Total stake</div>
-					    <div class="fs-5 fw-semibold">@Money(Model.TotalStake)</div>
-				    </div>
-			    </div>
-			    <div class="row g-2">
-				    <div class="col-12 col-sm-4">
-					    <div class="p-3 rounded bg-danger-subtle text-center">
-						    <div class="small text-muted">Total lost</div>
-						    <div class="fs-5 fw-semibold">@Money(Model.TotalLost)</div>
-					    </div>
-				    </div>
+			<!-- Quick totals -->
+			<div class="row g-2 mb-3">
+				<div class="col-6 col-md-3">
+					<div class="p-3 rounded bg-light text-center">
+						<div class="small text-muted">Pending</div>
+						<div class="fs-5 fw-semibold">@Model.CountPending</div>
+					</div>
+				</div>
+				<div class="col-6 col-md-3">
+					<div class="p-3 rounded bg-light text-center">
+						<div class="small text-muted">Won</div>
+						<div class="fs-5 fw-semibold text-success">@Model.CountWon</div>
+					</div>
+				</div>
+				<div class="col-6 col-md-3">
+					<div class="p-3 rounded bg-light text-center">
+						<div class="small text-muted">Lost / Voided</div>
+						<div class="fs-5 fw-semibold text-danger">@Model.CountLostOrVoided</div>
+					</div>
+				</div>
+				<div class="col-6 col-md-3">
+					<div class="p-3 rounded bg-light text-center">
+						<div class="small text-muted">Total stake</div>
+						<div class="fs-5 fw-semibold">@Money(Model.TotalStake)</div>
+					</div>
+				</div>
+				<div class="row g-2">
+					<div class="col-12 col-sm-4">
+						<div class="p-3 rounded bg-danger-subtle text-center">
+							<div class="small text-muted">Total lost</div>
+							<div class="fs-5 fw-semibold">@Money(Model.TotalLost)</div>
+						</div>
+					</div>
 
-				    <div class="col-12 col-sm-4">
-					    <div class="p-3 rounded @(Model.NetProfit >= 0 ? "bg-success-subtle" : "bg-danger-subtle") text-center">
-						    <div class="small text-muted">Total profit</div>
-						    <div class="fs-5 fw-semibold">@MoneySigned(Model.NetProfit)</div>
-					    </div>
-				    </div>
+					<div class="col-12 col-sm-4">
+						<div class="p-3 rounded @(Model.NetProfit >= 0 ? "bg-success-subtle" : "bg-danger-subtle") text-center">
+							<div class="small text-muted">Total profit</div>
+							<div class="fs-5 fw-semibold">@MoneySigned(Model.NetProfit)</div>
+						</div>
+					</div>
 
-				    <div class="col-12 col-sm-4">
-					    <div class="p-3 rounded bg-success-subtle text-center">
-						    <div class="small text-muted">Total returns (won)</div>
-						    <div class="fs-5 fw-semibold">@Money(Model.TotalReturns)</div>
-					    </div>
-				    </div>
-			    </div>
+					<div class="col-12 col-sm-4">
+						<div class="p-3 rounded bg-success-subtle text-center">
+							<div class="small text-muted">Total returns (won)</div>
+							<div class="fs-5 fw-semibold">@Money(Model.TotalReturns)</div>
+						</div>
+					</div>
+				</div>
 
-		    </div>
+			</div>
 
-		    <!-- Three columns -->
-		    <div class="row g-3">
-			    <!-- Pending -->
-			    <div class="col-12 col-lg-4">
-				    <div class="card shadow-sm border-0 rounded-4 h-100">
-					    <div class="card-header d-flex justify-content-between align-items-center bg-warning-subtle">
-						    <span class="fw-semibold">Pending</span>
-						    <span class="badge text-bg-warning text-dark">@Model.CountPending</span>
-					    </div>
-					    <div class="card-body p-0 column-scroll">
-						    @if (Model.Pending.Count == 0)
-						    {
-							    <div class="text-muted small text-center py-3">No pending bets.</div>
-						    }
-						    else
-						    {
-							    <div class="table-responsive">
-								    <table class="table table-sm table-hover align-middle mb-0 bets-table">
-									    <thead class="table-light">
-									    <tr>
-										    <th>Created</th>
-										    <th class="text-end">Stake</th>
-										    <th class="text-end">Potential</th>
-										    <th class="text-center">Sel.</th>
-									    </tr>
-									    </thead>
-									    <tbody>
-									    @foreach (var r in Model.Pending)
-									    {
-										    <tr>
-											    <td class="text-nowrap">@r.CreatedDisplay</td>
-											    <td class="text-end num">@Money(r.Stake)</td>
-											    <td class="text-end num">@MoneyOpt(r.PotentialReturn)</td>
-											    <td class="text-center">@r.Selections</td>
-										    </tr>
-									    }
-									    </tbody>
-								    </table>
-							    </div>
-						    }
-					    </div>
-				    </div>
-			    </div>
+			<!-- Three columns -->
+			<div class="row g-3">
+				<!-- Pending -->
+				<div class="col-12 col-lg-4">
+					<div class="card shadow-sm border-0 rounded-4 h-100">
+						<div class="card-header d-flex justify-content-between align-items-center bg-warning-subtle">
+							<span class="fw-semibold">Pending</span>
+							<span class="badge text-bg-warning text-dark">@Model.CountPending</span>
+						</div>
+						<div class="card-body p-0 column-scroll">
+							@if (Model.Pending.Count == 0)
+							{
+								<div class="text-muted small text-center py-3">No pending bets.</div>
+							}
+							else
+							{
+								<div class="table-responsive">
+									<table class="table table-sm table-hover align-middle mb-0 bets-table">
+										<thead class="table-light">
+										<tr>
+											<th>Created</th>
+											<th class="text-end">Stake</th>
+											<th class="text-end">Potential</th>
+											<th class="text-center">Sel.</th>
+										</tr>
+										</thead>
+										<tbody>
+										@foreach (var r in Model.Pending)
+										{
+											<tr class="slip-row" data-slip-id="@r.Id">
+												<td class="text-nowrap">@r.CreatedDisplay</td>
+												<td class="text-end num">@Money(r.Stake)</td>
+												<td class="text-end num">@MoneyOpt(r.PotentialReturn)</td>
+												<td class="text-center">@r.Selections</td>
+											</tr>
+										}
+										</tbody>
+									</table>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
 
-			    <!-- Won -->
-			    <div class="col-12 col-lg-4">
-				    <div class="card shadow-sm border-0 rounded-4 h-100">
-					    <div class="card-header d-flex justify-content-between align-items-center bg-success-subtle">
-						    <span class="fw-semibold">Won</span>
-						    <span class="badge text-bg-success">@Model.CountWon</span>
-					    </div>
-					    <div class="card-body p-0 column-scroll">
-						    @if (Model.Won.Count == 0)
-						    {
-							    <div class="text-muted small text-center py-3">No winning bets yet.</div>
-						    }
-						    else
-						    {
-							    <div class="table-responsive">
-								    <table class="table table-sm table-hover align-middle mb-0 bets-table">
-									    <thead class="table-light">
-									    <tr>
-										    <th>Created</th>
-										    <th class="text-end">Stake</th>
-										    <th class="text-end">Return</th>
-										    <th class="text-center">Sel.</th>
-									    </tr>
-									    </thead>
-									    <tbody>
-									    @foreach (var r in Model.Won)
-									    {
-										    <tr>
-											    <td class="text-nowrap">@r.CreatedDisplay</td>
-											    <td class="text-end num">@Money(r.Stake)</td>
-											    <td class="text-end num">@MoneyOpt(r.WinAmount)</td>
-											    <td class="text-center">@r.Selections</td>
-										    </tr>
-									    }
-									    </tbody>
-								    </table>
-							    </div>
-						    }
-					    </div>
-				    </div>
-			    </div>
+				<!-- Won -->
+				<div class="col-12 col-lg-4">
+					<div class="card shadow-sm border-0 rounded-4 h-100">
+						<div class="card-header d-flex justify-content-between align-items-center bg-success-subtle">
+							<span class="fw-semibold">Won</span>
+							<span class="badge text-bg-success">@Model.CountWon</span>
+						</div>
+						<div class="card-body p-0 column-scroll">
+							@if (Model.Won.Count == 0)
+							{
+								<div class="text-muted small text-center py-3">No winning bets yet.</div>
+							}
+							else
+							{
+								<div class="table-responsive">
+									<table class="table table-sm table-hover align-middle mb-0 bets-table">
+										<thead class="table-light">
+										<tr>
+											<th>Created</th>
+											<th class="text-end">Stake</th>
+											<th class="text-end">Return</th>
+											<th class="text-center">Sel.</th>
+										</tr>
+										</thead>
+										<tbody>
+										@foreach (var r in Model.Won)
+										{
+											<tr class="slip-row" data-slip-id="@r.Id">
+												<td class="text-nowrap">@r.CreatedDisplay</td>
+												<td class="text-end num">@Money(r.Stake)</td>
+												<td class="text-end num">@MoneyOpt(r.WinAmount)</td>
+												<td class="text-center">@r.Selections</td>
+											</tr>
+										}
+										</tbody>
+									</table>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
 
-			    <!-- Lost / Voided -->
-			    <div class="col-12 col-lg-4">
-				    <div class="card shadow-sm border-0 rounded-4 h-100">
-					    <div class="card-header d-flex justify-content-between align-items-center bg-danger-subtle">
-						    <span class="fw-semibold">Lost / Voided</span>
-						    <span class="badge text-bg-danger">@Model.CountLostOrVoided</span>
-					    </div>
-					    <div class="card-body p-0 column-scroll">
-						    @if (Model.LostOrVoided.Count == 0)
-						    {
-							    <div class="text-muted small text-center py-3">Nothing here.</div>
-						    }
-						    else
-						    {
-							    <div class="table-responsive">
-								    <table class="table table-sm table-hover align-middle mb-0 bets-table">
-									    <thead class="table-light">
-									    <tr>
-										    <th>Created</th>
-										    <th class="text-end">Stake</th>
-										    <th class="text-center">Sel.</th>
-										    <th class="text-center">Status</th>
-									    </tr>
-									    </thead>
-									    <tbody>
-									    @foreach (var r in Model.LostOrVoided)
-									    {
-										    <tr>
-											    <td class="text-nowrap">@r.CreatedDisplay</td>
-											    <td class="text-end num">@Money(r.Stake)</td>
-											    <td class="text-center">@r.Selections</td>
-											    <td class="text-center">
-												    <span class="@StatusBadge(r.SlipStatus)">@r.SlipStatus</span>
-											    </td>
-										    </tr>
-									    }
-									    </tbody>
-								    </table>
-							    </div>
-						    }
-					    </div>
-				    </div>
-			    </div>
+				<!-- Lost / Voided -->
+				<div class="col-12 col-lg-4">
+					<div class="card shadow-sm border-0 rounded-4 h-100">
+						<div class="card-header d-flex justify-content-between align-items-center bg-danger-subtle">
+							<span class="fw-semibold">Lost / Voided</span>
+							<span class="badge text-bg-danger">@Model.CountLostOrVoided</span>
+						</div>
+						<div class="card-body p-0 column-scroll">
+							@if (Model.LostOrVoided.Count == 0)
+							{
+								<div class="text-muted small text-center py-3">Nothing here.</div>
+							}
+							else
+							{
+								<div class="table-responsive">
+									<table class="table table-sm table-hover align-middle mb-0 bets-table">
+										<thead class="table-light">
+										<tr>
+											<th>Created</th>
+											<th class="text-end">Stake</th>
+											<th class="text-center">Sel.</th>
+											<th class="text-center">Status</th>
+										</tr>
+										</thead>
+										<tbody>
+										@foreach (var r in Model.LostOrVoided)
+										{
+											<tr class="slip-row" data-slip-id="@r.Id">
+												<td class="text-nowrap">@r.CreatedDisplay</td>
+												<td class="text-end num">@Money(r.Stake)</td>
+												<td class="text-center">@r.Selections</td>
+												<td class="text-center">
+													<span class="@StatusBadge(r.SlipStatus)">@r.SlipStatus</span>
+												</td>
+											</tr>
+										}
+										</tbody>
+									</table>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
 
-		    </div> <!-- /row -->
-	    </div>
-    </div>
+			</div> <!-- /row -->
+		</div>
+	</div>
+</div>
+
+<!-- Slip Details Modal -->
+<div class="modal fade" id="slipDetailsModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+		<div class="modal-content rounded-4 shadow">
+			<div class="modal-header">
+				<h5 class="modal-title">Bet Slip Details</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body" id="slip-details-body">
+				<div class="text-center text-muted py-3">
+					Loading…
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style>
@@ -260,3 +277,36 @@
 
     }
 </style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+
+		document.querySelectorAll(".slip-row").forEach(row => {
+			row.style.cursor = "pointer";
+
+			row.addEventListener("click", async () => {
+				const slipId = row.dataset.slipId;
+
+				// show modal
+				const modal = new bootstrap.Modal(document.getElementById("slipDetailsModal"));
+				modal.show();
+
+				// show loading
+				document.getElementById("slip-details-body").innerHTML =
+					`<div class="text-center text-muted py-3">Loading…</div>`;
+
+				// fetch details
+				try {
+					const response = await fetch(`/Admin/AdminUserBets/GetSlipDetails/${slipId}`);
+					const html = await response.text();
+					document.getElementById("slip-details-body").innerHTML = html;
+				}
+				catch {
+					document.getElementById("slip-details-body").innerHTML =
+						`<div class="alert alert-danger">Failed to load slip details.</div>`;
+				}
+			});
+		});
+	});
+</script>
+
