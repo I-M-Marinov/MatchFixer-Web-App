@@ -92,5 +92,49 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				LostOrVoided = lostOrVoided
 			};
 		}
+
+		public async Task<AdminBetSlipDetailsViewModel?> GetSlipDetailsAsync(Guid slipId)
+		{
+			var slip = await _dbContext.BetSlips
+				.Include(s => s.Bets)
+				.ThenInclude(b => b.MatchEvent)
+				.ThenInclude(me => me.HomeTeam)
+				.Include(s => s.Bets)
+				.ThenInclude(b => b.MatchEvent)
+				.ThenInclude(me => me.AwayTeam)
+				.FirstOrDefaultAsync(s => s.Id == slipId);
+
+			if (slip == null)
+				return null;
+
+			return new AdminBetSlipDetailsViewModel
+			{
+				Id = slip.Id,
+
+				// Status logic (derived from IsSettled + individual bet outcomes)
+				SlipStatus = slip.IsSettled
+					? (slip.WinAmount.HasValue && slip.WinAmount > 0 ? BetStatus.Won : BetStatus.Lost)
+					: BetStatus.Pending,
+
+				Stake = slip.Amount,
+				WinAmount = slip.WinAmount,
+				PotentialReturn = slip.Bets.Sum(b => b.Odds) * slip.Amount, 
+
+				Selections = slip.Bets.Select(b => new AdminBetSlipSelectionDto
+				{
+					MatchName = $"{b.MatchEvent.HomeTeam.Name} vs {b.MatchEvent.AwayTeam.Name}",
+					Pick = b.Pick.ToString(),
+					Odds = b.Odds,
+
+					Status = b.Status.ToString(),
+					StatusBadge =
+						b.Status == BetStatus.Won ? "bg-success" :
+						b.Status == BetStatus.Lost ? "bg-danger" :
+						"bg-warning text-dark"
+				}).ToList()
+			};
+		}
+
+
 	}
 }
