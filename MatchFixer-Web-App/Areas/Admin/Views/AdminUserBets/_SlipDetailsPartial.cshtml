@@ -1,0 +1,72 @@
+﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.Bets.AdminBetSlipDetailsViewModel
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h5 class="fw-semibold mb-0">Slip #@Model.Id</h5>
+
+	<form asp-controller="UserBets"
+	      asp-action="EvaluateSlip"
+	      asp-area=""
+	      method="post"
+	      class="ms-3">
+		@Html.AntiForgeryToken()
+		<input type="hidden" name="betSlipId" value="@Model.Id" />
+		<button type="submit" class="btn btn-sm btn-warning">
+			Reclassify
+		</button>
+	</form>
+</div>
+
+<hr />
+
+<div class="d-flex justify-content-between mb-3">
+	<div>
+		<div class="fw-semibold">Slip ID</div>
+		<div>@Model.Id</div>
+	</div>
+	<div>
+		<span class="badge @Model.StatusBadge">@Model.SlipStatus</span>
+	</div>
+</div>
+
+<div class="d-flex justify-content-between mb-3">
+	<div>
+		<div class="small text-muted">Stake</div>
+		<div class="fw-semibold">€@Model.Stake</div>
+	</div>
+	<div>
+		<div class="small text-muted">Potential</div>
+		<div class="fw-semibold">€@(Model.PotentialReturn ?? 0)</div>
+	</div>
+	<div>
+		<div class="small text-muted">Return</div>
+		<div class="fw-semibold">€@(Model.WinAmount ?? 0)</div>
+	</div>
+</div>
+
+<hr />
+
+<h6 class="fw-bold">Selections</h6>
+<table class="table table-sm align-middle">
+	<thead>
+	<tr>
+		<th>Match</th>
+		<th>Pick</th>
+		<th>Odds</th>
+		<th>Status</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var sel in Model.Selections)
+	{
+		<tr>
+			<td>@sel.MatchName</td>
+			<td>@sel.Pick</td>
+			<td>@sel.Odds</td>
+			<td>
+				<span class="badge @sel.StatusBadge">@sel.Status</span>
+			</td>
+		</tr>
+	}
+	</tbody>
+</table>
