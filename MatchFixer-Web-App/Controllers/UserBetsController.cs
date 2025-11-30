@@ -50,7 +50,10 @@ namespace MatchFixer_Web_App.Controllers
 				TempData["SuccessMessage"] = BetSlipEvaluatedSuccessfully;
 			}
 
-			return RedirectToAction(nameof(UserBets));
+			// Redirect back to where the request came from
+			var redirectUrl = Request.Headers["Referer"].ToString();
+
+			return Redirect(redirectUrl);
 		}
 
 	}
