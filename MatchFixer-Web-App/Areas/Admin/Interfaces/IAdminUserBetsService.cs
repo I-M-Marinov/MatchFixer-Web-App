@@ -8,5 +8,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 			Guid userId,
 			string timeZoneId,
 			int maxPerColumn = 200);
+
+		Task<AdminBetSlipDetailsViewModel?> GetSlipDetailsAsync(Guid slipId);
 	}
 }
