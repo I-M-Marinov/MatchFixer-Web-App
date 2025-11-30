@@ -23,17 +23,26 @@
 @await Html.PartialAsync("_BackToUsersButton", "Users")
 
 
+<div class="border-0 rounded-4 p-4 flex-fill">
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert success-message" id="success-message">
+		@TempData["SuccessMessage"]
+	</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert error-message" id="error-message">
+		@TempData["ErrorMessage"]
+	</div>
+}
+
+</div>
+
 <div class="background-profile"></div>
 
 <div class="border-0 rounded-4 p-3">
-	@if (TempData["SuccessMessage"] is string s)
-	{
-		<div class="alert alert-success shadow-sm mb-3">@s</div>
-	}
-	@if (TempData["ErrorMessage"] is string e)
-	{
-		<div class="alert alert-danger shadow-sm mb-3">@e</div>
-	}
 
 	<div class="card shadow-sm border-0 rounded-4 admin-user-bets-card">
 
