@@ -2,8 +2,6 @@
 
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-	<h5 class="fw-semibold mb-0">Slip #@Model.Id</h5>
-
 	<form asp-controller="UserBets"
 	      asp-action="EvaluateSlip"
 	      asp-area=""
@@ -12,7 +10,7 @@
 		@Html.AntiForgeryToken()
 		<input type="hidden" name="betSlipId" value="@Model.Id" />
 		<button type="submit" class="btn btn-sm btn-warning">
-			Reclassify
+			Re-Evaluate Slip
 		</button>
 	</form>
 </div>
