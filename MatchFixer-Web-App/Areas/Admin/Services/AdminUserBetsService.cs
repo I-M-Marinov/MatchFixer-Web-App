@@ -97,28 +97,47 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		{
 			var slip = await _dbContext.BetSlips
 				.Include(s => s.Bets)
-				.ThenInclude(b => b.MatchEvent)
-				.ThenInclude(me => me.HomeTeam)
+					.ThenInclude(b => b.MatchEvent)
+						.ThenInclude(me => me.HomeTeam)
 				.Include(s => s.Bets)
-				.ThenInclude(b => b.MatchEvent)
-				.ThenInclude(me => me.AwayTeam)
+					.ThenInclude(b => b.MatchEvent)
+						.ThenInclude(me => me.AwayTeam)
 				.FirstOrDefaultAsync(s => s.Id == slipId);
 
 			if (slip == null)
 				return null;
 
+			decimal totalOdds =
+				slip.Bets.Any()
+					? slip.Bets.Aggregate(1m, (acc, b) => acc * b.Odds)
+					: 0m;
+
+			BetStatus slipStatus;
+
+			if (!slip.IsSettled)
+			{
+				slipStatus = BetStatus.Pending;
+			}
+			else
+			{
+				if (slip.Bets.All(b => b.Status == BetStatus.Won))
+					slipStatus = BetStatus.Won;
+				else if (slip.Bets.Any(b => b.Status == BetStatus.Lost))
+					slipStatus = BetStatus.Lost;
+				else
+					slipStatus = BetStatus.Pending; // fallback for rare mixed cases
+			}
+
+			decimal? potentialReturn = slip.Amount * totalOdds;
+
 			return new AdminBetSlipDetailsViewModel
 			{
 				Id = slip.Id,
-
-				// Status logic (derived from IsSettled + individual bet outcomes)
-				SlipStatus = slip.IsSettled
-					? (slip.WinAmount.HasValue && slip.WinAmount > 0 ? BetStatus.Won : BetStatus.Lost)
-					: BetStatus.Pending,
+				SlipStatus = slipStatus,
 
 				Stake = slip.Amount,
 				WinAmount = slip.WinAmount,
-				PotentialReturn = slip.Bets.Sum(b => b.Odds) * slip.Amount, 
+				PotentialReturn = potentialReturn,
 
 				Selections = slip.Bets.Select(b => new AdminBetSlipSelectionDto
 				{
@@ -134,6 +153,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				}).ToList()
 			};
 		}
+
 
 
 	}
