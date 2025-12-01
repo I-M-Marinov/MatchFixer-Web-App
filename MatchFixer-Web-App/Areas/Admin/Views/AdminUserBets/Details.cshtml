@@ -244,7 +244,7 @@
 		<div class="modal-content rounded-4 shadow">
 			<div class="modal-header">
 				<h5 class="modal-title">Bet Slip Details</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				<button type="button" class="btn-close-custom3" data-bs-dismiss="modal">&times;</button>
 			</div>
 			<div class="modal-body" id="slip-details-body">
 				<div class="text-center text-muted py-3">
@@ -290,32 +290,64 @@
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 
-		document.querySelectorAll(".slip-row").forEach(row => {
+		const rows = document.querySelectorAll(".slip-row");
+		const modalEl = document.getElementById("slipDetailsModal");
+		const modal = new bootstrap.Modal(modalEl);
+		const body = document.getElementById("slip-details-body");
+
+		rows.forEach(row => {
 			row.style.cursor = "pointer";
 
 			row.addEventListener("click", async () => {
 				const slipId = row.dataset.slipId;
 
-				// show modal
-				const modal = new bootstrap.Modal(document.getElementById("slipDetailsModal"));
 				modal.show();
 
-				// show loading
-				document.getElementById("slip-details-body").innerHTML =
-					`<div class="text-center text-muted py-3">Loading…</div>`;
+				body.replaceChildren();
 
-				// fetch details
+					const loaderWrapper = document.createElement("div");
+					loaderWrapper.className = "d-flex flex-row justify-content-center align-items-center py-4 spinner-sequence";
+
+					const green = document.createElement("div");
+					green.className = "spinner-grow text-brand-green me-2";
+
+					const blue = document.createElement("div");
+					blue.className = "spinner-grow text-brand-blue";
+
+					const green2 = document.createElement("div");
+					green2.className = "spinner-grow text-brand-green me-2";  
+
+					const blue2 = document.createElement("div");
+					blue2.className = "spinner-grow text-brand-blue";
+
+					loaderWrapper.appendChild(green);
+					loaderWrapper.appendChild(blue);
+					loaderWrapper.appendChild(green2);
+					loaderWrapper.appendChild(blue2);
+
+					body.appendChild(loaderWrapper);
+
+
 				try {
 					const response = await fetch(`/Admin/AdminUserBets/GetSlipDetails/${slipId}`);
 					const html = await response.text();
-					document.getElementById("slip-details-body").innerHTML = html;
+
+					await new Promise(resolve => setTimeout(resolve, 1000));
+
+					const parser = new DOMParser();
+					const doc = parser.parseFromString(html, "text/html");
+					const newChildren = [...doc.body.children];
+
+					body.replaceChildren(...newChildren);
 				}
 				catch {
-					document.getElementById("slip-details-body").innerHTML =
-						`<div class="alert alert-danger">Failed to load slip details.</div>`;
+					body.replaceChildren();
+					const error = document.createElement("div");
+					error.className = "alert alert-danger";
+					error.textContent = "Failed to load slip details.";
+					body.appendChild(error);
 				}
 			});
 		});
 	});
 </script>
-
