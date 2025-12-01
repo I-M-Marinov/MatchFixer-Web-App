@@ -21,6 +21,10 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Bets
 				_ => "bg-light text-dark"
 			};
 
+		public decimal TotalOdds => Selections?.Any() == true
+			? Selections.Aggregate(1m, (acc, s) => acc * s.Odds)
+			: 0m;
+
 		public List<AdminBetSlipSelectionDto> Selections { get; set; } = new();
 	}
 }
