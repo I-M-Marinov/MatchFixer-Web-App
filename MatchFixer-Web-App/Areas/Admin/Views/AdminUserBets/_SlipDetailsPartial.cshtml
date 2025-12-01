@@ -1,4 +1,5 @@
-﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.Bets.AdminBetSlipDetailsViewModel
+﻿@using MatchFixer.Common.Enums
+@model MatchFixer_Web_App.Areas.Admin.ViewModels.Bets.AdminBetSlipDetailsViewModel
 
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -17,30 +18,52 @@
 
 <hr />
 
-<div class="d-flex justify-content-between mb-3">
+<div class="d-flex flex-row justify-content-center gap-2 mb-3">
 	<div>
-		<div class="fw-semibold">Slip ID</div>
-		<div>@Model.Id</div>
+		<div class="fw-semibold">Slip ID: <span class="badge bg-primary">@Model.Id</span></div>
 	</div>
 	<div>
 		<span class="badge @Model.StatusBadge">@Model.SlipStatus</span>
 	</div>
 </div>
 
-<div class="d-flex justify-content-between mb-3">
+<div class="d-flex flex-row justify-content-center gap-xl-5 mb-3">
+
 	<div>
 		<div class="small text-muted">Stake</div>
-		<div class="fw-semibold">€@Model.Stake</div>
+		<div class="fw-semibold">€@Model.Stake.ToString("F2")</div>
 	</div>
+
 	<div>
-		<div class="small text-muted">Potential</div>
-		<div class="fw-semibold">€@(Model.PotentialReturn ?? 0)</div>
+		<div class="small text-muted">Total Odds</div>
+		<div class="fw-semibold">@Model.TotalOdds.ToString("F2")</div>
 	</div>
-	<div>
-		<div class="small text-muted">Return</div>
-		<div class="fw-semibold">€@(Model.WinAmount ?? 0)</div>
-	</div>
+
+	@if (Model.SlipStatus == BetStatus.Pending)
+	{
+		<div>
+			<div class="small text-muted">Potential</div>
+			<div class="fw-semibold">€@(Model.PotentialReturn?.ToString("F2") ?? "0.00")</div>
+		</div>
+	}
+	else if (Model.SlipStatus == BetStatus.Won)
+	{
+		<div>
+			<div class="small text-muted">Return</div>
+			<div class="fw-semibold">€@(Model.WinAmount?.ToString("F2") ?? "0.00")</div>
+		</div>
+	}
+	else if (Model.SlipStatus == BetStatus.Lost)
+	{
+		<div>
+			<div class="small text-muted">Lost Amount</div>
+			<div class="fw-semibold">€@Model.Stake.ToString("F2")</div>
+		</div>
+	}
+
 </div>
+
+
 
 <hr />
 
@@ -55,16 +78,32 @@
 	</tr>
 	</thead>
 	<tbody>
-	@foreach (var sel in Model.Selections)
-	{
-		<tr>
-			<td>@sel.MatchName</td>
-			<td>@sel.Pick</td>
-			<td>@sel.Odds</td>
-			<td>
-				<span class="badge @sel.StatusBadge">@sel.Status</span>
-			</td>
-		</tr>
-	}
+		@foreach (var sel in Model.Selections)
+		{
+			string pickClass = sel.Pick switch
+			{
+				"Home" => "pill-brand-blue",
+				"Draw" => "pill-brand-yellow",
+				"Away" => "pill-brand-green",
+				_ => ""
+			};
+
+			<tr>
+				<td>@sel.MatchName</td>
+
+				<td>
+					<span class="@pickClass fw-semibold px-2 py-1 rounded">
+						@sel.Pick
+					</span>
+				</td>
+
+				<td>@sel.Odds</td>
+
+				<td>
+					<span class="badge @sel.StatusBadge">@sel.Status</span>
+				</td>
+			</tr>
+		}
+
 	</tbody>
 </table>
