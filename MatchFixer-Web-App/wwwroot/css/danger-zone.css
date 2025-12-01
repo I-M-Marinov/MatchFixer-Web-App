@@ -152,7 +152,8 @@
 }
 
 .btn-close-custom,
-.btn-close-custom2{
+.btn-close-custom2,
+.btn-close-custom3 {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -172,8 +173,14 @@
     color: whitesmoke;
 }
 
+
+.btn-close-custom3 {
+    color: darkred !important;
+}
+
 .btn-close-custom:hover,
-.btn-close-custom2:hover{
+.btn-close-custom2:hover,
+.btn-close-custom3:hover{
     opacity: 1;
     color: #dc3545;
     transform: scale(1.1);
