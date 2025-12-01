@@ -1,5 +1,4 @@
 ﻿using MatchFixer.Common.Identity;
-using MatchFixer.Core.Contracts;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
