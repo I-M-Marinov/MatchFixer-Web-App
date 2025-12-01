@@ -287,83 +287,91 @@ public class BettingService : IBettingService
 	{
 		var betSlip = await _dbContext.BetSlips
 			.Include(bs => bs.Bets)
+				.ThenInclude(b => b.MatchEvent)
+					.ThenInclude(me => me.LiveResult)
 			.FirstOrDefaultAsync(bs => bs.Id == betSlipId);
 
 		if (betSlip == null || betSlip.IsSettled)
 			return false;
 
-		var bets = betSlip.Bets.ToList();
 		bool anyPending = false;
 		bool anyLost = false;
+		bool anyWon = false;
 		bool allVoided = true;
-		decimal totalOdds = 1.0m;
+		decimal totalOdds = 1m;
 
-		foreach (var bet in bets)
+		foreach (var bet in betSlip.Bets)
 		{
 			if (bet.Status == BetStatus.Voided)
-				continue;
+				continue; 
 
-			var match = await _dbContext.MatchEvents
-				.Include(m => m.LiveResult)
-				.FirstOrDefaultAsync(m => m.Id == bet.MatchEventId);
+			var result = bet.MatchEvent.LiveResult;
 
-			if (match?.LiveResult == null)
+			if (result == null)
 			{
 				anyPending = true;
 				continue;
 			}
 
-			var actualOutcome = match.LiveResult.HomeScore > match.LiveResult.AwayScore
-				? MatchPick.Home
-				: match.LiveResult.HomeScore < match.LiveResult.AwayScore
-					? MatchPick.Away
-					: MatchPick.Draw;
+			var actualOutcome =
+				result.HomeScore > result.AwayScore ? MatchPick.Home :
+				result.HomeScore < result.AwayScore ? MatchPick.Away :
+				MatchPick.Draw;
+
+			allVoided = false;
 
 			if (bet.Pick == actualOutcome)
 			{
 				bet.Status = BetStatus.Won;
+				anyWon = true;
 				totalOdds *= bet.Odds;
-				allVoided = false;
 			}
 			else
 			{
 				bet.Status = BetStatus.Lost;
 				anyLost = true;
-				allVoided = false;
 			}
 		}
 
-		// Settle immediately if lost
+		//  LOST SLIP — settles immediately
+
 		if (anyLost)
 		{
 			betSlip.IsSettled = true;
 			betSlip.WinAmount = 0;
+
 			await _dbContext.SaveChangesAsync();
 			return true;
 		}
 
-		// If any pending and no losses, wait
+		// STILL PENDING — do not settle
+
 		if (anyPending)
-		{
 			return false;
-		}
-		
-		betSlip.IsSettled = true;
+
+		// ALL VOIDED — refund stake
 
 		if (allVoided)
 		{
+			betSlip.IsSettled = true;
 			betSlip.WinAmount = 0;
+
 			await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
-		}
-		else
-		{
-			betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
-			await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
+			await _dbContext.SaveChangesAsync();
+			return true;
 		}
 
+		// WON SLIP — calculate payout
+
+		betSlip.IsSettled = true;
+		betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
+
+		await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
 		await _dbContext.SaveChangesAsync();
+
 		return true;
 	}
+
 
 
 	private static bool IsEventOpenForBetting(MatchEvent ev)
