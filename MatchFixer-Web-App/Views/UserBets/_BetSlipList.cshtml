@@ -177,12 +177,6 @@ else
 									        }
 									        </tbody>
 								        </table>
-								        <!-- Only for the time being this will be here, until the admin page for betslips is created ! -->
-								        <form asp-action="EvaluateSlip" method="post">
-									        @Html.AntiForgeryToken()
-									        <input type="hidden" name="betSlipId" value="@betSlip.Id"/>
-									        <button type="submit" class="btn btn-sm btn-warning">Reclassify</button>
-								        </form>
 							        </div>
 						        }
 					        </div>
