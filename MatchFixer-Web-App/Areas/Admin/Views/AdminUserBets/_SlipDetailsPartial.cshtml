@@ -95,7 +95,7 @@
 <hr />
 
 <h6 class="fw-bold text-center">Selections</h6>
-<table class="table table-sm align-middle">
+<table class="table table-sm align-middle" id="user-betslip-table">
 	<thead>
 	<tr>
 		<th>Match</th>
@@ -116,7 +116,11 @@
 			};
 
 			<tr>
-				<td>@sel.MatchName</td>
+				<td class="d-flex gap-2 justify-content-center align-items-center">
+					<img src="@sel.HomeTeamLogoUrl" alt="@sel.MatchName" class="team-logo-user-betslip" title="@sel.MatchName">
+					VS
+					<img src="@sel.AwayTeamLogoUrl" alt="@sel.MatchName" class="team-logo-user-betslip" title="@sel.MatchName">
+				</td>
 
 				<td>
 					<span class="@pickClass fw-semibold px-2 py-1 rounded">
