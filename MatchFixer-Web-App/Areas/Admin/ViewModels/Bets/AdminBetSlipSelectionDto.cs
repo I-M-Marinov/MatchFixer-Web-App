@@ -3,6 +3,8 @@
 	public class AdminBetSlipSelectionDto
 	{
 		public string MatchName { get; set; }
+		public string? HomeTeamLogoUrl { get; set; }
+		public string? AwayTeamLogoUrl { get; set; }
 		public string Pick { get; set; }
 		public decimal Odds { get; set; }
 		public string Status { get; set; }
