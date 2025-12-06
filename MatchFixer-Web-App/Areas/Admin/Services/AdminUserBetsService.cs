@@ -144,8 +144,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					MatchName = $"{b.MatchEvent.HomeTeam.Name} vs {b.MatchEvent.AwayTeam.Name}",
 					Pick = b.Pick.ToString(),
 					Odds = b.Odds,
-
-					Status = b.Status.ToString(),
+					HomeTeamLogoUrl = b.MatchEvent.HomeTeam.LogoUrl,
+					AwayTeamLogoUrl = b.MatchEvent.AwayTeam.LogoUrl,
 					StatusBadge =
 						b.Status == BetStatus.Won ? "bg-success" :
 						b.Status == BetStatus.Lost ? "bg-danger" :
