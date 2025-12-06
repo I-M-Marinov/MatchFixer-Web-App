@@ -81,3 +81,17 @@
 .stat-wrapper:hover i {
     transform: scale(1.08);
 }
+
+#user-betslip-table {
+    font-size: 0.8em;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: baseline;
+}
+
+.team-logo-user-betslip {
+    max-width: 45px;
+    max-height: 45px;
+    margin: 0.15em;
+    object-fit: contain;
+}
