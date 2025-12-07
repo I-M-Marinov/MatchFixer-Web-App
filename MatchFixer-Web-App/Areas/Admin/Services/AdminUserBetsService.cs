@@ -146,10 +146,15 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					Odds = b.Odds,
 					HomeTeamLogoUrl = b.MatchEvent.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = b.MatchEvent.AwayTeam.LogoUrl,
-					StatusBadge =
-						b.Status == BetStatus.Won ? "bg-success" :
-						b.Status == BetStatus.Lost ? "bg-danger" :
-						"bg-warning text-dark"
+					Status = b.Status.ToString(),
+					StatusBadge = b.Status switch
+					{
+						BetStatus.Won => "bg-success",
+						BetStatus.Lost => "bg-danger",
+						BetStatus.Voided => "bg-secondary text-white",
+						BetStatus.Pending => "bg-warning text-dark",
+						_ => "bg-light text-dark"
+					}
 				}).ToList()
 			};
 		}
