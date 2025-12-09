@@ -1,0 +1,137 @@
+﻿@model List<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminEventOverviewDto>
+@{
+	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+	ViewData["Title"] = "Events History";
+}
+
+<h2 class="mb-4">Match Events History</h2>
+
+<div class="background-profile"></div>
+
+<form method="get" class="row g-3 mb-4">
+
+	<div class="col-md-3">
+		<label class="form-label">From Date</label>
+		<input type="date" name="FromDate" class="form-control" />
+	</div>
+
+	<div class="col-md-3">
+		<label class="form-label">To Date</label>
+		<input type="date" name="ToDate" class="form-control" />
+	</div>
+
+	<div class="col-md-3">
+		<label class="form-label">League</label>
+		<input type="text" name="League" class="form-control" placeholder="Premier League" />
+	</div>
+
+	<div class="col-md-3 d-flex align-items-end">
+		<button class="btn btn-primary w-100">Filter</button>
+	</div>
+</form>
+
+<table class="table table-bordered table-hover">
+	<thead class="table-light">
+	<tr>
+		<th>Match</th>
+		<th>Date</th>
+		<th>Result</th>
+		<th>Bets</th>
+		<th>Stake</th>
+		<th>Payout</th>
+		<th>Profit</th>
+		<th></th>
+	</tr>
+	</thead>
+
+	<tbody>
+	@foreach (var e in Model)
+	{
+		<tr>
+			<td>@e.MatchName</td>
+			<td>@e.MatchDate.ToString("g")</td>
+			<td>
+				@if (e.IsCancelled)
+				{
+					<span class="badge bg-secondary">Cancelled</span>
+				}
+				else
+				{
+					<span>@e.HomeScore - @e.AwayScore</span>
+				}
+			</td>
+			<td>@e.TotalBets</td>
+			<td>€@e.TotalStake.ToString("F2")</td>
+			<td>€@e.TotalPayout.ToString("F2")</td>
+			<td class="fw-bold @(e.Profit >= 0 ? "text-success" : "text-danger")">
+				€@e.Profit.ToString("F2")
+			</td>
+			<td>
+				<button class="btn btn-sm btn-outline-primary"
+				        data-bs-toggle="collapse"
+				        data-bs-target="#event-@e.EventId">
+					Details
+				</button>
+			</td>
+		</tr>
+
+		<tr class="collapse" id="event-@e.EventId">
+			<td colspan="8">
+				<div class="p-3">
+
+					@if (e.Bets.Any())
+					{
+						<h5 class="mb-2">Bets</h5>
+						@await Html.PartialAsync("_EventBetsPartial", e.Bets)
+					}
+					else
+					{
+						<p class="text-muted fst-italic">No bets were placed on this event.</p>
+					}
+
+					<hr />
+
+					@if (e.Logs.Any())
+					{
+						<h5 class="mb-2">Event Change Logs</h5>
+						@await Html.PartialAsync("_EventLogsPartial", e.Logs)
+					}
+					else
+					{
+						<p class="text-muted fst-italic">No changes were recorded for this event.</p>
+					}
+
+				</div>
+			</td>
+		</tr>
+	}
+	</tbody>
+</table>
+
+			
+<script>
+	const labels = @Html.Raw(Json.Serialize(Model.Select(m => m.MatchDate.ToString("yyyy-MM-dd"))));
+	const profits = @Html.Raw(Json.Serialize(Model.Select(m => m.Profit)));
+
+	new Chart(document.getElementById("profitChart"), {
+		type: 'line',
+		data: {
+			labels: labels,
+			datasets: [{
+				label: 'Profit',
+				data: profits,
+				borderWidth: 2
+			}]
+		}
+	});
+</script>
+
+<style>
+    .event-details-box {
+        background: #fafafa;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-top: .5rem;
+    }
+</style>
