@@ -1,0 +1,28 @@
+﻿@model List<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminBetSummaryDto>
+
+<h5>Bets</h5>
+<table class="table table-sm">
+	<thead>
+	<tr>
+		<th>User</th>
+		<th>Pick</th>
+		<th>Odds</th>
+		<th>Stake</th>
+		<th>Status</th>
+		<th>Payout</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var b in Model)
+	{
+		<tr>
+			<td>@b.FullName (@b.Username)</td>
+			<td>@b.Pick</td>
+			<td>@b.Odds</td>
+			<td>€@b.Stake</td>
+			<td>@b.Status</td>
+			<td>@(b.Payout?.ToString("F2") ?? "-")</td>
+		</tr>
+	}
+	</tbody>
+</table>
