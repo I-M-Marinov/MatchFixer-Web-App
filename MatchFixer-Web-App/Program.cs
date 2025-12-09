@@ -53,7 +53,8 @@ builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();					// Ad
 builder.Services.AddScoped<IAdminEmailService, AdminEmailService>();				    // Add the Admin Email Service
 builder.Services.AddScoped<IAdminUserBetsService, AdminUserBetsService>();				// Add the Admin User Bets Service
 builder.Services.AddScoped<IAdminTeamsService, AdminTeamsService>();					// Add the Admin Teams Service
-builder.Services.AddScoped<IAdminBetInsightsService, AdminBetInsightsService>();        // Add the Admin Teams Service
+builder.Services.AddScoped<IAdminBetInsightsService, AdminBetInsightsService>();        // Add the Admin BetInsights Service
+builder.Services.AddScoped<IAdminEventsService, AdminEventService>();					// Add the Admin Events Service ( historical for call events ) 
 
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
