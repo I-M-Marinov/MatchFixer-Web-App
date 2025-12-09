@@ -36,5 +36,7 @@ namespace MatchFixer.Infrastructure.Entities
 		public bool IsCancelled { get; set; } = false; 
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 		public ICollection<OddsBoost> OddsBoosts { get; set; } = new List<OddsBoost>();
+		public ICollection<MatchEventLog> MatchEventLogs { get; set; } = new List<MatchEventLog>();
+
 	}
 }
