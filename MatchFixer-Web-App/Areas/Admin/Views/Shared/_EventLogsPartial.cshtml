@@ -1,0 +1,26 @@
+﻿@model List<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.MatchEventLogDto>
+
+<h5>Event Change Logs</h5>
+<table class="table table-sm table-striped">
+	<thead>
+	<tr>
+		<th>Date</th>
+		<th>Property</th>
+		<th>Old</th>
+		<th>New</th>
+		<th>Admin</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var log in Model)
+	{
+		<tr>
+			<td>@log.ChangedAt.ToString("g")</td>
+			<td>@log.PropertyName</td>
+			<td>@log.OldValue</td>
+			<td>@log.NewValue</td>
+			<td>@log.ChangedBy</td>
+		</tr>
+	}
+	</tbody>
+</table>
