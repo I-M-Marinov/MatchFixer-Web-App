@@ -15,9 +15,21 @@
 	<tbody>
 	@foreach (var b in Model)
 	{
+		string pickClass = b.Pick switch
+		{
+			"Home" => "pill-brand-blue",
+			"Draw" => "pill-brand-yellow",
+			"Away" => "pill-brand-green",
+			_ => ""
+		};
+
 		<tr>
 			<td>@b.FullName (@b.Username)</td>
-			<td>@b.Pick</td>
+			<td>
+				<span class="@pickClass fw-semibold px-2 py-1 rounded">
+					@b.Pick
+				</span>
+			</td>
 			<td>@b.Odds</td>
 			<td>€@b.Stake</td>
 			<td>@b.Status</td>
