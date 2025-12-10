@@ -2,9 +2,152 @@
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
 	ViewData["Title"] = "Events History";
+
+	var totalProfit = Model.Sum(m => m.Profit);
+	var totalLoss = Model.Where(m => m.Profit < 0).Sum(m => m.Profit);
+	var totalPositive = Model.Where(m => m.Profit > 0).Sum(m => m.Profit);
+	var totalUserWinnings = Model.Sum(m => m.TotalPayout);   // sum of all payouts to players
+
+	var leagueStats = Model
+		.GroupBy(m => m.LeagueName)
+		.Select(g => new
+		{
+			League = g.Key,
+			TotalProfit = g.Sum(x => x.Profit),
+			EventCount = g.Count()
+		})
+		.OrderByDescending(x => x.TotalProfit)
+		.ToList();
 }
 
-<h2 class="mb-4">Match Events History</h2>
+<h2 class="mb-4 match-events-history-header">Match Events History</h2>
+
+<div class="accordion mb-4" id="dashboardAccordion">
+
+	<!-- COMPANY PERFORMANCE -->
+	<div class="accordion-item">
+		<h2 class="accordion-header" id="headingPerf">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse"
+					data-bs-target="#collapsePerf" aria-expanded="true">
+				Company Performance Overview
+			</button>
+		</h2>
+
+		<div id="collapsePerf" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+
+				<div class="row mb-4">
+
+					<!-- Total Net Profit -->
+					<div class="col-md-4">
+						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #28a745;">
+							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
+								<i class="bi bi-graph-up text-success" style="font-size: 2rem;"></i>
+								<div>
+									<h6 class="text-muted mb-1">Total Net Profit</h6>
+									<h4 class="fw-bold text-success text-center">€@totalProfit.ToString("F2")</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Total Loss -->
+					<div class="col-md-4">
+						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #dc3545;">
+							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
+								<i class="bi bi-graph-down text-danger" style="font-size: 2rem;"></i>
+								<div>
+									<h6 class="text-muted mb-1">Total Loss</h6>
+									<h4 class="fw-bold text-danger text-center">€@totalLoss.ToString("F2")</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Total Winning Events -->
+					<div class="col-md-4">
+						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #0d6efd;">
+							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
+								<i class="bi bi-cash-coin text-primary" style="font-size: 2rem;"></i>
+								<div>
+									<h6 class="text-muted mb-1">Total Winning Events</h6>
+									<h4 class="fw-bold text-primary text-center">€@totalPositive.ToString("F2")</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Total User Winnings -->
+					
+					<div class="col-12 d-flex justify-content-center mt-2">
+						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #6f42c1; width: 350px;">
+							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
+								<i class="bi bi-gift text-purple" style="font-size: 2rem; color:#6f42c1;"></i>
+								<div>
+									<h6 class="text-muted mb-1">Total User Winnings</h6>
+									<h4 class="fw-bold text-center" style="color:#6f42c1">€@totalUserWinnings.ToString("F2")</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+
+	<!-- PROFIT BY LEAGUE -->
+	<div class="accordion-item">
+		<h2 class="accordion-header" id="headingLeague">
+			<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+					data-bs-target="#collapseLeague">
+				Profit by League
+			</button>
+		</h2>
+
+		<div id="collapseLeague" class="accordion-collapse collapse">
+			<div class="accordion-body">
+
+				@if (leagueStats.Any())
+				{
+					<div class="row g-3 mb-4">
+						@foreach (var league in leagueStats)
+						{
+							var color = league.TotalProfit > 0 ? "text-success"
+							: league.TotalProfit < 0 ? "text-danger"
+							: "text-warning";
+
+							var borderColor = league.TotalProfit > 0 ? "#198754"
+							: league.TotalProfit < 0 ? "#dc3545"
+							: "#ffc107";
+
+							<div class="col-md-4">
+								<div class="card shadow-sm border-0" style="border-left: 6px solid @borderColor;">
+									<div class="card-body d-flex align-items-center gap-3">
+										<i class="bi bi-trophy" style="font-size: 2rem; color:@borderColor;"></i>
+										<div>
+											<h6 class="mb-1">@league.League</h6>
+											<div class="fw-bold @color">€@league.TotalProfit.ToString("F2")</div>
+											<small class="text-muted">@league.EventCount events</small>
+										</div>
+									</div>
+								</div>
+							</div>
+						}
+					</div>
+				}
+				else
+				{
+					<p class="text-muted fst-italic">No league data available.</p>
+				}
+
+			</div>
+		</div>
+	</div>
+</div>
 
 <div class="background-profile"></div>
 
@@ -61,8 +204,18 @@
 				}
 			</td>
 			<td>@e.TotalBets</td>
-			<td>€@e.TotalStake.ToString("F2")</td>
-			<td>€@e.TotalPayout.ToString("F2")</td>
+			<td class="fw-bold @(
+               e.TotalStake > 0 
+                   ? "text-success" 
+                   : e.TotalStake == 0 
+	                   ? "text-warning" 
+	                   : "text-danger"
+               )">				
+				€@e.TotalStake.ToString("F2")
+			</td>
+			<td class="fw-bold @(e.TotalPayout >= 0 ? "text-success" : "text-danger")">
+				€@e.TotalPayout.ToString("F2")
+			</td>
 			<td class="fw-bold @(e.Profit >= 0 ? "text-success" : "text-danger")">
 				€@e.Profit.ToString("F2")
 			</td>
@@ -128,10 +281,29 @@
 
 <style>
     .event-details-box {
-        background: #fafafa;
+        background-color: tomato !important;
         border: 1px solid #e0e0e0;
         border-radius: 6px;
         padding: 1rem;
         margin-top: .5rem;
     }
+
+	.match-events-history-header{
+		margin-top: 3.75em;
+		text-align: center;
+	}
+
+	.event-history-card{
+		display: flex !important;
+		align-items: center !important;
+		gap: 6px !important;
+		font-size: 0.65rem !important;
+		font-weight: 600 !important;
+		background-color: #000 !important;
+		
+	}
+
+	.event-history-card h6{
+		color: #fefefe !important;
+	}
 </style>
