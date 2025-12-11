@@ -234,7 +234,6 @@
 
 					@if (e.Bets.Any())
 					{
-						<h5 class="mb-2">Bets</h5>
 						@await Html.PartialAsync("_EventBetsPartial", e.Bets)
 					}
 					else
@@ -246,7 +245,6 @@
 
 					@if (e.Logs.Any())
 					{
-						<h5 class="mb-2">Event Change Logs</h5>
 						@await Html.PartialAsync("_EventLogsPartial", e.Logs)
 					}
 					else
