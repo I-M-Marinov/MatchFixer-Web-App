@@ -1,7 +1,7 @@
 ﻿@model List<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminBetSummaryDto>
 
-<h5>Bets</h5>
-<table class="table table-sm">
+<h5 class="text-center">Bets</h5>
+<table class="table table-sm admin-user-bets-table">
 	<thead>
 	<tr>
 		<th>User</th>
@@ -23,6 +23,13 @@
 			_ => ""
 		};
 
+		string statusClass = b.Status switch
+		{
+			"Won" => "badge bg-success",
+			"Lost" => "badge bg-danger",
+			_ => ""
+		};
+
 		<tr>
 			<td>@b.FullName (@b.Username)</td>
 			<td>
@@ -32,9 +39,25 @@
 			</td>
 			<td>@b.Odds</td>
 			<td>€@b.Stake</td>
-			<td>@b.Status</td>
+			<td>
+				<span class="@statusClass">
+					@b.Status
+				</span>
+			</td>
 			<td>@(b.Payout?.ToString("F2") ?? "-")</td>
 		</tr>
 	}
 	</tbody>
 </table>
+
+<style>
+	.admin-user-bets-table{
+		font-size: 0.85em;
+	}
+
+	.admin-user-bets-table tbody tr td .bg-success,
+	.admin-user-bets-table tbody tr td .bg-danger {
+		line-height: 1.5;
+		text-shadow: 0px 1px 1px black;
+	}
+</style>
