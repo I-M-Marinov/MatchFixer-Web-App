@@ -18,6 +18,21 @@
 		})
 		.OrderByDescending(x => x.TotalProfit)
 		.ToList();
+
+
+	var leagueLogos = new Dictionary<string, int>
+	{
+		["Premier League"] = 39,
+		["Parva Liga"] = 242,
+		["Bundesliga"] = 78,
+		["La Liga"] = 140,
+		["Eredivisie"] = 88,
+		["Ligue 1"] = 61,
+		["Serie A"] = 135,
+		["Liga Portugal"] = 94,
+		["Swiss League"] = 207,
+		["Polish League Ekstraklasa"] = 106
+	};
 }
 
 <h2 class="mb-4 match-events-history-header">Match Events History</h2>
@@ -39,7 +54,7 @@
 				<div class="row mb-4">
 
 					<!-- Total Net Profit -->
-					<div class="col-md-4">
+					<div class="col-lg-4 col-md-6 col-12">
 						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #28a745;">
 							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
 								<i class="bi bi-graph-up text-success" style="font-size: 2rem;"></i>
@@ -52,7 +67,7 @@
 					</div>
 
 					<!-- Total Loss -->
-					<div class="col-md-4">
+					<div class="col-lg-4 col-md-6 col-12">
 						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #dc3545;">
 							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
 								<i class="bi bi-graph-down text-danger" style="font-size: 2rem;"></i>
@@ -65,7 +80,7 @@
 					</div>
 
 					<!-- Total Winning Events -->
-					<div class="col-md-4">
+					<div class="col-lg-4 col-md-6 col-12">
 						<div class="card shadow-sm border-0 event-history-card" style="border-left: 6px solid #0d6efd;">
 							<div class="card-body d-flex align-items-center gap-3 justify-content-center">
 								<i class="bi bi-cash-coin text-primary" style="font-size: 2rem;"></i>
@@ -126,16 +141,36 @@
 
 							<div class="col-md-4">
 								<div class="card shadow-sm border-0" style="border-left: 6px solid @borderColor;">
-									<div class="card-body d-flex align-items-center gap-3">
-										<i class="bi bi-trophy" style="font-size: 2rem; color:@borderColor;"></i>
-										<div>
-											<h6 class="mb-1">@league.League</h6>
-											<div class="fw-bold @color">€@league.TotalProfit.ToString("F2")</div>
-											<small class="text-muted">@league.EventCount events</small>
+
+									<div class="card-body text-center">
+
+										<!-- League Logo -->
+										@{
+											int logoId = leagueLogos.ContainsKey(league.League) ? leagueLogos[league.League] : 39;
+											string logoUrl = $"https://media.api-sports.io/football/leagues/{logoId}.png";
+										}
+
+										<img src="@logoUrl"
+										     alt="@league.League logo"
+										     class="img-fluid mb-2"
+										     style="height:40px; width:auto; object-fit:contain;" />
+
+										<!-- League name -->
+										<h6 class="mb-1">@league.League</h6>
+
+										<!-- Profit -->
+										<div class="fw-bold @color">
+											€@league.TotalProfit.ToString("F2")
 										</div>
+
+										<!-- Event count -->
+										<small class="text-muted">@league.EventCount events</small>
+
 									</div>
+
 								</div>
 							</div>
+
 						}
 					</div>
 				}
