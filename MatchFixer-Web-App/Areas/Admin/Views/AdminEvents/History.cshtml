@@ -33,6 +33,9 @@
 		["Swiss League"] = 207,
 		["Polish League Ekstraklasa"] = 106
 	};
+
+	var today = DateTime.Today.ToString("yyyy-MM-dd");
+
 }
 
 <h2 class="mb-4 match-events-history-header">Match Events History</h2>
@@ -190,12 +193,12 @@
 
 	<div class="col-md-3">
 		<label class="form-label">From Date</label>
-		<input type="date" name="FromDate" class="form-control" />
+		<input type="date" name="FromDate" class="form-control" value="@today" />
 	</div>
 
 	<div class="col-md-3">
 		<label class="form-label">To Date</label>
-		<input type="date" name="ToDate" class="form-control" />
+		<input type="date" name="ToDate" class="form-control" value="@today" />
 	</div>
 
 	<div class="col-md-3">
