@@ -6,7 +6,7 @@ namespace MatchFixer.Core.Contracts
 	{
 		Task<List<TrophyViewModel>> GetAllTrophiesWithUserStatusAsync(Guid userId);
 		Task AwardTrophyIfNotAlreadyAsync(Guid userId, int trophyId, string profileUrl, string? notes = null);
-		Task EvaluateTrophiesAsync(Guid userId, string profileUrl);
+		Task EvaluateTrophiesAsync(Guid userId);
 		Task MarkTrophyAsSeenAsync(Guid userId, int trophyId);
 	}
 }
