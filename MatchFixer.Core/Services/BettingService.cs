@@ -137,7 +137,7 @@ public class BettingService : IBettingService
 
 		await PublishBetMixForEventsAsync(affectedEventIds, ct);
 
-		await _trophyService.EvaluateTrophiesAsync(userId, profileUrl);
+		// await _trophyService.EvaluateTrophiesAsync(userId, profileUrl);
 
 		return (BetSlipSubmittedSuccessfully, true);
 	}
@@ -368,6 +368,11 @@ public class BettingService : IBettingService
 
 		await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
 		await _dbContext.SaveChangesAsync();
+
+		if (betSlip.IsSettled)
+		{
+			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+		}
 
 		return true;
 	}
