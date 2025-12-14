@@ -198,32 +198,45 @@ namespace MatchFixer.Core.Services
 			}
 		}
 
-		public async Task EvaluateTrophiesAsync(Guid userId, string profileUrl)
+		public async Task EvaluateTrophiesAsync(Guid userId)
 		{
 			var now = DateTime.UtcNow;
 
-			// Load all trophies and user's earned trophies
-			var allTrophies = await _dbContext.Trophies.AsNoTracking().ToListAsync();
+			// Load trophies and already earned ones
+			var allTrophies = await _dbContext.Trophies
+				.AsNoTracking()
+				.ToListAsync();
+
 			var earnedIds = await _dbContext.UserTrophies
 				.Where(ut => ut.UserId == userId)
 				.Select(ut => ut.TrophyId)
 				.ToListAsync();
 
-			var toEvaluate = allTrophies.Where(t => !earnedIds.Contains(t.Id)).ToList();
+			var toEvaluate = allTrophies
+				.Where(t => !earnedIds.Contains(t.Id))
+				.ToDictionary(t => t.Name, t => t.Id);
 
-			// Fetch user bets in one go
+			// Fetch user bets 
 			var userBets = await _dbContext.Bets
 				.Include(b => b.BetSlip)
 				.Include(b => b.MatchEvent)
 				.Where(b => b.BetSlip.UserId == userId)
+				.OrderBy(b => b.BetTime)
 				.ToListAsync();
 
 			int totalBets = userBets.Count;
-			decimal totalWagered = userBets.Sum(b => b.BetSlip.Amount);
+
+			decimal totalWagered = userBets
+				.Select(b => b.BetSlip)
+				.Distinct()
+				.Sum(s => s.Amount);
 
 			var user = await _dbContext.Users
 				.AsNoTracking()
 				.FirstOrDefaultAsync(u => u.Id == userId);
+
+			if (user == null)
+				return;
 
 			var context = new UserTrophyContext
 			{
@@ -236,16 +249,20 @@ namespace MatchFixer.Core.Services
 				DbContext = _dbContext
 			};
 
-			foreach (var kv in _trophyConditions)
+			var profileUrl = $"/Profile/{userId}";
+
+			foreach (var (trophyName, condition) in _trophyConditions)
 			{
-				var trophyId = toEvaluate.FirstOrDefault(t => t.Name == kv.Key)?.Id;
-				if (trophyId != null && await kv.Value(context))
+				if (!toEvaluate.TryGetValue(trophyName, out var trophyId))
+					continue;
+
+				if (await condition(context))
 				{
-					await AwardTrophy(userId, trophyId.Value, profileUrl);
+					await AwardTrophy(userId, trophyId, profileUrl);
 				}
 			}
-
 		}
+
 
 
 		public async Task MarkTrophyAsSeenAsync(Guid userId, int trophyId)
@@ -335,6 +352,12 @@ namespace MatchFixer.Core.Services
 			return false;
 		}
 
+		public bool TryGetCondition(
+			string trophyName,
+			out Func<UserTrophyContext, Task<bool>> condition)
+		{
+			return _trophyConditions.TryGetValue(trophyName, out condition);
+		}
 
 	}
 
