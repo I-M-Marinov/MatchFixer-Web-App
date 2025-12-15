@@ -108,9 +108,24 @@ namespace MatchFixer.Core.Services
 				[TrophyNames.FixersHotStreak] = ctx => Task.FromResult(
 					HasConsecutiveOutcomes(ctx.UserBets, BetStatus.Won, 3)),
 
-				[TrophyNames.SyndicateSharpshooter] = ctx => Task.FromResult(
-					ctx.UserBets.GroupBy(b => b.BetTime.Date)
-						.Any(g => g.Count(b => b.Status == BetStatus.Won) >= 5)),
+				[TrophyNames.SyndicateSharpshooter] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
+
+					return Task.FromResult(
+						ctx.UserBets
+							.Where(b => b.Status == BetStatus.Won && b.BetSlip.IsSettled)
+							.GroupBy(b => b.BetSlipId) // group per slip
+							.Select(g => g.First())    // one bet per slip
+							.GroupBy(b =>
+								_timezoneService
+									.ConvertToUserTime(b.BetTime, ctx.User.TimeZone)
+									.Date
+							)
+							.Any(g => g.Count() >= 5)
+					);
+				},
 
 				[TrophyNames.RiggedToWin] = ctx => Task.FromResult(
 					ctx.UserBets.Count(b => b.Status == BetStatus.Won) >= 20),
@@ -121,9 +136,24 @@ namespace MatchFixer.Core.Services
 				[TrophyNames.UnluckySyndicateSoldier] = ctx => Task.FromResult(
 					ctx.UserBets.Count(b => b.Status == BetStatus.Lost) >= 10),
 
-				[TrophyNames.BankrollObliterator] = ctx => Task.FromResult(
-					ctx.UserBets.GroupBy(b => b.BetTime.Date)
-						.Any(g => g.Count(b => b.Status == BetStatus.Lost) >= 5)),
+				[TrophyNames.BankrollObliterator] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
+
+					return Task.FromResult(
+						ctx.UserBets
+							.Where(b => b.Status == BetStatus.Lost && b.BetSlip.IsSettled)
+							.GroupBy(b => b.BetSlipId)
+							.Select(g => g.First())
+							.GroupBy(b =>
+								_timezoneService
+									.ConvertToUserTime(b.BetTime, ctx.User.TimeZone)
+									.Date
+							)
+							.Any(g => g.Count() >= 5)
+					);
+				},
 
 				[TrophyNames.ComebackKingpin] = ctx => Task.FromResult(
 					HasLossStreakThenWin(ctx.UserBets, 5)),
