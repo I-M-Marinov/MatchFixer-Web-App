@@ -1,0 +1,141 @@
+﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Trophy
+@model List<AdminUserTrophyViewModel>
+
+@{
+	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+	ViewData["Title"] = "User Trophies";
+}
+
+@await Html.PartialAsync("_BackToUsersButton", "Users")
+
+<div class="background-profile"></div>
+
+<h2 class="mb-3 admin-user-trophies-heading">🏆 User Trophies</h2>
+
+
+@if (Model.Count > 1)
+{
+	<form asp-action="ReevaluateAll" method="post" class="mb-4 text-center">
+		@Html.AntiForgeryToken()
+		<button class="btn btn-danger">
+			Re-evaluate ALL users
+		</button>
+	</form>
+}
+
+
+<table class="table table-bordered table-striped align-middle admin-user-trophies-table">
+	<thead>
+	<tr>
+		<th>User</th>
+		<th>Email</th>
+		<th>Trophies</th>
+		<th>Actions</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var user in Model)
+	{
+		<tr>
+			<td>@user.FullName</td>
+			<td>@user.Email</td>
+			<td>
+				@if (!user.Trophies.Any())
+				{
+					<span class="text-muted">No trophies</span>
+				}
+				else
+				{
+					<div class="d-flex flex-wrap gap-2">
+						@foreach (var t in user.Trophies)
+						{
+							<img src="@t.IconUrl"
+							     alt="@t.Name"
+							     class="admin-trophy-icon rarity-@t.Level.ToString().ToLower()"
+							     data-bs-toggle="tooltip"
+							     data-bs-html="true"
+								title="
+									 <strong>@t.Name</strong><br/>
+									 <small>@t.Description</small><br/>
+									 <hr class='my-1'/>
+									 <small><em>Awarded:</em> @t.AwardedOn.ToString("dd MMM yyyy")</small>
+									 " />
+						}
+					</div>
+
+
+
+				}
+			</td>
+			<td class="text-center">
+				<form asp-action="ReevaluateUser" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="userId" value="@user.UserId" />
+					<button class="btn btn-sm btn-warning">
+						Re-evaluate
+					</button>
+				</form>
+			</td>
+		</tr>
+	}
+	</tbody>
+</table>
+
+<style>
+	.admin-user-trophies-heading{
+		margin-top: 3.75em;
+		text-align: center;
+	}
+
+	.admin-user-trophies-table{
+		margin-top: 1em;
+		margin-left: 1.5em;
+	}
+
+	.admin-trophy-icon {
+		width: 50px;
+		height: 50px;
+		object-fit: contain;
+		padding: 4px;
+		background: #0f172a;
+		cursor: help;
+		transition: transform .15s ease, box-shadow .15s ease;
+	}
+
+	/* Rarity rings */
+	.rarity-bronze {
+		box-shadow: 0 0 0 2px #cd7f32;
+	}
+
+	.rarity-silver {
+		box-shadow: 0 0 0 2px #cbd5e1;
+	}
+
+	.rarity-gold {
+		box-shadow: 0 0 0 2px #facc15;
+	}
+
+	.rarity-platinum {
+		box-shadow: 0 0 0 2px #38bdf8;
+	}
+
+	.rarity-legendary {
+		box-shadow: 0 0 0 2px #a855f7;
+	}
+
+	.admin-trophy-icon:hover {
+		transform: scale(1.08);
+		box-shadow: 0 0 0 2px currentColor, 0 2px 2px rgba(0,0,0,.45);
+	}
+
+
+</style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		document
+			.querySelectorAll('[data-bs-toggle="tooltip"]')
+			.forEach(el => new bootstrap.Tooltip(el));
+	});
+</script>
+
