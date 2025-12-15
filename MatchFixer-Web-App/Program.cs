@@ -11,6 +11,7 @@ using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Areas.Admin.Services.MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Hubs;
+using MatchFixer.Core.Services.Admin;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -55,6 +56,7 @@ builder.Services.AddScoped<IAdminUserBetsService, AdminUserBetsService>();				//
 builder.Services.AddScoped<IAdminTeamsService, AdminTeamsService>();					// Add the Admin Teams Service
 builder.Services.AddScoped<IAdminBetInsightsService, AdminBetInsightsService>();        // Add the Admin BetInsights Service
 builder.Services.AddScoped<IAdminEventsService, AdminEventService>();					// Add the Admin Events Service ( historical for call events ) 
+builder.Services.AddScoped<IAdminTrophyService, AdminTrophyService>();					// Add the Admin Trophy Service 
 
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
