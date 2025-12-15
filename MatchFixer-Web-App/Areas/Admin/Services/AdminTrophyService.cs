@@ -4,6 +4,7 @@ using MatchFixer.Core.DTOs.UserTrophyContext;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
+using MatchFixer_Web_App.Areas.Admin.ViewModels.Trophy;
 using Microsoft.EntityFrameworkCore;
 
 namespace MatchFixer.Core.Services.Admin
@@ -23,35 +24,36 @@ namespace MatchFixer.Core.Services.Admin
 
 		public async Task ReevaluateUserTrophiesAsync(Guid userId)
 		{
-			var allTrophies = await _dbContext.Trophies.AsNoTracking().ToListAsync();
-
-			var currentUserTrophies = await _dbContext.UserTrophies
+			var current = await _dbContext.UserTrophies
 				.Where(ut => ut.UserId == userId)
 				.ToListAsync();
 
-			var validTrophyIds = await EvaluateValidTrophyIdsAsync(userId);
+			var valid = await EvaluateValidTrophyIdsAsync(userId);
 
-			var toRemove = currentUserTrophies
-				.Where(ut => !validTrophyIds.Contains(ut.TrophyId))
+			var toRemove = current
+				.Where(ut => !valid.Contains(ut.TrophyId))
 				.ToList();
 
 			if (toRemove.Any())
-			{
 				_dbContext.UserTrophies.RemoveRange(toRemove);
+			var existingIds = current.Select(ut => ut.TrophyId).ToHashSet();
+
+			var toAdd = valid.Except(existingIds);
+
+			foreach (var trophyId in toAdd)
+			{
+				_dbContext.UserTrophies.Add(new UserTrophy
+				{
+					UserId = userId,
+					TrophyId = trophyId,
+					AwardedOn = DateTime.UtcNow,
+					IsNew = false // admin operation
+				});
 			}
 
 			await _dbContext.SaveChangesAsync();
-
-			foreach (var trophyId in validTrophyIds)
-			{
-				bool alreadyHas = currentUserTrophies.Any(ut => ut.TrophyId == trophyId);
-				if (!alreadyHas)
-				{
-					await _trophyService.EvaluateTrophiesAsync(userId);
-					break; // Evaluate once, service handles the rest
-				}
-			}
 		}
+
 
 		public async Task ReevaluateAllUsersAsync()
 		{
@@ -89,12 +91,17 @@ namespace MatchFixer.Core.Services.Admin
 			if (user == null)
 				return new HashSet<int>();
 
+
+			var relevantBets = userBets
+				.Where(b => b.Status != BetStatus.Voided)
+				.ToList();
+
 			var context = new UserTrophyContext
 			{
 				UserId = userId,
 				User = user,
-				UserBets = userBets,
-				TotalBets = userBets.Count,
+				UserBets = relevantBets,
+				TotalBets = relevantBets.Count,
 				TotalWagered = userBets
 					.Select(b => b.BetSlip)
 					.Distinct()
@@ -119,6 +126,61 @@ namespace MatchFixer.Core.Services.Admin
 
 			return result;
 		}
+
+		public async Task<AdminUserTrophyViewModel?> GetUserWithTrophiesAsync(Guid userId)
+		{
+			return await _dbContext.Users
+				.AsNoTracking()
+				.Where(u => u.Id == userId)
+				.Select(u => new AdminUserTrophyViewModel
+				{
+					UserId = u.Id,
+					Email = u.Email,
+					FullName = u.FirstName + " " + u.LastName,
+					Trophies = u.UserTrophies
+						.Select(ut => new AdminTrophyItemViewModel
+						{
+							TrophyId = ut.TrophyId,
+							Name = ut.Trophy.Name,
+							IconUrl = ut.Trophy.IconUrl,
+							Description = ut.Trophy.Description,
+							Level = ut.Trophy.Level,
+							AwardedOn = ut.AwardedOn
+						})
+						.OrderByDescending(t => t.AwardedOn)
+						.ToList()
+				})
+				.FirstOrDefaultAsync();
+		}
+
+
+		public async Task<List<AdminUserTrophyViewModel>> GetUsersWithTrophiesAsync()
+		{
+			return await _dbContext.Users
+				.Where(u => u.IsActive)
+				.AsNoTracking()
+				.Select(u => new AdminUserTrophyViewModel
+				{
+					UserId = u.Id,
+					Email = u.Email,
+					FullName = u.FirstName + " " + u.LastName,
+					Trophies = u.UserTrophies
+						.Select(ut => new AdminTrophyItemViewModel
+						{
+							TrophyId = ut.TrophyId,
+							Name = ut.Trophy.Name,
+							IconUrl = ut.Trophy.IconUrl,
+							Description = ut.Trophy.Description,
+							Level = ut.Trophy.Level,
+							AwardedOn = ut.AwardedOn
+						})
+						.OrderByDescending(t => t.AwardedOn)
+						.ToList()
+				})
+				.OrderBy(u => u.Email)
+				.ToListAsync();
+		}
+
 
 	}
 
