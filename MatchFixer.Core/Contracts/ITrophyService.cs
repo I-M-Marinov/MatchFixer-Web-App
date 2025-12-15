@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.ViewModels.Profile;
+﻿using MatchFixer.Core.DTOs.UserTrophyContext;
+using MatchFixer.Core.ViewModels.Profile;
 
 namespace MatchFixer.Core.Contracts
 {
