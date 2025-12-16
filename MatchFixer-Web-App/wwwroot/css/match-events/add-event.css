@@ -426,3 +426,25 @@ table.responsive-stack td {
     opacity: 1;
 }
 
+
+.api-imported-match {
+    background: linear-gradient( 90deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.02)) !important;
+    border-left: 4px solid #0d6efd !important;
+}
+
+.api-imported-match:hover {
+    background-color: rgba(13, 110, 253, 0.12) !important;
+}
+
+.add-event-navigation-tabs{
+    font-size: 0.80em;
+}
+
+.add-match-auto-card{
+    width: 75%;
+    margin: 0 auto;
+}
+
+.api-upcoming-matches-table {
+    font-size: 0.80em;
+}
