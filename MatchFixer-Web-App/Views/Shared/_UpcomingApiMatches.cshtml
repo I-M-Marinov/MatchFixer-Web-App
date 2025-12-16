@@ -1,0 +1,47 @@
+﻿@model List<MatchFixer.Infrastructure.Models.FootballAPI.UpcomingMatchDto>
+
+@for (int i = 0; i < Model.Count; i++)
+{
+	<tr>
+		<td>
+			<input asp-for="@Model[i].Selected" class="form-check-input" />
+
+			<input type="hidden" asp-for="@Model[i].ApiFixtureId" />
+			<input type="hidden" asp-for="@Model[i].HomeName" />
+			<input type="hidden" asp-for="@Model[i].AwayName" />
+			<input type="hidden" asp-for="@Model[i].HomeLogo" />
+			<input type="hidden" asp-for="@Model[i].AwayLogo" />
+			<input type="hidden" asp-for="@Model[i].KickoffUtc" />
+		</td>
+
+		<td>@Model[i].KickoffUtc.ToString("g")</td>
+
+		<td>
+			<img src="@Model[i].HomeLogo" height="24" />
+			@Model[i].HomeName
+		</td>
+
+		<td>
+			<img src="@Model[i].AwayLogo" height="24" />
+			@Model[i].AwayName
+		</td>
+
+		<td><input asp-for="@Model[i].HomeOdds" class="form-control form-control-sm" /></td>
+		<td><input asp-for="@Model[i].DrawOdds" class="form-control form-control-sm" /></td>
+		<td><input asp-for="@Model[i].AwayOdds" class="form-control form-control-sm" /></td>
+	</tr>
+}
+
+
+<script>
+	document.querySelector("form").addEventListener("submit", e => {
+		const anyChecked = [...document.querySelectorAll("input[type=checkbox]")]
+			.some(cb => cb.checked);
+
+		if (!anyChecked) {
+			e.preventDefault();
+			alert("Select at least one match.");
+		}
+	});
+
+</script>
