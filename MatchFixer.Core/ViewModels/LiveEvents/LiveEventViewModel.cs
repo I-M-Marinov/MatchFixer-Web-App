@@ -31,7 +31,8 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public bool IsCancelled { get; set; }
 		public string MatchStatus { get; set; } = "Scheduled";
 		public BoostViewModel? BoostActive { get; set; }
-
+		public int? ApiFixtureId { get; set; }
+		public bool IsFromApi => ApiFixtureId != null;
 
 	}
 }
