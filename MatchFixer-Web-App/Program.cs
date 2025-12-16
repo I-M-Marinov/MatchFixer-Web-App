@@ -48,6 +48,8 @@ builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
 builder.Services.AddHttpClient();                                               // Add HTTP Client
 
 
+builder.Services.AddHttpClient<IFootballApiService, FootballApiService>();      // Add the FootballAPI Service ( newly added interface here ) 
+
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();			// Add the Admin Dashboard Service
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();						// Add the Admin User Service
 builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();					// Add the Admin Wallet Service
@@ -77,8 +79,7 @@ builder.Services.AddScoped<IOddsBoostService, OddsBoostService>();				// Add the
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
 builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
-builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();				// Add the Logo Quiz Service
-builder.Services.AddHttpClient<FootballApiService>();							// Add the FootballAPI Service 
+builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();                // Add the Logo Quiz Service
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
