@@ -35,6 +35,9 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public decimal? AwayOdds { get; set; }
 
 		public List<LiveEventViewModel> CurrentEvents { get; set; } = new();
+
+		public List<ApiLeagueSelectViewModel> ApiLeagues { get; set; } = new();
+
 	}
 
 }
