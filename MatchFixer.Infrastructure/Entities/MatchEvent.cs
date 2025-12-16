@@ -30,7 +30,7 @@ namespace MatchFixer.Infrastructure.Entities
 
 		[Range(OddsMinValue, OddsMaxValue)]
 		public decimal? AwayOdds { get; set; }
-
+		public int? ApiFixtureId { get; set; } // only for admin-imported matches ( manual matches leave it null ) 
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
 		public LiveMatchResult? LiveResult { get; set; }
 		public bool IsCancelled { get; set; } = false; 
