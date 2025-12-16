@@ -1,16 +1,15 @@
-﻿using System.Text.Json;
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-
+﻿using System.Runtime.CompilerServices;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.FootballAPI;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
 
 namespace MatchFixer.Infrastructure.Services
 {
-	public class FootballApiService
+	public class FootballApiService : IFootballApiService
 	{
 		private readonly HttpClient _httpClient;
 		private readonly MatchFixerDbContext _dbContext;
@@ -179,7 +178,7 @@ namespace MatchFixer.Infrastructure.Services
 
 
 		// Helper method to extract team ID
-		private int? ExtractTeamIdFromLogoUrl(string logoUrl)
+		public int? ExtractTeamIdFromLogoUrl(string logoUrl)
 		{
 			if (string.IsNullOrEmpty(logoUrl))
 				return null;
@@ -201,6 +200,49 @@ namespace MatchFixer.Infrastructure.Services
 				return null;
 			}
 		}
+
+		public async Task<List<UpcomingMatchDto>> GetUpcomingFromApiAsync(int leagueId)
+		{
+			var yearTodate = DateTime.Now.Year;
+
+			var url =
+				$"https://v3.football.api-sports.io/fixtures" +
+				$"?league={leagueId}&season={yearTodate}&next=20";
+
+			using var request = new HttpRequestMessage(HttpMethod.Get, url);
+			request.Headers.Add("x-apisports-key", _apiKey);
+
+			var response = await _httpClient.SendAsync(request);
+			response.EnsureSuccessStatusCode();
+
+			var json = await response.Content.ReadAsStringAsync();
+
+			var data = JsonSerializer.Deserialize<FixtureApiResponse>(
+				json,
+				new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+			);
+
+			if (data?.Response == null)
+				return new();
+
+			return data.Response.Select(f => new UpcomingMatchDto
+				{
+					ApiFixtureId = f.Fixture.Id,
+					KickoffUtc = f.Fixture.Date,
+
+					HomeName = f.Teams.Home.Name,
+					AwayName = f.Teams.Away.Name,
+					HomeLogo = f.Teams.Home.Logo,
+					AwayLogo = f.Teams.Away.Logo,
+
+					// admin-editable defaults
+					HomeOdds = 1.11m,
+					DrawOdds = 2.22m,
+					AwayOdds = 3.33m
+				})
+				.ToList();
+		}
+
 
 	}
 }
