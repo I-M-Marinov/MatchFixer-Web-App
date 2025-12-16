@@ -1,8 +1,11 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.FootballLeagues;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
+using MatchFixer.Infrastructure.Models.FootballAPI;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer.Common.DerbyLookup.DerbyLookup;
@@ -21,6 +24,8 @@ namespace MatchFixer.Core.Services
 		private readonly IBettingService _bettingService;
 		private readonly IMatchEventNotifier _notifier;
 		private readonly IOddsBoostService _oddsBoostService;
+		private readonly IFootballApiService _footballApiService;
+
 
 
 		public MatchEventService(
@@ -28,13 +33,16 @@ namespace MatchFixer.Core.Services
 			 IUserContextService userContextService,
 			 IBettingService bettingService,
 			 IMatchEventNotifier notifier,
-			 IOddsBoostService oddsBoostService)
+			 IOddsBoostService oddsBoostService,
+			IFootballApiService footballApiService)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
 			_bettingService = bettingService;
 			_notifier = notifier;
 			_oddsBoostService = oddsBoostService;
+			_footballApiService = footballApiService;
+
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -73,7 +81,8 @@ namespace MatchFixer.Core.Services
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					IsDerby = e.IsDerby,
-					UserTimeZone = user.TimeZone
+					UserTimeZone = user.TimeZone,
+					ApiFixtureId = e.ApiFixtureId
 				});
 			}
 
@@ -119,6 +128,7 @@ namespace MatchFixer.Core.Services
 					EffectiveHomeWinOdds = activeBoostEntity != null ? (e.HomeOdds + activeBoostEntity.BoostValue) : e.HomeOdds,
 					EffectiveDrawOdds = activeBoostEntity != null ? (e.DrawOdds + activeBoostEntity.BoostValue) : e.DrawOdds,
 					EffectiveAwayWinOdds = activeBoostEntity != null ? (e.AwayOdds + activeBoostEntity.BoostValue) : e.AwayOdds,
+					ApiFixtureId = e.ApiFixtureId,
 
 					ActiveBoost = activeBoostEntity,
 					BoostEndUtc = activeBoostEntity?.EndUtc,
@@ -174,6 +184,33 @@ namespace MatchFixer.Core.Services
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby
+			};
+
+			await _dbContext.MatchEvents.AddAsync(matchEvent);
+			await _dbContext.SaveChangesAsync();
+		}
+		public async Task AddEventAsync(MatchEventFormModel model, int apiFixtureId)
+		{
+			var homeTeam = await _dbContext.Teams.FindAsync(model.HomeTeamId);
+			var awayTeam = await _dbContext.Teams.FindAsync(model.AwayTeamId);
+
+			if (homeTeam == null || awayTeam == null)
+				throw new Exception(TeamDoesNotExist);
+
+			var utcMatchDate = DateTime.SpecifyKind(model.MatchDate, DateTimeKind.Utc);
+			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
+
+			var matchEvent = new MatchEvent
+			{
+				Id = Guid.NewGuid(),
+				HomeTeamId = model.HomeTeamId,
+				AwayTeamId = model.AwayTeamId,
+				MatchDate = utcMatchDate,
+				HomeOdds = model.HomeOdds,
+				DrawOdds = model.DrawOdds,
+				AwayOdds = model.AwayOdds,
+				IsDerby = isDerby,
+				ApiFixtureId = apiFixtureId  
 			};
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
@@ -316,6 +353,77 @@ namespace MatchFixer.Core.Services
 						.FirstOrDefault()
 				})
 				.ToDictionaryAsync(x => x.Id, x => x);
+		}
+
+		public Task<List<ApiLeagueSelectViewModel>> GetApiLeaguesAsync()
+		{
+			var leagues = SupportedApiLeagues.Football
+				.Select(l => new ApiLeagueSelectViewModel
+				{
+					ApiLeagueId = l.Key,
+					Name = l.Value
+				})
+				.ToList();
+
+			return Task.FromResult(leagues);
+		}
+
+		public async Task<bool> MatchExistsByApiFixtureAsync(int apiFixtureId)
+		{
+			return await _dbContext.MatchEvents
+				.AnyAsync(e => e.ApiFixtureId == apiFixtureId);
+		}
+
+		public async Task AddEventFromUpcomingAsync(UpcomingMatchDto m)
+		{
+			if (await MatchExistsByApiFixtureAsync(m.ApiFixtureId))
+				return;
+
+			var homeId = await ResolveTeamIdAsync(m.HomeName);
+			var awayId = await ResolveTeamIdAsync(m.AwayName);
+
+			var model = new MatchEventFormModel
+			{
+				HomeTeamId = homeId,
+				AwayTeamId = awayId,
+				MatchDate = m.KickoffUtc,
+				HomeOdds = m.HomeOdds,
+				DrawOdds = m.DrawOdds,
+				AwayOdds = m.AwayOdds
+			};
+
+			await AddEventAsync(model, m.ApiFixtureId);
+		}
+
+		private async Task<Guid> ResolveTeamIdAsync(string teamName, string? logoUrl = null)
+		{
+			if (!string.IsNullOrEmpty(logoUrl))
+			{
+				var apiTeamId = _footballApiService.ExtractTeamIdFromLogoUrl(logoUrl);
+
+				if (apiTeamId.HasValue)
+				{
+					var byApiId = await _dbContext.Teams
+						.Where(t => t.TeamId == apiTeamId.Value)
+						.Select(t => t.Id)
+						.FirstOrDefaultAsync();
+
+					if (byApiId != Guid.Empty)
+						return byApiId;
+				}
+			}
+
+			var byName = await _dbContext.Teams
+				.Where(t => t.Name == teamName)
+				.Select(t => t.Id)
+				.FirstOrDefaultAsync();
+
+			if (byName != Guid.Empty)
+				return byName;
+
+			throw new InvalidOperationException(
+				$"Team '{teamName}' not found in database. Seed teams first."
+			);
 		}
 
 	}
