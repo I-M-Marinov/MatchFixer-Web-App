@@ -101,7 +101,7 @@
 
 			// Spanish clubs
 
-			["Real Betis"] = "Real Betis Balompié",
+			["Real Betis"] = "Real Betis",
 			["Granada CF"] = "Granada CF",
 			["Almeria"] = "UD Almería",
 			["Osasuna"] = "CA Osasuna",
@@ -147,6 +147,7 @@
 			["Stade Brestois 29"] = "Stade Brestois 29",
 			["Paris FC"] = "Paris FC",
 			["Angers"] = "Angers SCO",
+			["Auxerre"] = "AJ Auxerre",
 
 			// Dutch clubs
 
@@ -175,6 +176,7 @@
 			["Emmen"] = "FC Emmen",
 			["Groningen"] = "FC Groningen",
 			["Telstar"] = "SC Telstar",
+			["Heracles"] = "Heracles Almelo",
 
 			
 			// Swiss clubs
@@ -214,6 +216,8 @@
 			["ŁKS Łódź"] = "ŁKS Łódź",
 			["Gornik Zabrze"] = "Górnik Zabrze",
 			["Slask Wroclaw"] = "Śląsk Wrocław",
+			["Arka Gdynia"] = "Arka Gdynia",
+			["Motor Lublin"] = "Motor Lublin",
 
 			// Bulgarian clubs
 
