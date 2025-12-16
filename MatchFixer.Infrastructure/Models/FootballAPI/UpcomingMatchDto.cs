@@ -1,0 +1,22 @@
+﻿namespace MatchFixer.Infrastructure.Models.FootballAPI
+{
+	public class UpcomingMatchDto
+	{
+		public bool Selected { get; set; }
+
+		public int ApiFixtureId { get; set; }
+
+		public string HomeName { get; set; } = null!;
+		public string AwayName { get; set; } = null!;
+		public string HomeLogo { get; set; } = null!;
+		public string AwayLogo { get; set; } = null!;
+
+		public DateTime KickoffUtc { get; set; }
+
+		public decimal HomeOdds { get; set; }
+		public decimal DrawOdds { get; set; }
+		public decimal AwayOdds { get; set; }
+	}
+
+
+}
