@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Common.Identity;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
@@ -378,7 +379,7 @@ namespace MatchFixer.Infrastructure.SeedData
 		public static async Task SeedMatchResultsAsync(IServiceProvider serviceProvider)
 		{
 			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
-			var footballApiService = serviceProvider.GetRequiredService<FootballApiService>();
+			var footballApiService = serviceProvider.GetRequiredService<IFootballApiService>();
 
 			// Safeguard: If there's already match data, skip seeding
 			if (await dbContext.MatchResults.AnyAsync())
@@ -392,7 +393,7 @@ namespace MatchFixer.Infrastructure.SeedData
 		public static async Task SeedTeams(IServiceProvider serviceProvider)
 		{
 			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
-			var footballApiService = serviceProvider.GetRequiredService<FootballApiService>();
+			var footballApiService = serviceProvider.GetRequiredService<IFootballApiService>();
 
 			// Safeguard: If there's already teams data, skip seeding
 			if (await dbContext.Teams.AnyAsync())
