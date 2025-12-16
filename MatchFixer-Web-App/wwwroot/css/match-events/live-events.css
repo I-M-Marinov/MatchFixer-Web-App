@@ -355,7 +355,8 @@
     padding: 0.25em 0.85em;
     font-size: 0.70em;
     font-weight: 800;
-    line-height: 1.5;
+    line-height: 1.75;
+    margin-top: 0.30em;
     color: black;
     text-align: center;
     white-space: nowrap;
