@@ -1,5 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
+using MatchFixer.Infrastructure.Contracts;
+using MatchFixer.Infrastructure.Models.FootballAPI;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +15,14 @@ namespace MatchFixer_Web_App.Controllers
 		private readonly IMatchEventService _matchEventService;
 		private readonly IUserContextService _userContextService;
 		private readonly IOddsBoostService _oddsBoostService;
+		private readonly IFootballApiService _footballApiService;
 
-		public EventController(IMatchEventService matchEventService, IUserContextService userContextService, IOddsBoostService oddsBoostService)
+		public EventController(IMatchEventService matchEventService, IUserContextService userContextService, IOddsBoostService oddsBoostService, IFootballApiService footballApiService)
 		{
 			_matchEventService = matchEventService;
 			_userContextService = userContextService;
 			_oddsBoostService = oddsBoostService;
+			_footballApiService = footballApiService;
 		}
 
 		[HttpGet]
@@ -29,8 +33,8 @@ namespace MatchFixer_Web_App.Controllers
 			var model = new MatchEventFormModel
 			{
 				TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync(),
-				CurrentEvents = await _matchEventService.GetAllEventsAsync()
-
+				CurrentEvents = await _matchEventService.GetAllEventsAsync(),
+				ApiLeagues = await _matchEventService.GetApiLeaguesAsync()
 			};
 
 			return View(model);
@@ -171,6 +175,31 @@ namespace MatchFixer_Web_App.Controllers
 			}
 		}
 
+		[HttpGet]
+		[Authorize]
+		[AdminOnly]
+		public async Task<IActionResult> UpcomingFromApi(int leagueId)
+		{
+			var matches = await _footballApiService.GetUpcomingFromApiAsync(leagueId);
+			return PartialView("_UpcomingApiMatches", matches);
+		}
+
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddUpcomingMatches(List<UpcomingMatchDto> selected)
+		{
+			if (selected == null || !selected.Any())
+				return RedirectToAction(nameof(AddMatchEvent));
+
+			foreach (var match in selected.Where(m => m.Selected))
+			{
+				await _matchEventService.AddEventFromUpcomingAsync(match);
+			}
+
+			return RedirectToAction(nameof(AddMatchEvent));
+		}
 
 
 	}
