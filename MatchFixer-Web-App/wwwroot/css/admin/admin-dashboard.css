@@ -37,11 +37,11 @@
     background: #dc3545;
 }
 
-.seg-pending:hover,
-.seg-won:hover,
-.seg-lost:hover {
-    transform: scale(1.2);
-}
+    .seg-pending:hover,
+    .seg-won:hover,
+    .seg-lost:hover {
+        transform: scale(1.2);
+    }
 
 #total-users-count,
 #total-bets-count {
@@ -148,3 +148,173 @@
     padding: 0.5rem;
     border-radius: 0.5em;
 }
+
+/* =====================================================
+   ADMIN METRICS GRID
+   ===================================================== */
+
+.admin-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Header */
+.metric-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: #6c757d;
+}
+
+/* Main number */
+.metric-main {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* Badges */
+.metric-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    justify-content: center;
+}
+
+    .metric-badges.center {
+        justify-content: center;
+    }
+
+/* Progress bar */
+.metric-bar {
+    position: relative;
+    height: 18px;
+    background: #e9ecef;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 0.25rem;
+}
+
+.users-wallets-bets-table .stack {
+    display: flex;
+}
+
+.users-wallets-bets-table .seg {
+    flex-shrink: 0;
+}
+
+.metric-bar .bar-fill {
+    transition: width .4s ease;
+}
+
+.metric-bar .bar-fill {
+    height: 100%;
+    float: none !important;
+    display: block;
+}
+
+.metric-bar .bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #000;
+    pointer-events: none;
+}
+
+.metric-note {
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-align: center;
+}
+
+/* ===============================
+   METRIC BAR 
+   =============================== */
+
+.metric-bar {
+    display: flex;
+    height: 14px;
+    background: #e9ecef;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.metric-bar .bar-fill {
+    height: 100%;
+    flex: 0 0 auto;
+}
+
+.metric-bar-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #495057;
+    text-align: center;
+    margin-top: 0.25rem;
+}
+
+/* =====================================================
+   SEGMENTED METRIC BAR 
+   ===================================================== */
+
+.metric-bar.segmented {
+    display: flex;
+    height: 20px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e9ecef;
+}
+
+.metric-bar.segmented > .bar-fill {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #fff;
+    transition: width 0.3s ease;
+}
+
+.metric-bar.segmented > .bar-fill.text-dark {
+    color: #000;
+}
+
+.metric-bar.segmented > .bar-fill > span {
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
+.metric-bar.segmented > .bar-fill[style*="width:0"] > span {
+    display: none;
+}
+
