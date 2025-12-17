@@ -166,9 +166,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				// Effectively permanent lock (666 years)
 				var end = DateTimeOffset.UtcNow.AddYears(666);
 				var res = await _userManager.SetLockoutEndDateAsync(user, end);
+				// user.WasDeactivatedByAdmin = true;
+
 				return res.Succeeded
 					? (true, UserLocked)
 					: (false, FailedToLockUser);
+
+
 			}
 
 			public async Task<(bool Ok, string Message)> UnlockUserAsync(Guid actorId, Guid targetUserId)
