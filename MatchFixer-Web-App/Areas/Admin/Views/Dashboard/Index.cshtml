@@ -5,12 +5,17 @@
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
 	ViewData["Title"] = "Admin Dashboard";
 
-	var activePct = Model.TotalUsers == 0 ? 0 : (int)Math.Round((double)Model.ActiveUsers * 100 / Model.TotalUsers);
 	var wonPct = Model.TotalBets == 0 ? 0 : (int)Math.Round((double)Model.WonBets * 100 / Model.TotalBets);
 	var lostPct = Model.TotalBets == 0 ? 0 : (int)Math.Round((double)Model.LostBets * 100 / Model.TotalBets);
 	var pendingPct = Model.TotalBets == 0 ? 0 : 100 - wonPct - lostPct;
 
-	var inactivePct = Math.Clamp(100 - activePct, 0, 100);
+	var totalUsers = Model.TotalUsers == 0 ? 1 : Model.TotalUsers;
+	var activePct = (int)Math.Round(Model.ActiveUsers * 100.0 / totalUsers);
+	var lockedPct = (int)Math.Round(Model.LockedUsers * 100.0 / totalUsers);
+	var bannedPct = (int)Math.Round(Model.BannedUsers * 100.0 / totalUsers);
+	var inactivePct = 100 - activePct - lockedPct - bannedPct;
+
+	inactivePct = Math.Clamp(inactivePct, 0, 100);
 
 }
 
@@ -35,102 +40,103 @@
 
 <h1>Admin Dashboard</h1>
 
-<div class="table-responsive users-wallets-bets-table">
-	<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
-		<thead class="table-dark">
-		<tr>
-			<th style="width: 220px;">Metric</th>
-			<th>Main</th>
-			<th>Details</th>
-		</tr>
-		</thead>
-		<tbody>
-		<!-- Users -->
-		<tr>
-			<td class="fw-bold">
-				<i class="bi bi-people"></i> Users
-			</td>
-			<td>
-				<span class="fs-5 fw-bold badge bg-primary-subtle mb-3" id="total-users-count">Total Users: @Model.TotalUsers</span>
-				<div>
-					<span class="badge bg-success">Active: @Model.ActiveUsers</span>
-					<div class="d-flex justify-content-center gap-1 mt-2">
-						<span class="badge bg-secondary d-flex justify-content-center align-items-center">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
-						<div class="total-inactive-users">
-							<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
-							<span class="badge bg-black">Deleted: @Model.DeletedUsers</span>
-							<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
-						</div>
-					</div>
-				</div>
-			</td>
-			<td>
-				<div class="d-inline-flex align-items-center gap-2">
-					<div class="progress position-relative rounded-pill" style="width:260px; height:30px;">
-						<!-- active segment -->
-						<div class="progress-bar bg-success" style="width:@activePct%"></div>
-						<!-- inactive segment (fills the rest) -->
-						<div class="progress-bar bg-danger text-white" style="width:@inactivePct%"></div>
+<div class="admin-metrics-grid">
 
-						<!-- overlay labels (sit on top of both bars) -->
-						<div class="position-absolute top-50 start-0 translate-middle-y w-100 d-flex justify-content-between px-2"
-						     style="pointer-events:none; font-size:.75rem;">
-							<span class="text-white fw-bold">@activePct% active</span>
-							<span class="text-white fw-bold">@inactivePct% inactive</span>
-						</div>
-					</div>
-				</div>
-			</td>
-		</tr>
+	<!-- USERS -->
+	<div class="metric-card">
+		<div class="metric-header">
+			<i class="bi bi-people"></i>
+			<span>Users</span>
+		</div>
 
-		<!-- Wallets / Transactions -->
-		<tr>
-			<td class="fw-bold">
-				<i class="bi bi-wallet2"></i> Wallets &amp; Transactions
-			</td>
-			<td>
-				<span class="fs-5 fw-semibold"> Total wallets balance: €@Model.TotalWalletBalance</span>
-				<div><span class="badge bg-info text-dark" style="width: 8em; margin: 0 auto;">Transactions: @Model.TotalTransactions</span></div>
-			</td>
-			<td class="text-muted">
-				<small>Total wallet balance is a sum of all user wallets.</small>
-			</td>
-		</tr>
+		<div class="metric-main">
+			<div class="metric-value">@Model.TotalUsers</div>
+			<div class="metric-label">Total Users</div>
+		</div>
 
-		<!-- Bets -->
-		<tr>
-			<td class="fw-bold">
-				<i class="bi bi-bar-chart-line"></i> Bets
-			</td>
-			<td>
-				<span class="fs-5 fw-semibold badge bg-primary-subtle mb-3" id="total-bets-count">Total Bets Placed: @Model.TotalBets</span>
-				<div class="mt-1 d-flex flex-wrap gap-1 justify-content-center">
-					<span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
-					<span class="badge bg-success">Won: @Model.WonBets</span>
-					<span class="badge bg-danger">Lost: @Model.LostBets</span>
-				</div>
-			</td>
-			<td>
-				<!-- tiny stacked bar -->
-				<div class="mini-stacked d-inline-flex align-items-center">
-					<div class="stack">
-						<div class="seg seg-pending" style="width:@pendingPct%">
-							<small>@pendingPct% pending</small>
-						</div>
-						<div class="seg seg-won" style="width:@wonPct%">
-							<small>@wonPct% won</small>
-						</div>
-						<div class="seg seg-lost" style="width:@lostPct%">
-							<small>@lostPct% lost</small>
-						</div>
-					</div>
-					
-				</div>
-			</td>
-		</tr>
-		</tbody>
-	</table>
+		<div class="metric-badges">
+			<span class="badge bg-success">Active: @Model.ActiveUsers</span>
+			<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+			<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
+			<span class="badge bg-dark">Deleted: @Model.DeletedUsers</span>
+			<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
+		</div>
+
+		<div class="metric-bar segmented">
+			<div class="bar-fill bg-success" style="width:@activePct%">
+				<span>@activePct%</span>
+			</div>
+			<div class="bar-fill bg-secondary" style="width:@inactivePct%">
+				<span>@inactivePct%</span>
+			</div>
+			<div class="bar-fill bg-warning text-dark" style="width:@lockedPct%">
+				<span>@lockedPct%</span>
+			</div>
+			<div class="bar-fill bg-danger" style="width:@bannedPct%">
+				<span>@bannedPct%</span>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- WALLETS -->
+	<div class="metric-card">
+		<div class="metric-header">
+			<i class="bi bi-wallet2"></i>
+			<span>Wallets</span>
+		</div>
+
+		<div class="metric-main">
+			<div class="metric-value">€@Model.TotalWalletBalance</div>
+			<div class="metric-label">Total Balance</div>
+		</div>
+
+		<div class="metric-badges center">
+			<span class="badge bg-info text-dark">
+				Transactions: @Model.TotalTransactions
+			</span>
+		</div>
+
+		<div class="metric-note">
+			Total wallet balance is a sum of all user wallets.
+		</div>
+	</div>
+
+	<!-- BETS -->
+	<div class="metric-card">
+		<div class="metric-header">
+			<i class="bi bi-bar-chart-line"></i>
+			<span>Bets</span>
+		</div>
+
+		<div class="metric-main">
+			<div class="metric-value">@Model.TotalBets</div>
+			<div class="metric-label">Total Bets Placed</div>
+		</div>
+
+		<div class="metric-badges">
+			<span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
+			<span class="badge bg-success">Won: @Model.WonBets</span>
+			<span class="badge bg-danger">Lost: @Model.LostBets</span>
+		</div>
+
+		<div class="metric-bar segmented">
+			<div class="bar-fill bg-warning text-dark" style="width:@pendingPct%">
+				<span>@pendingPct%</span>
+			</div>
+			<div class="bar-fill bg-success" style="width:@wonPct%">
+				<span>@wonPct%</span>
+			</div>
+			<div class="bar-fill bg-danger" style="width:@lostPct%">
+				<span>@lostPct%</span>
+			</div>
+		</div>
+
+
+	</div>
+
 </div>
+
 
 @{
 	var ev = Model.Events;
