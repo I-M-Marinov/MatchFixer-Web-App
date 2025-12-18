@@ -448,3 +448,8 @@ table.responsive-stack td {
 .api-upcoming-matches-table {
     font-size: 0.80em;
 }
+
+#eventDateTabs{
+    font-size: 0.75em;
+    gap: 0.5em;
+}
