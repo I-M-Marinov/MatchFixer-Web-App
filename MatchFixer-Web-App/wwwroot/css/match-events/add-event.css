@@ -87,6 +87,32 @@
     text-shadow: 0px 1px 1px #03ffd1;
 }
 
+
+.live-events-section {
+    flex: 1 1 0; 
+    gap: 2em;
+    min-width: 0; 
+    max-width: 1200px;
+}
+
+.live-events-table-wrapper {
+    height: 31em; 
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+#live-events-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+#live-events-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+
 /*----------------------------------------------------------------
 |             MODEL ERRORS SPAN + VALIDATION ERRORS              |
 -----------------------------------------------------------------*/
@@ -453,3 +479,141 @@ table.responsive-stack td {
     font-size: 0.75em;
     gap: 0.5em;
 }
+
+#eventDateTabs .nav-link {
+    position: relative;
+    border-radius: 999px;
+    padding: 0.45rem 1.1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0b5ed7;
+    background: transparent;
+    border: none;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+#eventDateTabs .nav-link:hover {
+    background: rgba(13, 110, 253, 0.12);
+    transform: translateY(-1px);
+}
+
+#eventDateTabs .nav-link.active {
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35), inset 0 -2px 0 rgba(255,255,255,0.2);
+}
+
+#eventDateTabs .nav-link:active {
+    transform: translateY(1px) scale(0.87);
+    box-shadow: 0 3px 8px rgba(13, 110, 253, 0.4), inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+#eventDateTabs .nav-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13,110,253,.35);
+}
+
+#eventDateTabs .nav-link::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: width 0.45s ease, height 0.45s ease, opacity 0.6s;
+}
+
+#eventDateTabs .nav-link:active::after {
+    width: 160%;
+    height: 160%;
+    opacity: 0;
+}
+
+.events-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.5rem;
+    padding: 0.5rem 3rem; 
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.add-match-event-container {
+    flex: 0 0 720px;
+    max-width: 750px;
+    margin-top: 3rem;
+}
+
+.live-events-section {
+    flex: 1 1 auto;
+    min-width: 0; 
+    max-width: 1500px;
+}
+
+
+
+.add-event-navigation-tabs {
+    border-bottom: none;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+}
+
+.add-event-navigation-tabs .nav-link {
+    border: none;
+    border-radius: 999px;
+    padding: 0.55rem 1.3rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0b5ed7;
+    background: transparent;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+.add-event-navigation-tabs .nav-link:hover {
+    background: rgba(13, 110, 253, 0.12);
+    transform: translateY(-1px);
+}
+
+.add-event-navigation-tabs .nav-link.active {
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35), inset 0 -2px 0 rgba(255,255,255,0.2);
+}
+
+.add-event-navigation-tabs .nav-link:active {
+    transform: translateY(1px) scale(0.95);
+    box-shadow: 0 3px 8px rgba(13, 110, 253, 0.4), inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.add-event-navigation-tabs .nav-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13,110,253,.35);
+}
+
+.add-event-navigation-tabs .nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.add-event-navigation-tabs .nav-link::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: width 0.45s ease, height 0.45s ease, opacity 0.6s;
+}
+
+.add-event-navigation-tabs .nav-link:active::after {
+    width: 160%;
+    height: 160%;
+    opacity: 0;
+}
+
