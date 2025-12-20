@@ -48,7 +48,8 @@ builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
 builder.Services.AddHttpClient();                                               // Add HTTP Client
 
 
-builder.Services.AddHttpClient<IFootballApiService, FootballApiService>();      // Add the FootballAPI Service ( newly added interface here ) 
+builder.Services.AddHttpClient<IFootballApiService, FootballApiService>();				// Add the FootballAPI Service ( newly added interface here )
+builder.Services.AddScoped<IUpcomingMatchSeederService, UpcomingMatchSeederService>();  // Upcoming Matches Seeder Service
 
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();			// Add the Admin Dashboard Service
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();						// Add the Admin User Service
@@ -77,6 +78,7 @@ builder.Services.AddScoped<IProfileService, ProfileService>();					// Add the Pr
 builder.Services.AddScoped<IWalletService, WalletService>();					// Add the Wallet Service
 builder.Services.AddScoped<IOddsBoostService, OddsBoostService>();				// Add the Odds Boost Service
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
+builder.Services.AddScoped<IUpcomingMatchService, UpcomingMatchService>();		// Add the Upcoming Matches Service 
 builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
 builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();                // Add the Logo Quiz Service
@@ -161,9 +163,11 @@ using (var scope = app.Services.CreateScope())
 	// deleted user's profile pictures
 	await SeedDeletedUsersProfilePicture(userManager, services);       // Seed the Deleted User Image ( when user deletes their profile ) 
 	// teams 
-	await SeedTeams(services);										 // Seed the Teams in the Teams Table
-	// match results
-	await SeedMatchResultsAsync(services);                         // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
+	await SeedTeams(services);                                       // Seed the Teams in the Teams Table
+	// upcoming events 
+	await SeedUpcomingMatchEventsAsync(services);                   // UpcomingMatchEvent (API)
+	// historical match results
+	await SeedMatchResultsAsync(services);                        // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 	// seed the Admin & Moderator Roles
 	await SeedRolesAndAdminAsync(services);						// Seed the Roles ( Admin and Moderator ) and the Admin account
 
