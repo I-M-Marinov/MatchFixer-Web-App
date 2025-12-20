@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Security.Claims;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
@@ -483,8 +484,20 @@ namespace MatchFixer.Infrastructure.SeedData
 			}
 		}
 
+		public static async Task SeedUpcomingMatchEventsAsync(IServiceProvider services)
+		{
+			using var scope = services.CreateScope();
 
+			var dbContext = services.GetRequiredService<MatchFixerDbContext>();
+			var seeder = services.GetRequiredService<IUpcomingMatchSeederService>();
 
+			if (await dbContext.UpcomingMatchEvents.AnyAsync())
+			{
+				return;
+			}
+
+			await seeder.SeedUpcomingMatchesAsync();
+		}
 
 	}
 }
