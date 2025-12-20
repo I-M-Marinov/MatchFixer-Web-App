@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 
 namespace MatchFixer.Infrastructure
@@ -27,6 +28,8 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<UserTrophy> UserTrophies { get; set; }
 		public virtual DbSet<MatchEventLog> MatchEventLogs { get; set; }
 		public virtual DbSet<OddsBoost> OddsBoosts { get; set; }
+		public virtual DbSet<UpcomingMatchEvent> UpcomingMatchEvents { get; set; }
+
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -107,6 +110,22 @@ namespace MatchFixer.Infrastructure
 
 			builder.Entity<OddsBoost>()
 				.HasIndex(b => new { b.MatchEventId, b.IsActive, b.StartUtc, b.EndUtc }); // Index for speed ! 
+
+			builder.Entity<UpcomingMatchEvent>(entity =>
+			{
+				entity.HasOne(e => e.HomeTeam)
+					.WithMany()
+					.HasForeignKey(e => e.HomeTeamId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasOne(e => e.AwayTeam)
+					.WithMany()
+					.HasForeignKey(e => e.AwayTeamId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasIndex(e => e.ApiFixtureId)
+					.IsUnique();
+			});
 		}
 	}
 }
