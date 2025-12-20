@@ -1,6 +1,5 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LiveEvents;
-using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Models.FootballAPI;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
@@ -13,16 +12,16 @@ namespace MatchFixer_Web_App.Controllers
 	public class EventController : Controller
 	{
 		private readonly IMatchEventService _matchEventService;
+		private readonly IUpcomingMatchService _upcomingMatchService;
 		private readonly IUserContextService _userContextService;
 		private readonly IOddsBoostService _oddsBoostService;
-		private readonly IFootballApiService _footballApiService;
 
-		public EventController(IMatchEventService matchEventService, IUserContextService userContextService, IOddsBoostService oddsBoostService, IFootballApiService footballApiService)
+		public EventController(IMatchEventService matchEventService, IUpcomingMatchService upcomingMatchService, IUserContextService userContextService, IOddsBoostService oddsBoostService)
 		{
 			_matchEventService = matchEventService;
+			_upcomingMatchService = upcomingMatchService;
 			_userContextService = userContextService;
 			_oddsBoostService = oddsBoostService;
-			_footballApiService = footballApiService;
 		}
 
 		[HttpGet]
@@ -180,7 +179,7 @@ namespace MatchFixer_Web_App.Controllers
 		[AdminOnly]
 		public async Task<IActionResult> UpcomingFromApi(int leagueId)
 		{
-			var matches = await _footballApiService.GetUpcomingFromApiAsync(leagueId);
+			var matches = await _upcomingMatchService.GetUpcomingMatchesAsync(leagueId);
 			return PartialView("_UpcomingApiMatches", matches);
 		}
 
