@@ -73,8 +73,8 @@ namespace MatchFixer.Infrastructure.Services
 
 				await _dbContext.SaveChangesAsync();
 
-				// ⏱️ API LIMIT: 1 request every 6 seconds
-				await Task.Delay(6000);
+				// API LIMIT: 1 request every 1 seconds ( free version 1 request every 6 seconds ) 
+				await Task.Delay(1000);
 			}
 		}
 
