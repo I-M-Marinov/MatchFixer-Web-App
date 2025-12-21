@@ -201,13 +201,20 @@ namespace MatchFixer.Infrastructure.Services
 			}
 		}
 
-		public async Task<List<UpcomingMatchDto>> GetUpcomingFromApiAsync(int leagueId)
+		public async Task<List<UpcomingMatchDto>> GetUpcomingFromApiAsync(
+			int leagueId,
+			int? limit = null)
 		{
-			var yearTodate = DateTime.Now.Year;
+			var season = DateTime.UtcNow.Year;
 
-			var url =
+			var baseUrl =
 				$"https://v3.football.api-sports.io/fixtures" +
-				$"?league={leagueId}&season={yearTodate}&next=20";
+				$"?league={leagueId}&season={season}";
+
+			// If limit is specified → preview mode
+			var url = limit.HasValue
+				? $"{baseUrl}&next={limit.Value}"
+				: $"{baseUrl}&status=NS"; // ALL upcoming
 
 			using var request = new HttpRequestMessage(HttpMethod.Get, url);
 			request.Headers.Add("x-apisports-key", _apiKey);
@@ -225,23 +232,25 @@ namespace MatchFixer.Infrastructure.Services
 			if (data?.Response == null)
 				return new();
 
-			return data.Response.Select(f => new UpcomingMatchDto
+			return data.Response
+				.Select(f => new UpcomingMatchDto
 				{
 					ApiFixtureId = f.Fixture.Id,
 					KickoffUtc = f.Fixture.Date,
 
 					HomeName = f.Teams.Home.Name,
 					AwayName = f.Teams.Away.Name,
+
 					HomeLogo = f.Teams.Home.Logo,
 					AwayLogo = f.Teams.Away.Logo,
 
-					// admin-editable defaults
 					HomeOdds = 1.11m,
 					DrawOdds = 2.22m,
 					AwayOdds = 3.33m
 				})
 				.ToList();
 		}
+
 
 
 	}
