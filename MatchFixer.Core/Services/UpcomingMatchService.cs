@@ -50,7 +50,7 @@ namespace MatchFixer.Core.Services
 				return fromDb;
 
 			// Fallback to API ----->  TAKE ${take} 
-			var fromApi = await _footballApiService.GetUpcomingFromApiAsync(leagueId);
+			var fromApi = await _footballApiService.GetUpcomingFromApiAsync(leagueId, 30);
 
 			return fromApi
 				.OrderBy(x => x.KickoffUtc)
