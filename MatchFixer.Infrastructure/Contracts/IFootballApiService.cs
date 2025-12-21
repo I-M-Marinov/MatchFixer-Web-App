@@ -6,7 +6,7 @@ namespace MatchFixer.Infrastructure.Contracts
 	{
 		Task FetchAndSaveFixturesAsync();
 		Task FetchAndSaveTeamsAsync();
-		Task<List<UpcomingMatchDto>> GetUpcomingFromApiAsync(int leagueId);
+		Task<List<UpcomingMatchDto>> GetUpcomingFromApiAsync(int leagueId, int? limit = null); 
 		int? ExtractTeamIdFromLogoUrl(string logoUrl);
 	}
 }
