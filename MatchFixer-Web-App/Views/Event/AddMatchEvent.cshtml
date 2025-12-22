@@ -428,11 +428,10 @@
 		</div>
 
 	<div class="tab-pane fade" id="apiTab" role="tabpanel">
-			<div class="card shadow-sm p-3 add-match-auto-card">
+		<div class="card shadow-sm p-3 add-match-auto-card">
 
-				<form asp-action="AddUpcomingMatches" method="post">
+			<form id="addUpcomingForm" asp-action="AddUpcomingMatches" asp-controller="Event" method="post">
 					@Html.AntiForgeryToken()
-
 					<div class="row mb-3 align-items-end">
 						<div class="col-md-4">
 							<label class="form-label">League</label>
@@ -481,9 +480,9 @@
 						</button>
 					</div>
 
-				</form>
+			</form>
 
-			</div>
+		</div>
 	</div>
 
 </div>
@@ -704,7 +703,7 @@
 
 		});
 
-		// Football API request from the Admin 
+		// Football API request from the Admin
 
 		document.getElementById("loadUpcomingBtn").addEventListener("click", async () => {
 			const leagueId = document.getElementById("apiLeagueSelect").value;
@@ -715,6 +714,51 @@
 
 			const res = await fetch(`/Event/UpcomingFromApi?leagueId=${leagueId}`);
 			document.getElementById("apiMatchesBody").innerHTML = await res.text();
+		});
+
+				
+		document.addEventListener("DOMContentLoaded", () => {
+			const upcomingForm = document.getElementById("addUpcomingForm");
+
+			if (upcomingForm) {
+				upcomingForm.addEventListener("submit", function(e) {
+					e.preventDefault();
+
+					const checkedBoxes = document.querySelectorAll("#apiMatchesBody input[type=checkbox]:checked");
+
+					if (checkedBoxes.length === 0) {
+						alert("Select at least one match.");
+						return;
+					}
+
+					document.querySelectorAll("#apiMatchesBody input[type=checkbox]:not(:checked)")
+						.forEach(cb => cb.closest('tr').remove());
+
+					const tbody = document.getElementById("apiMatchesBody");
+					const rows = tbody.querySelectorAll("tr");
+
+					rows.forEach((row, newIndex) => {
+						// Only process inputs INSIDE the tbody rows, not the anti-forgery token
+						row.querySelectorAll("input").forEach(input => {
+							const name = input.getAttribute("name");
+							if (name && name.startsWith("Selected[")) {  
+								const newName = name.replace(/Selected\[\d+\]/, `Selected[${newIndex}]`);
+								input.setAttribute("name", newName);
+							}
+						});
+					});
+
+					// Verify anti-forgery token exists before submitting
+					const token = this.querySelector("input[name='__RequestVerificationToken']");
+					if (!token) {
+						console.error("Anti-forgery token missing!");
+						alert("Security token missing. Please refresh the page.");
+						return;
+					}
+
+					this.submit();
+				});
+			}
 		});
 
 
