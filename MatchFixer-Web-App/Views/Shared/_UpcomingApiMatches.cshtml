@@ -1,47 +1,59 @@
-﻿@model List<MatchFixer.Infrastructure.Models.FootballAPI.UpcomingMatchDto>
+﻿
+@model MatchFixer.Infrastructure.Models.FootballAPI.UpcomingMatchesSelectionViewModel
 
-@for (int i = 0; i < Model.Count; i++)
+@for (int i = 0; i < Model.Selected.Count; i++)
 {
-	<tr>
-		<td>
-			<input asp-for="@Model[i].Selected" class="form-check-input" />
+    <tr>
+        <td>
+            <input type="checkbox"
+                   name="Selected[@i].Selected"
+                   value="true"
+                   class="form-check-input" />
 
-			<input type="hidden" asp-for="@Model[i].ApiFixtureId" />
-			<input type="hidden" asp-for="@Model[i].HomeName" />
-			<input type="hidden" asp-for="@Model[i].AwayName" />
-			<input type="hidden" asp-for="@Model[i].HomeLogo" />
-			<input type="hidden" asp-for="@Model[i].AwayLogo" />
-			<input type="hidden" asp-for="@Model[i].KickoffUtc" />
-		</td>
+            <input type="hidden" name="Selected[@i].ApiFixtureId" value="@Model.Selected[i].ApiFixtureId" />
+            <input type="hidden" name="Selected[@i].HomeName" value="@Model.Selected[i].HomeName" />
+            <input type="hidden" name="Selected[@i].AwayName" value="@Model.Selected[i].AwayName" />
+            <input type="hidden" name="Selected[@i].HomeLogo" value="@Model.Selected[i].HomeLogo" />
+            <input type="hidden" name="Selected[@i].AwayLogo" value="@Model.Selected[i].AwayLogo" />
+            <input type="hidden" name="Selected[@i].KickoffUtc" value="@Model.Selected[i].KickoffUtc.ToString("o")" />
+        </td>
 
-		<td>@Model[i].KickoffUtc.ToString("g")</td>
+        <td>
+            @Model.Selected[i].KickoffUtc.ToString("g")
+        </td>
 
-		<td>
-			<img src="@Model[i].HomeLogo" height="24" />
-			@Model[i].HomeName
-		</td>
+        <td>
+            <img src="@Model.Selected[i].HomeLogo" height="24" />
+            @Model.Selected[i].HomeName
+        </td>
 
-		<td>
-			<img src="@Model[i].AwayLogo" height="24" />
-			@Model[i].AwayName
-		</td>
+        <td>
+            <img src="@Model.Selected[i].AwayLogo" height="24" />
+            @Model.Selected[i].AwayName
+        </td>
 
-		<td><input asp-for="@Model[i].HomeOdds" class="form-control form-control-sm" /></td>
-		<td><input asp-for="@Model[i].DrawOdds" class="form-control form-control-sm" /></td>
-		<td><input asp-for="@Model[i].AwayOdds" class="form-control form-control-sm" /></td>
-	</tr>
+        <td>
+            <input type="number"
+                   name="Selected[@i].HomeOdds"
+                   value="@Model.Selected[i].HomeOdds"
+                   step="0.01"
+                   class="form-control form-control-sm" />
+        </td>
+
+        <td>
+            <input type="number"
+                   name="Selected[@i].DrawOdds"
+                   value="@Model.Selected[i].DrawOdds"
+                   step="0.01"
+                   class="form-control form-control-sm" />
+        </td>
+
+        <td>
+            <input type="number"
+                   name="Selected[@i].AwayOdds"
+                   value="@Model.Selected[i].AwayOdds"
+                   step="0.01"
+                   class="form-control form-control-sm" />
+        </td>
+    </tr>
 }
-
-
-<script>
-	document.querySelector("form").addEventListener("submit", e => {
-		const anyChecked = [...document.querySelectorAll("input[type=checkbox]")]
-			.some(cb => cb.checked);
-
-		if (!anyChecked) {
-			e.preventDefault();
-			alert("Select at least one match.");
-		}
-	});
-
-</script>
