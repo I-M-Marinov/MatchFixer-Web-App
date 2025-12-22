@@ -21,9 +21,10 @@ namespace MatchFixer.Core.Services
 			int leagueId,
 			int take = 20)
 		{
-			// DB first ----->  TAKE ALL
 			var fromDb = await _dbContext.UpcomingMatchEvents
 				.AsNoTracking()
+				.Include(x => x.HomeTeam)
+				.Include(x => x.AwayTeam)
 				.Where(x =>
 					x.ApiLeagueId == leagueId &&
 					!x.IsImported &&
@@ -49,14 +50,11 @@ namespace MatchFixer.Core.Services
 			if (fromDb.Any())
 				return fromDb;
 
-			// Fallback to API ----->  TAKE ${take} 
-			var fromApi = await _footballApiService.GetUpcomingFromApiAsync(leagueId, 30);
-
-			return fromApi
+			return (await _footballApiService.GetUpcomingFromApiAsync(leagueId, take))
 				.OrderBy(x => x.KickoffUtc)
-				.Take(take)
 				.ToList();
 		}
+
 
 
 	}
