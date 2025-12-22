@@ -4,21 +4,41 @@
 @for (int i = 0; i < Model.Selected.Count; i++)
 {
     <tr>
-        <td>
-            <input type="checkbox"
-                   name="Selected[@i].Selected"
-                   value="true"
-                   class="form-check-input" />
+	    <td>
+		    <input type="checkbox"
+		           name="Selected[@i].Selected"
+		           value="true"
+		           class="form-check-input"
+		           disabled="@Model.Selected[i].IsAlreadyImported" />
 
-            <input type="hidden" name="Selected[@i].ApiFixtureId" value="@Model.Selected[i].ApiFixtureId" />
-            <input type="hidden" name="Selected[@i].HomeName" value="@Model.Selected[i].HomeName" />
-            <input type="hidden" name="Selected[@i].AwayName" value="@Model.Selected[i].AwayName" />
-            <input type="hidden" name="Selected[@i].HomeLogo" value="@Model.Selected[i].HomeLogo" />
-            <input type="hidden" name="Selected[@i].AwayLogo" value="@Model.Selected[i].AwayLogo" />
-            <input type="hidden" name="Selected[@i].KickoffUtc" value="@Model.Selected[i].KickoffUtc.ToString("o")" />
-        </td>
+		    <input type="hidden" name="Selected[@i].ApiFixtureId" value="@Model.Selected[i].ApiFixtureId" />
+		    <input type="hidden" name="Selected[@i].HomeName" value="@Model.Selected[i].HomeName" />
+		    <input type="hidden" name="Selected[@i].AwayName" value="@Model.Selected[i].AwayName" />
+		    <input type="hidden" name="Selected[@i].HomeLogo" value="@Model.Selected[i].HomeLogo" />
+		    <input type="hidden" name="Selected[@i].AwayLogo" value="@Model.Selected[i].AwayLogo" />
+		    <input type="hidden" name="Selected[@i].KickoffUtc" value="@Model.Selected[i].KickoffUtc.ToString("o")" />  
+	    </td>
+        
+	    <td class="text-center">
+		    @if (Model.Selected[i].IsAlreadyImported)
+		    {
+			    <i class="bi bi-check-circle-fill text-success"
+			       data-bs-toggle="tooltip"
+			       data-bs-placement="top"
+			       title="This match is already imported">
+			    </i>
+		    }
+		    else
+		    {
+			    <i class="bi bi-x-circle-fill text-danger"
+			       data-bs-toggle="tooltip"
+			       data-bs-placement="top"
+			       title="This match is not yet imported">
+			    </i>
+		    }
+	    </td>
 
-        <td>
+	    <td>
             @Model.Selected[i].KickoffUtc.ToString("g")
         </td>
 
