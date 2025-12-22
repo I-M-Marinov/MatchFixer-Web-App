@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using MatchFixer.Core.ValidationAttributes;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using MatchFixer.Core.ValidationAttributes;
-
 using static MatchFixer.Common.ValidationConstants.MatchEventFormValidations;
 
 namespace MatchFixer.Core.ViewModels.LiveEvents
@@ -9,14 +8,14 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 	[DifferentTeams]
 	public class MatchEventFormModel
 	{
-
-		[Required(ErrorMessage = ChooseAValidTeam)]	
+		[Required(ErrorMessage = ChooseAValidTeam)]
 		public Guid HomeTeamId { get; set; }
 
 		[Required(ErrorMessage = ChooseAValidTeam)]
 		public Guid AwayTeamId { get; set; }
 
-		public Dictionary<string, List<SelectListItem>> TeamsByLeague { get; set; } = new Dictionary<string, List<SelectListItem>>();
+		public Dictionary<string, List<SelectListItem>> TeamsByLeague { get; set; }
+			= new();
 
 		[Required(ErrorMessage = ChooseAValidDateAndTime)]
 		[DataType(DataType.DateTime)]
@@ -37,7 +36,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public List<LiveEventViewModel> CurrentEvents { get; set; } = new();
 
 		public List<ApiLeagueSelectViewModel> ApiLeagues { get; set; } = new();
-
 	}
+
 
 }
