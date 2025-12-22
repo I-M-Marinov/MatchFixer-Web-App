@@ -1,19 +1,20 @@
-﻿using MatchFixer_Web_App.Areas.Admin.Hubs;
-using MatchFixer.Common.Identity;
+﻿using MatchFixer.Common.Identity;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Middlewares;
 using MatchFixer.Core.Services;
+using MatchFixer.Core.Services.Admin;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Services;
+using MatchFixer_Web_App.Areas.Admin.Hubs;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Areas.Admin.Services.MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Hubs;
-using MatchFixer.Core.Services.Admin;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -37,6 +38,11 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.Configure<FormOptions>(options =>
+{
+	options.ValueCountLimit = 5000; // Increase from default 1024
+});
 
 builder.Services.AddDbContext<MatchFixerDbContext>(options =>
     options.UseSqlServer(connectionString));
