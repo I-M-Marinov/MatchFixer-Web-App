@@ -57,7 +57,8 @@
                    name="Selected[@i].HomeOdds"
                    value="@Model.Selected[i].HomeOdds"
                    step="0.01"
-                   class="form-control form-control-sm" />
+                   class="form-control form-control-sm"
+                   disabled="@Model.Selected[i].IsAlreadyImported"/>
         </td>
 
         <td>
@@ -65,7 +66,8 @@
                    name="Selected[@i].DrawOdds"
                    value="@Model.Selected[i].DrawOdds"
                    step="0.01"
-                   class="form-control form-control-sm" />
+                   class="form-control form-control-sm"
+                   disabled="@Model.Selected[i].IsAlreadyImported"/>
         </td>
 
         <td>
@@ -73,7 +75,8 @@
                    name="Selected[@i].AwayOdds"
                    value="@Model.Selected[i].AwayOdds"
                    step="0.01"
-                   class="form-control form-control-sm" />
+                   class="form-control form-control-sm"
+                   disabled="@Model.Selected[i].IsAlreadyImported"ss/>
         </td>
     </tr>
 }
