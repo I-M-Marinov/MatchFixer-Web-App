@@ -180,26 +180,39 @@ namespace MatchFixer_Web_App.Controllers
 		public async Task<IActionResult> UpcomingFromApi(int leagueId)
 		{
 			var matches = await _upcomingMatchService.GetUpcomingMatchesAsync(leagueId);
-			return PartialView("_UpcomingApiMatches", matches);
-		}
 
+			var model = new UpcomingMatchesSelectionViewModel
+			{
+				Selected = matches
+			};
+
+			return PartialView("_UpcomingApiMatches", model);
+		}
 		[HttpPost]
 		[Authorize]
 		[AdminOnly]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> AddUpcomingMatches(List<UpcomingMatchDto> selected)
+		public async Task<IActionResult> AddUpcomingMatches(
+			UpcomingMatchesSelectionViewModel model)
 		{
-			if (selected == null || !selected.Any())
-				return RedirectToAction(nameof(AddMatchEvent));
-
-			foreach (var match in selected.Where(m => m.Selected))
+			if (!ModelState.IsValid)
 			{
-				await _matchEventService.AddEventFromUpcomingAsync(match);
+				var errors = ModelState.Values
+					.SelectMany(v => v.Errors)
+					.Select(e => e.ErrorMessage);
+				TempData["ErrorMessage"] = string.Join(", ", errors);
+				return RedirectToAction(nameof(AddMatchEvent));
 			}
-
+			if (!model.Selected.Any(x => x.Selected))
+			{
+				TempData["ErrorMessage"] = "No matches selected";
+				return RedirectToAction(nameof(AddMatchEvent));
+			}
+			foreach (var match in model.Selected.Where(x => x.Selected))
+				await _matchEventService.AddEventFromUpcomingAsync(match);
+			TempData["SuccessMessage"] = "Matches added successfully";
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
-
 
 	}
 }
