@@ -11,7 +11,7 @@
 		public string HomeLogo { get; set; } = null!;
 		public string AwayLogo { get; set; } = null!;
 
-		public DateTime KickoffUtc { get; set; }
+		public DateTimeOffset KickoffUtc { get; set; }
 
 		public decimal HomeOdds { get; set; }
 		public decimal DrawOdds { get; set; }
