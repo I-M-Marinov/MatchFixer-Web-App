@@ -456,6 +456,7 @@
 							<thead class="table-dark">
 							<tr>
 								<th>Add</th>
+								<th>Status</th>
 								<th>Date</th>
 								<th>Home</th>
 								<th>Away</th>
@@ -831,5 +832,15 @@
 			});
 		});
 
+
+			document.addEventListener("DOMContentLoaded", function () {
+				const tooltipTriggerList = [].slice.call(
+					document.querySelectorAll('[data-bs-toggle="tooltip"]')
+				);
+
+				tooltipTriggerList.forEach(el => {
+					new bootstrap.Tooltip(el);
+			});
+		});
 	</script>
 }
