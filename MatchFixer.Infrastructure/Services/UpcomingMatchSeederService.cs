@@ -60,7 +60,7 @@ namespace MatchFixer.Infrastructure.Services
 						Id = Guid.NewGuid(),
 						ApiFixtureId = apiMatch.ApiFixtureId,
 						ApiLeagueId = league,
-						MatchDateUtc = apiMatch.KickoffUtc,
+						MatchDateUtc = apiMatch.KickoffUtc.UtcDateTime,
 						HomeTeamId = homeTeam.Id,
 						AwayTeamId = awayTeam.Id,
 						IsCancelled = false,
