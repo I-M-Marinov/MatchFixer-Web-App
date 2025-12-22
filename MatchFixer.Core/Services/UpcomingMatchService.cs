@@ -21,6 +21,15 @@ namespace MatchFixer.Core.Services
 			int leagueId,
 			int take = 20)
 		{
+			// Load wwwwwwwwwwwwww ONCE
+			var existingFixtureIds = new HashSet<int>(
+				await _dbContext.MatchEvents
+					.Where(m => m.ApiFixtureId.HasValue)
+					.Select(m => m.ApiFixtureId.Value)
+					.ToListAsync()
+			);
+
+			// Try DB-backed upcoming matches first
 			var fromDb = await _dbContext.UpcomingMatchEvents
 				.AsNoTracking()
 				.Include(x => x.HomeTeam)
@@ -43,17 +52,30 @@ namespace MatchFixer.Core.Services
 
 					HomeOdds = 1.11m,
 					DrawOdds = 2.22m,
-					AwayOdds = 3.33m
+					AwayOdds = 3.33m,
+
+					// already imported
+					IsAlreadyImported = existingFixtureIds.Contains(x.ApiFixtureId)
 				})
 				.ToListAsync();
 
 			if (fromDb.Any())
 				return fromDb;
 
-			return (await _footballApiService.GetUpcomingFromApiAsync(leagueId, take))
+			// API fallback — MARK imported here
+			var apiUpcoming = await _footballApiService
+				.GetUpcomingFromApiAsync(leagueId, take);
+
+			foreach (var m in apiUpcoming)
+			{
+				m.IsAlreadyImported = existingFixtureIds.Contains(m.ApiFixtureId);
+			}
+
+			return apiUpcoming
 				.OrderBy(x => x.KickoffUtc)
 				.ToList();
 		}
+
 
 
 
