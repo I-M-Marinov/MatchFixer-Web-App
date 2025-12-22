@@ -197,7 +197,6 @@ namespace MatchFixer.Core.Services
 			if (homeTeam == null || awayTeam == null)
 				throw new Exception(TeamDoesNotExist);
 
-			var utcMatchDate = DateTime.SpecifyKind(model.MatchDate, DateTimeKind.Utc);
 			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
 
 			var matchEvent = new MatchEvent
@@ -205,7 +204,7 @@ namespace MatchFixer.Core.Services
 				Id = Guid.NewGuid(),
 				HomeTeamId = model.HomeTeamId,
 				AwayTeamId = model.AwayTeamId,
-				MatchDate = utcMatchDate,
+				MatchDate = model.MatchDate,
 				HomeOdds = model.HomeOdds,
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
@@ -386,7 +385,7 @@ namespace MatchFixer.Core.Services
 			{
 				HomeTeamId = homeId,
 				AwayTeamId = awayId,
-				MatchDate = m.KickoffUtc,
+				MatchDate = m.KickoffUtc.UtcDateTime,
 				HomeOdds = m.HomeOdds,
 				DrawOdds = m.DrawOdds,
 				AwayOdds = m.AwayOdds
