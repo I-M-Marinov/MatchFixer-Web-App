@@ -5,6 +5,7 @@ using MatchFixer.Infrastructure.Models.FootballAPI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
+using MatchFixer.Common.FootballLeagues;
 using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
 
 namespace MatchFixer.Infrastructure.Services
@@ -125,7 +126,8 @@ namespace MatchFixer.Infrastructure.Services
 				{ EredivisieId, EredivisieName },
 				{ LigaPortugalId, LigaPortugalName },
 				{ PolishLeagueId, PolishLeagueName },
-				{ SwissLeagueId, SwissLeagueName }
+				{ SwissLeagueId, SwissLeagueName },
+				{ BulgarianLeagueId, BulgarianLeagueName }
 			};
 
 			foreach (var kvp in leagues)
@@ -205,16 +207,32 @@ namespace MatchFixer.Infrastructure.Services
 			int leagueId,
 			int? limit = null)
 		{
-			var season = DateTime.UtcNow.Year;
+			// Season START year (API-Football rule)
+			var season = DateTime.UtcNow.Month >= 7
+				? DateTime.UtcNow.Year
+				: DateTime.UtcNow.Year - 1;
 
 			var baseUrl =
 				$"https://v3.football.api-sports.io/fixtures" +
 				$"?league={leagueId}&season={season}";
 
-			// If limit is specified → preview mode
-			var url = limit.HasValue
-				? $"{baseUrl}&next={limit.Value}"
-				: $"{baseUrl}&status=NS"; // ALL upcoming
+			string url;
+
+			// 🔥 Bulgaria: get ALL fixtures from today to season end
+			if (SupportedApiLeagues.UnreliableNsStatusLeagues.Contains(leagueId))
+			{
+				var fromDate = DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
+				var toDate = new DateTime(season + 1, 6, 30).ToString("yyyy-MM-dd");
+
+				url = $"{baseUrl}&from={fromDate}&to={toDate}";
+			}
+			else
+			{
+				// Normal leagues (NS works fine)
+				url = limit.HasValue
+					? $"{baseUrl}&next={limit.Value}"
+					: $"{baseUrl}&status=NS";
+			}
 
 			using var request = new HttpRequestMessage(HttpMethod.Get, url);
 			request.Headers.Add("x-apisports-key", _apiKey);
@@ -233,6 +251,9 @@ namespace MatchFixer.Infrastructure.Services
 				return new();
 
 			return data.Response
+				// ✅ Only require a real DATE (time may be 00:00)
+				.Where(f => f.Fixture.Date.Year > 2000)
+				.OrderBy(f => f.Fixture.Date)
 				.Select(f => new UpcomingMatchDto
 				{
 					ApiFixtureId = f.Fixture.Id,
@@ -250,6 +271,8 @@ namespace MatchFixer.Infrastructure.Services
 				})
 				.ToList();
 		}
+
+
 
 
 
