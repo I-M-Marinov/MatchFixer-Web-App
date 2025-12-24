@@ -617,3 +617,39 @@ table.responsive-stack td {
     opacity: 0;
 }
 
+
+/* ===== Responsive Team Cell ===== */
+
+.team-cell {
+    vertical-align: middle;
+}
+
+.team-row {
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    gap: 3px;
+}
+
+.team-logo {
+    height: 32px;
+    width: auto;
+}
+
+.team-name {
+    font-weight: 500;
+}
+
+/* Mobile stacking */
+@media (max-width: 1600.98px) {
+    .team-cell {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .team-row + .team-row {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dashed rgba(0, 0, 0, 0.15);
+    }
+}
