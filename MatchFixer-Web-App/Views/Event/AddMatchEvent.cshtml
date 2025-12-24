@@ -263,23 +263,45 @@
 												<span class="badge bg-info ms-1">auto</span>
 											}
 										</td>
+
 										<td>
 											@ev.KickoffTime.ToLocalTime().ToString("g")
 										</td>
-										<td>
-											<img src="@ev.HomeTeamLogoUrl" alt="@ev.HomeTeam Logo" style="height: 40px; width:auto; margin-right: 5px;"/>
-											@ev.HomeTeam
+
+										<td class="team-cell">
+											<div class="team-row home-team">
+												<img src="@ev.HomeTeamLogoUrl"
+												     alt="@ev.HomeTeam Logo"
+												     class="team-logo" />
+												<span class="team-name">@ev.HomeTeam</span>
+											</div>
+
+											<div class="team-row away-team d-md-none">
+												<img src="@ev.AwayTeamLogoUrl"
+												     alt="@ev.AwayTeam Logo"
+												     class="team-logo" />
+												<span class="team-name">@ev.AwayTeam</span>
+											</div>
 										</td>
-										<td>
-											<img src="@ev.AwayTeamLogoUrl" alt="@ev.AwayTeam Logo" style="height: 40px; width:auto; margin-right: 5px;"/>
-											@ev.AwayTeam
+
+										<td class="team-cell d-none d-md-table-cell">
+											<div class="team-row away-team">
+												<img src="@ev.AwayTeamLogoUrl"
+												     alt="@ev.AwayTeam Logo"
+												     class="team-logo" />
+												<span class="team-name">@ev.AwayTeam</span>
+											</div>
 										</td>
+
 										<td>
 											@if (ev.BoostActive != null)
 											{
 												<div class="d-flex flex-column align-items-center boost-timer-row"
 												     data-boost-end="@ev.BoostActive.EndUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")">
-													<span class="badge bg-success mb-1">Boost Active!</span>
+													<div class="d-flex flex-column justify-content-center gap-1">
+														<span class="badge bg-success mb-1">Boost</span>
+														<span class="badge bg-success mb-1">Active!</span>
+													</div>
 													<span class="boost-countdown fw-bold"></span>
 												</div>
 											}
@@ -309,7 +331,7 @@
 											}
 										</td>
 										<td style="max-width: 350px;">
-											<div class="d-flex justify-content-center align-items-center flex-wrap">
+											<div class="d-flex justify-content-center align-items-center">
 
 												<div class="d-flex flex-column gap-1">
 
@@ -325,7 +347,6 @@
 														       value="@ev.DrawOdds" class="form-control form-control-sm draw-odds-style" style="width: 80px;" placeholder="Draw" @isDisabled/>
 														<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
 														       value="@ev.AwayWinOdds" class="form-control form-control-sm away-odds-style" style="width: 80px;" placeholder="Away" @isDisabled/>
-
 													</div>
 
 													<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
