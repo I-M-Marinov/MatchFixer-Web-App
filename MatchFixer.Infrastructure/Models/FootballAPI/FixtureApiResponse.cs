@@ -3,5 +3,7 @@
 	public class FixtureApiResponse
 	{
 		public List<FixtureData> Response { get; set; }
+		public ApiPaging Paging { get; set; } = new();
+
 	}
 }
