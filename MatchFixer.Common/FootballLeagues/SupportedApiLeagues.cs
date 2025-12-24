@@ -20,5 +20,11 @@
 			// Regional
 			{ 172, "First Professional League (Bulgaria)" }
 		};
+
+		// Leagues where NS status is unreliable
+		public static readonly HashSet<int> UnreliableNsStatusLeagues = new()
+		{
+			172 // Bulgaria
+		};
 	}
 }
