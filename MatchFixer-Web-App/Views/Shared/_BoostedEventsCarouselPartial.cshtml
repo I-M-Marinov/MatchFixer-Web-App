@@ -363,7 +363,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!lim) return;
         const parts = [];
         if (typeof msg.maxStake !== "undefined" && msg.maxStake !== null) parts.push(`€${Number(msg.maxStake).toFixed(0)} max`);
-        if (typeof msg.maxUses  !== "undefined" && msg.maxUses  !== null) parts.push(`${msg.maxUses} per user`);
+            if (typeof msg.maxUses  !== "undefined" && msg.maxUses  !== null && msg.maxUses  !== 9999) parts.push(`${msg.maxUses} per user`)
+        else if (typeof msg.maxUses  !== "undefined" && msg.maxUses  == 9999) parts.push(`No limit`);
             lim.textContent = parts.join(" • ");
       }
 
