@@ -254,10 +254,41 @@
 																€@match.ActiveBoost?.MaxStakePerBet
 															</small>
 
+															@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
+															{
+																<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold" style="margin-left: -1em;">
+																	@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
+																	{
+																		<div class="me-1">x</div>
+																	}
+																	@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
+																	{
+																		<div style="text-align: center;">No limit</div>
+																	}
+																	else
+																	{
+																		@match.ActiveBoost?.MaxUsesPerUser
+																	}
+																</small>
+															}
+															else
+															{
 																<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-																x
-																@match.ActiveBoost?.MaxUsesPerUser
-															</small>
+																	@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
+																	{
+																		<div class="me-1">x</div>
+																	}
+																	@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
+																	{
+																		<div style="text-align: center;">No limit</div>
+																	}
+																	else
+																	{
+																		@match.ActiveBoost?.MaxUsesPerUser
+																	}
+																</small>
+															}
+															
 															
 														</td>
 													</tr>
