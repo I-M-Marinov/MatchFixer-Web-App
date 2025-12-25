@@ -84,20 +84,22 @@ namespace MatchFixer.Infrastructure.Services
 
 		private async Task<Team?> ResolveTeamAsync(string teamName, string logoUrl)
 		{
-			// 1️⃣ Try by API Team ID (best)
+			// Try by API Team ID
 			var apiTeamId = ExtractTeamIdFromLogoUrl(logoUrl);
 
 			if (apiTeamId.HasValue)
 			{
 				var byId = await _dbContext.Teams
+					.AsNoTracking()
 					.FirstOrDefaultAsync(t => t.TeamId == apiTeamId.Value);
-
+				
 				if (byId != null)
 					return byId;
 			}
 
-			// 2️⃣ Fallback by name
+			// Fallback by name
 			return await _dbContext.Teams
+				.AsNoTracking()
 				.FirstOrDefaultAsync(t => t.Name == teamName);
 		}
 
