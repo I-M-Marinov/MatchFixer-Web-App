@@ -496,21 +496,6 @@
 
 		container.appendChild(allBtn);
 
-		const hasBoosted = document.querySelector('.event-card[data-has-boost="true"]') !== null;
-		if (hasBoosted) {
-			const boostBtn = document.createElement('button');
-			boostBtn.className = 'custom-date-pill me-2';
-			boostBtn.dataset.date = 'boosted';
-
-			const icon = document.createElement('i');
-			icon.className = 'ri-fire-fill boost-fire-icon me-1';
-			boostBtn.appendChild(icon);
-
-			boostBtn.appendChild(document.createTextNode('Boosted'));
-
-			container.appendChild(boostBtn);
-		}
-
 		getUniqueEventDates().forEach(date => {
 			const btn = document.createElement('button');
 			const dateObj = new Date(date);
@@ -593,6 +578,8 @@
 
 	document.addEventListener('DOMContentLoaded', () => {
 		renderDatePills();
+		syncBoostedDatePill();
+
 	});
 
 	document.addEventListener("DOMContentLoaded", function () {
@@ -679,6 +666,7 @@
 			}
 
 			scheduleBoost(oddsRow, boostData);
+			syncBoostedDatePill();
 		});
 
 
@@ -832,6 +820,9 @@
 		}
 	
 		row.remove();
+		
+		syncBoostedDatePill();
+
 	}
 
 	function activateBoost(row, boostData) {
@@ -973,6 +964,50 @@
 
 	  boostTimers.set(key, timers);
 	}
+	
+	
+	// Boosted date pill dynamic creation/removal
+
+
+		function syncBoostedDatePill() {
+		const container = document.getElementById("datePillContainer");
+		if (!container) return;
+
+		const boostBtn = container.querySelector('button[data-date="boosted"]');
+		const hasBoostedCards =
+			document.querySelector('.event-card[data-has-boost="true"]') !== null;
+
+		// If NO boosted cards left - remove the pill
+		if (!hasBoostedCards && boostBtn) {
+
+			const wasActive = boostBtn.classList.contains("active");
+			boostBtn.remove();
+
+			// If user was on Boosted tab → switch back to All
+			if (wasActive) {
+				const allTab = document.getElementById("allTab");
+				if (allTab) allTab.click();
+			}
+		}
+
+		// If boosted cards exist but pill is missing → recreate it
+		if (hasBoostedCards && !boostBtn) {
+			const btn = document.createElement("button");
+			btn.className = "custom-date-pill me-2";
+			btn.dataset.date = "boosted";
+
+			const icon = document.createElement("i");
+			icon.className = "ri-fire-fill boost-fire-icon me-1";
+
+			btn.appendChild(icon);
+			btn.appendChild(document.createTextNode("Boosted"));
+
+			// Insert after "All"
+			const allTab = container.querySelector("#allTab");
+			allTab?.after(btn);
+		}
+	}
+
 
 
 	
