@@ -4,8 +4,9 @@ using MatchFixer.Infrastructure.Models.FootballAPI;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
+using static MatchFixer.Common.GeneralConstants.OddsBoostConstants;
+using static MatchFixer.Common.GeneralConstants.MatchEventsApiConstants;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -166,7 +167,7 @@ namespace MatchFixer_Web_App.Controllers
 					maxUsesPerUser: model.MaxUsesPerUser,
 					note: model.Note);
 
-				return Json(new { success = true, message = "Created successfully!" });
+				return Json(new { success = true, message = OddsBoostCreatedSuccessfully });
 			}
 			catch (Exception ex)
 			{
@@ -205,12 +206,21 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			if (!model.Selected.Any(x => x.Selected))
 			{
-				TempData["ErrorMessage"] = "No matches selected";
+				TempData["ErrorMessage"] = NoMatchesWereSelected;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 			foreach (var match in model.Selected.Where(x => x.Selected))
 				await _matchEventService.AddEventFromUpcomingAsync(match);
-			TempData["SuccessMessage"] = "Matches added successfully";
+
+			if (model.Selected.Count > 1 && model.Selected.Count != 0)
+			{
+				TempData["SuccessMessage"] = MatchEventsWereAddedSuccessfully;
+			}
+			else
+			{
+				TempData["SuccessMessage"] = MatchEventWasAddedSuccessfully;
+			}
+
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
