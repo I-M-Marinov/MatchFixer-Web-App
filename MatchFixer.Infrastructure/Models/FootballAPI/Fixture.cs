@@ -9,6 +9,6 @@ namespace MatchFixer.Infrastructure.Models.FootballAPI
 	public class Fixture
 	{
 		public int Id { get; set; }
-		public DateTime Date { get; set; }
+		public DateTimeOffset Date { get; set; }
 	}
 }
