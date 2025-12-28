@@ -13,7 +13,7 @@ namespace MatchFixer.Infrastructure.Entities
 		public int ApiFixtureId { get; set; }
 
 		[Required]
-		public DateTime Date { get; set; }
+		public DateTimeOffset Date { get; set; }
 
 		[Required]
 		[StringLength(LeagueNameMaxLength, ErrorMessage = LeagueNameCannotExceed100Characters)]
