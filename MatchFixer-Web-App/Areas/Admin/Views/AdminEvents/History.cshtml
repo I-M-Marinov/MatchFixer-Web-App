@@ -211,6 +211,19 @@
 	</div>
 </form>
 
+<ul class="nav nav-pills justify-content-center mb-3" id="eventFilterPills">
+	<li class="nav-item">
+		<button class="nav-link active" data-filter="all">All Events</button>
+	</li>
+	<li class="nav-item">
+		<button class="nav-link" data-filter="concluded">Concluded</button>
+	</li>
+	<li class="nav-item">
+		<button class="nav-link" data-filter="cancelled">Cancelled</button>
+	</li>
+</ul>
+
+
 <table class="table table-bordered table-hover" style="font-size: 0.85em;">
 	<thead class="table-light">
 	<tr>
@@ -228,7 +241,12 @@
 	<tbody>
 	@foreach (var e in Model)
 	{
-		<tr>
+		<tr class="event-row"
+		    data-status="@(e.IsCancelled 
+             ? "cancelled" 
+             : (e.HomeScore.HasValue && e.AwayScore.HasValue ? "concluded" : "pending")
+         )">
+
 			<td>@e.MatchName</td>
 			<td>@e.MatchDate.ToString("g")</td>
 			<td>
@@ -299,21 +317,56 @@
 
 			
 <script>
-	const labels = @Html.Raw(Json.Serialize(Model.Select(m => m.MatchDate.ToString("yyyy-MM-dd"))));
-	const profits = @Html.Raw(Json.Serialize(Model.Select(m => m.Profit)));
+	document.addEventListener("DOMContentLoaded", () => {
 
-	new Chart(document.getElementById("profitChart"), {
-		type: 'line',
-		data: {
-			labels: labels,
-			datasets: [{
-				label: 'Profit',
-				data: profits,
-				borderWidth: 2
-			}]
+		const labels = @Html.Raw(Json.Serialize(Model.Select(m => m.MatchDate.ToString("yyyy-MM-dd"))));
+		const profits = @Html.Raw(Json.Serialize(Model.Select(m => m.Profit)));
+
+		const chartEl = document.getElementById("profitChart");
+		if (chartEl) {
+			new Chart(chartEl, {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [{
+						label: 'Profit',
+						data: profits,
+						borderWidth: 2
+					}]
+				}
+			});
 		}
+
+		document.querySelectorAll('#eventFilterPills button').forEach(btn => {
+			btn.addEventListener('click', () => {
+
+				document.querySelectorAll('#eventFilterPills button')
+					.forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+
+				const filter = btn.dataset.filter;
+
+				document.querySelectorAll('.event-row').forEach(row => {
+					const status = row.dataset.status;
+					const collapseRow = row.nextElementSibling;
+
+					const show =
+						filter === 'all' ||
+						(filter === 'cancelled' && status === 'cancelled') ||
+						(filter === 'concluded' && status === 'concluded');
+
+					row.style.display = show ? '' : 'none';
+
+					if (collapseRow?.classList.contains('collapse')) {
+						collapseRow.style.display = show ? '' : 'none';
+					}
+				});
+			});
+		});
+
 	});
 </script>
+
 
 <style>
     .event-details-box {
@@ -342,4 +395,67 @@
 	.event-history-card h6{
 		color: #fefefe !important;
 	}
+
+	#eventFilterPills {
+		border-bottom: none;
+		gap: 0.75rem;
+		padding: 0.5rem 1rem;
+	}
+
+	#eventFilterPills .nav-link {
+		border: none;
+		border-radius: 999px;
+		padding: 0.55rem 1.3rem;
+		font-weight: 600;
+		font-size: 0.9rem;
+		color: #0b5ed7;
+		background: transparent;
+		transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+	}
+
+	#eventFilterPills .nav-link:hover {
+		background: rgba(13, 110, 253, 0.12);
+		transform: translateY(-1px);
+	}
+
+	#eventFilterPills .nav-link.active {
+		background: linear-gradient(135deg, #0d6efd, #3b82f6);
+		color: #fff;
+		box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35), inset 0 -2px 0 rgba(255,255,255,0.2);
+	}
+
+	#eventFilterPills .nav-link:active {
+		transform: translateY(1px) scale(0.95);
+		box-shadow: 0 3px 8px rgba(13, 110, 253, 0.4), inset 0 2px 4px rgba(0,0,0,0.15);
+	}
+
+	#eventFilterPills .nav-link:focus-visible {
+		outline: none;
+		box-shadow: 0 0 0 3px rgba(13,110,253,.35);
+	}
+
+	#eventFilterPills .nav-link {
+		position: relative;
+		overflow: hidden;
+	}
+
+	#eventFilterPills .nav-link::after {
+		content: "";
+		position: absolute;
+		inset: 50%;
+		width: 0;
+		height: 0;
+		background: rgba(255,255,255,0.4);
+		border-radius: 50%;
+		transform: translate(-50%, -50%);
+		opacity: 0;
+		transition: width 0.45s ease, height 0.45s ease, opacity 0.6s;
+	}
+
+	#eventFilterPills .nav-link:active::after {
+		width: 160%;
+		height: 160%;
+		opacity: 0;
+	}
+
 </style>
