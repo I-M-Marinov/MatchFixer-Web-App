@@ -6,6 +6,7 @@
 .admin-bets-spread-table .table tbody,
 .admin-bets-spread-table .table tbody tr:last-of-type{
     border-radius: 0.50em 0.5em 0em 0em !important;
+    font-size: 0.90em;
 }
 
 .admin-bets-spread-table tfoot tr,
@@ -15,6 +16,7 @@
 
 .admin-bets-spread-table tfoot tr td{
     border-bottom: none;
+    text-align: center;
 }
 
 .odds-color-map{
@@ -63,6 +65,42 @@
 .projected-away {
     background-color: #8b0000;
     color: #f5f5f5;
+}
+
+#leagueFilterPills {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.league-filter-pill {
+    width: 55px;
+    height: 55px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .25s ease, background-color .25s ease;
+}
+
+.league-filter-pill img {
+    width: 33px;
+    height: 33px;
+    display: block;
+}
+
+.league-filter-pill:hover {
+    background: rgba(13,110,253,.12);
+    transform: translateY(-1.5px);
+}
+
+.league-filter-pill.active {
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    box-shadow: 0 6px 18px rgba(13,110,253,.35);
 }
 
 @media (max-width: 989px) {
