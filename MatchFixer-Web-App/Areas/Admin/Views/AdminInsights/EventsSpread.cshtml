@@ -19,12 +19,27 @@
 	    { "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
 	    { "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
     };
+
+    var leagueLogos = new Dictionary<string, int>
+    {
+	    ["Premier League"] = 39,
+	    ["Parva Liga"] = 172,
+	    ["Bundesliga"] = 78,
+	    ["La Liga"] = 140,
+	    ["Eredivisie"] = 88,
+	    ["Ligue 1"] = 61,
+	    ["Serie A"] = 135,
+	    ["Liga Portugal"] = 94,
+	    ["Swiss League"] = 207,
+	    ["Polish League Ekstraklasa"] = 106
+    };
+
 }
 
 <div class="background-profile"></div>
 
 
-<div class="card events-spread-card p-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
+<div class="card events-spread-card p-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em; z-index: 2;">
     <h3 class="h5 mb-3 text-center text-black">Upcoming Events — Bet Distribution</h3>
 
     @if (!Model.Items.Any())
@@ -33,7 +48,13 @@
     }
     else
     {
-        <div class="table-responsive admin-bets-spread-table">
+	    <div id="leagueFilterPills" class="league-pills">
+		    <button class="league-pill active" data-league="all" title="All leagues">
+			    <i class="bi bi-globe"></i>
+		    </button>
+	    </div>
+
+	    <div class="table-responsive admin-bets-spread-table">
             <table class="table align-middle">
                 <thead>
                     <tr>
@@ -53,7 +74,7 @@
                 <tbody>
                 @foreach (var r in Model.Items)
                 {
-	                <tr data-event-id="@r.EventId">
+                    <tr data-event-id="@r.EventId" data-league="@r.LeagueName">
                         <td>
                                 <img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam" />
                                 <img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
@@ -148,6 +169,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
 <script>
+
+	const leagueLogoMap = @Html.Raw(Json.Serialize(leagueLogos));
+
+
     (function(){
       const hubUrl = "/hubs/admin-insights";
 
@@ -214,4 +239,66 @@
         });
       });
     })();
+
+	document.addEventListener("DOMContentLoaded", () => {
+
+		const pillContainer = document.getElementById("leagueFilterPills");
+		if (!pillContainer) return;
+
+		const rows = [...document.querySelectorAll("tr[data-event-id]")];
+
+		/* -----------------------------
+		  CREATE "ALL" BUTTON
+		-------------------------------- */
+		const allBtn = document.createElement("button");
+		allBtn.className = "league-filter-pill active";
+		allBtn.dataset.league = "all";
+		allBtn.title = "All leagues";
+		allBtn.innerHTML = `<i class="bi bi-globe"></i>`;
+		pillContainer.appendChild(allBtn);
+
+		/* -----------------------------
+		  CREATE LEAGUE PILLS
+		-------------------------------- */
+		Object.entries(leagueLogoMap).forEach(([league, leagueId]) => {
+
+			const btn = document.createElement("button");
+			btn.className = "league-filter-pill";
+			btn.dataset.league = league;
+			btn.title = league;
+
+			const img = document.createElement("img");
+			img.src = `https://media.api-sports.io/football/leagues/${leagueId}.png`;
+			img.alt = league;
+
+			btn.appendChild(img);
+			pillContainer.appendChild(btn);
+		});
+
+		/* -----------------------------
+		  FILTER LOGIC
+		-------------------------------- */
+		pillContainer.addEventListener("click", e => {
+			const btn = e.target.closest(".league-filter-pill");
+			if (!btn) return;
+
+			// single-select behavior
+			pillContainer
+				.querySelectorAll(".league-filter-pill")
+				.forEach(b => b.classList.remove("active"));
+
+			btn.classList.add("active");
+
+			const selected = btn.dataset.league;
+
+			rows.forEach(row => {
+				const show =
+					selected === "all" ||
+					row.dataset.league === selected;
+
+				row.style.display = show ? "" : "none";
+			});
+		});
+	});
+
 </script>
