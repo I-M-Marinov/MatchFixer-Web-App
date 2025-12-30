@@ -21,7 +21,20 @@ namespace MatchFixer.Core.Services
 			int leagueId,
 			int take = 20)
 		{
-			// Load wwwwwwwwwwwwww ONCE
+
+			var teams = await _dbContext.Teams
+				.AsNoTracking()
+				.Select(t => new
+				{
+					t.Id,
+					t.Name
+				})
+				.ToListAsync();
+
+			var teamByName = teams
+				.ToDictionary(t => t.Name, t => t.Id, StringComparer.OrdinalIgnoreCase);
+
+			// Load ONCE
 			var existingFixtureIds = new HashSet<int>(
 				await _dbContext.MatchEvents
 					.Where(m => m.ApiFixtureId.HasValue)
@@ -29,35 +42,76 @@ namespace MatchFixer.Core.Services
 					.ToListAsync()
 			);
 
-			// Try DB-backed upcoming matches first
-			var fromDb = await _dbContext.UpcomingMatchEvents
-				.AsNoTracking()
-				.Include(x => x.HomeTeam)
-				.Include(x => x.AwayTeam)
-				.Where(x =>
-					x.ApiLeagueId == leagueId &&
-					!x.IsImported &&
-					x.MatchDateUtc > DateTime.UtcNow)
-				.OrderBy(x => x.MatchDateUtc)
-				.Select(x => new UpcomingMatchDto
+			var existingManualMatches = await _dbContext.MatchEvents
+				.Where(m => !m.IsCancelled && !m.ApiFixtureId.HasValue)
+				.Select(m => new
 				{
-					ApiFixtureId = x.ApiFixtureId,
-					KickoffUtc = x.MatchDateUtc,
-
-					HomeName = x.HomeTeam.Name,
-					AwayName = x.AwayTeam.Name,
-
-					HomeLogo = x.HomeTeam.LogoUrl,
-					AwayLogo = x.AwayTeam.LogoUrl,
-
-					HomeOdds = 1.11m,
-					DrawOdds = 2.22m,
-					AwayOdds = 3.33m,
-
-					// already imported
-					IsAlreadyImported = existingFixtureIds.Contains(x.ApiFixtureId)
+					m.HomeTeamId,
+					m.AwayTeamId,
+					MatchDate = m.MatchDate.Date
 				})
 				.ToListAsync();
+
+			bool IsManualDuplicate(Guid homeId, Guid awayId, DateTimeOffset kickoff)
+			{
+				var kickoffUtc = kickoff.UtcDateTime.Date;
+
+				return existingManualMatches.Any(m =>
+					m.HomeTeamId == homeId &&
+					m.AwayTeamId == awayId &&
+					m.MatchDate == kickoffUtc
+				);
+			}
+
+			// Try DB-backed upcoming matches first
+			var fromDb = await _dbContext.UpcomingMatchEvents
+					.AsNoTracking()
+					.Include(x => x.HomeTeam)
+					.Include(x => x.AwayTeam)
+					.Where(x =>
+						x.ApiLeagueId == leagueId &&
+						!x.IsImported &&
+						x.MatchDateUtc > DateTime.UtcNow)
+					.OrderBy(x => x.MatchDateUtc)
+					.Select(x => new UpcomingMatchDto
+					{
+						ApiFixtureId = x.ApiFixtureId,
+						KickoffUtc = new DateTimeOffset(x.MatchDateUtc, TimeSpan.Zero),
+
+						HomeTeamId = x.HomeTeamId,
+						AwayTeamId = x.AwayTeamId,
+
+						HomeName = x.HomeTeam.Name,
+						AwayName = x.AwayTeam.Name,
+
+						HomeLogo = x.HomeTeam.LogoUrl,
+						AwayLogo = x.AwayTeam.LogoUrl,
+
+						HomeOdds = 1.11m,
+						DrawOdds = 2.22m,
+						AwayOdds = 3.33m
+					})
+					.ToListAsync();
+
+			foreach (var m in fromDb)
+			{
+				if (m.HomeTeamId.HasValue && m.AwayTeamId.HasValue)
+				{
+					m.IsManualDuplicate =
+						IsManualDuplicate(m.HomeTeamId.Value,
+							m.AwayTeamId.Value,
+							m.KickoffUtc);
+				}
+				else
+				{
+					m.IsManualDuplicate = false;
+				}
+
+				m.IsAlreadyImported =
+					existingFixtureIds.Contains(m.ApiFixtureId)
+					|| m.IsManualDuplicate == true;
+			}
+
 
 			if (fromDb.Any())
 				return fromDb;
@@ -68,16 +122,27 @@ namespace MatchFixer.Core.Services
 
 			foreach (var m in apiUpcoming)
 			{
-				m.IsAlreadyImported = existingFixtureIds.Contains(m.ApiFixtureId);
+				if (m.HomeTeamId.HasValue && m.AwayTeamId.HasValue)
+				{
+					m.IsManualDuplicate =
+						IsManualDuplicate(m.HomeTeamId.Value,
+							m.AwayTeamId.Value,
+							m.KickoffUtc);
+				}
+				else
+				{
+					m.IsManualDuplicate = false;
+				}
+
+				m.IsAlreadyImported =
+					existingFixtureIds.Contains(m.ApiFixtureId)
+					|| m.IsManualDuplicate == true;
 			}
 
 			return apiUpcoming
 				.OrderBy(x => x.KickoffUtc)
 				.ToList();
 		}
-
-
-
 
 	}
 }
