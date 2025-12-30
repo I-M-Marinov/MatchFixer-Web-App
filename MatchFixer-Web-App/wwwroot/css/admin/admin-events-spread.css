@@ -2,11 +2,14 @@
     margin-top: 5.55em;
 }
 
+.league-name{
+    text-align: center;
+}
+
 .admin-bets-spread-table,
-.admin-bets-spread-table .table tbody,
-.admin-bets-spread-table .table tbody tr:last-of-type{
+.admin-bets-spread-table .table tbody {
     border-radius: 0.50em 0.5em 0em 0em !important;
-    font-size: 0.90em;
+    font-size: 0.90em !important;
 }
 
 .admin-bets-spread-table tfoot tr,
@@ -28,15 +31,15 @@
 .current-odds-cell {
     color: var(--primary-color);
     font-weight: bold;
-    font-size: 0.75em !important;
+    font-size: 0.90em;
 }
 
 .admin-bets-spread-table th {
     font-size: 0.95em;
 }
 
-.admin-bets-spread-table tbody tr td{
-    font-size: 0.85em;
+.admin-bets-spread-table tbody tr td {
+    font-size: 0.90em !important;
 }
 
 .progress-home {
