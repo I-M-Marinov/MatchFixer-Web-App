@@ -11,7 +11,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		private readonly MatchFixerDbContext _db;
 		public AdminBetInsightsService(MatchFixerDbContext db) => _db = db;
 
-		public async Task<PaginatedEventList<EventBetStatsRow>> GetUpcomingEventBetStatsAsync(int page, int pageSize, CancellationToken ct = default)
+		public async Task<PaginatedEventList<EventBetStatsRow>>
+	GetUpcomingEventBetStatsAsync(string? league, int page, int pageSize, CancellationToken ct = default)
 		{
 			page = Math.Max(1, page);
 			pageSize = Math.Clamp(pageSize, 5, 100);
@@ -23,6 +24,14 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Include(e => e.AwayTeam)
 				.AsNoTracking()
 				.Where(e => e.MatchDate > now && !e.IsCancelled);
+
+			// League filter 
+			if (!string.IsNullOrWhiteSpace(league))
+			{
+				baseQ = baseQ.Where(e =>
+					(e.HomeTeam.LeagueName != null && e.HomeTeam.LeagueName == league) ||
+					(e.AwayTeam.LeagueName != null && e.AwayTeam.LeagueName == league));
+			}
 
 			var total = await baseQ.CountAsync(ct);
 
@@ -37,9 +46,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					AwayTeam = e.AwayTeam.Name,
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
-					LeagueName = !string.IsNullOrEmpty(e.HomeTeam.LeagueName) ? e.HomeTeam.LeagueName
-							   : !string.IsNullOrEmpty(e.AwayTeam.LeagueName) ? e.AwayTeam.LeagueName
-							   : "Unknown",
+
+					LeagueName =
+						!string.IsNullOrEmpty(e.HomeTeam.LeagueName) ? e.HomeTeam.LeagueName :
+						!string.IsNullOrEmpty(e.AwayTeam.LeagueName) ? e.AwayTeam.LeagueName :
+						"Unknown",
+
 					KickoffUtc = e.MatchDate,
 
 					e.HomeOdds,
@@ -84,6 +96,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					decimal pH = x.HomeOdds is > 0 ? 1m / x.HomeOdds!.Value : 0m;
 					decimal pD = x.DrawOdds is > 0 ? 1m / x.DrawOdds!.Value : 0m;
 					decimal pA = x.AwayOdds is > 0 ? 1m / x.AwayOdds!.Value : 0m;
+
 					var sum = pH + pD + pA;
 					if (sum > 0)
 					{
@@ -138,7 +151,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				TotalCount = total
 			};
 		}
-
 
 	}
 
