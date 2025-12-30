@@ -58,8 +58,9 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-	                    <th>Event</th>
+						<th class="text-center">Event</th>
                         <th class="league-name">League</th>
+                        <th class="text-center">Kick Off</th>
                         <th class="text-center">Total Stake</th>
                         <th class="text-center">Total Bets</th>
                         <th class="text-center" style="min-width:220px">
@@ -75,7 +76,7 @@
                 @foreach (var r in Model.Items)
                 {
                     <tr data-event-id="@r.EventId" data-league="@r.LeagueName">
-                        <td>
+                        <td class="text-center">
                                 <img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam" />
                                 <img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
                                 <img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam" />
@@ -85,13 +86,23 @@
 				                ? url
 				                : "https://media.api-sports.io/flags/eu.svg";
 		                }
-		                <td class="league-name d-flex align-items-center justify-content-start gap-2 p-3">
+		                <td class="league-name d-flex align-items-center justify-content-center gap-2 p-3">
 			                <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;" />
 			                <span class="mb-0">@r.LeagueName</span>
 		                </td>
-                            <td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
-				                @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
-			                </td>
+		                <td>
+			                @{
+				                var local = r.KickoffUtc.ToLocalTime();
+				                var formatted =
+					                $"{Ordinal(local.Day)} " +
+					                $"{local:MMM yyyy} at {local:h:mm tt}";
+			                }
+
+			                <span class="mb-0">@formatted</span>
+		                </td>
+                        <td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
+			                @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
+		                </td>
 		                <td class="text-center fw-semibold @(r.TotalBets == 0 ? "current-odds-cell text-primary" : "text-black")"
 		                    data-role="total-bets">
 			                @(r.TotalBets == 0 ? "current odds" : r.TotalBets)
@@ -121,7 +132,7 @@
 
                 <tfoot>
                 <tr>
-	                <td colspan="5">
+	                <td colspan="6">
 		                @{
 			                var p = Model.Page;
 			                var total = Model.TotalPages;
@@ -305,6 +316,23 @@
 			window.location.href = url.toString();
 		});
 	});
+
+	@functions {
+		string Ordinal(int day)
+		{
+			if (day % 100 is >= 11 and <= 13)
+				return $"{day}th";
+
+			return (day % 10) switch
+			{
+				1 => $"{day}st",
+				2 => $"{day}nd",
+				3 => $"{day}rd",
+				_ => $"{day}th"
+			};
+		}
+	}
+
 
 
 </script>
