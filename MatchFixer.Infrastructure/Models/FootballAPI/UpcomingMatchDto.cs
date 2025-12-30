@@ -6,6 +6,9 @@
 
 		public int ApiFixtureId { get; set; }
 
+		public Guid? HomeTeamId { get; set; }
+		public Guid? AwayTeamId { get; set; }
+
 		public string HomeName { get; set; } = null!;
 		public string AwayName { get; set; } = null!;
 		public string HomeLogo { get; set; } = null!;
@@ -17,8 +20,7 @@
 		public decimal DrawOdds { get; set; }
 		public decimal AwayOdds { get; set; }
 		public bool IsAlreadyImported { get; set; }
+		public bool? IsManualDuplicate { get; set; }
 
 	}
-
-
 }
