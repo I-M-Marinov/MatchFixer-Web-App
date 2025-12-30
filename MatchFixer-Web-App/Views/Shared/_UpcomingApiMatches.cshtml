@@ -12,6 +12,9 @@
 		           disabled="@Model.Selected[i].IsAlreadyImported" />
 
 		    <input type="hidden" name="Selected[@i].ApiFixtureId" value="@Model.Selected[i].ApiFixtureId" />
+		    <input type="hidden" name="Selected[@i].HomeTeamId" value="@Model.Selected[i].HomeTeamId" />
+		    <input type="hidden" name="Selected[@i].AwayTeamId" value="@Model.Selected[i].AwayTeamId" />
+			<input type="hidden" name="Selected[@i].IsManualDuplicate" value="@Model.Selected[i].IsManualDuplicate.ToString().ToLower()" />
 		    <input type="hidden" name="Selected[@i].HomeName" value="@Model.Selected[i].HomeName" />
 		    <input type="hidden" name="Selected[@i].AwayName" value="@Model.Selected[i].AwayName" />
 		    <input type="hidden" name="Selected[@i].HomeLogo" value="@Model.Selected[i].HomeLogo" />
@@ -19,24 +22,36 @@
 		    <input type="hidden" name="Selected[@i].KickoffUtc" value="@Model.Selected[i].KickoffUtc.ToString("o")" />  
 	    </td>
         
-	    <td class="text-center">
+	    <td class="text-center" style="font-size: 1.2em;">
 		    @if (Model.Selected[i].IsAlreadyImported)
 		    {
-			    <i class="bi bi-check-circle-fill text-success"
-			       data-bs-toggle="tooltip"
-			       data-bs-placement="top"
-			       title="This match is already imported">
-			    </i>
+				if (Model.Selected[i].IsManualDuplicate == true)
+			    {
+				    <i class="bi bi-person-check-fill text-primary"
+				       data-bs-toggle="tooltip"
+				       data-bs-placement="top"
+				       title="This match was added manually">
+				    </i>
+			    }
+			    else
+			    {
+				    <i class="bi bi-cloud-check-fill text-success"
+				       data-bs-toggle="tooltip"
+				       data-bs-placement="top"
+				       title="This match was imported from the API/DB">
+				    </i>
+			    }
 		    }
 		    else
 		    {
-			    <i class="bi bi-x-circle-fill text-danger"
+			    <i class="bi bi-plus-circle-fill text-danger"
 			       data-bs-toggle="tooltip"
 			       data-bs-placement="top"
 			       title="This match is not yet imported">
 			    </i>
 		    }
 	    </td>
+
 
 	    <td>
             @Model.Selected[i].KickoffUtc.ToString("g")
