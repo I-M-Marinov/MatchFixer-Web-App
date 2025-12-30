@@ -245,20 +245,26 @@
 		const pillContainer = document.getElementById("leagueFilterPills");
 		if (!pillContainer) return;
 
-		const rows = [...document.querySelectorAll("tr[data-event-id]")];
+		const params = new URLSearchParams(window.location.search);
+		const selectedLeague = params.get("league");
 
 		/* -----------------------------
-		  CREATE "ALL" BUTTON
+		   CREATE "ALL" BUTTON
 		-------------------------------- */
 		const allBtn = document.createElement("button");
-		allBtn.className = "league-filter-pill active";
+		allBtn.className = "league-filter-pill";
 		allBtn.dataset.league = "all";
 		allBtn.title = "All leagues";
 		allBtn.innerHTML = `<i class="bi bi-globe"></i>`;
+
+		if (!selectedLeague) {
+			allBtn.classList.add("active");
+		}
+
 		pillContainer.appendChild(allBtn);
 
 		/* -----------------------------
-		  CREATE LEAGUE PILLS
+		   CREATE LEAGUE PILLS
 		-------------------------------- */
 		Object.entries(leagueLogoMap).forEach(([league, leagueId]) => {
 
@@ -266,6 +272,10 @@
 			btn.className = "league-filter-pill";
 			btn.dataset.league = league;
 			btn.title = league;
+
+			if (selectedLeague === league) {
+				btn.classList.add("active");
+			}
 
 			const img = document.createElement("img");
 			img.src = `https://media.api-sports.io/football/leagues/${leagueId}.png`;
@@ -276,29 +286,25 @@
 		});
 
 		/* -----------------------------
-		  FILTER LOGIC
+		   NAVIGATION LOGIC
 		-------------------------------- */
 		pillContainer.addEventListener("click", e => {
 			const btn = e.target.closest(".league-filter-pill");
 			if (!btn) return;
 
-			// single-select behavior
-			pillContainer
-				.querySelectorAll(".league-filter-pill")
-				.forEach(b => b.classList.remove("active"));
+			const league = btn.dataset.league;
 
-			btn.classList.add("active");
+			const url = new URL(window.location.href);
+			if (league === "all") {
+				url.searchParams.delete("league");
+			} else {
+				url.searchParams.set("league", league);
+				url.searchParams.set("page", 1);
+			}
 
-			const selected = btn.dataset.league;
-
-			rows.forEach(row => {
-				const show =
-					selected === "all" ||
-					row.dataset.league === selected;
-
-				row.style.display = show ? "" : "none";
-			});
+			window.location.href = url.toString();
 		});
 	});
+
 
 </script>
