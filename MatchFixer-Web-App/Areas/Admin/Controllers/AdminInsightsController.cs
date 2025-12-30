@@ -14,10 +14,19 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public AdminInsightsController(IAdminBetInsightsService svc) => _svc = svc;
 
 		[HttpGet]
-		public async Task<IActionResult> EventsSpread(int page = 1, CancellationToken ct = default)
+		public async Task<IActionResult> EventsSpread(
+			string? league,
+			int page = 1,
+			CancellationToken ct = default)
 		{
-			var model = await _svc.GetUpcomingEventBetStatsAsync(page, PageSize, ct);
+			var model = await _svc.GetUpcomingEventBetStatsAsync(
+				league,
+				page,
+				PageSize,
+				ct);
+
 			return View(model);
 		}
+
 	}
 }
