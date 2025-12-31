@@ -12,9 +12,20 @@
              };
          };
 
+       
          const showTooltip = async (element, teamName) => {
-             const tooltip = document.createElement('div');
-             tooltip.className = 'wiki-tooltip';
+
+              const sponsoredTeams = {
+                "Manchester United": "sponsor-manutd"
+             };
+
+             const sponsorClass = sponsoredTeams[teamName] || "";
+             const isManUtd = sponsorClass === "sponsor-manutd";
+
+
+             const tooltip = document.createElement('div');  
+             tooltip.className = `wiki-tooltip ${sponsorClass} loading`;
+
 
              const getTeamInfoHtml = (data) => {
                  const summaryText = data.summary || "";
@@ -65,11 +76,18 @@
                  setTimeout(() => tooltip.remove(), 250);
              };
 
-             tooltip.innerHTML = getSpinnerHtml();
-             document.body.appendChild(tooltip);
+                // Set initial loading state
+                tooltip.classList.add('loading');
 
-             // Always wait at least 1.5 seconds before showing content
-             const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
+                // Only non-ManUtd teams get spinner markup
+                if (!isManUtd) {
+                    tooltip.innerHTML = getSpinnerHtml();
+                }
+
+                document.body.appendChild(tooltip);
+
+             // Always wait at least 2.5 seconds before showing content
+             const minDelay = new Promise(resolve => setTimeout(resolve, 2500));
 
              try {
                  let dataToUse;
@@ -90,12 +108,15 @@
 
                  // Wait for minimum delay regardless of cache status
                  await minDelay;
-                 tooltip.innerHTML = getTeamInfoHtml(dataToUse);
+
+                    tooltip.classList.remove('loading');
+                    tooltip.classList.add('loaded');
+                    tooltip.innerHTML = getTeamInfoHtml(dataToUse);
 
              } catch (error) {
                  tooltip.innerHTML = `
                      <div class="wiki-tooltip-inner">
-                         <div class="alert alert-warning m-0 p-2">
+                          <div class="alert alert-warning m-0 p-2">
                              <i class="fas fa-exclamation-circle me-2"></i>
                              ${error.message}
                          </div>
