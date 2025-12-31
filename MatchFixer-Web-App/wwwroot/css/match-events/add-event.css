@@ -629,6 +629,11 @@ table.responsive-stack td {
     gap: 3px;
 }
 
+.adding-team-logo {
+    height: 45px;
+    width: auto;
+}
+
 .team-logo {
     height: 32px;
     width: auto;
