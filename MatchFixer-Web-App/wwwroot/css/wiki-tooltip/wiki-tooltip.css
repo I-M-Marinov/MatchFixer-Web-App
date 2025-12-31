@@ -22,6 +22,7 @@
     background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
     padding: 1rem;
 }
+
 .wiki-tooltip.fade-out {
     opacity: 0;
 }
@@ -184,4 +185,90 @@
     background-color: #0d6efd;
     border-color: #0d6efd;
     opacity: 0.65;
+}
+
+/*-------------------------------------------------------------------------------------
+|        CUSTOM LOADER AND STYLING FOR THE WIKI TOOLTIP FOR MANCHESTER UNITED          |
+--------------------------------------------------------------------------------------*/
+
+.wiki-tooltip.sponsor-manutd .wiki-tooltip-content {
+    border: 5px solid #ffdf00 !important;
+    position: relative;
+    background: url('/images/wiki-tooltip/manutd-devil.png') center bottom / 75px no-repeat, linear-gradient( 135deg, #9b0000 0%, #c40000 28%, #111111 55%, #000000 100% ) !important;
+    width: 150% !important;
+    height: 13.3em !important;
+}
+
+.wiki-tooltip.sponsor-manutd .wiki-tooltip-content p {
+   color: #ffeeee;
+}
+
+
+.wiki-tooltip.sponsor-manutd h5 {
+    background: black;
+    font-size: 1.2em;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 700 !important;
+    color: #f50000 !important;
+    text-shadow: 1px 1px 1px black !important;
+}
+
+.wiki-tooltip.sponsor-manutd .more-info-button {
+    background: #c30404 !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+
+.wiki-tooltip.sponsor-manutd .more-info-button:hover {
+    background: linear-gradient( 135deg, #9b0000 0%, #c40000 28%, #111111 55%, #000000 100% ) !important;
+    color: #efc6c6 !important;
+    font-weight: 700 !important;
+    text-shadow: 1px 1px 2px black;
+}
+
+.more-info-button:hover {
+    color: #fff;
+    background-color: #0a58ca;
+    border-color: #0d6efd;
+    text-shadow: 1px 1px 2px black;
+}
+
+.wiki-tooltip.sponsor-manutd.loading::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    background: url('/images/wiki-tooltip/manutd-devil.png') center / contain no-repeat;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 999;
+    animation: devilPulse 0.65s ease-in-out infinite;
+}
+
+.wiki-tooltip.sponsor-manutd.loaded::after {
+    opacity: 0;
+    animation: none;
+}
+
+@keyframes devilPulse {
+    0% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.85;
+        filter: drop-shadow(0 0 0 rgba(255,0,0,0));
+    }
+
+    45% {
+        transform: translateX(-50%) scale(1.10);
+        opacity: 1;
+        filter: drop-shadow(0 0 25px rgba(255,0,0,0.35));
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.85;
+        filter: drop-shadow(0 0 0 rgba(255,0,0,0));
+    }
 }
