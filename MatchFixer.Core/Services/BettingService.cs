@@ -294,12 +294,8 @@ public class BettingService : IBettingService
 		if (betSlip == null || betSlip.IsSettled)
 			return false;
 
-		bool anyPending = false;
-		bool anyLost = false;
-		bool anyVoided = betSlip.Bets.Any(b => b.Status == BetStatus.Voided);
-
 		// ANY VOIDED → VOID ENTIRE SLIP
-		if (anyVoided)
+		if (betSlip.Bets.Any(b => b.Status == BetStatus.Voided))
 		{
 			betSlip.IsSettled = true;
 			betSlip.WinAmount = 0;
@@ -314,13 +310,14 @@ public class BettingService : IBettingService
 			return true;
 		}
 
+		bool anyLost = false;
+		bool anyPending = false;
 		decimal totalOdds = 1m;
 
 		foreach (var bet in betSlip.Bets)
 		{
 			var result = bet.MatchEvent.LiveResult;
 
-			// Pending match → stop evaluation
 			if (result == null)
 			{
 				anyPending = true;
@@ -344,11 +341,7 @@ public class BettingService : IBettingService
 			}
 		}
 
-		// STILL PENDING → DO NOT SETTLE
-		if (anyPending)
-			return false;
-
-		//  ANY LOST → LOST SLIP
+		// ANY LOST → LOST SLIP (IMMEDIATE)
 		if (anyLost)
 		{
 			betSlip.IsSettled = true;
@@ -358,7 +351,11 @@ public class BettingService : IBettingService
 			return true;
 		}
 
-		//  ALL WON
+		// NO LOST BUT SOME PENDING → DO NOT SETTLE
+		if (anyPending)
+			return false;
+
+		// ALL WON → WON SLIP
 		betSlip.IsSettled = true;
 		betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
 
@@ -369,11 +366,12 @@ public class BettingService : IBettingService
 		);
 
 		await _dbContext.SaveChangesAsync();
-
 		await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
 
 		return true;
 	}
+
+
 
 
 
