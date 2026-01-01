@@ -44,7 +44,7 @@
 					@b.Status
 				</span>
 			</td>
-			<td>@(b.Payout?.ToString("F2") ?? "-")</td>
+			<td>@(b.Payout.HasValue ? $"€{b.Payout.Value:F2}" : "-")</td>
 		</tr>
 	}
 	</tbody>
