@@ -97,6 +97,7 @@
 			["Empoli"] = "Empoli FC",
 			["Monza"] = "AC Monza",
 			["Como"] = "Como 1907",
+			["Cremonese"] = "US Cremonese",
 
 
 			// Spanish clubs
