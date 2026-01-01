@@ -6,24 +6,26 @@
 }
 
 <div class="tw-h-100" style="overflow-y: visible; overflow-x: visible;">
-	<div class="border-0 rounded-4 p-4 flex-fill">
-		@if (TempData["SuccessMessage"] != null)
-		{
-			<div class="alert success-message" id="success-message">
-				@TempData["SuccessMessage"]
-			</div>
-		}
+<div class="border-0 rounded-4 p-4 flex-fill">
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert success-message" id="success-message">
+			@TempData["SuccessMessage"]
+		</div>
+	}
 
-		@if (TempData["ErrorMessage"] != null)
-		{
-			<div class="alert error-message" id="error-message">
-				@TempData["ErrorMessage"]
-			</div>
-		}
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert error-message" id="error-message">
+			@TempData["ErrorMessage"]
+		</div>
+	}
 
-	</div>
+</div>
+
+
 	
-	@await Html.PartialAsync("_WikipediaTooltipPartial")
+@await Html.PartialAsync("_WikipediaTooltipPartial")
 
 	<div class="container mt-4">
 
@@ -50,6 +52,10 @@
 							<i class="bi bi-search animate__animated animate__flipInX"></i>
 						</span>
 						<input type="text" id="matchSearch" class="form-control border-start-0" placeholder="Search team name..." oninput="filterMatches()" />
+					</div>
+					<div id="matchCount"
+					     class="text-muted fw-semibold text-center" style="font-size: 0.75em; margin-left: 1em; display: flex; justify-content: center; align-items: center;">
+						Available matches: 0
 					</div>
 				</div>
 			
@@ -1008,8 +1014,33 @@
 		}
 	}
 
+	// Match count
 
+		function updateMatchCount() {
+		const cards = document.querySelectorAll('.event-card');
+		let count = 0;
 
+		cards.forEach(card => {
+			const col = card.closest('.col');
+			if (!col || col.style.display === 'none') return;
+
+			const oddsTable = card.querySelector('.odds-table');
+			const mask = card.querySelector('.event-mask');
+
+			// Must be visible AND bettable
+			if (oddsTable && !oddsTable.classList.contains('d-none') &&
+				mask && mask.classList.contains('d-none')) {
+				count++;
+			}
+		});
+
+		const el = document.getElementById('matchCount');
+		if (el) {
+			el.textContent = `All events: ${count}`;
+		}
+	}
+
+	updateMatchCount();
 	
 </script>
 
