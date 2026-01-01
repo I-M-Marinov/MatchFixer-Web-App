@@ -97,7 +97,7 @@
 				                    <div style="font-size: 0.65em;">@u.Id</div>
 			                    </td>
 
-			                    <td class="text-center">
+									<td class="text-center" style="font-size: 0.75em;">
 				                    <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "").Trim())</div>
 			                    </td>
 								
@@ -119,11 +119,11 @@
 				                    </div>
 			                    </td>
 
-			                    <td class="text-break" style="font-size: 0.66em;">
+			                    <td class="text-break" style="font-size: 0.50em;">
 				                    @u.Email
 			                    </td>
 
-			                    <td>
+									<td style="font-size: 0.65em;">
 				                    @if (!u.IsDeleted)
 				                    {
 					                    @if (u.EmailConfirmed)
@@ -166,8 +166,8 @@
 					                    <span class="text-muted">N/A</span>
 				                    }
 			                    </td>
-			                    <td>€@(u.WalletBalance?.ToString() ?? "0")</td>
-			                    <td>@u.BetsCount</td>
+								<td style="font-size: 0.75em;">€@(u.WalletBalance?.ToString() ?? "0")</td>
+								<td style="font-size: 0.75em;">@u.BetsCount</td>
 			                    <td class="text-nowrap">
 				                    <div class="d-flex gap-1 justify-content-center">
 					                    @if (!u.IsDeleted)
