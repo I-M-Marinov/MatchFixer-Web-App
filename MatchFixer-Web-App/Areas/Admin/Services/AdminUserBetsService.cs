@@ -102,33 +102,93 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Include(s => s.Bets)
 					.ThenInclude(b => b.MatchEvent)
 						.ThenInclude(me => me.AwayTeam)
+				.Include(s => s.Bets)
+					.ThenInclude(b => b.MatchEvent)
+						.ThenInclude(me => me.LiveResult)
 				.FirstOrDefaultAsync(s => s.Id == slipId);
 
 			if (slip == null)
 				return null;
 
-			decimal totalOdds =
-				slip.Bets.Any()
-					? slip.Bets.Aggregate(1m, (acc, b) => acc * b.Odds)
-					: 0m;
+			/* -----------------------------
+			 * 1) EVALUATE EACH BET 
+			 * ----------------------------- */
+
+			bool anyBetUpdated = false;
+
+			foreach (var bet in slip.Bets)
+			{
+				if (bet.Status != BetStatus.Pending)
+					continue;
+
+				var result = bet.MatchEvent.LiveResult;
+				if (result == null)
+					continue;
+
+				var actualOutcome =
+					result.HomeScore > result.AwayScore ? MatchPick.Home :
+					result.HomeScore < result.AwayScore ? MatchPick.Away :
+					MatchPick.Draw;
+
+				bet.Status = bet.Pick == actualOutcome
+					? BetStatus.Won
+					: BetStatus.Lost;
+
+				anyBetUpdated = true;
+			}
+
+			if (anyBetUpdated)
+			{
+				await _dbContext.SaveChangesAsync();
+			}
+
+			/* -----------------------------
+			 * 2) CALCULATE TOTAL ODDS
+			 * ----------------------------- */
+
+			decimal totalOdds = slip.Bets
+				.Where(b => b.Status != BetStatus.Voided)
+				.Aggregate(1m, (acc, b) => acc * b.Odds);
+
+			decimal? potentialReturn = slip.Amount * totalOdds;
+
+			/* -----------------------------
+			 * 3) DETERMINE SLIP STATUS 
+			 * ----------------------------- */
 
 			BetStatus slipStatus;
 
-			if (!slip.IsSettled)
+			if (slip.Bets.Any(b => b.Status == BetStatus.Pending))
 			{
 				slipStatus = BetStatus.Pending;
+				slip.IsSettled = false;
 			}
 			else
 			{
-				if (slip.Bets.All(b => b.Status == BetStatus.Won))
-					slipStatus = BetStatus.Won;
+				slip.IsSettled = true;
+
+				if (slip.Bets.All(b => b.Status == BetStatus.Voided))
+				{
+					slipStatus = BetStatus.Voided;
+					slip.WinAmount = slip.Amount; // refund
+				}
 				else if (slip.Bets.Any(b => b.Status == BetStatus.Lost))
+				{
 					slipStatus = BetStatus.Lost;
+					slip.WinAmount = 0m;
+				}
 				else
-					slipStatus = BetStatus.Pending; // fallback for rare mixed cases
+				{
+					slipStatus = BetStatus.Won;
+					slip.WinAmount = potentialReturn;
+				}
+
+				await _dbContext.SaveChangesAsync();
 			}
 
-			decimal? potentialReturn = slip.Amount * totalOdds;
+			/* -----------------------------
+			 * 4) MAP VIEW MODEL
+			 * ----------------------------- */
 
 			return new AdminBetSlipDetailsViewModel
 			{
@@ -158,6 +218,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				}).ToList()
 			};
 		}
+
 
 
 
