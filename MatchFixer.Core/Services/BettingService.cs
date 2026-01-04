@@ -144,6 +144,81 @@ public class BettingService : IBettingService
 
 
 
+	//public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
+	//{
+	//	var betSlips = await _dbContext.BetSlips
+	//		.Include(bs => bs.Bets)
+	//		.ThenInclude(b => b.MatchEvent)
+	//		.ThenInclude(me => me.HomeTeam)
+	//		.Include(bs => bs.Bets)
+	//		.ThenInclude(b => b.MatchEvent)
+	//		.ThenInclude(me => me.AwayTeam)
+	//		.Include(bs => bs.Bets)
+	//		.ThenInclude(b => b.MatchEvent)
+	//		.ThenInclude(me => me.LiveResult) 
+	//		.Where(bs => bs.UserId == userId)
+	//		.OrderByDescending(b => b.BetTime)
+	//		.ToListAsync();
+
+
+	//	foreach (var slip in betSlips)
+	//	{
+	//		slip.Bets = slip.Bets
+	//			.Where(b => b.Status != BetStatus.Voided)
+	//			.ToList();
+
+	//	}
+
+	//	betSlips = betSlips
+	//		.Where(bs => bs.Bets.Any())
+	//		.ToList();
+
+	//	var timeZoneId = _sessionService.GetUserTimezone();
+
+
+
+	//	return betSlips.Select(bs => new UserBetSlipDTO
+	//	{
+	//		Id = bs.Id,
+	//		BetTime = bs.BetTime,
+	//		DisplayTime = _timezoneService.FormatForUserBets(bs.BetTime, timeZoneId),
+	//		Amount = bs.Amount,
+	//		UserId = bs.UserId,
+	//		WinAmount = bs.WinAmount,
+	//		TotalOdds = bs.Bets.Any()
+	//			? bs.Bets.Select(b => b.Odds).Aggregate((acc, odd) => acc * odd)
+	//			: 1,
+	//		Status = bs.IsSettled
+	//			? (bs.WinAmount > 0 ? nameof(BetStatus.Won) : nameof(BetStatus.Lost))
+	//			: nameof(BetStatus.Pending),
+
+	//		Bets = bs.Bets.Select(b =>
+	//		{
+	//			var result = b.MatchEvent.LiveResult;
+	//			string? outcome = null;
+
+	//			if (result != null)
+	//			{
+	//				outcome = result.HomeScore > result.AwayScore
+	//					? MatchPick.Home.ToString()
+	//					: result.HomeScore < result.AwayScore
+	//						? MatchPick.Away.ToString()
+	//						: MatchPick.Draw.ToString();
+	//			}
+
+	//			return new SingleBetDto
+	//			{
+	//				MatchId = b.MatchEventId,
+	//				HomeTeam = b.MatchEvent.HomeTeam.Name,
+	//				AwayTeam = b.MatchEvent.AwayTeam.Name,
+	//				SelectedOption = b.Pick.ToString(),
+	//				Odds = b.Odds,
+	//				Outcome = outcome
+	//			};
+	//		}).ToList()
+	//	});
+	//}
+
 	public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
 	{
 		var betSlips = await _dbContext.BetSlips
@@ -155,68 +230,79 @@ public class BettingService : IBettingService
 			.ThenInclude(me => me.AwayTeam)
 			.Include(bs => bs.Bets)
 			.ThenInclude(b => b.MatchEvent)
-			.ThenInclude(me => me.LiveResult) 
+			.ThenInclude(me => me.LiveResult)
 			.Where(bs => bs.UserId == userId)
-			.OrderByDescending(b => b.BetTime)
+			.OrderByDescending(bs => bs.BetTime)
 			.ToListAsync();
-
-
-		foreach (var slip in betSlips)
-		{
-			slip.Bets = slip.Bets
-				.Where(b => b.Status != BetStatus.Voided)
-				.ToList();
-
-		}
-
-		betSlips = betSlips
-			.Where(bs => bs.Bets.Any())
-			.ToList();
 
 		var timeZoneId = _sessionService.GetUserTimezone();
 
-
-
-		return betSlips.Select(bs => new UserBetSlipDTO
+		return betSlips.Select(bs =>
 		{
-			Id = bs.Id,
-			BetTime = bs.BetTime,
-			DisplayTime = _timezoneService.FormatForUserBets(bs.BetTime, timeZoneId),
-			Amount = bs.Amount,
-			UserId = bs.UserId,
-			WinAmount = bs.WinAmount,
-			TotalOdds = bs.Bets.Any()
-				? bs.Bets.Select(b => b.Odds).Aggregate((acc, odd) => acc * odd)
-				: 1,
-			Status = bs.IsSettled
-				? (bs.WinAmount > 0 ? nameof(BetStatus.Won) : nameof(BetStatus.Lost))
-				: nameof(BetStatus.Pending),
+			var slipStatus = ComputeSlipStatus(bs);
+			var totalOdds = ComputeTotalOdds(bs.Bets);
 
-			Bets = bs.Bets.Select(b =>
+			return new UserBetSlipDTO
 			{
-				var result = b.MatchEvent.LiveResult;
-				string? outcome = null;
+				Id = bs.Id,
+				BetTime = bs.BetTime,
+				DisplayTime = _timezoneService.FormatForUserBets(bs.BetTime, timeZoneId),
+				Amount = bs.Amount,
+				UserId = bs.UserId,
+				WinAmount = bs.WinAmount,
+				TotalOdds = totalOdds,
 
-				if (result != null)
-				{
-					outcome = result.HomeScore > result.AwayScore
-						? MatchPick.Home.ToString()
-						: result.HomeScore < result.AwayScore
-							? MatchPick.Away.ToString()
-							: MatchPick.Draw.ToString();
-				}
+				Status = slipStatus.ToString(),
 
-				return new SingleBetDto
+				Bets = bs.Bets.Select(b =>
 				{
-					MatchId = b.MatchEventId,
-					HomeTeam = b.MatchEvent.HomeTeam.Name,
-					AwayTeam = b.MatchEvent.AwayTeam.Name,
-					SelectedOption = b.Pick.ToString(),
-					Odds = b.Odds,
-					Outcome = outcome
-				};
-			}).ToList()
+					var result = b.MatchEvent.LiveResult;
+					string? outcome = null;
+
+					if (result != null)
+					{
+						outcome =
+							result.HomeScore > result.AwayScore ? MatchPick.Home.ToString() :
+							result.HomeScore < result.AwayScore ? MatchPick.Away.ToString() :
+							MatchPick.Draw.ToString();
+					}
+
+					return new SingleBetDto
+					{
+						MatchId = b.MatchEventId,
+						HomeTeam = b.MatchEvent.HomeTeam.Name,
+						AwayTeam = b.MatchEvent.AwayTeam.Name,
+						SelectedOption = b.Pick.ToString(),
+						Odds = b.Odds,
+						Outcome = outcome,
+						Status = b.Status.ToString() 
+					};
+				}).ToList()
+			};
 		});
+	}
+
+
+	static BetStatus ComputeSlipStatus(BetSlip slip)
+	{
+		if (slip.Bets.Any(b => b.Status == BetStatus.Voided))
+			return BetStatus.Voided;
+
+		if (slip.Bets.Any(b => b.Status == BetStatus.Lost))
+			return BetStatus.Lost;
+
+		if (slip.Bets.Any(b => b.Status == BetStatus.Pending))
+			return BetStatus.Pending;
+
+		return BetStatus.Won;
+	}
+
+
+	static decimal ComputeTotalOdds(IEnumerable<Bet> bets)
+	{
+		return bets
+			.Where(b => b.Status != BetStatus.Voided)
+			.Aggregate(1m, (acc, b) => acc * b.Odds);
 	}
 
 	public async Task<bool> CancelBetsForMatchAsync(Guid matchEventId)
