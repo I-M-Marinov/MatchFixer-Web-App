@@ -8,5 +8,6 @@
 		public string SelectedOption { get; set; } // "Home", "Draw", "Away"
 		public decimal Odds { get; set; }
 		public string Outcome { get; set; } = string.Empty;
+		public string? Status { get; set; }
 	}
 }
