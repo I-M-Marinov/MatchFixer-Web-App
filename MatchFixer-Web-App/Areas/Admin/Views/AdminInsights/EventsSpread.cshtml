@@ -40,140 +40,146 @@
 
 
 <div class="card events-spread-card p-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em; z-index: 2;">
-    <h3 class="h5 mb-3 text-center text-black">Upcoming Events — Bet Distribution</h3>
+	<h3 class="h5 mb-3 text-center text-black">Upcoming Events — Bet Distribution</h3>
 
-    @if (!Model.Items.Any())
-    {
-        <p class="text-muted">No upcoming events.</p>
-    }
-    else
-    {
-	    <div id="leagueFilterPills" class="league-pills">
-		    <button class="league-pill active" data-league="all" title="All leagues">
-			    <i class="bi bi-globe"></i>
-		    </button>
-	    </div>
+    <div id="leagueFilterPills" class="league-pills">
+	    <button class="league-pill active" data-league="all" title="All leagues">
+		    <i class="bi bi-globe"></i>
+	    </button>
+    </div>
 
-	    <div class="table-responsive admin-bets-spread-table">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-						<th class="text-center">Event</th>
-                        <th class="league-name">League</th>
-                        <th class="text-center">Kick Off</th>
-                        <th class="text-center">Total Stake</th>
-                        <th class="text-center">Total Bets</th>
-                        <th class="text-center" style="min-width:220px">
-                            <span class="progress-home badge"> Home </span>
-                            |
-                            <span class="progress-draw badge"> Draw </span>
-                            |
-                            <span class="progress-away badge"> Away </span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach (var r in Model.Items)
-                {
-                    <tr data-event-id="@r.EventId" data-league="@r.LeagueName">
-                        <td class="text-center">
-                                <img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam" />
-                                <img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
-                                <img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam" />
-		                </td>
-		                @{
-			                string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
-				                ? url
-				                : "https://media.api-sports.io/flags/eu.svg";
-		                }
-		                <td class="league-name d-flex align-items-center justify-content-center gap-2 p-3">
-			                <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;" />
-			                <span class="mb-0">@r.LeagueName</span>
-		                </td>
-		                <td>
-			                @{
-				                var local = r.KickoffUtc.ToLocalTime();
-				                var formatted =
-					                $"{Ordinal(local.Day)} " +
-					                $"{local:MMM yyyy} at {local:h:mm tt}";
-			                }
-
-			                <span class="mb-0">@formatted</span>
-		                </td>
-                        <td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
-			                @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
-		                </td>
-		                <td class="text-center fw-semibold @(r.TotalBets == 0 ? "current-odds-cell text-primary" : "text-black")"
-		                    data-role="total-bets">
-			                @(r.TotalBets == 0 ? "current odds" : r.TotalBets)
-		                </td>
-		                <td>
-			                <div class="d-flex align-items-center gap-2">
-				                <div class="progress flex-grow-1" style="height: 25px; font-size: 0.65rem;">
-                                    @if (r.TotalStake == 0)
-                                    {
-	                                    <div class="progress-bar projected-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
-                                        <div class="progress-bar projected-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
-                                        <div class="progress-bar projected-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
-                                    }
-                                    else
-                                    {
-	                                    <div class="progress-bar progress-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
-	                                    <div class="progress-bar progress-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
-	                                    <div class="progress-bar progress-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
-                                    }
-					              
-				                </div>
-			                </div>
-		                </td>
-	                </tr>
-                }
-                </tbody>
-
-                <tfoot>
+    <div class="table-responsive admin-bets-spread-table">
+        <table class="table align-middle">
+            <thead>
                 <tr>
-	                <td colspan="6">
-		                @{
-			                var p = Model.Page;
-			                var total = Model.TotalPages;
-			                string Link(int i) => Url.Action("EventsSpread", "AdminInsights", new { area = "Admin", page = i })!;
-		                }
-		                <ul class="pagination pagination-ivm mb-0 d-flex justify-content-center">
-			                <li class="page-item @(p == 1 ? "disabled" : null)">
-				                <a class="page-link" href="@(p == 1 ? "#" : Link(1))">&laquo;</a>
-			                </li>
-			                <li class="page-item @(p == 1 ? "disabled" : null)">
-				                <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))">&lsaquo;</a>
-			                </li>
-			                @for (var i = Math.Max(1, p - 3); i <= Math.Min(total, p + 3); i++)
-			                {
-				                <li class="page-item @(i == p ? "active" : null)">
-					                <a class="page-link" href="@Link(i)">@i</a>
-				                </li>
-			                }
-			                <li class="page-item @(p == total ? "disabled" : null)">
-				                <a class="page-link" href="@(p == total ? "#" : Link(p + 1))">&rsaquo;</a>
-			                </li>
-			                <li class="page-item @(p == total ? "disabled" : null)">
-				                <a class="page-link" href="@(p == total ? "#" : Link(total))">&raquo;</a>
-			                </li>
-		                </ul>
-	                </td>
+					<th class="text-center">Event</th>
+                    <th class="league-name">League</th>
+                    <th class="text-center">Kick Off</th>
+                    <th class="text-center">Total Stake</th>
+                    <th class="text-center">Total Bets</th>
+                    <th class="text-center" style="min-width:220px">
+                        <span class="progress-home badge"> Home </span>
+                        |
+                        <span class="progress-draw badge"> Draw </span>
+                        |
+                        <span class="progress-away badge"> Away </span>
+                    </th>
                 </tr>
-                <div class="odds-color-map">
-	                <span class="me-2 text-primary" style="font-size: 0.65em;">
-		                odds: 
-	                </span> 
-	                <span class="projected-home badge"> Home </span>
-	                |
-	                <span class="projected-draw badge"> Draw </span>
-	                |
-	                <span class="projected-away badge"> Away </span>
-                </div>
-                </tfoot>
-            </table>
-        </div>
-    }
+            </thead>
+            <tbody>
+            @if (Model.Items.Any())
+            {
+	            @foreach (var r in Model.Items)
+	            {
+		            <tr data-event-id="@r.EventId" data-league="@r.LeagueName">
+			            <td class="text-center">
+				            <img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam"/>
+				            <img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
+				            <img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam"/>
+			            </td>
+			            @{
+				            string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
+					            ? url
+					            : "https://media.api-sports.io/flags/eu.svg";
+			            }
+			            <td class="league-name d-flex align-items-center justify-content-center gap-2 p-3">
+				            <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;"/>
+				            <span class="mb-0">@r.LeagueName</span>
+			            </td>
+			            <td>
+				            @{
+					            var local = r.KickoffUtc.ToLocalTime();
+					            var formatted =
+						            $"{Ordinal(local.Day)} " +
+						            $"{local:MMM yyyy} at {local:h:mm tt}";
+				            }
+
+				            <span class="mb-0">@formatted</span>
+			            </td>
+			            <td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
+				            @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
+			            </td>
+			            <td class="text-center fw-semibold @(r.TotalBets == 0 ? "current-odds-cell text-primary" : "text-black")"
+			                data-role="total-bets">
+				            @(r.TotalBets == 0 ? "current odds" : r.TotalBets)
+			            </td>
+			            <td>
+				            <div class="d-flex align-items-center gap-2">
+					            <div class="progress flex-grow-1" style="height: 25px; font-size: 0.65rem;">
+						            @if (r.TotalStake == 0)
+						            {
+							            <div class="progress-bar projected-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
+							            <div class="progress-bar projected-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
+							            <div class="progress-bar projected-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
+						            }
+						            else
+						            {
+							            <div class="progress-bar progress-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
+							            <div class="progress-bar progress-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
+							            <div class="progress-bar progress-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
+						            }
+
+					            </div>
+				            </div>
+			            </td>
+		            </tr>
+	            } 
+	            
+            }
+            else
+            {
+	            <tr >
+		            <td colspan = "6" class ="text-center py-4 text-muted fw-semibold" >
+			            No upcoming events for this
+			            league.
+		            </td >
+	            </tr>
+            }
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <td colspan="6">
+	                @{
+		                var p = Model.Page;
+		                var total = Model.TotalPages;
+		                string Link(int i) => Url.Action("EventsSpread", "AdminInsights", new { area = "Admin", page = i })!;
+	                }
+	                <ul class="pagination pagination-ivm mb-0 d-flex justify-content-center">
+		                <li class="page-item @(p == 1 ? "disabled" : null)">
+			                <a class="page-link" href="@(p == 1 ? "#" : Link(1))">&laquo;</a>
+		                </li>
+		                <li class="page-item @(p == 1 ? "disabled" : null)">
+			                <a class="page-link" href="@(p == 1 ? "#" : Link(p - 1))">&lsaquo;</a>
+		                </li>
+		                @for (var i = Math.Max(1, p - 3); i <= Math.Min(total, p + 3); i++)
+		                {
+			                <li class="page-item @(i == p ? "active" : null)">
+				                <a class="page-link" href="@Link(i)">@i</a>
+			                </li>
+		                }
+		                <li class="page-item @(p == total ? "disabled" : null)">
+			                <a class="page-link" href="@(p == total ? "#" : Link(p + 1))">&rsaquo;</a>
+		                </li>
+		                <li class="page-item @(p == total ? "disabled" : null)">
+			                <a class="page-link" href="@(p == total ? "#" : Link(total))">&raquo;</a>
+		                </li>
+	                </ul>
+                </td>
+            </tr>
+            <div class="odds-color-map">
+                <span class="me-2 text-primary" style="font-size: 0.65em;">
+	                odds: 
+                </span> 
+                <span class="projected-home badge"> Home </span>
+                |
+                <span class="projected-draw badge"> Draw </span>
+                |
+                <span class="projected-away badge"> Away </span>
+            </div>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
 									
@@ -315,6 +321,47 @@
 
 			window.location.href = url.toString();
 		});
+
+		function applyLeagueBadges() {
+			const leagueCounts = getLeagueCounts();
+			const totalCount = getTotalCount();
+
+			document.querySelectorAll(".league-filter-pill").forEach(btn => {
+				const league = btn.dataset.league;
+
+				btn.querySelector(".league-count-badge")?.remove();
+
+				const count =
+					league === "all"
+						? totalCount
+						: (leagueCounts[league] ?? 0);
+
+				const badge = document.createElement("span");
+				badge.className = "league-count-badge";
+				badge.textContent = count;
+
+				if (count === 0) {
+					badge.classList.add("zero");
+				}
+
+				btn.appendChild(badge);
+			});
+		}
+
+
+		function getLeagueCounts() {
+			const el = document.getElementById("league-counts-data");
+			return el ? JSON.parse(el.textContent) : {};
+		}
+
+		function getTotalCount() {
+			const el = document.getElementById("league-total-count");
+			return el ? Number(el.textContent) : 0;
+		}
+
+		applyLeagueBadges();
+
+
 	});
 
 	@functions {
@@ -333,6 +380,12 @@
 		}
 	}
 
+</script>
 
+<script id="league-counts-data" type="application/json">
+	@Json.Serialize(Model.LeagueEventCounts)
+</script>
 
+<script id="league-total-count" type="application/json">
+	@Json.Serialize(Model.LeagueEventCounts.Values.Sum())
 </script>
