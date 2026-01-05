@@ -25,6 +25,17 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.AsNoTracking()
 				.Where(e => e.MatchDate > now && !e.IsCancelled);
 
+			var leagueCounts = await baseQ
+				.Select(e =>
+					!string.IsNullOrEmpty(e.HomeTeam.LeagueName)
+						? e.HomeTeam.LeagueName
+						: !string.IsNullOrEmpty(e.AwayTeam.LeagueName)
+							? e.AwayTeam.LeagueName
+							: "Unknown")
+				.GroupBy(leagueName => leagueName)
+				.Select(g => new { League = g.Key, Count = g.Count() })
+				.ToDictionaryAsync(x => x.League, x => x.Count, ct);
+
 			// League filter 
 			if (!string.IsNullOrWhiteSpace(league))
 			{
@@ -148,7 +159,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				Items = rows,
 				Page = page,
 				PageSize = pageSize,
-				TotalCount = total
+				TotalCount = total,
+				LeagueEventCounts = leagueCounts
 			};
 		}
 
