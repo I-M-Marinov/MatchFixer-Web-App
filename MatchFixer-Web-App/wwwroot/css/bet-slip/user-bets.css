@@ -40,6 +40,16 @@
     box-shadow: 0 0 0 0.11rem #ffc107, 0 0 0 0.22rem #ffdd57 !important;
 }
 
+.slip-border-void {
+    border: 1px solid #6c757d !important; 
+    box-shadow: 0 0 0 0.11rem #adb5bd, 0 0 0 0.22rem #ced4da !important;
+    opacity: 0.9;
+}
+
+.slip-border-void .card-body {
+    color: #6c757d;
+}
+
 .custom-card-user-bets p {
     font-size: 0.80em;
     color: #000000;
@@ -178,7 +188,8 @@
 
 #betSlipTabs #won-tab,
 #betSlipTabs #lost-tab,
-#betSlipTabs #pending-tab {
+#betSlipTabs #pending-tab,
+#betSlipTabs #voided-tab {
     color: white;
 }
 
@@ -203,10 +214,17 @@
     border-bottom: 3px white solid;
 }
 
+#voided-tab.active {
+    background-color: #6c757d !important;
+    color: white !important;
+    border-color: black;
+    border-bottom: 3px white solid;
+}
 
 #won-tab:hover,
 #lost-tab:hover,
-#pending-tab:hover {
+#pending-tab:hover,
+#voided-tab:hover {
     color: black;
     background-color: #043c6f;
 }
