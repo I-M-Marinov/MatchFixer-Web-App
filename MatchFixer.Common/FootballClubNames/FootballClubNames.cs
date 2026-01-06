@@ -98,6 +98,7 @@
 			["Monza"] = "AC Monza",
 			["Como"] = "Como 1907",
 			["Cremonese"] = "US Cremonese",
+			["Pisa"] = "Pisa SC",
 
 
 			// Spanish clubs
