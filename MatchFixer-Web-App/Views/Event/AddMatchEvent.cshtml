@@ -49,465 +49,514 @@
 
 <div class="tab-content">
 
-	<div class="tab-pane fade show active" id="manualTab" role="tabpanel">
-			<div class="modal fade" id="createBoostModal" tabindex="-1" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<form id="createBoostForm">
-							@Html.AntiForgeryToken()
-							<div class="modal-header">
-								<h5 class="modal-title">Create Odds Boost</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-							</div>
-
-							<div class="modal-body">
-								<input type="hidden" name="MatchEventId" id="MatchEventId" />
-
-								<!-- Boost Value + Duration (same row) -->
-								<div class="row">
-									<div class="col-md-6 mb-3">
-										<label class="form-label">Boost Value</label>
-										<input type="number" step="0.01" class="form-control" name="BoostValue" required />
-									</div>
-									<div class="col-md-6 mb-3">
-										<label class="form-label">Duration (minutes)</label>
-										<input type="number" class="form-control" name="DurationMinutes" value="30" />
-									</div>
-								</div>
-
-								<!-- Max Stake + Max Uses (same row) -->
-								<div class="row">
-									<div class="col-md-6 mb-3">
-										<label class="form-label">Max Stake Per Bet</label>
-										<input type="number" step="0.01" class="form-control" name="MaxStakePerBet" />
-									</div>
-									<div class="col-md-6 mb-3">
-										<label class="form-label">Max Uses Per User</label>
-										<input type="number" class="form-control" name="MaxUsesPerUser" />
-									</div>
-								</div>
-
-								<!-- Start Time -->
-								<div class="mb-3 d-flex align-items-center">
-									<label class="form-label">Start Time (UTC)</label>
-									<input type="datetime-local" class="form-control" name="StartUtc" />
-									<small class="form-text text-muted">Leave empty to start immediately.</small>
-								</div>
-
-								<!-- Note -->
-								<div class="mb-3 d-flex align-items-center">
-									<label class="form-label">Note</label>
-									<input type="text" class="form-control" name="Note" />
-								</div>
-							</div>
-
-							<div class="modal-footer">
-								<button type="submit" class="btn btn-primary">Create</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-
-
-			<div class="position-relative">
-				<div id="model-error-add-event" asp-validation-summary="ModelOnly"
-					 class="position-absolute start-50 translate-middle-x"
-					 style="top: -80px; white-space: nowrap; z-index: 1005;">
+<div class="tab-pane fade show active" id="manualTab" role="tabpanel">
+<div class="modal fade" id="createBoostModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="createBoostForm">
+				@Html.AntiForgeryToken()
+				<div class="modal-header">
+					<h5 class="modal-title">Create Odds Boost</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 				</div>
 
-			@* <div class="d-flex justify-content-center align-items-start flex-wrap gap-1 mt-1">*@				
-			<div class="events-layout">
+				<div class="modal-body">
+					<input type="hidden" name="MatchEventId" id="MatchEventId" />
 
-
-			<div class="add-match-event-container mt-4">
-				<form id="team-selection-form" asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
-					@Html.AntiForgeryToken()
-					<div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
-						<div class="col">
-							<div class="text-center my-2">
-								<img id="home-team-logo"
-								     src="/images/add-match/question-mark.png"
-								     alt="Home Team Logo"
-									 class="adding-team-logo"
-								     style="max-height: 75px; margin-bottom:1em;"/>
-							</div>
-							<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
-								<option value="">-- Select Home Team --</option>
-								@foreach (var league in Model.TeamsByLeague)
-								{
-									<optgroup class="add-team-league-label" label="@league.Key">
-										@foreach (var team in league.Value)
-										{
-											var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-											var teamName = team.Text.Split('|').FirstOrDefault();
-											<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
-										}
-									</optgroup>
-								}
-							</select>
-							<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
+					<!-- Boost Value + Duration (same row) -->
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label class="form-label">Boost Value</label>
+							<input type="number" step="0.01" class="form-control" name="BoostValue" required />
 						</div>
-
-						<div class="col">
-							<div class="text-center my-2">
-								<img id="away-team-logo"
-								     src="/images/add-match/question-mark.png"
-								     alt="Away Team Logo"
-								     class="adding-team-logo"
-								     style="max-height: 75px; margin-bottom:1em;"/>
-							</div>
-							<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
-								<option value="">-- Select Away Team --</option>
-								@foreach (var league in Model.TeamsByLeague)
-								{
-									<optgroup class="add-team-league-label" label="@league.Key">
-										@foreach (var team in league.Value)
-										{
-											var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-											var teamName = team.Text.Split('|').FirstOrDefault();
-											<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
-										}
-									</optgroup>
-								}
-							</select>
-							<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
+						<div class="col-md-6 mb-3">
+							<label class="form-label">Duration (minutes)</label>
+							<input type="number" class="form-control" name="DurationMinutes" value="30" />
 						</div>
 					</div>
 
-					<div id="dateAndTime" class="mb-3">
-						<label asp-for="MatchDate" class="form-label">Date and Time</label>
-						<input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
-						<span asp-validation-for="MatchDate" class="bg-info validation-add-event centered-validation"></span>
-					</div>
-
-					<div class="d-flex justify-content-center align-items-center row mb-3">
-						<div class="home-odds col">
-							<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
-							<input asp-for="HomeOdds" class="form-control"/>
-							<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
+					<!-- Max Stake + Max Uses (same row) -->
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label class="form-label">Max Stake Per Bet</label>
+							<input type="number" step="0.01" class="form-control" name="MaxStakePerBet" />
 						</div>
-						<div class="draw-odds col">
-							<label asp-for="DrawOdds" class="form-label">Draw</label>
-							<input asp-for="DrawOdds" class="form-control"/>
-							<span asp-validation-for="DrawOdds" class="bg-info validation-add-event centered-validation"></span>
-
-						</div>
-						<div class="away-odds col">
-							<label asp-for="AwayOdds" class="form-label">Away Team Win</label>
-							<input asp-for="AwayOdds" class="form-control"/>
-							<span asp-validation-for="AwayOdds" class="bg-info validation-add-event centered-validation"></span>
-
+						<div class="col-md-6 mb-3">
+							<label class="form-label">Max Uses Per User</label>
+							<input type="number" class="form-control" name="MaxUsesPerUser" />
 						</div>
 					</div>
 
-					<span class="custom-add-match-tooltip-wrapper">
-						<button type="submit" class="btn add-event-icon-container">
-							<div class="text-center my-2">
-								<img id="add-event-icon"
-								     src="/images/add-match/add-event.png"
-								     alt="Add Event"
-								     style="max-height: 85px;"/>
-							</div>
-							<span class="custom-add-match-tooltip">Add this game to the Events Board</span>
-						</button>
-
-
-					</span>
-
-				</form>
-			</div>
-
-
-			<div class="live-events-section mt-3 mx-auto" style="max-width: 1400px;">
-				<h3 class="text-center mb-2">Current Live Events</h3>
-				<ul class="nav nav-pills justify-content-center mb-3" id="eventDateTabs"></ul>
-
-				@if (Model.CurrentEvents.Any())
-				{
-					<div class="table-responsive">
-
-						<div class="live-events-table-wrapper">
-							<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle"
-							       id="live-events-table">
-								<thead class="table-dark">
-								<tr>
-									<th>Status</th>
-									<th>Date & Time (local)</th>
-									<th>Home Team</th>
-									<th>Away Team</th>
-									<th>Boost</th>
-									<th>Update</th>
-								</tr>
-								</thead>
-								<tbody>
-								@foreach (var ev in Model.CurrentEvents)
-								{
-									<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "")"
-									    data-date="@ev.KickoffTime.ToLocalTime().Date.ToString("yyyy-MM-dd")">
-										<td>
-											@switch (ev.MatchStatus)
-											{
-												case "Live":
-													<span class="badge bg-success">Live</span>
-													break;
-												case "Started":
-													<span class="badge bg-warning text-dark">Started</span>
-													break;
-												case "Cancelled":
-													<span class="badge bg-danger">Cancelled</span>
-													break;
-											}
-											@if (ev.ApiFixtureId != null)
-											{
-												<span class="badge bg-info ms-1">auto</span>
-											}
-										</td>
-
-										<td>
-											@ev.KickoffTime.ToLocalTime().ToString("g")
-										</td>
-
-										<td class="team-cell">
-											<div class="team-row home-team">
-												<img src="@ev.HomeTeamLogoUrl"
-												     alt="@ev.HomeTeam Logo"
-												     class="team-logo" />
-												<span class="team-name">@ev.HomeTeam</span>
-											</div>
-
-											<div class="team-row away-team d-md-none">
-												<img src="@ev.AwayTeamLogoUrl"
-												     alt="@ev.AwayTeam Logo"
-												     class="team-logo" />
-												<span class="team-name">@ev.AwayTeam</span>
-											</div>
-										</td>
-
-										<td class="team-cell d-none d-md-table-cell">
-											<div class="team-row away-team">
-												<img src="@ev.AwayTeamLogoUrl"
-												     alt="@ev.AwayTeam Logo"
-												     class="team-logo" />
-												<span class="team-name">@ev.AwayTeam</span>
-											</div>
-										</td>
-
-										<td>
-											@if (ev.BoostActive != null)
-											{
-												<div class="d-flex flex-column align-items-center boost-timer-row"
-												     data-boost-end="@ev.BoostActive.EndUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")">
-													<div class="d-flex flex-column justify-content-center gap-1">
-														<span class="badge bg-success mb-1">Boost</span>
-														<span class="badge bg-success mb-1">Active!</span>
-													</div>
-													<span class="boost-countdown fw-bold"></span>
-												</div>
-											}
-											else
-											{
-												<span class="custom-tooltip-wrapper">
-													@if (ev.MatchStatus == "Started")
-													{
-														<button type="button" class="btn btn-sm btn-outline-danger create-boost-btn text-muted"
-														        data-match-id="@ev.Id" disabled>
-															<i class="ri-fire-fill"></i>
-														</button>
-														<span class="custom-tooltip text-bg-info">Cannot add a boost to a game that already started!</span>
-													}
-													else
-													{
-														<button type="button" class="btn btn-sm btn-warning create-boost-btn"
-														        data-bs-toggle="modal"
-														        data-bs-target="#createBoostModal"
-														        data-match-id="@ev.Id">
-															<i class="ri-fire-fill"></i>
-														</button>
-														<span class="custom-tooltip text-bg-warning">Add an odds boost for this game</span>
-													}
-												</span>
-
-											}
-										</td>
-										<td style="max-width: 350px;">
-											<div class="d-flex justify-content-center align-items-center">
-
-												<div class="d-flex flex-column gap-1">
-
-													@{
-														var isDisabled = (ev.MatchStatus == "Started" || ev.ActiveBoost != null) ? "disabled" : "";
-													}
-
-
-													<div class="d-flex gap-2">
-														<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														       value="@ev.HomeWinOdds" class="form-control form-control-sm home-odds-style" style="width: 80px;" placeholder="Home" @isDisabled/>
-														<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														       value="@ev.DrawOdds" class="form-control form-control-sm draw-odds-style" style="width: 80px;" placeholder="Draw" @isDisabled/>
-														<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-														       value="@ev.AwayWinOdds" class="form-control form-control-sm away-odds-style" style="width: 80px;" placeholder="Away" @isDisabled/>
-													</div>
-
-													<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
-													       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
-													       class="form-control form-control-sm matchdate-style" style="min-width: 240px;" @isDisabled/>
-												</div>
-
-												<div class="d-flex flex-column gap-1 align-items-end">
-													@if (ev.MatchStatus != "Started")
-													{
-														<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
-															@Html.AntiForgeryToken()
-															<input type="hidden" name="Id" value="@ev.Id"/>
-															<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
-															<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
-															<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
-															<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
-
-															<span class="custom-save-remove-tooltip-wrapper">
-																<button type="submit" class="btn btn-outline-success btn-sm update-event-btn">
-																	<div class="icon">
-																		<i class="bx bxs-save"></i>
-																	</div>
-																</button>
-																<span class="custom-save-remove-tooltip">Save the event</span>
-															</span>
-														</form>
-													}
-
-													@if (ev.IsCancelled != true)
-													{
-														<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
-															@Html.AntiForgeryToken()
-															<input type="hidden" name="id" value="@ev.Id"/>
-															<span class="custom-save-remove-tooltip-wrapper">
-																<button type="button"
-																        class="btn btn-outline-danger btn-sm update-event-btn"
-																        data-bs-toggle="modal"
-																        data-bs-target="#confirmCancelModal"
-																        data-event-id="@ev.Id">
-																	<div class="icon">
-																		<i class="ri-delete-bin-2-fill"></i>
-																		<div class="label"></div>
-																	</div>
-																</button>
-																<span class="custom-save-remove-tooltip">Cancel the event</span>
-															</span>
-
-														</form>
-													}
-												</div>
-
-											</div>
-										</td>
-
-									</tr>
-								}
-								</tbody>
-							</table>
-						</div>
+					<!-- Start Time -->
+					<div class="mb-3 d-flex align-items-center">
+						<label class="form-label">Start Time (UTC)</label>
+						<input type="datetime-local" class="form-control" name="StartUtc" />
+						<small class="form-text text-muted">Leave empty to start immediately.</small>
 					</div>
-				}
-				else
-				{
-					<div class="alert alert-info text-center">
-						There are no live or started events available.
-					</div>
-				}
 
-			</div>
-			</div>
-
-			</div>
-
-
-			<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content border-danger">
-						<div class="modal-header text-danger fw-bold">
-							<h5 class="modal-title" id="confirmCancelLabel">
-								<i class="bi bi-exclamation-triangle-fill me-2"></i>
-								Confirm Cancellation
-							</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body text-center">
-							Are you sure you want to void this event?
-						</div>
-						<div class="modal-footer justify-content-center">
-							<form id="cancelEventForm" asp-action="CancelMatchEvent" asp-controller="Event" method="post">
-								@Html.AntiForgeryToken()
-								<input type="hidden" name="id" id="cancelEventId" value="" />
-								<button type="submit" class="btn btn-danger">Yes, Void</button>
-							</form>
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
-						</div>
+					<!-- Note -->
+					<div class="mb-3 d-flex align-items-center">
+						<label class="form-label">Note</label>
+						<input type="text" class="form-control" name="Note" />
 					</div>
 				</div>
+
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Create</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<div class="position-relative">
+<div id="model-error-add-event" asp-validation-summary="ModelOnly"
+     class="position-absolute start-50 translate-middle-x"
+     style="top: -80px; white-space: nowrap; z-index: 1005;">
+</div>
+
+@* <div class="d-flex justify-content-center align-items-start flex-wrap gap-1 mt-1">*@				
+<div class="events-layout">
+
+
+<div class="add-match-event-container mt-4">
+	<form id="team-selection-form" asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
+		@Html.AntiForgeryToken()
+		<div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
+			<div class="col">
+				<div class="text-center my-2">
+					<img id="home-team-logo"
+					     src="/images/add-match/question-mark.png"
+					     alt="Home Team Logo"
+					     class="adding-team-logo"
+					     style="max-height: 75px; margin-bottom:1em;"/>
+				</div>
+				<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
+					<option value="">-- Select Home Team --</option>
+					@foreach (var league in Model.TeamsByLeague)
+					{
+						<optgroup class="add-team-league-label" label="@league.Key">
+							@foreach (var team in league.Value)
+							{
+								var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+								var teamName = team.Text.Split('|').FirstOrDefault();
+								<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+							}
+						</optgroup>
+					}
+				</select>
+				<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
+			</div>
+
+			<div class="col">
+				<div class="text-center my-2">
+					<img id="away-team-logo"
+					     src="/images/add-match/question-mark.png"
+					     alt="Away Team Logo"
+					     class="adding-team-logo"
+					     style="max-height: 75px; margin-bottom:1em;"/>
+				</div>
+				<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
+					<option value="">-- Select Away Team --</option>
+					@foreach (var league in Model.TeamsByLeague)
+					{
+						<optgroup class="add-team-league-label" label="@league.Key">
+							@foreach (var team in league.Value)
+							{
+								var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+								var teamName = team.Text.Split('|').FirstOrDefault();
+								<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+							}
+						</optgroup>
+					}
+				</select>
+				<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
 			</div>
 		</div>
 
-	<div class="tab-pane fade" id="apiTab" role="tabpanel">
-		<div class="card shadow-sm p-3 add-match-auto-card">
+		<div id="dateAndTime" class="mb-3">
+			<label asp-for="MatchDate" class="form-label">Date and Time</label>
+			<input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
+			<span asp-validation-for="MatchDate" class="bg-info validation-add-event centered-validation"></span>
+		</div>
 
-			<form id="addUpcomingForm" asp-action="AddUpcomingMatches" asp-controller="Event" method="post">
-					@Html.AntiForgeryToken()
-					<div class="row mb-3 align-items-end">
-						<div class="col-md-4">
-							<label class="form-label">League</label>
-							<select id="apiLeagueSelect" class="form-select">
-								<option value="">Select league</option>
-								@foreach (var league in Model.ApiLeagues)
+		<div class="d-flex justify-content-center align-items-center row mb-3">
+			<div class="home-odds col">
+				<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
+				<input asp-for="HomeOdds" class="form-control"/>
+				<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
+			</div>
+			<div class="draw-odds col">
+				<label asp-for="DrawOdds" class="form-label">Draw</label>
+				<input asp-for="DrawOdds" class="form-control"/>
+				<span asp-validation-for="DrawOdds" class="bg-info validation-add-event centered-validation"></span>
+
+			</div>
+			<div class="away-odds col">
+				<label asp-for="AwayOdds" class="form-label">Away Team Win</label>
+				<input asp-for="AwayOdds" class="form-control"/>
+				<span asp-validation-for="AwayOdds" class="bg-info validation-add-event centered-validation"></span>
+
+			</div>
+		</div>
+
+		<span class="custom-add-match-tooltip-wrapper">
+			<button type="submit" class="btn add-event-icon-container">
+				<div class="text-center my-2">
+					<img id="add-event-icon"
+					     src="/images/add-match/add-event.png"
+					     alt="Add Event"
+					     style="max-height: 85px;"/>
+				</div>
+				<span class="custom-add-match-tooltip">Add this game to the Events Board</span>
+			</button>
+
+
+		</span>
+
+	</form>
+</div>
+
+
+<div class="live-events-section mt-3 mx-auto" style="max-width: 1400px;">
+	<h3 class="text-center mb-2">Current Live Events</h3>
+	<ul class="nav nav-pills justify-content-center mb-3" id="eventDateTabs"></ul>
+
+	@if (Model.CurrentEvents.Any())
+	{
+		<div class="table-responsive">
+
+			<div class="live-events-table-wrapper">
+				<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle"
+				       id="live-events-table">
+					<thead class="table-dark">
+					<tr>
+						<th>Status</th>
+						<th>Date & Time (local)</th>
+						<th>Home Team</th>
+						<th>Away Team</th>
+						<th>Boost</th>
+						<th>Update</th>
+					</tr>
+					</thead>
+					<tbody>
+					@foreach (var ev in Model.CurrentEvents)
+					{
+						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "")"
+						    data-date="@ev.KickoffTime.ToLocalTime().Date.ToString("yyyy-MM-dd")">
+							<td>
+								@switch (ev.MatchStatus)
 								{
-									<option value="@league.ApiLeagueId">@league.Name</option>
+									case "Live":
+										<span class="badge bg-success">Live</span>
+										break;
+									case "Started":
+										<span class="badge bg-warning text-dark">Started</span>
+										break;
+									case "Cancelled":
+										<span class="badge bg-danger">Cancelled</span>
+										break;
 								}
-							</select>
-						</div>
+								@if (ev.ApiFixtureId != null)
+								{
+									<span class="badge bg-info ms-1">auto</span>
+								}
+							</td>
 
-						<div class="col-md-3">
-							<button type="button" id="loadUpcomingBtn" class="btn btn-primary">
-								Load upcoming matches
-							</button>
-						</div>
-					</div>
+							<td>
+								@ev.KickoffTime.ToLocalTime().ToString("g")
+							</td>
 
-					<div class="table-responsive api-upcoming-matches-table">
-						<table class="table table-sm table-hover align-middle text-center">
-							<thead class="table-dark">
-							<tr>
-								<th>Add</th>
-								<th>Status</th>
-								<th>Date</th>
-								<th>Home</th>
-								<th>Away</th>
-								<th>H</th>
-								<th>D</th>
-								<th>A</th>
-							</tr>
-							</thead>
-							<tbody id="apiMatchesBody">
-							<tr>
-								<td colspan="7" class="text-muted">
-									Select a league to load upcoming matches
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
+							<td class="team-cell">
+								<div class="team-row home-team">
+									<img src="@ev.HomeTeamLogoUrl"
+									     alt="@ev.HomeTeam Logo"
+									     class="team-logo" />
+									<span class="team-name">@ev.HomeTeam</span>
+								</div>
 
-					<div class="text-end mt-3">
-						<button type="submit" class="btn btn-success">
-							Add selected matches
-						</button>
-					</div>
+								<div class="team-row away-team d-md-none">
+									<img src="@ev.AwayTeamLogoUrl"
+									     alt="@ev.AwayTeam Logo"
+									     class="team-logo" />
+									<span class="team-name">@ev.AwayTeam</span>
+								</div>
+							</td>
 
-			</form>
+							<td class="team-cell d-none d-md-table-cell">
+								<div class="team-row away-team">
+									<img src="@ev.AwayTeamLogoUrl"
+									     alt="@ev.AwayTeam Logo"
+									     class="team-logo" />
+									<span class="team-name">@ev.AwayTeam</span>
+								</div>
+							</td>
+
+							<td>
+								@if (ev.BoostActive != null)
+								{
+									<div class="d-flex flex-column align-items-center boost-timer-row"
+									     data-boost-end="@ev.BoostActive.EndUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")">
+										<div class="d-flex flex-column justify-content-center gap-1">
+											<span class="badge bg-success mb-1">Boost</span>
+											<span class="badge bg-success mb-1">Active!</span>
+										</div>
+										<span class="boost-countdown fw-bold"></span>
+									</div>
+								}
+								else
+								{
+									<span class="custom-tooltip-wrapper">
+										@if (ev.MatchStatus == "Started")
+										{
+											<button type="button" class="btn btn-sm btn-outline-danger create-boost-btn text-muted"
+											        data-match-id="@ev.Id" disabled>
+												<i class="ri-fire-fill"></i>
+											</button>
+											<span class="custom-tooltip text-bg-info">Cannot add a boost to a game that already started!</span>
+										}
+										else
+										{
+											<button type="button" class="btn btn-sm btn-warning create-boost-btn"
+											        data-bs-toggle="modal"
+											        data-bs-target="#createBoostModal"
+											        data-match-id="@ev.Id">
+												<i class="ri-fire-fill"></i>
+											</button>
+											<span class="custom-tooltip text-bg-warning">Add an odds boost for this game</span>
+										}
+									</span>
+
+								}
+							</td>
+							<td style="max-width: 350px;">
+								<div class="d-flex justify-content-center align-items-center">
+
+									<div class="d-flex flex-column gap-1">
+
+										@{
+											var isDisabled = (ev.MatchStatus == "Started" || ev.ActiveBoost != null) ? "disabled" : "";
+										}
+
+
+										<div class="d-flex gap-2">
+											<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+											       value="@ev.HomeWinOdds" class="form-control form-control-sm home-odds-style" style="width: 80px;" placeholder="Home" @isDisabled/>
+											<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+											       value="@ev.DrawOdds" class="form-control form-control-sm draw-odds-style" style="width: 80px;" placeholder="Draw" @isDisabled/>
+											<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
+											       value="@ev.AwayWinOdds" class="form-control form-control-sm away-odds-style" style="width: 80px;" placeholder="Away" @isDisabled/>
+										</div>
+
+										<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
+										       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
+										       class="form-control form-control-sm matchdate-style" style="min-width: 240px;" @isDisabled/>
+									</div>
+
+									<div class="d-flex flex-column gap-1 align-items-end">
+										@if (ev.MatchStatus != "Started")
+										{
+											<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="Id" value="@ev.Id"/>
+												<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
+												<input type="hidden" name="DrawOdds" id="HiddenDrawOdds-@ev.Id"/>
+												<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
+												<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
+
+												<span class="custom-save-remove-tooltip-wrapper">
+													<button type="submit" class="btn btn-outline-success btn-sm update-event-btn">
+														<div class="icon">
+															<i class="bx bxs-save"></i>
+														</div>
+													</button>
+													<span class="custom-save-remove-tooltip">Save the event</span>
+												</span>
+											</form>
+										}
+
+										@if (ev.IsCancelled != true)
+										{
+											<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@ev.Id"/>
+												<span class="custom-save-remove-tooltip-wrapper">
+													<button type="button"
+													        class="btn btn-outline-danger btn-sm update-event-btn"
+													        data-bs-toggle="modal"
+													        data-bs-target="#confirmCancelModal"
+													        data-event-id="@ev.Id">
+														<div class="icon">
+															<i class="ri-delete-bin-2-fill"></i>
+															<div class="label"></div>
+														</div>
+													</button>
+													<span class="custom-save-remove-tooltip">Cancel the event</span>
+												</span>
+
+											</form>
+										}
+									</div>
+
+								</div>
+							</td>
+
+						</tr>
+					}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	}
+	else
+	{
+		<div class="alert alert-info text-center">
+			There are no live or started events available.
+		</div>
+	}
+
+</div>
+</div>
+
+</div>
+
+
+<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content border-danger">
+			<div class="modal-header text-danger fw-bold">
+				<h5 class="modal-title" id="confirmCancelLabel">
+					<i class="bi bi-exclamation-triangle-fill me-2"></i>
+					Confirm Cancellation
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body text-center">
+				Are you sure you want to void this event?
+			</div>
+			<div class="modal-footer justify-content-center">
+				<form id="cancelEventForm" asp-action="CancelMatchEvent" asp-controller="Event" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="cancelEventId" value="" />
+					<button type="submit" class="btn btn-danger">Yes, Void</button>
+				</form>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="tab-pane fade" id="apiTab" role="tabpanel">
+	<div class="card shadow-sm p-3 add-match-auto-card">
+
+		<form id="addUpcomingForm" asp-action="AddUpcomingMatches" asp-controller="Event" method="post">
+			@Html.AntiForgeryToken()
+			<div class="row mb-3 align-items-end">
+				<div class="col-md-4">
+					<label class="form-label">League</label>
+					<select id="apiLeagueSelect" class="form-select">
+						<option value="">Select league</option>
+						@foreach (var league in Model.ApiLeagues)
+						{
+							<option value="@league.ApiLeagueId">@league.Name</option>
+						}
+					</select>
+				</div>
+
+				<div class="col-md-3">
+					<button type="button" id="loadUpcomingBtn" class="btn btn-primary">
+						Load upcoming matches
+					</button>
+				</div>
+			</div>
+
+			<div class="table-responsive api-upcoming-matches-table">
+				<table class="table table-sm table-hover align-middle text-center">
+					<thead class="table-dark">
+					<tr>
+						<th>Add</th>
+						<th>Status</th>
+						<th>Date</th>
+						<th>Home</th>
+						<th>Away</th>
+						<th>H</th>
+						<th>D</th>
+						<th>A</th>
+					</tr>
+					</thead>
+					<tbody id="apiMatchesBody">
+					<tr>
+						<td colspan="7" class="text-muted">
+							Select a league to load upcoming matches
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<button type="button"
+			        class="btn btn-success"
+			        id="reviewUpcomingBtn">
+				Review & Add selected matches
+			</button>
+
+		</form>
+
+	</div>
+</div>
+
+</div>
+<div class="modal fade" id="reviewUpcomingModal" tabindex="-1">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h5 class="modal-title">
+					<i class="bi bi-clipboard-check me-2"></i>
+					Review Upcoming Matches
+				</h5>
+				<button type="button" class="btn-close review-upcoming-matches-close-btn" data-bs-dismiss="modal"></button>
+			</div>
+
+			<div class="modal-body">
+
+				<table class="table table-sm table-hover align-middle text-center">
+					<thead class="table-dark">
+					<tr>
+						<th>Status</th>
+						<th>Date</th>
+						<th>Home</th>
+						<th>Away</th>
+						<th>H</th>
+						<th>D</th>
+						<th>A</th>
+					</tr>
+					</thead>
+					<tbody id="reviewMatchesBody">
+					
+					</tbody>
+				</table>
+
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+					Cancel
+				</button>
+
+				<button type="button"
+				        class="btn btn-success"
+				        id="confirmAddUpcoming">
+					Confirm & Add Matches
+				</button>
+			</div>
 
 		</div>
 	</div>
-
 </div>
+
 
 
 
@@ -854,14 +903,127 @@
 		});
 
 
-			document.addEventListener("DOMContentLoaded", function () {
-				const tooltipTriggerList = [].slice.call(
-					document.querySelectorAll('[data-bs-toggle="tooltip"]')
-				);
+		document.addEventListener("DOMContentLoaded", function () {
+			const tooltipTriggerList = [].slice.call(
+				document.querySelectorAll('[data-bs-toggle="tooltip"]')
+			);
 
-				tooltipTriggerList.forEach(el => {
+			tooltipTriggerList.forEach(el => {
 					new bootstrap.Tooltip(el);
 			});
 		});
+
+		document.addEventListener("DOMContentLoaded", () => {
+
+			const DEFAULT_ODDS = {
+				home: 1.11,
+				draw: 2.22,
+				away: 3.33
+			};
+
+			const reviewBtn = document.getElementById("reviewUpcomingBtn");
+			const modal = new bootstrap.Modal(document.getElementById("reviewUpcomingModal"));
+			const body = document.getElementById("reviewMatchesBody");
+			const form = document.getElementById("addUpcomingForm");
+			const confirmBtn = document.getElementById("confirmAddUpcoming");
+
+			reviewBtn.addEventListener("click", () => {
+
+				const selectedRows = [
+					...document.querySelectorAll("#apiMatchesBody tr")
+				].filter(r => {
+					const cb = r.querySelector("input[type=checkbox]");
+					return cb && cb.checked && !cb.disabled;
+				});
+
+				if (!selectedRows.length) {
+					alert("Select at least one match.");
+					return;
+				}
+
+				body.innerHTML = "";
+
+				selectedRows.forEach(row => {
+
+					const clone = row.cloneNode(true);
+
+					const firstTd = clone.querySelector("td");
+					if (firstTd) {
+						firstTd.remove();
+					}
+					clone.querySelectorAll("input[type='number']").forEach(input => {
+						const td = input.closest("td");
+						if (!td) return;
+
+						const value = parseFloat(input.value);
+						const colIndex = [...td.parentElement.children].indexOf(td);
+
+						let pillClass = "pill-brand-blue";
+						let isDefault = false;
+
+
+						if (colIndex === 4) {
+							isDefault = value === DEFAULT_ODDS.home;
+							pillClass = isDefault ? "pill-brand-red" : "pill-brand-blue";
+						}
+
+						if (colIndex === 5) {
+							isDefault = value === DEFAULT_ODDS.draw;
+							pillClass = isDefault ? "pill-brand-red" : "pill-brand-yellow";
+						}
+
+						if (colIndex === 6) {
+							isDefault = value === DEFAULT_ODDS.away;
+							pillClass = isDefault ? "pill-brand-red" : "pill-brand-green";
+						}
+
+						td.innerHTML = `
+							<span class="pill ${pillClass}"
+								  ${isDefault ? `title="Default odds detected"` : ""}>
+								${value.toFixed(2)}
+							</span>
+						`;
+
+						if (isDefault) {
+							td.closest("tr")?.classList.add("has-default-odds");
+						}
+
+						const hasDefaults =
+							body.querySelectorAll("tr.has-default-odds").length > 0;
+
+						if (hasDefaults) {
+							confirmBtn.disabled = true;
+							confirmBtn.innerHTML = `
+								<i class="bi bi-exclamation-triangle-fill me-1"></i>
+								Default odds detected
+							`;
+							confirmBtn.classList.remove("btn-success");
+							confirmBtn.classList.add("btn-danger");
+							confirmBtn.title = "Please adjust default odds (1.11 / 2.22 / 3.33) before importing.";
+						} else {
+							confirmBtn.disabled = false;
+							confirmBtn.innerHTML = "Confirm & Add Matches";
+							confirmBtn.classList.remove("btn-danger");
+							confirmBtn.classList.add("btn-success");
+							confirmBtn.removeAttribute("title");
+						}
+
+					});
+
+					clone.querySelectorAll("input[type='hidden']").forEach(i => i.remove());
+
+					body.appendChild(clone);
+				});
+
+
+				modal.show();
+			});
+
+			document.getElementById("confirmAddUpcoming")
+				.addEventListener("click", () => {
+					form.submit();
+			});
+		});
+
 	</script>
 }
