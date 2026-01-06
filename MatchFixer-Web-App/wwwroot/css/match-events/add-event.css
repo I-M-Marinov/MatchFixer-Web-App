@@ -643,6 +643,47 @@ table.responsive-stack td {
     font-weight: 500;
 }
 
+#reviewUpcomingModal .review-upcoming-matches-close-btn{
+    position: absolute !important;
+    top: 0.7em !important;
+    right: 0.7em !important;
+    font-size: 0.85em;
+}
+
+.pill-brand-red {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 800;
+    line-height: 1.5;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 50rem;
+    background-color: #dc3545; 
+    text-shadow: 0px 1px 1px black;
+}
+
+.has-default-odds .pill-brand-red {
+    animation: pulse-warning 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse-warning {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220,53,69,0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(220,53,69,0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(220,53,69,0);
+    }
+}
+
+
 /* Mobile stacking */
 @media (max-width: 1600.98px) {
     .team-cell {
