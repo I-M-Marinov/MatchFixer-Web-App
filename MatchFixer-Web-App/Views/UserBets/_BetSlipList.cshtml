@@ -167,36 +167,35 @@ else
 											        </td>
 											        <td>@bet.Odds.ToString("F2")x</td>
 											        <td>
-												        @if (bet.Status == "Voided")
+												        @switch (bet.Status)
 												        {
-													        <i class="bi bi-slash-circle"
-													           style="color:#6c757d;"
-													           title="Bet voided"></i>
-												        }
-												        else if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome == bet.SelectedOption)
-												        {
-													        <i class="ri-checkbox-circle-fill"
-													           style="color:#056301;"
-													           title="Won"></i>
-												        }
-												        else if (!string.IsNullOrEmpty(bet.Outcome) && bet.Outcome != bet.SelectedOption)
-												        {
-													        <i class="ri-close-circle-fill"
-													           style="color:#dc3545;"
-													           title="Lost"></i>
-												        }
-												        else
-												        {
-													        <i class="bi bi-question-circle"
-													           title="Pending"
-													           style="color:#ff6a00;"></i>
+													        case "Won":
+														        <i class="ri-checkbox-circle-fill"
+														           style="color:#056301;"
+														           title="Bet is won"></i>
+														        break;
+
+													        case "Lost":
+														        <i class="ri-close-circle-fill"
+														           style="color:#dc3545;"
+														           title="Bet is lost"></i>
+														        break;
+
+													        case "Voided":
+														        <i class="bi bi-slash-circle"
+														           style="color:#6c757d;"
+														           title="Bet was voided"></i>
+														        break;
+
+													        default: // Pending
+														        <i class="bi bi-question-circle"
+														           style="color:#ff6a00;"
+														           title="Bet is pending"></i>
+														        break;
 												        }
 
-												        @(
-												        bet.Status == "Voided"
-													        ? "Voided"
-													        : bet.Outcome
-												        )
+												        @(bet.Status == "Pending" ? "" : bet.Outcome)
+
 											        </td>
 
 										        </tr>
