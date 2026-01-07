@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
@@ -16,7 +17,7 @@ namespace MatchFixer.Core.Services
 		private readonly IUserContextService _userContextService;
 		private readonly ITimezoneService _timezoneService;
 
-		public WalletService(MatchFixerDbContext dbContext, 
+		public WalletService(MatchFixerDbContext dbContext,
 			IUserContextService userContextService,
 			ITimezoneService timezoneService)
 		{
@@ -138,7 +139,8 @@ namespace MatchFixer.Core.Services
 			wallet.Balance -= amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			var withdrawalTransaction = WalletTransactionFactory.CreateWithdrawalTransaction(wallet.Id, userId, amount, description);
+			var withdrawalTransaction =
+				WalletTransactionFactory.CreateWithdrawalTransaction(wallet.Id, userId, amount, description);
 
 			await _dbContext.WalletTransactions.AddAsync(withdrawalTransaction);
 			await _dbContext.SaveChangesAsync();
@@ -152,7 +154,7 @@ namespace MatchFixer.Core.Services
 
 			var wallet = await _dbContext.Wallets
 				.Include(w => w.Transactions)
-				.FirstOrDefaultAsync(w => w.UserId == userId);		
+				.FirstOrDefaultAsync(w => w.UserId == userId);
 
 			if (wallet == null)
 				return (false, WalletNotFound);
@@ -207,11 +209,13 @@ namespace MatchFixer.Core.Services
 			wallet.Balance += amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			var winningsTransaction = WalletTransactionFactory.CreateWinningsTransaction(wallet.Id, userId, amount, matchDescription);
+			var winningsTransaction =
+				WalletTransactionFactory.CreateWinningsTransaction(wallet.Id, userId, amount, matchDescription);
 
 			await _dbContext.WalletTransactions.AddAsync(winningsTransaction);
 			await _dbContext.SaveChangesAsync();
 		}
+
 		public async Task<bool> AwardBirthdayBonusAsync(Guid userId)
 		{
 			const decimal bonusAmount = 10m;
@@ -240,12 +244,29 @@ namespace MatchFixer.Core.Services
 
 			wallet.Balance += amount;
 
-			var transaction = WalletTransactionFactory.CreateBetRefundedTransaction(wallet.Id, userId, amount, betSlipId);
+			var transaction =
+				WalletTransactionFactory.CreateBetRefundedTransaction(wallet.Id, userId, amount, betSlipId);
 
 			await _dbContext.WalletTransactions.AddAsync(transaction);
 
 			return true;
 		}
 
+		public async Task<bool> HasTransactionForSlipAsync(
+			Guid userId,
+			WalletTransactionType type,
+			Guid betSlipId)
+		{
+			return await _dbContext.WalletTransactions
+				.AnyAsync(t =>
+					t.TransactionType == type &&
+					t.Reference.Contains(betSlipId.ToString()) &&
+					t.Wallet.UserId == userId
+				);
+		}
+
+
+
 	}
 }
+
