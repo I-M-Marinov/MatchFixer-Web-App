@@ -51,9 +51,19 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var slips = e.Bets.Select(b => b.BetSlip).Distinct().ToList();
 
 				decimal totalStake = slips.Sum(s => s.Amount);
-				decimal totalPayout = slips
-					.Where(s => s.IsSettled && s.WinAmount.HasValue)
-					.Sum(s => s.WinAmount.Value);
+
+				var winningSlips = slips
+					.Where(s =>
+						s.IsSettled &&
+						s.WinAmount.HasValue &&
+						s.WinAmount.Value > 0 &&
+						s.Bets
+							.Where(b => b.MatchEventId == e.Id)
+							.All(b => b.Status == BetStatus.Won || b.Status == BetStatus.Voided)
+					)
+					.ToList();
+
+				decimal totalPayout = winningSlips.Sum(s => s.WinAmount!.Value);
 
 				var matchResult = e.LiveResult;
 
@@ -128,11 +138,5 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			return result;
 		}
-
-
-
-
-
-
 	}
 }
