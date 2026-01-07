@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.ViewModels.Wallet;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure.Entities;
 
 namespace MatchFixer.Core.Contracts
@@ -16,6 +17,7 @@ namespace MatchFixer.Core.Contracts
 		Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription);
 		Task<bool> AwardBirthdayBonusAsync(Guid userId);
 		Task<bool> RefundBetAsync(Guid userId, decimal amount, Guid betSlipId);
+		Task<bool> HasTransactionForSlipAsync(Guid userId, WalletTransactionType type, Guid betSlipId);
 
 	}
 }
