@@ -69,10 +69,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					e.DrawOdds,
 					e.AwayOdds,
 
-					TotalBets = e.Bets.Count(b => b.Status == BetStatus.Pending),
-					HomeBets = e.Bets.Count(b => b.Status == BetStatus.Pending && b.Pick == MatchPick.Home),
-					DrawBets = e.Bets.Count(b => b.Status == BetStatus.Pending && b.Pick == MatchPick.Draw),
-					AwayBets = e.Bets.Count(b => b.Status == BetStatus.Pending && b.Pick == MatchPick.Away),
+					TotalBets = e.Bets.Count(),
+					HomeBets = e.Bets.Count(b => b.Pick == MatchPick.Home),
+					DrawBets = e.Bets.Count(b => b.Pick == MatchPick.Draw),
+					AwayBets = e.Bets.Count(b => b.Pick == MatchPick.Away),
+
 				})
 				.ToListAsync(ct);
 
@@ -134,7 +135,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var perLeg = await _db.Bets
 					.AsNoTracking()
-					.Where(b => eventIds.Contains(b.MatchEventId) && b.Status == BetStatus.Pending)
+					.Where(b => eventIds.Contains(b.MatchEventId))
 					.GroupBy(b => new { b.BetSlipId, b.MatchEventId })
 					.Select(g => new
 					{
