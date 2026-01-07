@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
+using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Bets;
 using Microsoft.EntityFrameworkCore;
@@ -36,16 +37,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.OrderByDescending(s => s.BetTime)
 				.ToListAsync();
 
-			// Helper to compute slip status from bets + slip flags
-			 static BetStatus ComputeSlipStatus(global::MatchFixer.Infrastructure.Entities.BetSlip s) 
-			{
-				if (!s.IsSettled) return BetStatus.Pending;
-
-				if (s.Bets.Any() && s.Bets.All(b => b.Status == BetStatus.Voided))
-					return BetStatus.Voided;
-
-				return (s.WinAmount ?? 0m) > 0m ? BetStatus.Won : BetStatus.Lost;
-			}
 
 			// Map to admin rows
 			var rows = slips.Select(s =>
@@ -96,6 +87,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		public async Task<AdminBetSlipDetailsViewModel?> GetSlipDetailsAsync(Guid slipId)
 		{
 			var slip = await _dbContext.BetSlips
+				.AsNoTracking()
 				.Include(s => s.Bets)
 					.ThenInclude(b => b.MatchEvent)
 						.ThenInclude(me => me.HomeTeam)
@@ -111,83 +103,30 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				return null;
 
 			/* -----------------------------
-			 * 1) EVALUATE EACH BET 
-			 * ----------------------------- */
-
-			bool anyBetUpdated = false;
-
-			foreach (var bet in slip.Bets)
-			{
-				if (bet.Status != BetStatus.Pending)
-					continue;
-
-				var result = bet.MatchEvent.LiveResult;
-				if (result == null)
-					continue;
-
-				var actualOutcome =
-					result.HomeScore > result.AwayScore ? MatchPick.Home :
-					result.HomeScore < result.AwayScore ? MatchPick.Away :
-					MatchPick.Draw;
-
-				bet.Status = bet.Pick == actualOutcome
-					? BetStatus.Won
-					: BetStatus.Lost;
-
-				anyBetUpdated = true;
-			}
-
-			if (anyBetUpdated)
-			{
-				await _dbContext.SaveChangesAsync();
-			}
-
-			/* -----------------------------
-			 * 2) CALCULATE TOTAL ODDS
+			 *  CALCULATE TOTAL ODDS (READ ONLY)
 			 * ----------------------------- */
 
 			decimal totalOdds = slip.Bets
 				.Where(b => b.Status != BetStatus.Voided)
 				.Aggregate(1m, (acc, b) => acc * b.Odds);
 
-			decimal? potentialReturn = slip.Amount * totalOdds;
+			decimal potentialReturn = slip.Amount * totalOdds;
 
 			/* -----------------------------
-			 * 3) DETERMINE SLIP STATUS 
+			 *  DETERMINE SLIP STATUS (PURE)
 			 * ----------------------------- */
 
-			BetStatus slipStatus;
+			var slipStatus = ComputeSlipStatus(slip);
 
-			if (slip.Bets.Any(b => b.Status == BetStatus.Pending))
+			decimal? winAmount = slipStatus switch
 			{
-				slipStatus = BetStatus.Pending;
-				slip.IsSettled = false;
-			}
-			else
-			{
-				slip.IsSettled = true;
-
-				if (slip.Bets.All(b => b.Status == BetStatus.Voided))
-				{
-					slipStatus = BetStatus.Voided;
-					slip.WinAmount = slip.Amount; // refund
-				}
-				else if (slip.Bets.Any(b => b.Status == BetStatus.Lost))
-				{
-					slipStatus = BetStatus.Lost;
-					slip.WinAmount = 0m;
-				}
-				else
-				{
-					slipStatus = BetStatus.Won;
-					slip.WinAmount = potentialReturn;
-				}
-
-				await _dbContext.SaveChangesAsync();
-			}
+				BetStatus.Won => potentialReturn,
+				BetStatus.Voided => slip.Amount,
+				_ => 0m
+			};
 
 			/* -----------------------------
-			 * 4) MAP VIEW MODEL
+			 *  MAP VIEW MODEL
 			 * ----------------------------- */
 
 			return new AdminBetSlipDetailsViewModel
@@ -196,7 +135,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				SlipStatus = slipStatus,
 
 				Stake = slip.Amount,
-				WinAmount = slip.WinAmount,
+				WinAmount = winAmount,
 				PotentialReturn = potentialReturn,
 
 				Selections = slip.Bets.Select(b => new AdminBetSlipSelectionDto
@@ -219,6 +158,21 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			};
 		}
 
+
+		// Helper to compute slip status from bets + slip flags
+		static BetStatus ComputeSlipStatus(BetSlip s)
+		{
+			if (s.Bets.Any(b => b.Status == BetStatus.Voided))
+				return BetStatus.Voided;
+
+			if (s.Bets.Any(b => b.Status == BetStatus.Lost))
+				return BetStatus.Lost;
+
+			if (s.Bets.Any(b => b.Status == BetStatus.Pending))
+				return BetStatus.Pending;
+
+			return BetStatus.Won;
+		}
 
 
 
