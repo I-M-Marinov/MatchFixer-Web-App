@@ -296,13 +296,18 @@
 							<td>
 								@if (ev.BoostActive != null)
 								{
-									<div class="d-flex flex-column align-items-center boost-timer-row"
-									     data-boost-end="@ev.BoostActive.EndUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")">
-										<div class="d-flex flex-column justify-content-center gap-1">
-											<span class="badge bg-success mb-1">Boost</span>
-											<span class="badge bg-success mb-1">Active!</span>
-										</div>
-										<span class="boost-countdown fw-bold"></span>
+									<div class="d-flex flex-column align-items-center gap-1">
+
+										<button type="button"
+										        class="btn btn-sm btn-outline-danger stop-boost-btn"
+										        data-boost-id="@ev.BoostActive.Id">
+											<i class="ri-stop-circle-line"></i>
+											Stop
+										</button>
+
+										<span class="boost-countdown fw-bold"
+										      data-boost-end="@ev.BoostActive.EndUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")">
+										</span>
 									</div>
 								}
 								else
@@ -676,29 +681,8 @@
 			});
 		});
 
-
 		document.addEventListener("DOMContentLoaded", () => {
-			document.querySelectorAll(".boost-timer-row").forEach(row => {
-				const countdown = row.querySelector(".boost-countdown");
-				const endTime = new Date(row.dataset.boostEnd); // parsed as UTC
-
-				function update() {
-					const now = new Date(); // local browser time
-					const diff = endTime.getTime() - now.getTime();
-
-					if (diff <= 0) {
-						countdown.textContent = "Expired";
-						return clearInterval(interval);
-					}
-
-					const minutes = Math.floor(diff / 1000 / 60);
-					const seconds = Math.floor((diff / 1000) % 60);
-					countdown.textContent = `${minutes}m ${seconds}s`;
-				}
-
-				update();
-				const interval = setInterval(update, 1000);
-			});
+			document.querySelectorAll(".boost-countdown").forEach(startBoostCountdown);
 		});
 
 
@@ -721,6 +705,25 @@
 			})
 
 			connection.on("MatchEventUpdated", function (update) {
+
+				if (update.activeBoostId === null) {
+
+					const row = document.querySelector(
+						`#live-events-table tr[data-match-id="${update.matchEventId}"]`
+					);
+					if (!row) return;
+
+					const boostCell = row.querySelector("td:nth-child(5)");
+					if (!boostCell) return;
+
+					boostCell.replaceChildren(
+						renderCreateBoostButton(update.matchEventId)
+					);
+
+					return; 
+				}
+
+
 				const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
 				if (!card) return;
 
@@ -1024,6 +1027,126 @@
 					form.submit();
 			});
 		});
+
+
+		document.addEventListener("click", async function (e) {
+
+			const btn = e.target.closest(".stop-boost-btn");
+			if (!btn) return;
+
+			const boostId = btn.dataset.boostId;
+			if (!boostId) return;
+
+			if (!confirm("Stop this boost immediately?")) return;
+
+			// disable to prevent double clicks
+			btn.disabled = true;
+
+			try {
+				const token = document.querySelector(
+					"input[name='__RequestVerificationToken']"
+				)?.value;
+
+				const res = await fetch("/Event/StopOddsBoost", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"RequestVerificationToken": token
+					},
+					body: JSON.stringify({ oddsBoostId: boostId })
+				});
+
+				if (!res.ok) {
+					throw new Error("Failed to stop boost");
+				}
+
+				location.reload(); // RELOAD THE PAGE ! 
+
+			} catch (err) {
+				console.error(err);
+				alert("Failed to stop boost.");
+				btn.disabled = false;
+			}
+		});
+
+		function renderCreateBoostButton(matchEventId) {
+
+			const wrapper = document.createElement("span");
+			wrapper.className = "custom-tooltip-wrapper";
+
+			const button = document.createElement("button");
+			button.type = "button";
+			button.className = "btn btn-sm btn-warning create-boost-btn";
+			button.setAttribute("data-bs-toggle", "modal");
+			button.setAttribute("data-bs-target", "#createBoostModal");
+			button.setAttribute("data-match-id", matchEventId);
+
+			const icon = document.createElement("i");
+			icon.className = "ri-fire-fill";
+
+			button.appendChild(icon);
+
+			const tooltip = document.createElement("span");
+			tooltip.className = "custom-tooltip text-bg-warning";
+			tooltip.textContent = "Add an odds boost for this game";
+
+			wrapper.appendChild(button);
+			wrapper.appendChild(tooltip);
+
+			return wrapper;
+		}
+
+		function renderActiveBoostControls(boostId, boostEndUtc) {
+
+			const container = document.createElement("div");
+			container.className = "d-flex flex-column align-items-center gap-1";
+
+			const stopBtn = document.createElement("button");
+			stopBtn.type = "button";
+			stopBtn.className = "btn btn-sm btn-outline-danger stop-boost-btn";
+			stopBtn.dataset.boostId = boostId;
+
+			const icon = document.createElement("i");
+			icon.className = "ri-stop-circle-line";
+			stopBtn.appendChild(icon);
+			stopBtn.append(" Stop");
+
+			const countdown = document.createElement("span");
+			countdown.className = "boost-countdown fw-bold";
+			countdown.dataset.boostEnd = boostEndUtc;
+
+			container.appendChild(stopBtn);
+			container.appendChild(countdown);
+
+			return container;
+		}
+
+
+		function startBoostCountdown(countdownEl) {
+			if (!countdownEl) return;
+
+			const endTime = new Date(countdownEl.dataset.boostEnd);
+			let intervalId = null;
+
+			function update() {
+				const now = new Date(); // local browser time
+				const diff = endTime.getTime() - now.getTime();
+
+				if (diff <= 0) {
+					countdownEl.textContent = "Expired";
+					clearInterval(intervalId);
+					return;
+				}
+
+				const minutes = Math.floor(diff / 1000 / 60);
+				const seconds = Math.floor((diff / 1000) % 60);
+				countdownEl.textContent = `${minutes}m ${seconds}s`;
+			}
+
+			update();
+			intervalId = setInterval(update, 1000);
+		}
+
 
 	</script>
 }
