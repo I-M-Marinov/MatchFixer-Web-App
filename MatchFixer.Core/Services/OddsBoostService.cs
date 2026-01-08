@@ -25,8 +25,10 @@ namespace MatchFixer.Core.Services
 			var now = DateTime.UtcNow;
 
 			var boost = await _dbContext.OddsBoosts
-				.Where(b => b.MatchEventId == matchEventId && b.IsActive && b.StartUtc <= now && b.EndUtc > now)
-				.OrderByDescending(b => b.BoostValue) // get the boost with the most value ( ex. if there is a 0.10 and 0.11 boosts it will get the 0.11 ) 
+				.AsNoTracking()
+				.Where(b => b.MatchEventId == matchEventId && b.StartUtc <= now && b.EndUtc > now)
+				.OrderByDescending(b => b.BoostValue)
+				.ThenBy(b => b.StartUtc)
 				.FirstOrDefaultAsync(ct);
 
 			if (boost is null)
@@ -131,6 +133,63 @@ namespace MatchFixer.Core.Services
 				boostEndUtc: end,           
 				maxStake: maxStakePerBet ?? 0m,
 				maxUses: maxUsesPerUser ?? 0
+			);
+
+			return boost;
+		}
+
+		public async Task<OddsBoost?> StopOddsBoostAsync(Guid oddsBoostId, Guid stoppedByUserId, CancellationToken ct = default)
+		{
+			var now = DateTime.UtcNow;
+
+			var boost = await _dbContext.OddsBoosts
+				.Include(b => b.MatchEvent)
+				.ThenInclude(m => m.HomeTeam)
+				.Include(b => b.MatchEvent)
+				.ThenInclude(m => m.AwayTeam)
+				.FirstOrDefaultAsync(b => b.Id == oddsBoostId, ct);
+
+			if (boost is null)
+				throw new InvalidOperationException("Odds boost not found.");
+
+			// If already ended, ensure flag is consistent and return
+			if (!boost.IsActive || boost.EndUtc <= now)
+			{
+				if (boost.IsActive)
+				{
+					boost.IsActive = false;
+					boost.EndUtc = now;
+					await _dbContext.SaveChangesAsync(ct);
+				}
+
+				return boost;
+			}
+
+			// Mark ended now
+			boost.EndUtc = now;
+			boost.IsActive = false;
+
+			await _dbContext.SaveChangesAsync(ct);
+
+			// Notify subscribers
+			var match = boost.MatchEvent;
+			var baseHome = match?.HomeOdds ?? 0m;
+			var baseDraw = match?.DrawOdds ?? 0m;
+			var baseAway = match?.AwayOdds ?? 0m;
+
+			var effHome = Math.Round(baseHome, 2, MidpointRounding.AwayFromZero);
+			var effDraw = Math.Round(baseDraw, 2, MidpointRounding.AwayFromZero);
+			var effAway = Math.Round(baseAway, 2, MidpointRounding.AwayFromZero);
+
+			await _notifier.NotifyMatchEventUpdatedAsync(
+				boost.MatchEventId,
+				baseHome,
+				baseDraw,
+				baseAway,
+				effectiveHomeOdds: effHome,
+				effectiveDrawOdds: effDraw,
+				effectiveAwayOdds: effAway,
+				activeBoostId: null
 			);
 
 			return boost;
