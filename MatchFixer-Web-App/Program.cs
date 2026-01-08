@@ -69,7 +69,8 @@ builder.Services.AddScoped<IAdminTrophyService, AdminTrophyService>();					// Ad
 
 builder.Services.AddHttpClient<WikipediaService>();                             // Add the Wikipedia Service ( HTTP Client ) 
 builder.Services.AddScoped<IWikipediaService, WikipediaService>();              // Add the Wikipedia Service 
-builder.Services.AddHostedService<UserCleanupService>();						// Add User Cleanup Service ( background service ) 
+builder.Services.AddHostedService<UserCleanupService>();                        // Add User Cleanup Service ( background service ) 
+builder.Services.AddHostedService<ExpiredBoostCleanupService>();                // Add the Expired Boosts Cleanup Service ( background service ) 
 builder.Services.AddHostedService<BirthdayEmailService>();						// Add User Birthday Email Service ( background service that runs once a day ! ) 
 builder.Services.AddScoped<ITimezoneService, TimezoneService>();				// Add the Timezone Service ( NodaTime )
 builder.Services.AddHttpContextAccessor();                                      // Add HTTP Context Accessor
