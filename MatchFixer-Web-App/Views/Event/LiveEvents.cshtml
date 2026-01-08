@@ -607,6 +607,25 @@
 		})
 
 		connection.on("MatchEventUpdated", function (update) {
+
+			if (update.activeBoostId === null) {
+				const card = document.querySelector(
+					`[data-match-id="${update.matchEventId}"]`
+				);
+				if (!card) return;
+
+				// Kill boost timers
+				const timerRow = card.querySelector(".boost-timer-row");
+				if (timerRow) resetBoost(timerRow);
+
+				// Clear stored boost odds
+				["Home", "Draw", "Away"].forEach(opt => {
+					localStorage.removeItem(`boost_${update.matchEventId}_${opt}`);
+				});
+
+				return; // IMPORTANT: stop further boost logic
+			}
+
 			const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
 			if (!card) return;
 
@@ -781,26 +800,43 @@
 	});
 
 	function resetBoost(row) {
+
+		// 0. Resolve card once
+		const cardEl = row.closest(".event-card");
+
+		// 0.1 Clear boost timers safely
+		if (cardEl) {
+			const key = cardEl.dataset.matchId;
+			const timers = boostTimers.get(key);
+			if (timers) {
+				if (timers.start) clearTimeout(timers.start);
+				if (timers.stop) clearTimeout(timers.stop);
+				boostTimers.delete(key);
+			}
+		}
+
 		// 1. Find the enclosing card-body (container for background + options)
 		const cardBody = row.closest(".card-body");
 		if (!cardBody) return;
 
 		// 2. Reset all .bet-option buttons
-		const betOptions = cardBody.querySelectorAll(".bet-option");
-		betOptions.forEach(btn => {
+		cardBody.querySelectorAll(".bet-option").forEach(btn => {
 			btn.classList.remove("boosted");
 		});
 
 		// 3. Reset ALL bet-option pills (badges)
-		const pills = cardBody.querySelectorAll(".bet-trigger .badge");
-		pills.forEach(pill => {
+		cardBody.querySelectorAll(".bet-trigger .badge").forEach(pill => {
 			const oldOdds = pill.querySelector(".old-odds");
 			if (!oldOdds) return;
 
 			const baseOdds = oldOdds.textContent.trim();
 
 			// Remove boosted classes
-			pill.classList.remove("pill-boosted-green", "pill-boosted-blue", "pill-boosted-yellow");
+			pill.classList.remove(
+				"pill-boosted-green",
+				"pill-boosted-blue",
+				"pill-boosted-yellow"
+			);
 
 			// Restore brand classes
 			if (pill.dataset.option === "Home") pill.classList.add("pill-brand-blue");
@@ -811,25 +847,29 @@
 			pill.dataset.hasBoost = "false";
 			pill.dataset.odds = baseOdds;
 
-			// Reset markup to just the base odds
-			pill.innerHTML = baseOdds;
+			// Reset markup
+			pill.textContent = baseOdds;
 		});
 
+		// 4. Reset container visuals
 		cardBody.classList.remove("boosted-match-container-effects");
+
 		if (cardBody.dataset.isDerby === "true") {
 			cardBody.classList.add("derby-match-container-effects");
 		}
 
-		const card = cardBody.closest(".event-card");
-		if (card) {
-			card.dataset.hasBoost = "false";
+		// 5. Reset card dataset
+		if (cardEl) {
+			cardEl.dataset.hasBoost = "false";
 		}
-	
-		row.remove();
-		
-		syncBoostedDatePill();
 
+		// 6. Remove boost timer row
+		row.remove();
+
+		// 7. Sync boosted date pill
+		syncBoostedDatePill();
 	}
+
 
 	function activateBoost(row, boostData) {
 		const cardBody = row.closest(".card-body");
