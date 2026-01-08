@@ -18,5 +18,7 @@ namespace MatchFixer.Core.Contracts
 			int? maxUsesPerUser = null,
 			string? note = null,
 			CancellationToken ct = default);
+
+		Task<OddsBoost?> StopOddsBoostAsync(Guid oddsBoostId, Guid stoppedByUserId, CancellationToken ct = default);
 	}
 }
