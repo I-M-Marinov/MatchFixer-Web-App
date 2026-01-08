@@ -394,24 +394,24 @@ document.addEventListener("DOMContentLoaded", function () {
         if (b?.timerId) clearInterval(b.timerId);
       }
 
-      function removeBoost(id){
-        const sid = String(id);
-        stopCountdown(sid);
-        boosts.delete(sid);
-        activeOriginalIds.delete(sid);
+        function removeBoost(id) {
+          const sid = String(id);
 
-        const track = getTrack();
-        const real = document.getElementById(carouselCardId(sid));
-        if (real && track && real.parentElement === track) real.remove();
+          stopCountdown(sid);
+          boosts.delete(sid);
+          activeOriginalIds.delete(sid);
 
-        if (track){
-          Array.from(track.querySelectorAll(`.boost-card[data-kind='boost'][data-dup='1']`))
-            .filter(n => n.dataset.boostId === sid)
-            .forEach(n => n.remove());
+          const real = document.getElementById(carouselCardId(sid));
+          if (real) real.remove();
+
+          // 🧹 ALSO remove any clones
+          const track = getTrack();
+          if (track) {
+            track.querySelectorAll(
+              `.boost-card[data-kind='boost'][data-boost-id='${sid}']`
+            ).forEach(n => n.remove());
+          }
         }
-
-        enforceCarouselLayout();
-      }
 
       // Enable/disable scroll when we do/do not clone
 
@@ -459,7 +459,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
           curr = getOriginalBoostCards();
 
-          // --- CHANGED LOGIC STARTS HERE ---
           // Always show the info card; text depends on count
 
           clearEmptyState(); 
@@ -557,18 +556,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-      function handleMatchEventUpdated(msg){
-        const id = String(msg.matchEventId);
-        updateMainCardOnMatchUpdated(msg);
+    function handleMatchEventUpdated(msg) {
+      const id = String(msg.matchEventId);
 
-        if (msg.activeBoostId) {
-          const card = document.getElementById(carouselCardId(id)) || ensureCarouselCard(msg);
-          updateCarouselOdds(card, msg);
-        } else {
-          removeBoost(id);
-        }
-        enforceCarouselLayout();
+      updateMainCardOnMatchUpdated(msg);
+
+      // BOOST STOPPED
+      if (!msg.activeBoostId) {
+        removeBoost(id);           // removes card + stops countdown
+        clearInfoCard();           // ensure stale info card is gone
+        enforceCarouselLayout();   // recalculates empty/info/scroll
+        return;
       }
+
+      // BOOST STILL ACTIVE
+      const card =
+        document.getElementById(carouselCardId(id)) ||
+        ensureCarouselCard(msg);
+
+        updateCarouselOdds(card, msg);
+        updateCarouselLimits(card, msg);
+        enforceCarouselLayout();
+    }
+
 
       // ---------- SIGNALR ----------
       const connection = new signalR.HubConnectionBuilder()
