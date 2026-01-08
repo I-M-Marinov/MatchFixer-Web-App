@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.ViewModels.DTO;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure.Models.FootballAPI;
 using MatchFixer.Infrastructure.Security;
@@ -223,6 +224,33 @@ namespace MatchFixer_Web_App.Controllers
 
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
+
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> StopOddsBoost([FromBody] StopOddsBoostRequest model)
+		{
+			if (model == null || model.OddsBoostId == Guid.Empty)
+				return BadRequest("Invalid boost id.");
+
+			try
+			{
+				var user = await _userContextService.GetCurrentUserAsync();
+
+				await _oddsBoostService.StopOddsBoostAsync(
+					model.OddsBoostId,
+					user.Id
+				);
+
+				return Ok(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new { success = false, message = ex.Message });
+			}
+		}
+
 
 	}
 }
