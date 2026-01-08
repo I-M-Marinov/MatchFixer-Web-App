@@ -135,6 +135,7 @@ namespace MatchFixer.Core.Services
 
 					BoostActive = activeBoostEntity != null ? new BoostViewModel
 					{
+						Id = activeBoostEntity.Id,
 						BoostValue = activeBoostEntity.BoostValue,
 						StartUtc = activeBoostEntity.StartUtc,
 						EndUtc = activeBoostEntity.EndUtc,
