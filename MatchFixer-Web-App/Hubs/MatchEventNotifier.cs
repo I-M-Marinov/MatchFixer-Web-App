@@ -27,19 +27,29 @@ namespace MatchFixer_Web_App.Hubs
 			decimal? effectiveAwayOdds = null,
 			Guid? activeBoostId = null)
 		{
-			return _hubContext.Clients
-				.Group(matchEventId.ToString())
-				.SendAsync("MatchEventUpdated", new
-				{
-					matchEventId,
-					homeOdds,
-					drawOdds,
-					awayOdds,
-					effectiveHomeOdds = effectiveHomeOdds ?? homeOdds,
-					effectiveDrawOdds = effectiveDrawOdds ?? drawOdds,
-					effectiveAwayOdds = effectiveAwayOdds ?? awayOdds,
-					activeBoostId
-				});
+			var payload = new
+			{
+				matchEventId,
+				homeOdds,
+				drawOdds,
+				awayOdds,
+				effectiveHomeOdds = effectiveHomeOdds ?? homeOdds,
+				effectiveDrawOdds = effectiveDrawOdds ?? drawOdds,
+				effectiveAwayOdds = effectiveAwayOdds ?? awayOdds,
+				activeBoostId
+			};
+
+			return Task.WhenAll(
+				// Match-specific listeners (live events, match cards)
+				_hubContext.Clients
+					.Group(matchEventId.ToString())
+					.SendAsync("MatchEventUpdated", payload),
+
+				// Boost carousel listeners 
+				_hubContext.Clients
+					.Group(MatchEventHub.BoostWatchers)
+					.SendAsync("MatchEventUpdated", payload)
+			);
 		}
 
 		public Task NotifyBoostStartedAsync(
