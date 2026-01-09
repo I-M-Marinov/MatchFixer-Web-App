@@ -10,7 +10,7 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly IServiceScopeFactory _scopeFactory;
 		private readonly ILogger<ExpiredBoostCleanupService> _logger;
-		private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
+		private readonly TimeSpan _interval = TimeSpan.FromMinutes(15);
 
 		public ExpiredBoostCleanupService(
 			IServiceScopeFactory scopeFactory,
