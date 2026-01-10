@@ -49,8 +49,8 @@ namespace MatchFixer.Core.Services
 					return Task.FromResult(ctx.UserBets.Any(b =>
 					{
 						var localBetTime = _timezoneService.ConvertToUserTime(b.BetTime, ctx.User.TimeZone);
-						return localBetTime.TimeOfDay >= TimeSpan.FromHours(5) &&
-						       localBetTime.TimeOfDay <= TimeSpan.FromHours(8);
+						return localBetTime.Value.TimeOfDay >= TimeSpan.FromHours(5) &&
+						       localBetTime.Value.TimeOfDay <= TimeSpan.FromHours(8);
 					}));
 				},
 
@@ -62,8 +62,8 @@ namespace MatchFixer.Core.Services
 					return Task.FromResult(ctx.UserBets.Any(b =>
 					{
 						var localBetTime = _timezoneService.ConvertToUserTime(b.BetTime, ctx.User.TimeZone);
-						return localBetTime.TimeOfDay >= TimeSpan.Zero &&
-						       localBetTime.TimeOfDay <= TimeSpan.FromHours(4);
+						return localBetTime.Value.TimeOfDay >= TimeSpan.Zero &&
+						       localBetTime.Value.TimeOfDay <= TimeSpan.FromHours(4);
 					}));
 				},
 
@@ -75,17 +75,23 @@ namespace MatchFixer.Core.Services
 					return Task.FromResult(ctx.UserBets.Any(b =>
 					{
 						var localBetTime = _timezoneService.ConvertToUserTime(b.BetTime, ctx.User.TimeZone);
-						return localBetTime.DayOfWeek == DayOfWeek.Saturday ||
-						       localBetTime.DayOfWeek == DayOfWeek.Sunday;
+						return localBetTime.Value.DayOfWeek == DayOfWeek.Saturday ||
+						       localBetTime.Value.DayOfWeek == DayOfWeek.Sunday;
 					}));
 				},
 
 				[TrophyNames.LastMinuteLeak] = async ctx =>
 					await ctx.DbContext.Set<Bet>()
 						.Include(b => b.MatchEvent)
-						.Where(b => b.BetSlip.UserId == ctx.UserId &&
-						            b.MatchEvent != null &&
-						            EF.Functions.DateDiffMinute(b.BetTime, b.MatchEvent.MatchDate) <= 5)
+						.Where(b =>
+							b.BetSlip.UserId == ctx.UserId &&
+							b.MatchEvent != null &&
+							b.MatchEvent.MatchDate != null &&  
+							EF.Functions.DateDiffMinute(
+								b.BetTime,
+								b.MatchEvent.MatchDate.Value
+							) <= 5
+						)
 						.AnyAsync(),
 
 				// Special dates
@@ -121,7 +127,7 @@ namespace MatchFixer.Core.Services
 							.GroupBy(b =>
 								_timezoneService
 									.ConvertToUserTime(b.BetTime, ctx.User.TimeZone)
-									.Date
+									.Value.Date
 							)
 							.Any(g => g.Count() >= 5)
 					);
@@ -149,7 +155,7 @@ namespace MatchFixer.Core.Services
 							.GroupBy(b =>
 								_timezoneService
 									.ConvertToUserTime(b.BetTime, ctx.User.TimeZone)
-									.Date
+									.Value.Date
 							)
 							.Any(g => g.Count() >= 5)
 					);
