@@ -23,6 +23,8 @@
 			["AVS"] = "AVS Futebol SAD",
 			["Gil Vicente"] = "Gil Vicente F.C.",
 			["Rio Ave"] = "Rio Ave F.C.",
+			["Santa Clara"] = "C.D. Santa Clara",
+			["Nacional"] = "C.D. Nacional",
 
 
 			// German clubs
