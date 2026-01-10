@@ -51,10 +51,18 @@ namespace MatchFixer.Core.Services
 			var user = await _userContextService.GetCurrentUserAsync();
 
 			var events = await _dbContext.MatchEvents
-				.Where(e => e.MatchDate > now && e.LiveResult == null && e.IsCancelled != true)
+				.Where(e =>
+					e.LiveResult == null &&
+					e.IsCancelled != true &&
+					(
+						e.IsPostponed ||
+						e.MatchDate > now
+					)
+				)
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
-				.OrderBy(e => e.MatchDate)
+				.OrderBy(e => e.IsPostponed)
+				.ThenBy(e => e.MatchDate)
 				.ToListAsync();
 
 			var result = new List<LiveEventViewModel>();
@@ -69,7 +77,9 @@ namespace MatchFixer.Core.Services
 					Id = e.Id,
 					HomeTeam = e.HomeTeam.Name,
 					AwayTeam = e.AwayTeam.Name,
-					KickoffTime = DateTime.SpecifyKind(e.MatchDate, DateTimeKind.Utc),
+					KickoffTime = e.MatchDate.HasValue
+						? DateTime.SpecifyKind(e.MatchDate.Value, DateTimeKind.Utc)
+						: null,
 					HomeWinOdds = e.HomeOdds ?? 0,
 					DrawOdds = e.DrawOdds ?? 0,
 					AwayWinOdds = e.AwayOdds ?? 0,
@@ -81,6 +91,7 @@ namespace MatchFixer.Core.Services
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					IsDerby = e.IsDerby,
+					IsPostponed = e.IsPostponed,
 					UserTimeZone = user.TimeZone,
 					ApiFixtureId = e.ApiFixtureId
 				});
@@ -100,8 +111,16 @@ namespace MatchFixer.Core.Services
 				.Include(e => e.AwayTeam)
 				.Include(e => e.LiveResult)
 				.Include(e => e.OddsBoosts)
-				.Where(e => e.LiveResult == null && e.IsCancelled != true && e.MatchDate > cutoff) // Only upcoming matches + result submitted yet + matches that are not already voided
-				.OrderBy(e => e.MatchDate)
+				.Where(e =>
+					e.LiveResult == null &&
+					e.IsCancelled != true &&
+					(
+						e.IsPostponed ||
+						e.MatchDate > cutoff
+					)
+				)
+				.OrderBy(e => e.IsPostponed)
+				.ThenBy(e => e.MatchDate)
 				.AsNoTracking()
 				.ToListAsync();
 
@@ -119,8 +138,9 @@ namespace MatchFixer.Core.Services
 					Id = e.Id,
 					HomeTeam = e.HomeTeam.Name,
 					AwayTeam = e.AwayTeam.Name,
-					KickoffTime = DateTime.SpecifyKind(e.MatchDate, DateTimeKind.Utc),
-
+					KickoffTime = e.MatchDate.HasValue
+						? DateTime.SpecifyKind(e.MatchDate.Value, DateTimeKind.Utc)
+						: null,
 					HomeWinOdds = e.HomeOdds ?? 0,
 					DrawOdds = e.DrawOdds ?? 0,
 					AwayWinOdds = e.AwayOdds ?? 0,
@@ -151,9 +171,12 @@ namespace MatchFixer.Core.Services
 					IsCancelled = e.IsCancelled,
 					MatchStatus = e.IsCancelled
 						? "Cancelled"
-						: e.MatchDate <= now
-							? "Started"
-							: "Live"
+						: e.IsPostponed
+							? "Postponed"
+							: e.MatchDate <= now
+								? "Started"
+								: "Live"
+
 				};
 			}).ToList();
 
@@ -250,7 +273,7 @@ namespace MatchFixer.Core.Services
 			return teamsByLeague;
 		}
 
-		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime kickoffTime)
+		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime)
 		{
 			var userId = _userContextService.GetUserId();
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
@@ -425,6 +448,35 @@ namespace MatchFixer.Core.Services
 				$"Team '{teamName}' not found in database. Seed teams first."
 			);
 		}
+
+		public async Task<bool> PostponeMatchEventAsync(Guid matchEventId, Guid userId)
+		{
+			var match = await _dbContext.MatchEvents
+				.FirstOrDefaultAsync(m => m.Id == matchEventId);
+
+			if (match == null)
+				throw new InvalidOperationException("Match not found.");
+
+			match.IsPostponed = true;
+
+			// Optional but recommended
+			match.MatchDate = null;
+
+			// Hard stop any boosts (clean state)
+			var activeBoosts = await _dbContext.OddsBoosts
+				.Where(b => b.MatchEventId == matchEventId && b.IsActive)
+				.ToListAsync();
+
+			foreach (var boost in activeBoosts)
+			{
+				boost.IsActive = false;
+				boost.EndUtc = DateTime.UtcNow;
+			}
+
+			await _dbContext.SaveChangesAsync();
+			return true;
+		}
+
 
 	}
 }
