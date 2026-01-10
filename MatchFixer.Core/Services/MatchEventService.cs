@@ -458,8 +458,6 @@ namespace MatchFixer.Core.Services
 				throw new InvalidOperationException("Match not found.");
 
 			match.IsPostponed = true;
-
-			// Optional but recommended
 			match.MatchDate = null;
 
 			// Hard stop any boosts (clean state)
