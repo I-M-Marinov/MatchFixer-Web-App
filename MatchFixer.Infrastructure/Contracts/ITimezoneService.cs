@@ -5,10 +5,10 @@ namespace MatchFixer.Infrastructure.Contracts
 	{
 		IEnumerable<string> GetTimezonesForCountry(string countryCode);
 		Task<bool> IsValidTimezoneAsync(string countryCode, string timezone);
-		DateTime ConvertToUserTime(DateTime utcTime, string timeZoneId);
-		string FormatForUser(DateTime utcTime, string timeZoneId, string culture);
-		string FormatForUserBets(DateTime utcTime, string timeZoneId, string culture = "en-US");
-		string FormatForUserExact(DateTime utcTime, string timeZoneId, string format, IFormatProvider? provider = null); // Admin Area
+		DateTime? ConvertToUserTime(DateTime? utcTime, string timeZoneId);
+		string FormatForUser(DateTime? utcTime, string timeZoneId, string culture);
+		string FormatForUserBets(DateTime? utcTime, string timeZoneId, string culture = "en-US");
+		string FormatForUserExact(DateTime? utcTime, string timeZoneId, string format, IFormatProvider? provider = null); // Admin Area
 	}
 }
 

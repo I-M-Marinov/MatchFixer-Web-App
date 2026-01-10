@@ -53,12 +53,18 @@ namespace MatchFixer.Infrastructure.Services
 			}
 		}
 
-		public DateTime ConvertToUserTime(DateTime utcTime, string timeZoneId)
+		public DateTime? ConvertToUserTime(DateTime? utcTime, string timeZoneId)
 		{
+			if (!utcTime.HasValue)
+				return null;
+
 			try
 			{
-				var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-				return TimeZoneInfo.ConvertTimeFromUtc(utcTime, timeZone);
+				var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+				return TimeZoneInfo.ConvertTimeFromUtc(
+					DateTime.SpecifyKind(utcTime.Value, DateTimeKind.Utc),
+					tz
+				);
 			}
 			catch (TimeZoneNotFoundException)
 			{
@@ -66,25 +72,56 @@ namespace MatchFixer.Infrastructure.Services
 			}
 		}
 
-		public string FormatForUser(DateTime utcTime, string timeZoneId, string culture = "en-US")
+		public string FormatForUser(DateTime? utcTime, string timeZoneId, string culture = "en-US")
 		{
 			var localTime = ConvertToUserTime(utcTime, timeZoneId);
-			return localTime.ToString("g", CultureInfo.GetCultureInfo(culture));
+
+			if (!localTime.HasValue)
+				return "TBA";
+
+			return localTime.Value.ToString(
+				"g",
+				CultureInfo.GetCultureInfo(culture)
+			);
 		}
 
-		public string FormatForUserBets(DateTime utcTime, string timeZoneId, string culture = "en-US")
+
+		public string FormatForUserBets(DateTime? utcTime, string timeZoneId, string culture = "en-US")
 		{
 			var localTime = ConvertToUserTime(utcTime, timeZoneId);
-			return localTime.ToString("ddd, MMM d, hh:mm tt", CultureInfo.GetCultureInfo(culture));
+
+			if (!localTime.HasValue)
+				return "TBA";
+
+			return localTime.Value.ToString(
+				"ddd, MMM d, hh:mm tt",
+				CultureInfo.GetCultureInfo(culture)
+			);
 		}
 
-		// overload for the Admin Area 
-		public string FormatForUserExact(DateTime utcTime, string timeZoneId, string format, IFormatProvider? provider = null)
+		// overload for the Admin Area
+		public string FormatForUserExact(DateTime? utcTime, string timeZoneId, string format, IFormatProvider? provider = null)
 		{
-			var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-			var local = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcTime, DateTimeKind.Utc), tz);
-			return local.ToString(format, provider ?? CultureInfo.InvariantCulture);
+			if (!utcTime.HasValue)
+				return "TBA";
+
+			try
+			{
+				var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+
+				var local = TimeZoneInfo.ConvertTimeFromUtc(
+					DateTime.SpecifyKind(utcTime.Value, DateTimeKind.Utc),
+					tz
+				);
+
+				return local.ToString(format, provider ?? CultureInfo.InvariantCulture);
+			}
+			catch (TimeZoneNotFoundException)
+			{
+				return utcTime.Value.ToString(format, provider ?? CultureInfo.InvariantCulture);
+			}
 		}
+
 
 	}
 
