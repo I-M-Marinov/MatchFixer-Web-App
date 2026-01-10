@@ -8,7 +8,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public Guid Id { get; set; }
 		public string HomeTeam { get; set; }
 		public string AwayTeam { get; set; }
-		public DateTime KickoffTime { get; set; }
+		public DateTime? KickoffTime { get; set; }
 
 		// Base odds
 		public decimal HomeWinOdds { get; set; }
@@ -29,6 +29,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public bool IsDerby { get; set; }
 		public string UserTimeZone { get; set; }
 		public bool IsCancelled { get; set; }
+		public bool IsPostponed { get; set; }
 		public string MatchStatus { get; set; } = "Scheduled";
 		public BoostViewModel? BoostActive { get; set; }
 		public int? ApiFixtureId { get; set; }
