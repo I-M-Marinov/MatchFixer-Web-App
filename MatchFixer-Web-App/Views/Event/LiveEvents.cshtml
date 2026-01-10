@@ -69,7 +69,12 @@
 				@foreach (var match in Model)
 				{
 					<div class="col">
-						<div class="event-card position-relative" data-match-id="@match.Id" data-kickoff="@match.KickoffTime.ToString("o")" data-user-tz="@match.UserTimeZone" data-has-boost="@(match.ActiveBoost != null ? "true" : "false")">
+						<div class="event-card position-relative"
+						     data-match-id="@match.Id"
+						     data-kickoff="@(match.KickoffTime?.ToString("o") ?? "")"
+						     data-user-tz="@match.UserTimeZone"
+						     data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
+						     data-postponed="@(match.IsPostponed ? "true" : "false")">
 
 
 								<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
@@ -117,190 +122,207 @@
 									<div class="d-flex justify-content-around mb-3">
 
 										<div class="tw-overflow-x-auto">
-											<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden">
-												<thead class="tw-bg-gray-50 tw-shadow">
-												<tr>
+											@if (!match.IsPostponed)
+											{
+												<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden">
+													<thead class="tw-bg-gray-50 tw-shadow">
+													<tr>
 														<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="0"
-													    data-match-id="@match.Id"
-													    data-home="@match.HomeTeam"
-													    data-away="@match.AwayTeam"
-													    data-home-logo-url="@match.HomeTeamLogoUrl"
-													    data-away-logo-url="@match.AwayTeamLogoUrl"
-													    data-option="Home"
-													    data-odds="@match.HomeWinOdds"
-													    data-start-time="@match.KickoffTime.ToString("o")">
+														    data-match-id="@match.Id"
+														    data-home="@match.HomeTeam"
+														    data-away="@match.AwayTeam"
+														    data-home-logo-url="@match.HomeTeamLogoUrl"
+														    data-away-logo-url="@match.AwayTeamLogoUrl"
+														    data-option="Home"
+														    data-odds="@match.HomeWinOdds"
+														    data-start-time="@(match.KickoffTime?.ToString("o") ?? "")">
 
 															<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
 																Home
 															</button>
-													</th>
+														</th>
 														<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="1"
-													    data-match-id="@match.Id"
-													    data-home="@match.HomeTeam"
-													    data-away="@match.AwayTeam"
-													    data-home-logo-url="@match.HomeTeamLogoUrl"
-													    data-away-logo-url="@match.AwayTeamLogoUrl"
-													    data-option="Draw"
-													    data-odds="@match.DrawOdds" 
-													    data-start-time="@match.KickoffTime.ToString("o")">
+														    data-match-id="@match.Id"
+														    data-home="@match.HomeTeam"
+														    data-away="@match.AwayTeam"
+														    data-home-logo-url="@match.HomeTeamLogoUrl"
+														    data-away-logo-url="@match.AwayTeamLogoUrl"
+														    data-option="Draw"
+														    data-odds="@match.DrawOdds"
+															data-start-time="@(match.KickoffTime?.ToString("o") ?? "")">
 
 															<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
 																Draw
 															</button>
-													</th>
+														</th>
 														<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="2"
-													    data-match-id="@match.Id"
-													    data-home="@match.HomeTeam"
-													    data-away="@match.AwayTeam"
-													    data-home-logo-url="@match.HomeTeamLogoUrl"
-													    data-away-logo-url="@match.AwayTeamLogoUrl"
-													    data-option="Away"
-													    data-odds="@match.AwayWinOdds"
-													    data-start-time="@match.KickoffTime.ToString("o")">
-													    
+														    data-match-id="@match.Id"
+														    data-home="@match.HomeTeam"
+														    data-away="@match.AwayTeam"
+														    data-home-logo-url="@match.HomeTeamLogoUrl"
+														    data-away-logo-url="@match.AwayTeamLogoUrl"
+														    data-option="Away"
+														    data-odds="@match.AwayWinOdds"
+															data-start-time="@(match.KickoffTime?.ToString("o") ?? "")">
+
 															<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
 																Away
 															</button>
-													</th>
-												</tr>
-												</thead>
-												<tbody class="tw-divide-y tw-divide-gray-200">
-												<tr>
-													<!-- Home Odds -->
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
-															@(match.ActiveBoost != null ? "pill-boosted-blue" : "pill-brand-blue")"
-														      data-match-id="@match.Id"
-														      data-home="@match.HomeTeam"
-														      data-away="@match.AwayTeam"
-														      data-home-logo-url="@match.HomeTeamLogoUrl"
-														      data-away-logo-url="@match.AwayTeamLogoUrl"
-														      data-option="Home"
-														      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
-														      data-odds="@(match.EffectiveHomeWinOdds ?? match.HomeWinOdds)">
-															@if (match.ActiveBoost != null)
-															{
-																<div class="d-flex flex-column align-items-center justify-content-center">
-																	<span class="old-odds">@match.HomeWinOdds</span>
-																	<span class="boosted-odds">@match.EffectiveHomeWinOdds</span>
-																</div>
-															}
-															else
-															{
-																@match.HomeWinOdds
-															}
-														</span>
-													</td>
-
-													<!-- Draw Odds -->
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
-																			@(match.ActiveBoost != null ? "pill-boosted-yellow" : "pill-brand-yellow")"
-																  
-														      data-match-id="@match.Id"
-														      data-home="@match.HomeTeam"
-														      data-away="@match.AwayTeam"
-														      data-home-logo-url="@match.HomeTeamLogoUrl"
-														      data-away-logo-url="@match.AwayTeamLogoUrl"
-														      data-option="Draw"
-														      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")" 
-														      data-odds="@(match.EffectiveDrawOdds ?? match.DrawOdds)">
-															@if (match.ActiveBoost != null)
-															{
-																<div class="d-flex flex-column align-items-center justify-content-center">
-																	<span class="old-odds">@match.DrawOdds</span>
-																	<span class="boosted-odds">@match.EffectiveDrawOdds</span>
-																</div>
-															}
-															else
-															{
-																@match.DrawOdds
-															}
-														</span>	
-													</td>
-
-													<!-- Away Odds -->
-													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
-																@(match.ActiveBoost != null ? "pill-boosted-green" : "pill-brand-green")"
-														      data-match-id="@match.Id"
-														      data-home="@match.HomeTeam"
-														      data-away="@match.AwayTeam"
-														      data-home-logo-url="@match.HomeTeamLogoUrl"
-														      data-away-logo-url="@match.AwayTeamLogoUrl"
-														      data-option="Away"
-														      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
-														      data-odds="@(match.EffectiveAwayWinOdds ?? match.AwayWinOdds)">
-															@if (match.ActiveBoost != null)
-															{
-																<div class="d-flex flex-column align-items-center justify-content-center">
-																	<span class="old-odds">@match.AwayWinOdds</span>
-																	<span class="boosted-odds">@match.EffectiveAwayWinOdds</span>
-																</div>
-															}
-															else
-															{
-																@match.AwayWinOdds
-															}
-														</span>
-													</td>
-														
-												</tr>
-												@if (match.ActiveBoost != null)
-												{
-													<tr class="boost-timer-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
-														<td colspan="3" class="text-center">
-														
-															<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-																<i class="ri-fire-fill boost-fire-icon me-1"></i>
-																<span class="boost-countdown"> 00:00</span>
-															</span>
-																<small class="badge text-white fw-bold boost-max-stake">
-																Max:<br/>
-																€@match.ActiveBoost?.MaxStakePerBet
-															</small>
-
-															@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
-															{
-																<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold" style="margin-left: -1em;">
-																	@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
-																	{
-																		<div class="me-1">x</div>
-																	}
-																	@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
-																	{
-																		<div style="text-align: center;">No limit</div>
-																	}
-																	else
-																	{
-																		@match.ActiveBoost?.MaxUsesPerUser
-																	}
-																</small>
-															}
-															else
-															{
-																<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-																	@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
-																	{
-																		<div class="me-1">x</div>
-																	}
-																	@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
-																	{
-																		<div style="text-align: center;">No limit</div>
-																	}
-																	else
-																	{
-																		@match.ActiveBoost?.MaxUsesPerUser
-																	}
-																</small>
-															}
-															
-															
-														</td>
+														</th>
 													</tr>
-												}
-												</tbody>
-											</table>
+													</thead>
+													<tbody class="tw-divide-y tw-divide-gray-200">
+													<tr>
+														<!-- Home Odds -->
+														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+															<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+															@(match.ActiveBoost != null ? "pill-boosted-blue" : "pill-brand-blue")"
+															      data-match-id="@match.Id"
+															      data-home="@match.HomeTeam"
+															      data-away="@match.AwayTeam"
+															      data-home-logo-url="@match.HomeTeamLogoUrl"
+															      data-away-logo-url="@match.AwayTeamLogoUrl"
+															      data-option="Home"
+															      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
+															      data-odds="@(match.EffectiveHomeWinOdds ?? match.HomeWinOdds)">
+																@if (match.ActiveBoost != null)
+																{
+																	<div class="d-flex flex-column align-items-center justify-content-center">
+																		<span class="old-odds">@match.HomeWinOdds</span>
+																		<span class="boosted-odds">@match.EffectiveHomeWinOdds</span>
+																	</div>
+																}
+																else
+																{
+																	@match.HomeWinOdds
+																}
+															</span>
+														</td>
+
+														<!-- Draw Odds -->
+														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+															<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+																			@(match.ActiveBoost != null ? "pill-boosted-yellow" : "pill-brand-yellow")"
+
+															      data-match-id="@match.Id"
+															      data-home="@match.HomeTeam"
+															      data-away="@match.AwayTeam"
+															      data-home-logo-url="@match.HomeTeamLogoUrl"
+															      data-away-logo-url="@match.AwayTeamLogoUrl"
+															      data-option="Draw"
+															      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
+															      data-odds="@(match.EffectiveDrawOdds ?? match.DrawOdds)">
+																@if (match.ActiveBoost != null)
+																{
+																	<div class="d-flex flex-column align-items-center justify-content-center">
+																		<span class="old-odds">@match.DrawOdds</span>
+																		<span class="boosted-odds">@match.EffectiveDrawOdds</span>
+																	</div>
+																}
+																else
+																{
+																	@match.DrawOdds
+																}
+															</span>
+														</td>
+
+														<!-- Away Odds -->
+														<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+															<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+																@(match.ActiveBoost != null ? "pill-boosted-green" : "pill-brand-green")"
+															      data-match-id="@match.Id"
+															      data-home="@match.HomeTeam"
+															      data-away="@match.AwayTeam"
+															      data-home-logo-url="@match.HomeTeamLogoUrl"
+															      data-away-logo-url="@match.AwayTeamLogoUrl"
+															      data-option="Away"
+															      data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
+															      data-odds="@(match.EffectiveAwayWinOdds ?? match.AwayWinOdds)">
+																@if (match.ActiveBoost != null)
+																{
+																	<div class="d-flex flex-column align-items-center justify-content-center">
+																		<span class="old-odds">@match.AwayWinOdds</span>
+																		<span class="boosted-odds">@match.EffectiveAwayWinOdds</span>
+																	</div>
+																}
+																else
+																{
+																	@match.AwayWinOdds
+																}
+															</span>
+														</td>
+
+													</tr>
+													@if (match.ActiveBoost != null)
+													{
+														<tr class="boost-timer-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
+															<td colspan="3" class="text-center">
+
+																<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+																	<i class="ri-fire-fill boost-fire-icon me-1"></i>
+																	<span class="boost-countdown"> 00:00</span>
+																</span>
+																<small class="badge text-white fw-bold boost-max-stake">
+																	Max:<br/>
+																	€@match.ActiveBoost?.MaxStakePerBet
+																</small>
+
+																@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
+																{
+																	<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold" style="margin-left: -1em;">
+																		@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
+																		{
+																			<div class="me-1">x</div>
+																		}
+																		@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
+																		{
+																			<div style="text-align: center;">No limit</div>
+																		}
+																		else
+																		{
+																			@match.ActiveBoost?.MaxUsesPerUser
+																		}
+																	</small>
+																}
+																else
+																{
+																	<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+																		@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
+																		{
+																			<div class="me-1">x</div>
+																		}
+																		@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
+																		{
+																			<div style="text-align: center;">No limit</div>
+																		}
+																		else
+																		{
+																			@match.ActiveBoost?.MaxUsesPerUser
+																		}
+																	</small>
+																}
+
+
+															</td>
+														</tr>
+													}
+													</tbody>
+												</table>
+											}
+											else
+											{
+												<div class="d-flex justify-content-center mb-3">
+													<div class="postponed-card text-center p-4 animate__animated animate__fadeIn">
+														<i class="bi bi-pause-circle-fill mb-2 postponed-icon"></i>
+
+														<h6 class="fw-bold mb-1">Match Postponed</h6>
+
+														<p class="text-muted mb-0">
+															The new date will be announced soon.
+														</p>
+													</div>
+												</div>
+											}
 										</div>
 									</div>
 									<!-- Event content -->
@@ -380,9 +402,15 @@
 	});
 
 	document.querySelectorAll('.event-card').forEach(card => {
-		const userTimeZone = card.dataset.userTz;
 
-		const kickoffDate = new Date(card.dataset.kickoff); // ******************** / UTC / ********************
+		// Skip postponed or missing kickoff
+		if (card.dataset.postponed === "true") return;
+		if (!card.dataset.kickoff) return;
+
+		const kickoffDate = new Date(card.dataset.kickoff);
+		if (isNaN(kickoffDate)) return;
+
+		const userTimeZone = card.dataset.userTz;
 
 		const formatter = new Intl.DateTimeFormat(undefined, {
 			weekday: 'short',
@@ -402,8 +430,26 @@
 		}
 	});
 
+
 	function updateEventClocks() {
 		document.querySelectorAll('.event-card').forEach(card => {
+
+			const isPostponed = card.dataset.postponed === "true";
+			if (isPostponed) {
+				// Hide betting UI
+				const oddsTable = card.querySelector('.odds-table');
+				if (oddsTable) oddsTable.classList.add('d-none');
+
+				// Hide countdown & mask
+				const countdownEl = card.querySelector('.countdown');
+				if (countdownEl) countdownEl.classList.add('d-none');
+
+				const mask = card.querySelector('.event-mask');
+				if (mask) mask.classList.add('d-none');
+
+				return; // skip ALL timing logic
+			}
+
 			const kickoffStr = card.dataset.kickoff;
 			const kickoffTime = new Date(kickoffStr); // UTC datetime
 			const now = new Date(); // also in UTC (local browser time, but same reference)
@@ -479,13 +525,22 @@
 		const dateSet = new Set();
 
 		document.querySelectorAll('.event-card').forEach(card => {
+
+			// skip postponed or missing kickoff
+
+			if (card.dataset.postponed === "true") return;
+			if (!card.dataset.kickoff) return;
+
 			const kickoff = new Date(card.dataset.kickoff);
-			const dateStr = kickoff.toISOString().split('T')[0]; // format: YYYY-MM-DD
+			if (isNaN(kickoff)) return;
+
+			const dateStr = kickoff.toISOString().split('T')[0];
 			dateSet.add(dateStr);
 		});
 
 		return Array.from(dateSet).sort();
 	}
+
 
 
 	document.getElementById('matchSearch').addEventListener('input', filterMatches);
@@ -512,6 +567,20 @@
 			btn.dataset.date = date;
 			container.appendChild(btn);
 		});
+
+		if (hasPostponedMatches()) {
+			const postponedBtn = document.createElement('button');
+			postponedBtn.className = 'custom-date-pill me-2';
+			postponedBtn.dataset.date = 'postponed';
+
+			const icon = document.createElement('i');
+			icon.className = 'bi bi-pause-circle-fill me-1';
+
+			postponedBtn.appendChild(icon);
+			postponedBtn.appendChild(document.createTextNode('Postponed'));
+
+			container.appendChild(postponedBtn);
+		}
 	}
 
 	function getOrdinalSuffix(day) {
@@ -565,16 +634,28 @@
 
 			// apply filter
 			document.querySelectorAll('.event-card').forEach(card => {
-				const kickoffDate = card.dataset.kickoff.split('T')[0];
-				const isBoosted = card.dataset.hasBoost === 'true';
 
-				let matches;
+				const isPostponed = card.dataset.postponed === "true";
+				const isBoosted = card.dataset.hasBoost === "true";
+				let matches = false;
+
 				if (selected === 'all') {
 					matches = true;
-				} else if (selected === 'boosted') {
+				}
+				else if (selected === 'boosted') {
 					matches = isBoosted;
-				} else {
-					matches = (kickoffDate === selected);
+				}
+				else if (selected === 'postponed') {
+					matches = isPostponed;
+				}
+				else {
+					// Date pills → NEVER include postponed
+					if (isPostponed || !card.dataset.kickoff) {
+						matches = false;
+					} else {
+						const kickoffDate = card.dataset.kickoff.split('T')[0];
+						matches = kickoffDate === selected;
+					}
 				}
 
 				card.closest('.col').style.display = matches ? '' : 'none';
@@ -1057,10 +1138,13 @@
 	// Match count
 
 		function updateMatchCount() {
+
 		const cards = document.querySelectorAll('.event-card');
 		let count = 0;
 
 		cards.forEach(card => {
+			if (card.dataset.postponed === "true") return;
+
 			const col = card.closest('.col');
 			if (!col || col.style.display === 'none') return;
 
@@ -1081,6 +1165,10 @@
 	}
 
 	updateMatchCount();
+
+	function hasPostponedMatches() {
+		return document.querySelector('.event-card[data-postponed="true"]') !== null;
+	}
 	
 </script>
 
