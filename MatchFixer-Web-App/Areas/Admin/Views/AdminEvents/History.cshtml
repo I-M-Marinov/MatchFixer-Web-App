@@ -248,7 +248,7 @@
          )">
 
 			<td>@e.MatchName</td>
-			<td>@e.MatchDate.ToString("g")</td>
+			<td>@(e.MatchDate?.ToString("g") ?? "TBA")</td>
 			<td>
 				@if (e.IsCancelled)
 				{
@@ -319,7 +319,10 @@
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 
-		const labels = @Html.Raw(Json.Serialize(Model.Select(m => m.MatchDate.ToString("yyyy-MM-dd"))));
+	const labels = @Html.Raw(Json.Serialize(Model.Select(m => m.MatchDate.HasValue
+			               ? m.MatchDate.Value.ToString("yyyy-MM-dd")
+			               : "TBA")
+               ));
 		const profits = @Html.Raw(Json.Serialize(Model.Select(m => m.Profit)));
 
 		const chartEl = document.getElementById("profitChart");
