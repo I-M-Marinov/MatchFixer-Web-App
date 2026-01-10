@@ -18,9 +18,7 @@ namespace MatchFixer.Infrastructure.Entities
 
 		[ForeignKey(nameof(AwayTeamId))]
 		public Team AwayTeam { get; set; }
-
-		[Required]
-		public DateTime MatchDate { get; set; }
+		public DateTime? MatchDate { get; set; } // nullable match date 
 
 		[Range(OddsMinValue, OddsMaxValue)] 
 		public decimal? HomeOdds { get; set; }
@@ -32,6 +30,7 @@ namespace MatchFixer.Infrastructure.Entities
 		public decimal? AwayOdds { get; set; }
 		public int? ApiFixtureId { get; set; } // only for admin-imported matches ( manual matches leave it null ) 
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
+		public bool IsPostponed { get; set; } = false; // default to false ( match is not postponed ) 
 		public LiveMatchResult? LiveResult { get; set; }
 		public bool IsCancelled { get; set; } = false; 
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
