@@ -244,19 +244,33 @@
 					@foreach (var ev in Model.CurrentEvents)
 					{
 						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "")"
-						    data-date="@ev.KickoffTime.ToLocalTime().Date.ToString("yyyy-MM-dd")">
+						    data-date="@(ev.KickoffTime.HasValue 
+							               ? ev.KickoffTime.Value.ToString("yyyy-MM-dd") 
+							               : "tba")"
+						    data-postponed="@ev.IsPostponed">
 							<td>
-								@switch (ev.MatchStatus)
+								@if (ev.IsPostponed)
 								{
-									case "Live":
-										<span class="badge bg-success">Live</span>
-										break;
-									case "Started":
-										<span class="badge bg-warning text-dark">Started</span>
-										break;
-									case "Cancelled":
-										<span class="badge bg-danger">Cancelled</span>
-										break;
+									<span class="badge bg-secondary ms-1">
+										<i class="bi bi-pause-circle me-1"></i>
+										Postponed
+									</span>
+								}
+								else if (ev.MatchStatus != "Started" && ev.IsCancelled != true)
+								{
+									<form asp-action="PostponeMatchEvent"
+									      asp-controller="Event"
+									      method="post"
+									      class="d-inline ms-2">
+										@Html.AntiForgeryToken()
+										<input type="hidden" name="id" value="@ev.Id" />
+
+										<button type="submit"
+										        class="btn btn-sm btn-outline-secondary"
+										        onclick="return confirm('Postpone this match?')">
+											<i class="bi bi-pause-circle"></i>
+										</button>
+									</form>
 								}
 								@if (ev.ApiFixtureId != null)
 								{
@@ -265,7 +279,14 @@
 							</td>
 
 							<td>
-								@ev.KickoffTime.ToLocalTime().ToString("g")
+								@if (ev.IsPostponed || !ev.KickoffTime.HasValue)
+								{
+									<span class="badge bg-secondary">TBA</span>
+								}
+								else
+								{
+									@ev.KickoffTime.Value.ToLocalTime().ToString("g")
+								}							
 							</td>
 
 							<td class="team-cell">
@@ -341,7 +362,8 @@
 									<div class="d-flex flex-column gap-1">
 
 										@{
-											var isDisabled = (ev.MatchStatus == "Started" || ev.ActiveBoost != null) ? "disabled" : "";
+											var isDisabled = (ev.MatchStatus == "Started" || ev.ActiveBoost != null || ev.IsPostponed) ? "disabled" : "";
+
 										}
 
 
@@ -354,9 +376,16 @@
 											       value="@ev.AwayWinOdds" class="form-control form-control-sm away-odds-style" style="width: 80px;" placeholder="Away" @isDisabled/>
 										</div>
 
-										<input type="datetime-local" id="MatchDateInput-@ev.Id" data-id="@ev.Id"
-										       value="@ev.KickoffTime.ToString("yyyy-MM-ddTHH:mm")"
-										       class="form-control form-control-sm matchdate-style" style="min-width: 240px;" @isDisabled/>
+										<input type="datetime-local"
+										       id="MatchDateInput-@ev.Id"
+										       data-id="@ev.Id"
+										       value="@(ev.KickoffTime.HasValue 
+											              ? ev.KickoffTime.Value.ToString("yyyy-MM-ddTHH:mm") 
+											              : "")"
+										       class="form-control form-control-sm matchdate-style"
+										       style="min-width: 240px;"
+										       @isDisabled />
+
 									</div>
 
 									<div class="d-flex flex-column gap-1 align-items-end">
@@ -843,7 +872,13 @@
 
 			if (!rows.length) return;
 
-			const uniqueDates = [...new Set(rows.map(r => r.dataset.date))].slice(0, 5);
+			const uniqueDates = [
+			  ...new Set(
+				rows
+				  .map(r => r.dataset.date)
+				  .filter(d => d && d !== "tba")
+			  )
+			].slice(0, 5);
 
 			const today = new Date();
 			today.setHours(0,0,0,0);
@@ -879,7 +914,18 @@
 						All
 					</button>
 				`;
-		tabs.appendChild(allLi);
+
+				tabs.appendChild(allLi);
+
+			const postponedLi = document.createElement("li");
+				postponedLi.className = "nav-item";
+				postponedLi.innerHTML = `
+				  <button class="nav-link" data-date="tba">
+					Postponed
+				  </button>
+				`;
+
+				tabs.appendChild(postponedLi);
 
 			uniqueDates.forEach((date, i) => {
 				const li = document.createElement("li");
