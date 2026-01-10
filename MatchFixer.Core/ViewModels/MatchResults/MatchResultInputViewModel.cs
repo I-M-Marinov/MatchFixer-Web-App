@@ -12,7 +12,7 @@ namespace MatchFixer.Core.ViewModels.MatchResults
 		[Required]
 		public string AwayTeam { get; set; } = null!;
 
-		public DateTime MatchDate { get; set; }
+		public DateTime? MatchDate { get; set; }
 
 		public string DisplayTime { get; set; } = null!;
 
