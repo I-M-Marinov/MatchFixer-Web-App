@@ -48,7 +48,9 @@ namespace MatchFixer.Core.Services
 				{
 					m.HomeTeamId,
 					m.AwayTeamId,
-					MatchDate = m.MatchDate.Date
+					MatchDate = m.MatchDate.HasValue
+						? m.MatchDate.Value.Date
+						: (DateTime?)null
 				})
 				.ToListAsync();
 
