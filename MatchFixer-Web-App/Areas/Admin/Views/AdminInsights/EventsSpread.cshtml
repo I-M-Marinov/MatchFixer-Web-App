@@ -88,10 +88,19 @@
 			            </td>
 			            <td>
 				            @{
-					            var local = r.KickoffUtc.ToLocalTime();
-					            var formatted =
-						            $"{Ordinal(local.Day)} " +
-						            $"{local:MMM yyyy} at {local:h:mm tt}";
+					            string formatted;
+
+					            if (!r.KickoffUtc.HasValue)
+					            {
+						            formatted = "TBA";
+					            }
+					            else
+					            {
+						            var local = r.KickoffUtc.Value.ToLocalTime();
+						            formatted =
+							            $"{Ordinal(local.Day)} " +
+							            $"{local:MMM yyyy} at {local:h:mm tt}";
+					            }
 				            }
 
 				            <span class="mb-0">@formatted</span>
