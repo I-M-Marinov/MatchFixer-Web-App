@@ -779,3 +779,17 @@ odds-up {
     left: 2.2em;
     background: #0d6efd;
 }
+
+.postponed-card {
+    background: #f8f9fa;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.postponed-icon {
+    font-size: 2.5rem;
+    color: #6c757d;
+}
+
