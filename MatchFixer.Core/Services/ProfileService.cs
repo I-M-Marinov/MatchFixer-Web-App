@@ -574,14 +574,21 @@ namespace MatchFixer.Core.Services
 
 		private async Task SendPasswordChangedEmailAsync(ApplicationUser user)
 		{
+			var localTime =
+				_timezoneService.ConvertToUserTime(DateTime.UtcNow, user.TimeZone)
+				?? DateTime.UtcNow;
 
-			var userTime = _timezoneService.ConvertToUserTime(DateTime.UtcNow, user.TimeZone);
-			var formattedTime = userTime.ToString("dd MMM yyyy HH:mm");
+			var formattedTime = localTime.ToString("dd MMM yyyy HH:mm");
 
 			var emailBody = EmailTemplates.PasswordChanged(LogoUrl, formattedTime);
 
-			await _emailSender.SendEmailAsync(user.Email!, EmailTemplates.SubjectAccountPasswordChanged, emailBody);
+			await _emailSender.SendEmailAsync(
+				user.Email!,
+				EmailTemplates.SubjectAccountPasswordChanged,
+				emailBody
+			);
 		}
+
 
 
 		private async Task<IdentityResult> ValidatePasswordAsync(string password)
