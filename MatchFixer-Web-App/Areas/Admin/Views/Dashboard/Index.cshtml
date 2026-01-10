@@ -238,9 +238,11 @@
                         foreach (var r in ev.RecentUpdated)
                         {
 	                        <tr>
-								@{
-									var matchStartUtc = r.MatchUtc.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
-								}
+		                        @{
+			                        var matchStartUtc = r.MatchUtc.HasValue
+				                        ? r.MatchUtc.Value.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture)
+				                        : "TBA";
+		                        }
 								
 
 								<td>@matchStartUtc</td>
