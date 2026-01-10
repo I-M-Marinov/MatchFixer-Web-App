@@ -251,6 +251,28 @@ namespace MatchFixer_Web_App.Controllers
 			}
 		}
 
+		[Authorize]
+		[AdminOnly]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> PostponeMatchEvent(Guid id)
+		{
+			try
+			{
+				var user = await _userContextService.GetCurrentUserAsync();
+				await _matchEventService.PostponeMatchEventAsync(id, user.Id);
+
+				TempData["SuccessMessage"] = "Match has been postponed.";
+			}
+			catch (Exception ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
+
+			return RedirectToAction(nameof(AddMatchEvent));
+		}
+
+
 
 	}
 }
