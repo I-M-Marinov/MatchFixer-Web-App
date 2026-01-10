@@ -8,7 +8,7 @@
 		public string HomeTeamLogo { get; set; } = "";
 		public string AwayTeam { get; set; } = "";
 		public string AwayTeamLogo { get; set; } = "";
-		public DateTime MatchUtc { get; set; }
+		public DateTime? MatchUtc { get; set; }
 		public string Status { get; set; } = "";
 		public DateTime? UpdatedUtc { get; set; }
 	}
