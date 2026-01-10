@@ -5,7 +5,7 @@
 		public Guid EventId { get; set; }
 		public string MatchName { get; set; }
 		public string LeagueName { get; set; }
-		public DateTime MatchDate { get; set; }
+		public DateTime? MatchDate { get; set; }
 		public int? HomeScore { get; set; }
 		public int? AwayScore { get; set; }
 		public bool IsCancelled { get; set; }
