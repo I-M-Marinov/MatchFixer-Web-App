@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260109215129_Added_IsPostponed_Property_To_The_MatchEvent_Entity")]
+    partial class Added_IsPostponed_Property_To_The_MatchEvent_Entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -288,7 +291,7 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<bool>("IsPostponed")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("MatchDate")
+                    b.Property<DateTime>("MatchDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
