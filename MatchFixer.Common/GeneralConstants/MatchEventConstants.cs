@@ -10,5 +10,9 @@
 
 		public const string EventCancellationUnsuccessful = "There was an error cancelling this event";
 		public const string EventCancellationSuccessful = "Event cancelled successfully.";
+
+		public const string TeamNotFoundInDatabase = "Team '{0}' not found in database. Seed teams first.";
+		public const string MatchNotFound = "Match not found."; 
+		public const string MatchHasBeenPostponed = "Match has been postponed.";
 	}
 }
