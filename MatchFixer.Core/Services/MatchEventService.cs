@@ -445,7 +445,10 @@ namespace MatchFixer.Core.Services
 				return byName;
 
 			throw new InvalidOperationException(
-				$"Team '{teamName}' not found in database. Seed teams first."
+				string.Format(
+					TeamNotFoundInDatabase,
+					teamName
+				)
 			);
 		}
 
@@ -455,7 +458,7 @@ namespace MatchFixer.Core.Services
 				.FirstOrDefaultAsync(m => m.Id == matchEventId);
 
 			if (match == null)
-				throw new InvalidOperationException("Match not found.");
+				throw new InvalidOperationException(MatchNotFound);
 
 			match.IsPostponed = true;
 			match.MatchDate = null;
