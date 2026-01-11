@@ -1,5 +1,4 @@
 ﻿using MatchFixer.Common.EmailTemplates;
-using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using  static MatchFixer.Common.GeneralConstants.BirthdayEmailLogMessages;
 
 public class BirthdayEmailService : BackgroundService
 {
@@ -23,7 +23,7 @@ public class BirthdayEmailService : BackgroundService
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		_logger.LogInformation("BirthdayEmailService started.");
+		_logger.LogInformation(ServiceStarted);
 
 		while (!stoppingToken.IsCancellationRequested)
 		{
@@ -38,51 +38,49 @@ public class BirthdayEmailService : BackgroundService
 					var today = DateTime.Today;
 
 					var usersWithBirthdayToday = await dbContext.Users
-						.Where(u => u.DateOfBirth.Month == today.Month && u.DateOfBirth.Day == today.Day)
+						.Where(u => u.DateOfBirth.Month == today.Month &&
+						            u.DateOfBirth.Day == today.Day)
 						.ToListAsync(stoppingToken);
 
-					var userIds = usersWithBirthdayToday.Select(u => u.Id).ToList();
-
-					var alreadyAwardedUserIds = await dbContext.WalletTransactions
-						.Where(t => t.CreatedAt.Date == today.Date &&
-						            t.TransactionType == WalletTransactionType.BirthdayBonus &&
-						            userIds.Contains(t.Wallet.UserId))
-						.Select(t => t.Wallet.UserId)
-						.ToListAsync(stoppingToken);
-
-					var eligibleUsers = usersWithBirthdayToday
-						.Where(u => !alreadyAwardedUserIds.Contains(u.Id))
-						.ToList();
-
-					if (eligibleUsers.Any())
+					if (!usersWithBirthdayToday.Any())
 					{
-						var logoUrl = LogoUrl;
-
-						foreach (var user in usersWithBirthdayToday)
-						{
-							string emailBody = EmailTemplates.BirthdayEmail(logoUrl, user.FullName);
-							await emailService.SendEmailAsync(user.Email, EmailTemplates.SubjectHappyBirthdayFromMatchFixer, emailBody);
-							_logger.LogInformation($"Sent birthday email to {user.Email}");
-
-							await walletService.AwardBirthdayBonusAsync(user.Id);
-							_logger.LogInformation($"Awarded €10 birthday bonus to {user.Email}");
-						}
+						_logger.LogInformation(NoBirthdaysToday);
+						continue;
 					}
-					else
+
+					foreach (var user in usersWithBirthdayToday)
 					{
-						_logger.LogInformation("No birthdays today.");
+						string emailBody =
+							EmailTemplates.BirthdayEmail(LogoUrl, user.FullName);
+
+						await emailService.SendEmailAsync(
+							user.Email,
+							EmailTemplates.SubjectHappyBirthdayFromMatchFixer,
+							emailBody);
+
+						_logger.LogInformation(
+							BirthdayEmailSent,
+							user.Email
+						);
+
+						await walletService.AwardBirthdayBonusAsync(user.Id);
+
+						_logger.LogInformation(
+							BirthdayBonusAwarded,
+							user.Email
+						);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Error occurred while sending birthday emails.");
+				_logger.LogError(ex, ProcessingError);
 			}
 
 			await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
 		}
 
-		_logger.LogInformation("BirthdayEmailService stopping.");
+		_logger.LogInformation(ServiceStopping);
 	}
 
 }
