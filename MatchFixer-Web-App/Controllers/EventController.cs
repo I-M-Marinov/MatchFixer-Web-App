@@ -262,7 +262,7 @@ namespace MatchFixer_Web_App.Controllers
 				var user = await _userContextService.GetCurrentUserAsync();
 				await _matchEventService.PostponeMatchEventAsync(id, user.Id);
 
-				TempData["SuccessMessage"] = "Match has been postponed.";
+				TempData["SuccessMessage"] = MatchHasBeenPostponed;
 			}
 			catch (Exception ex)
 			{
