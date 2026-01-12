@@ -277,28 +277,46 @@ namespace MatchFixer.Core.Services
 		{
 			var userId = _userContextService.GetUserId();
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
-			if (match == null || match.IsCancelled)
-			{
-				throw new Exception(MatchUpdateFailed);
-			}
 
-			var changes = new (string Property, object? OldValue, object? NewValue, Action Apply)[]
-			{
-				(nameof(match.HomeOdds), match.HomeOdds, homeOdds, () => match.HomeOdds = homeOdds),
-				(nameof(match.DrawOdds), match.DrawOdds, drawOdds, () => match.DrawOdds = drawOdds),
-				(nameof(match.AwayOdds), match.AwayOdds, awayOdds, () => match.AwayOdds = awayOdds),
-				(nameof(match.MatchDate), match.MatchDate, kickoffTime, () => match.MatchDate = kickoffTime)
-			};
+			if (match == null || match.IsCancelled)
+				throw new Exception(MatchUpdateFailed);
 
 			bool anyChange = false;
 
-			foreach (var (property, oldVal, newVal, apply) in changes)
+			// ---- ODDS ----
+			if (match.HomeOdds != homeOdds)
 			{
-				if (!Equals(oldVal, newVal))
+				LogChange(match.Id, nameof(match.HomeOdds), match.HomeOdds, homeOdds, userId);
+				match.HomeOdds = homeOdds;
+				anyChange = true;
+			}
+
+			if (match.DrawOdds != drawOdds)
+			{
+				LogChange(match.Id, nameof(match.DrawOdds), match.DrawOdds, drawOdds, userId);
+				match.DrawOdds = drawOdds;
+				anyChange = true;
+			}
+
+			if (match.AwayOdds != awayOdds)
+			{
+				LogChange(match.Id, nameof(match.AwayOdds), match.AwayOdds, awayOdds, userId);
+				match.AwayOdds = awayOdds;
+				anyChange = true;
+			}
+
+			// ---- MATCH DATE / POSTPONED LOGIC ----
+			if (match.MatchDate != kickoffTime)
+			{
+				LogChange(match.Id, nameof(match.MatchDate), match.MatchDate, kickoffTime, userId);
+				match.MatchDate = kickoffTime;
+				anyChange = true;
+
+				// ---- UNPOSTPONE THE MATCH IF A NEW DATE IS PRESENT ----
+				if (kickoffTime.HasValue && match.IsPostponed)
 				{
-					LogChange(match.Id, property, oldVal, newVal, userId);
-					apply();
-					anyChange = true;
+					LogChange(match.Id, nameof(match.IsPostponed), true, false, userId);
+					match.IsPostponed = false;
 				}
 			}
 
@@ -306,10 +324,17 @@ namespace MatchFixer.Core.Services
 				return false;
 
 			await _dbContext.SaveChangesAsync();
-			await _notifier.NotifyMatchEventUpdatedAsync(matchEventId, homeOdds, drawOdds, awayOdds);
+
+			await _notifier.NotifyMatchEventUpdatedAsync(
+				matchEventId,
+				homeOdds,
+				drawOdds,
+				awayOdds
+			);
 
 			return true;
 		}
+
 
 		public async Task<bool> CancelMatchEventAsync(Guid matchEventId)
 		{
@@ -452,13 +477,18 @@ namespace MatchFixer.Core.Services
 			);
 		}
 
-		public async Task<bool> PostponeMatchEventAsync(Guid matchEventId, Guid userId)
+		public async Task<bool> PostponeMatchAsync(Guid matchEventId, Guid userId)
 		{
 			var match = await _dbContext.MatchEvents
 				.FirstOrDefaultAsync(m => m.Id == matchEventId);
 
 			if (match == null)
 				throw new InvalidOperationException(MatchNotFound);
+
+			// Already postponed ----> idempotent
+
+			if (match.IsPostponed)
+				return true;
 
 			match.IsPostponed = true;
 			match.MatchDate = null;
@@ -475,8 +505,13 @@ namespace MatchFixer.Core.Services
 			}
 
 			await _dbContext.SaveChangesAsync();
+
+			// Notify AFTER persistence
+			await _notifier.NotifyMatchPostponedAsync(matchEventId);
+
 			return true;
 		}
+
 
 
 	}
