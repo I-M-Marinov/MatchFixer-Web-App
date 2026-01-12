@@ -6,7 +6,7 @@ namespace MatchFixer.Core.DTOs.Bets
 	{
 		[JsonPropertyName("MatchId")]
 		public Guid MatchId { get; set; }
-
+		public bool IsPostponed { get; set; }
 		public string? HomeTeam { get; set; }
 		public string? AwayTeam { get; set; }
 		public string? HomeLogoUrl { get; set; }
