@@ -25,6 +25,10 @@ namespace MatchFixer.Core.Contracts
 			decimal maxStake,
 			int maxUses);
 
+		Task NotifyMatchPostponedAsync(
+			Guid matchEventId,
+			DateTime? newKickoffUtc = null);
+
 
 		Task BroadcastBoostStartedAsync(BoostRealtimeMessage msg, CancellationToken ct = default);
 
