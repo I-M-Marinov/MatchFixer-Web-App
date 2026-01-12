@@ -5,6 +5,7 @@ using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+
 using static MatchFixer.Common.GeneralConstants.BettingServiceConstants;
 
 namespace MatchFixer.Core.Services;
@@ -72,8 +73,29 @@ public class BettingService : IBettingService
 			if (matchEvent == null)
 				return (InvalidMatchId(betDto.MatchId), false);
 
-			if (!IsEventOpenForBetting(matchEvent))
-				return (EventOrEventsCancelledInSlip, false);
+			var blockReason = GetBettingBlockReason(matchEvent);
+
+			if (blockReason != BettingBlockReason.None)
+			{
+				return blockReason switch
+				{
+					BettingBlockReason.Cancelled =>
+						(EventCancelledInSlip, false),
+
+					BettingBlockReason.Postponed =>
+						(EventPostponedInSlip, false),
+
+					BettingBlockReason.AlreadyStarted =>
+						(EventAlreadyStartedInSlip, false),
+
+					BettingBlockReason.AlreadyFinished =>
+						(EventAlreadyFinishedInSlip, false),
+
+					_ =>
+						(EventNotOpenForBetting, false)
+				};
+			}
+
 
 			if (DateTime.UtcNow >= matchEvent.MatchDate)
 				return (EventAlreadyStartedInSlip, false);
@@ -141,7 +163,6 @@ public class BettingService : IBettingService
 
 		return (BetSlipSubmittedSuccessfully, true);
 	}
-
 
 
 	public async Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId)
@@ -224,7 +245,6 @@ public class BettingService : IBettingService
 		// 4. Otherwise pending
 		return BetStatus.Pending;
 	}
-
 
 
 	static decimal ComputeTotalOdds(IEnumerable<Bet> bets)
@@ -428,25 +448,26 @@ public class BettingService : IBettingService
 	}
 
 
-
-
-
-
-	private static bool IsEventOpenForBetting(MatchEvent ev)
+	private static BettingBlockReason GetBettingBlockReason(MatchEvent ev)
 	{
-		var nowUtc = DateTime.UtcNow;
+		if (ev == null)
+			return BettingBlockReason.Cancelled;
 
-		// if event was not found return false
-		if (ev == null) return false;
+		if (ev.IsCancelled)
+			return BettingBlockReason.Cancelled;
 
-		// if event is cancelled return false
-		if (ev.IsCancelled) return false;
+		if (ev.IsPostponed)
+			return BettingBlockReason.Postponed;
 
-		// if that event already has a result recorded in the database return false
-		if (ev.LiveResult != null) return false;
+		if (ev.LiveResult != null)
+			return BettingBlockReason.AlreadyFinished;
 
-		return true;
+		if (ev.MatchDate <= DateTime.UtcNow)
+			return BettingBlockReason.AlreadyStarted;
+
+		return BettingBlockReason.None;
 	}
+
 
 
 	private async Task PublishBetMixForEventsAsync(IEnumerable<Guid> eventIds, CancellationToken ct)
