@@ -50,6 +50,8 @@ namespace MatchFixer_Web_App.Controllers
 				if (!matches.TryGetValue(bet.MatchId, out var match))
 					continue;
 
+				bet.IsPostponed = match.IsPostponed;
+
 				var (home, draw, away, _) = await oddsBoostService.GetEffectiveOddsAsync(
 					match.Id,
 					match.HomeOdds,
@@ -83,7 +85,8 @@ namespace MatchFixer_Web_App.Controllers
 					selectedOption = b.SelectedOption,
 					odds = b.Odds,
 					startTimeUtc = b.StartTimeUtc?.ToUniversalTime()
-						.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
+						.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'"),
+					isPostponed = b.IsPostponed
 				}),
 				totalOdds = betSlip.TotalOdds,
 				stakeAmount = betSlip.StakeAmount
