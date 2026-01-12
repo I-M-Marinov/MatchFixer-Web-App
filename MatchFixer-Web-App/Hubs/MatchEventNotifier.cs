@@ -110,6 +110,24 @@ namespace MatchFixer_Web_App.Hubs
 			);
 		}
 
+		public Task NotifyMatchPostponedAsync(Guid matchEventId, DateTime? newKickoffUtc = null)
+		{
+			var payload = new
+			{
+				matchEventId,
+				status = "Postponed",
+				newKickoffUtc = newKickoffUtc.HasValue
+					? (DateTime?)DateTime.SpecifyKind(newKickoffUtc.Value, DateTimeKind.Utc)
+					: null
+			};
+
+			return _hubContext.Clients
+				.Group(matchEventId.ToString())
+				.SendAsync("MatchPostponed", payload);
+		}
+
+
+
 	}
 
 }

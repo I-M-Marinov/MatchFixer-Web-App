@@ -83,7 +83,7 @@ namespace MatchFixer_Web_App.Hubs
 				return Array.Empty<BoostDto>();
 			}
 		}
-
+			
 		public Task<string> Ping() => Task.FromResult($"ok {DateTime.UtcNow:o}");
 
 		public sealed class BoostDto
