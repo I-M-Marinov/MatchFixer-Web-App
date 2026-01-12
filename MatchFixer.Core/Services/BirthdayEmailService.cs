@@ -45,8 +45,10 @@ public class BirthdayEmailService : BackgroundService
 					if (!usersWithBirthdayToday.Any())
 					{
 						_logger.LogInformation(NoBirthdaysToday);
+						await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
 						continue;
 					}
+
 
 					foreach (var user in usersWithBirthdayToday)
 					{
