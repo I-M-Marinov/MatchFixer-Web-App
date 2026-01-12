@@ -45,11 +45,51 @@ document.addEventListener('DOMContentLoaded', function () {
     let betSlip = {
         bets: [],
         amount: 0
-    };
+};
+
+// ===============================
+// SignalR connection for BET SLIP
+// ===============================
+
+    const betSlipConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/matchEventHub")
+        .withAutomaticReconnect()
+        .build();
+
+    betSlipConnection.start()
+        .then(() => {
+            console.log("✅ BetSlip SignalR connected");
+
+            betSlip.bets.forEach(bet => {
+                betSlipConnection.invoke("SubscribeToEvent", bet.matchId);
+            });
+
+        })
+        .catch(err => console.error("❌ BetSlip SignalR error:", err));
+
+betSlipConnection.on("MatchPostponed", msg => {
+
+    let affected = false;
+
+    betSlip.bets.forEach(bet => {
+        if (bet.matchId === msg.matchEventId) {
+            bet.isPostponed = true;
+            affected = true;
+        }
+    });
+
+    if (affected) {
+        renderBetSlip();
+        updateBetStatuses();
+    }
+
+});
+
+
 
 async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
     try {
-        // 🎯 Fetch effective odds from server
+        //  Fetch effective odds from server
         const response = await fetch(`/BetSlip/GetEffectiveOdds?matchId=${matchId}&option=${option}`);
         if (!response.ok) {
             console.error("Failed to fetch odds:", response.statusText);
@@ -59,7 +99,7 @@ async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUr
         const data = await response.json(); // { odds: 2.35, boostId: "..." }
         const odds = data.odds;
 
-        // 🔍 See if bet already exists
+        // See if bet already exists
         const existingBet = betSlip.bets.find(b => b.matchId === matchId);
 
         if (existingBet) {
@@ -90,6 +130,9 @@ async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUr
 
             betSlip.bets.push(betItem);
             addBetToSession(betItem);
+
+            // subscribe bet slip to live updates
+            await betSlipConnection.invoke("SubscribeToEvent", matchId);
         }
 
         renderBetSlip();
@@ -344,6 +387,8 @@ function renderBetSlip() {
         item.dataset.startTime = bet.startTimeUtc;
         item.dataset.matchId = bet.matchId;
         item.dataset.option = bet.selectedOption;
+        item.dataset.isPostponed = bet.isPostponed === true ? "true" : "false";
+
 
         removeBtnSpan.appendChild(removeIconElement);
         removeBtnSpan.appendChild(customTooltipSpan);
@@ -521,37 +566,50 @@ function getAntiForgeryToken() {
     const input = document.querySelector('input[name="__RequestVerificationToken"]');
     return input ? input.value : null;
 }
+
 function updateBetStatuses() {
     const nowUtc = Date.now(); // UTC
 
     document.querySelectorAll('.bet-item').forEach(item => {
 
+        const statusBadge = item.querySelector('.status-badge');
+        const removeBtn = item.querySelector('#remove-bet-button');
+        if (!statusBadge || !removeBtn) return;
+
+        const isPostponed = item.dataset.isPostponed === "true";
+
+        // POSTPONED
+        if (isPostponed) {
+            statusBadge.textContent = "Postponed";
+            statusBadge.className =
+                "badge status-badge bg-secondary animate__animated animate__fadeIn";
+
+            removeBtn.classList.remove('animate__pulse', 'animate__infinite');
+
+            return; 
+        }
+
+        // Normal time-based logic
         let startTimeStr = item.dataset.startTime;
         if (!startTimeStr) return;
 
         if (!startTimeStr.endsWith('Z')) startTimeStr += 'Z';
 
         const startTimeUtc = Date.parse(startTimeStr);
-        const statusBadge = item.querySelector('.status-badge');
-        const removeBtn = item.querySelector('#remove-bet-button');
-
-        if (!statusBadge || !removeBtn) return;
-       
+        if (Number.isNaN(startTimeUtc)) return;
 
         if (nowUtc >= startTimeUtc) {
 
             statusBadge.textContent = 'Started';
-            statusBadge.className = 'badge status-badge bg-danger animate__animated animate__headShake animate__slower animate__infinite';
+            statusBadge.className =
+                'badge status-badge bg-danger animate__animated animate__headShake animate__slower animate__infinite';
 
             statusBadge.style.position = 'absolute';
-            statusBadge.style.right = '';
-            statusBadge.style.bottom = '0.4em';
             statusBadge.style.left = '0.4em';
+            statusBadge.style.bottom = '0.4em';
+            statusBadge.style.whiteSpace = 'nowrap';
 
-            statusBadge.style.width = "auto";
-            statusBadge.style.maxWidth = "fit-content";
-            statusBadge.style.whiteSpace = "nowrap";
-
+            removeBtn.disabled = false;
             removeBtn.classList.add('animate__animated', 'animate__pulse', 'animate__infinite');
             removeBtn.style.color = "rgba(220, 53, 69)";
 
@@ -562,8 +620,6 @@ function updateBetStatuses() {
                 tooltip.style.backgroundColor = "rgba(220, 53, 69)";
                 tooltip.classList.add("animate__animated", "animate__fadeIn");
             }
-
-
 
         } else {
             const diffMs = startTimeUtc - nowUtc;
@@ -581,9 +637,11 @@ function updateBetStatuses() {
                 statusBadge.className = 'badge status-badge bg-warning event-countdown';
                 statusBadge.textContent = `Starts in ${diffHours}h`;
             }
-        }
 
+            removeBtn.disabled = false;
+        }
     });
 }
+
 // Run every 3 seconds
 setInterval(updateBetStatuses, 3000);
