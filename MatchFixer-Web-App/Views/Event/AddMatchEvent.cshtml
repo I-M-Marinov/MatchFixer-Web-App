@@ -347,13 +347,13 @@
 								else
 								{
 									<span class="custom-tooltip-wrapper">
-										@if (ev.MatchStatus == "Started")
+										@if (ev.MatchStatus == "Started" || ev.IsPostponed || !ev.KickoffTime.HasValue)
 										{
 											<button type="button" class="btn btn-sm btn-outline-danger create-boost-btn text-muted"
 											        data-match-id="@ev.Id" disabled>
 												<i class="ri-fire-fill"></i>
 											</button>
-											<span class="custom-tooltip text-bg-info">Cannot add a boost to a game that already started!</span>
+											<span class="custom-tooltip text-bg-info">Cannot add a boost to this game right now !</span>
 										}
 										else
 										{
