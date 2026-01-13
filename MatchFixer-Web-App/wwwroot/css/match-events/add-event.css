@@ -683,6 +683,21 @@ table.responsive-stack td {
     }
 }
 
+/* ===============================
+   STARTED / LIVE MATCH
+   =============================== */
+
+.event-started-match {
+    background: linear-gradient( 90deg, rgba(25, 135, 84, 0.10), rgba(25, 135, 84, 0.02) ) !important;
+    border-left: 4px solid #8400d4 !important;
+}
+
+.event-started-match .badge {
+    background-color: #8400d4 !important;
+    border-left: 4px solid #8400d4 !important;
+}
+
+
 
 /* Mobile stacking */
 @media (max-width: 1600.98px) {
