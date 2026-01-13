@@ -243,7 +243,7 @@
 					<tbody>
 					@foreach (var ev in Model.CurrentEvents)
 					{
-						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "")"
+						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "") @(ev.MatchStatus == "Started" ? "event-started-match" : "")"
 						    data-date="@(ev.KickoffTime.HasValue 
 							               ? ev.KickoffTime.Value.ToString("yyyy-MM-dd") 
 							               : "tba")"
@@ -266,13 +266,22 @@
 										<input type="hidden" name="id" value="@ev.Id" />
 
 										<button type="submit"
-										        class="btn btn-sm btn-outline-secondary"
-										        onclick="return confirm('Postpone this match?')">
+										        class="btn btn-sm btn-outline-secondary text-center"
+										        onclick="return confirm('Are you sure you want to postpone this match?')"
+												title="Postpone this match">
 											<i class="bi bi-pause-circle"></i>
 										</button>
 									</form>
 								}
-								@if (ev.ApiFixtureId != null)
+								else if (ev.MatchStatus == "Started" && ev.IsCancelled != true)
+								{
+									<span class="badge ms-1">
+										<i class="bi bi-play-circle-fill me-1"></i>
+										Started
+									</span>
+								}
+
+								@if (ev.ApiFixtureId != null && ev.MatchStatus != "Started")
 								{
 									<span class="badge bg-info ms-1">auto</span>
 								}
