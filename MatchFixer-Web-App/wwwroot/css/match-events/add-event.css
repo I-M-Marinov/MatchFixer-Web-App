@@ -458,11 +458,17 @@ table.responsive-stack td {
     border-left: 4px solid #0d6efd !important;
 }
 
-.api-imported-match:hover {
+.manually-added-match {
+    background: linear-gradient( 90deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.02)) !important;
+    border-left: 4px solid var(--secondary-color) !important;
+}
+
+.api-imported-match:hover,
+.manually-added-match:hover {
     background-color: rgba(13, 110, 253, 0.12) !important;
 }
 
-.add-event-navigation-tabs{
+.add-event-navigation-tabs {
     font-size: 0.80em;
 }
 
