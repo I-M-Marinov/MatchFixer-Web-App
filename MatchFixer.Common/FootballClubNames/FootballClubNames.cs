@@ -101,6 +101,7 @@
 			["Como"] = "Como 1907",
 			["Cremonese"] = "US Cremonese",
 			["Pisa"] = "Pisa SC",
+			["Parma"] = "Parma Calcio 1913",
 
 
 			// Spanish clubs
