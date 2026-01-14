@@ -285,7 +285,7 @@
     font-size: 1rem;
 }
 
-#event-countdown{
+#event-countdown {
     font-size: 0.75rem;
     width: 37%;
     margin: 0 auto;
@@ -295,6 +295,8 @@
     background-color: tomato;
     color: ghostwhite !important;
     text-shadow: 1px 1px 1px black !important;
+    margin-top: -3em !important;
+    margin-bottom: 0.5em !important;
 }
 
 
