@@ -126,7 +126,7 @@
 											<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden">
 												<thead class="tw-bg-gray-50 tw-shadow">
 												<tr>
-													<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="0"
+														<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="0"
 													    data-match-id="@match.Id"
 													    data-home="@match.HomeTeam"
 													    data-away="@match.AwayTeam"
@@ -140,7 +140,7 @@
 															Home
 														</button>
 													</th>
-													<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="1"
+														<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="1"
 													    data-match-id="@match.Id"
 													    data-home="@match.HomeTeam"
 													    data-away="@match.AwayTeam"
@@ -154,7 +154,7 @@
 															Draw
 														</button>
 													</th>
-													<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="2"
+														<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="2"
 													    data-match-id="@match.Id"
 													    data-home="@match.HomeTeam"
 													    data-away="@match.AwayTeam"
@@ -174,7 +174,7 @@
 												<tr>
 													<!-- Home Odds -->
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+															<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
 														@(match.ActiveBoost != null ? "pill-boosted-blue" : "pill-brand-blue")"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
@@ -200,7 +200,7 @@
 
 													<!-- Draw Odds -->
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+															<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
 																		@(match.ActiveBoost != null ? "pill-boosted-yellow" : "pill-brand-yellow")"
 
 														      data-match-id="@match.Id"
@@ -227,7 +227,7 @@
 
 													<!-- Away Odds -->
 													<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
-														<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
+															<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
 															@(match.ActiveBoost != null ? "pill-boosted-green" : "pill-brand-green")"
 														      data-match-id="@match.Id"
 														      data-home="@match.HomeTeam"
@@ -629,7 +629,7 @@
 		}
 	}
 
-		document.addEventListener('click', function (e) {
+	document.addEventListener('click', function (e) {
 		if (e.target.matches('#datePillContainer button')) {
 			const selected = e.target.dataset.date;
 
@@ -666,7 +666,7 @@
 
 				card.closest('.col').style.display = matches ? '' : 'none';
 			});
-		}
+				}
 	});
 
 	document.addEventListener('DOMContentLoaded', () => {
@@ -695,23 +695,25 @@
 
 		connection.on("MatchEventUpdated", function (update) {
 
-			if (update.activeBoostId === null) {
-				const card = document.querySelector(
-					`[data-match-id="${update.matchEventId}"]`
-				);
-				if (!card) return;
+				if (update.activeBoostId === null) {
 
-				// Kill boost timers
-				const timerRow = card.querySelector(".boost-timer-row");
-				if (timerRow) resetBoost(timerRow);
+				const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
+					if (!card) return;
 
-				// Clear stored boost odds
-				["Home", "Draw", "Away"].forEach(opt => {
-					localStorage.removeItem(`boost_${update.matchEventId}_${opt}`);
-				});
+					// Only reset if the card WAS boosted
+					if (card.dataset.hasBoost === "true") {
 
-				return; // IMPORTANT: stop further boost logic
+						const timerRow = card.querySelector(".boost-timer-row");
+						if (timerRow) resetBoost(timerRow);
+
+						["Home", "Draw", "Away"].forEach(opt => {
+							localStorage.removeItem(`boost_${update.matchEventId}_${opt}`);
+						});
+				}
+
+				// 🚨 DO NOT RETURN
 			}
+
 
 			const card = document.querySelector(`[data-match-id="${update.matchEventId}"]`);
 			if (!card) return;
@@ -836,13 +838,13 @@
 
 		[...element.classList].forEach(c => {
 			if (c.startsWith('animate__')) element.classList.remove(c);
-		});
+		}); 
+
 		element.classList.remove('odds-up', 'odds-down');
-		void element.offsetWidth;
+		void element.offsetWidth; 
 
 		element.style.setProperty('--animate-duration', '0.8s');
-		element.classList.add('animate__animated', animClass, colorClass, 'animate__slower');
-
+		element.classList.add('animate__animated', animClass, colorClass, 'animate__slower'); 
 		function onEnd(e) {
 			if (e.target !== element) return;
 			element.classList.remove('animate__animated', animClass, 'odds-up', 'odds-down');
