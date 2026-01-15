@@ -1,13 +1,17 @@
 ﻿using MatchFixer_Web_App.Areas.Admin.ViewModels.Events;
+using MatchFixer.Common.Enums;
 
 namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 {
 	public interface IAdminBetInsightsService
 	{
-		Task<PaginatedEventList<EventBetStatsRow>> GetUpcomingEventBetStatsAsync(
+		Task<PaginatedEventList<EventBetStatsRow>>
+			GetUpcomingEventBetStatsAsync(
 				string? league,
 				int page,
 				int pageSize,
-				CancellationToken ct);
+				EventSort sort,
+				bool desc,
+				CancellationToken ct = default);
 	}
 }
