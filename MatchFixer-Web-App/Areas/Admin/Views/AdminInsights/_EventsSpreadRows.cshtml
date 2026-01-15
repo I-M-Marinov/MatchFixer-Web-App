@@ -1,0 +1,106 @@
+﻿@model IEnumerable<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.EventBetStatsRow>
+
+@{
+	var leagueFlags = new Dictionary<string, string>
+	{
+		{ "Premier League", "https://media.api-sports.io/flags/gb.svg" },
+		{ "La Liga",        "https://media.api-sports.io/flags/es.svg" },
+		{ "Bundesliga",     "https://media.api-sports.io/flags/de.svg" },
+		{ "Serie A",        "https://media.api-sports.io/flags/it.svg" },
+		{ "Ligue 1",        "https://media.api-sports.io/flags/fr.svg" },
+		{ "Eredivisie",     "https://media.api-sports.io/flags/nl.svg" },
+		{ "Liga Portugal",  "https://media.api-sports.io/flags/pt.svg" },
+		{ "Ekstraklasa",    "https://media.api-sports.io/flags/pl.svg" },
+		{ "Swiss Super League", "https://media.api-sports.io/flags/ch.svg" },
+		{ "Parva Liga", "https://media.api-sports.io/flags/bg.svg" },
+		{ "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
+		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
+	};
+}
+
+@foreach (var r in Model)
+{
+	<tr data-event-id="@r.EventId"
+	    data-league="@r.LeagueName"
+	    data-kickoff="@(r.KickoffUtc?.ToString("o") ?? "")"
+	    data-stake="@r.TotalStake"
+	    data-bets="@r.TotalBets">
+
+		<td class="text-center">
+			<img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam" />
+			<img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
+			<img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam" />
+		</td>
+		@{
+			string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
+			? url
+			: "https://media.api-sports.io/flags/eu.svg";
+		}
+		<td class="league-name d-flex align-items-center justify-content-center gap-2 p-3">
+			<img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;" />
+			<span class="mb-0">@r.LeagueName</span>
+		</td>
+		<td>
+			@{
+				string formatted;
+
+				if (!r.KickoffUtc.HasValue)
+				{
+					formatted = "TBA";
+				}
+				else
+				{
+					var local = r.KickoffUtc.Value.ToLocalTime();
+					formatted =
+					$"{Ordinal(local.Day)} " +
+					$"{local:MMM yyyy} at {local:h:mm tt}";
+				}
+			}
+
+			<span class="mb-0">@formatted</span>
+		</td>
+		<td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
+			@r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
+		</td>
+		<td class="text-center fw-semibold @(r.TotalBets == 0 ? "current-odds-cell text-primary" : "text-black")"
+			data-role="total-bets">
+			@(r.TotalBets == 0 ? "current odds" : r.TotalBets)
+		</td>
+		<td>
+			<div class="d-flex align-items-center gap-2">
+				<div class="progress flex-grow-1" style="height: 25px; font-size: 0.65rem;">
+					@if (r.TotalStake == 0)
+					{
+						<div class="progress-bar projected-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
+						<div class="progress-bar projected-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
+						<div class="progress-bar projected-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
+					}
+					else
+					{
+						<div class="progress-bar progress-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
+						<div class="progress-bar progress-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
+						<div class="progress-bar progress-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
+					}
+
+				</div>
+			</div>
+		</td>
+
+	</tr>
+}
+
+@functions {
+	string Ordinal(int day)
+	{
+		if (day % 100 is >= 11 and <= 13)
+			return $"{day}th";
+
+		return (day % 10) switch
+		{
+			1 => $"{day}st",
+			2 => $"{day}nd",
+			3 => $"{day}rd",
+			_ => $"{day}th"
+		};
+	}
+}
