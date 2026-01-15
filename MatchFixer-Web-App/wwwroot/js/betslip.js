@@ -1,6 +1,10 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿let betSlipConnection = null;
+
+
+document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('betSlipContent')) {
         initializeBetSlip();
+        ensureBetSlipSignalR();
     }
 });
 
@@ -51,24 +55,39 @@ document.addEventListener('DOMContentLoaded', function () {
 // SignalR connection for BET SLIP
 // ===============================
 
-    const betSlipConnection = new signalR.HubConnectionBuilder()
-        .withUrl("/matchEventHub")
-        .withAutomaticReconnect()
-        .build();
+function ensureBetSlipSignalR() {
+    if (typeof signalR === "undefined") return;
 
-    betSlipConnection.start()
-        .then(() => {
-            console.log("✅ BetSlip SignalR connected");
+    // create connection ONCE
+    if (!betSlipConnection) {
+        betSlipConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/matchEventHub")
+            .withAutomaticReconnect()
+            .build();
 
-            betSlip.bets.forEach(bet => {
-                betSlipConnection.invoke("SubscribeToEvent", bet.matchId);
-            });
+        betSlipConnection.start()
+            .then(() => {
+                console.log("✅ BetSlip SignalR connected");
+                subscribeAllBetSlipEvents();
+            })
+            .catch(err => console.error("❌ BetSlip SignalR error:", err));
 
-        })
-        .catch(err => console.error("❌ BetSlip SignalR error:", err));
+        betSlipConnection.on("MatchPostponed", onBetSlipMatchPostponed);
+    }
+    // connection already exists → just resubscribe
+    else {
+        subscribeAllBetSlipEvents();
+    }
+}
 
-betSlipConnection.on("MatchPostponed", msg => {
 
+function subscribeAllBetSlipEvents() {
+    betSlip.bets.forEach(bet => {
+        betSlipConnection.invoke("SubscribeToEvent", bet.matchId);
+    });
+}
+
+function onBetSlipMatchPostponed(msg) {
     let affected = false;
 
     betSlip.bets.forEach(bet => {
@@ -82,9 +101,7 @@ betSlipConnection.on("MatchPostponed", msg => {
         renderBetSlip();
         updateBetStatuses();
     }
-
-});
-
+}
 
 
 async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
@@ -132,6 +149,7 @@ async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUr
             addBetToSession(betItem);
 
             // subscribe bet slip to live updates
+            ensureBetSlipSignalR();
             await betSlipConnection.invoke("SubscribeToEvent", matchId);
         }
 
@@ -558,6 +576,7 @@ function initializeBetSlip() {
                 betSlip = data;
                 updateBadge();
                 renderBetSlip();
+                ensureBetSlipSignalR();
             }
         })
         .catch(err => console.error("Failed to load bet slip:", err));
