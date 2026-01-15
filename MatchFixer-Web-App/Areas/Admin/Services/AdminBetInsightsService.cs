@@ -12,7 +12,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		public AdminBetInsightsService(MatchFixerDbContext db) => _db = db;
 
 		public async Task<PaginatedEventList<EventBetStatsRow>>
-	GetUpcomingEventBetStatsAsync(string? league, int page, int pageSize, CancellationToken ct = default)
+			GetUpcomingEventBetStatsAsync(
+				string? league,
+				int page,
+				int pageSize,
+				EventSort sort,
+				bool desc,
+				CancellationToken ct = default)
 		{
 			page = Math.Max(1, page);
 			pageSize = Math.Clamp(pageSize, 5, 100);
@@ -47,9 +53,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var total = await baseQ.CountAsync(ct);
 
 			var raw = await baseQ
-				.OrderByDescending(e => e.Bets.Count)
-				.Skip((page - 1) * pageSize)
-				.Take(pageSize)
 				.Select(e => new
 				{
 					e.Id,
@@ -73,7 +76,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					HomeBets = e.Bets.Count(b => b.Pick == MatchPick.Home),
 					DrawBets = e.Bets.Count(b => b.Pick == MatchPick.Draw),
 					AwayBets = e.Bets.Count(b => b.Pick == MatchPick.Away),
-
 				})
 				.ToListAsync(ct);
 
@@ -155,9 +157,33 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				}
 			}
 
+			IEnumerable<EventBetStatsRow> sorted = rows;
+
+			sorted = sort switch
+			{
+				EventSort.TotalStake => desc
+					? sorted.OrderByDescending(r => r.TotalStake)
+					: sorted.OrderBy(r => r.TotalStake),
+
+				EventSort.TotalBets => desc
+					? sorted.OrderByDescending(r => r.TotalBets)
+					: sorted.OrderBy(r => r.TotalBets),
+
+				EventSort.Kickoff => desc
+					? sorted.OrderByDescending(r => r.KickoffUtc)
+					: sorted.OrderBy(r => r.KickoffUtc),
+
+				_ => sorted
+			};
+
+			var paged = sorted
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToList();
+
 			return new PaginatedEventList<EventBetStatsRow>
 			{
-				Items = rows,
+				Items = paged,
 				Page = page,
 				PageSize = pageSize,
 				TotalCount = total,
