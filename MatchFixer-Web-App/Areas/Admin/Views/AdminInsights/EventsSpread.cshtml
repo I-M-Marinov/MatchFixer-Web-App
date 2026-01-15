@@ -4,21 +4,7 @@
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
     ViewData["Title"] = "Events — Bet Spread";
 
-    var leagueFlags = new Dictionary<string, string>
-    {
-	    { "Premier League", "https://media.api-sports.io/flags/gb.svg" },
-	    { "La Liga",        "https://media.api-sports.io/flags/es.svg" },
-	    { "Bundesliga",     "https://media.api-sports.io/flags/de.svg" },
-	    { "Serie A",        "https://media.api-sports.io/flags/it.svg" },
-	    { "Ligue 1",        "https://media.api-sports.io/flags/fr.svg" },
-	    { "Eredivisie",     "https://media.api-sports.io/flags/nl.svg" },
-	    { "Liga Portugal",  "https://media.api-sports.io/flags/pt.svg" },
-	    { "Ekstraklasa",    "https://media.api-sports.io/flags/pl.svg" },
-	    { "Swiss Super League", "https://media.api-sports.io/flags/ch.svg" },
-	    { "Parva Liga", "https://media.api-sports.io/flags/bg.svg" },
-	    { "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
-	    { "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
-    };
+    
 
     var leagueLogos = new Dictionary<string, int>
     {
@@ -54,9 +40,9 @@
                 <tr>
 					<th class="text-center">Event</th>
                     <th class="league-name">League</th>
-                    <th class="text-center">Kick Off</th>
-                    <th class="text-center">Total Stake</th>
-                    <th class="text-center">Total Bets</th>
+                    <th class="sortable" data-sort="Kickoff">Kick Off</th>
+                    <th class="sortable" data-sort="TotalStake">Total Stake</th>
+                    <th class="sortable" data-sort="TotalBets">Total Bets</th>
                     <th class="text-center" style="min-width:220px">
                         <span class="progress-home badge"> Home </span>
                         |
@@ -69,71 +55,7 @@
             <tbody>
             @if (Model.Items.Any())
             {
-	            @foreach (var r in Model.Items)
-	            {
-		            <tr data-event-id="@r.EventId" data-league="@r.LeagueName">
-			            <td class="text-center">
-				            <img src="@r.HomeTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;margin-left: 1.5em;" title="@r.HomeTeam"/>
-				            <img src="/images/live-events/versus.png" style="width: auto; height: 16px; margin: 0em 0.5em 0em 0.5em;" class="img-fluid">
-				            <img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam"/>
-			            </td>
-			            @{
-				            string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
-					            ? url
-					            : "https://media.api-sports.io/flags/eu.svg";
-			            }
-			            <td class="league-name d-flex align-items-center justify-content-center gap-2 p-3">
-				            <img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;"/>
-				            <span class="mb-0">@r.LeagueName</span>
-			            </td>
-			            <td>
-				            @{
-					            string formatted;
-
-					            if (!r.KickoffUtc.HasValue)
-					            {
-						            formatted = "TBA";
-					            }
-					            else
-					            {
-						            var local = r.KickoffUtc.Value.ToLocalTime();
-						            formatted =
-							            $"{Ordinal(local.Day)} " +
-							            $"{local:MMM yyyy} at {local:h:mm tt}";
-					            }
-				            }
-
-				            <span class="mb-0">@formatted</span>
-			            </td>
-			            <td class="text-center fw-semibold  @(r.TotalBets == 0 ? "text-primary" : "text-black")" data-role="total-stake">
-				            @r.TotalStake.ToString("C", new System.Globalization.CultureInfo("en-IE"))
-			            </td>
-			            <td class="text-center fw-semibold @(r.TotalBets == 0 ? "current-odds-cell text-primary" : "text-black")"
-			                data-role="total-bets">
-				            @(r.TotalBets == 0 ? "current odds" : r.TotalBets)
-			            </td>
-			            <td>
-				            <div class="d-flex align-items-center gap-2">
-					            <div class="progress flex-grow-1" style="height: 25px; font-size: 0.65rem;">
-						            @if (r.TotalStake == 0)
-						            {
-							            <div class="progress-bar projected-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
-							            <div class="progress-bar projected-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
-							            <div class="progress-bar projected-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
-						            }
-						            else
-						            {
-							            <div class="progress-bar progress-home text-center" style="width:@r.HomePct%">@(r.HomePct > 5 ? $"{r.HomePct}%" : "")</div>
-							            <div class="progress-bar progress-draw text-center" style="width:@r.DrawPct%">@(r.DrawPct > 5 ? $"{r.DrawPct}%" : "")</div>
-							            <div class="progress-bar progress-away text-center" style="width:@r.AwayPct%">@(r.AwayPct > 5 ? $"{r.AwayPct}%" : "")</div>
-						            }
-
-					            </div>
-				            </div>
-			            </td>
-		            </tr>
-	            } 
-	            
+	            @await Html.PartialAsync("_EventsSpreadRows", Model.Items)
             }
             else
             {
@@ -152,7 +74,17 @@
 	                @{
 		                var p = Model.Page;
 		                var total = Model.TotalPages;
-		                string Link(int i) => Url.Action("EventsSpread", "AdminInsights", new { area = "Admin", page = i })!;
+		                string Link(int i) => Url.Action(
+			                "EventsSpread",
+			                "AdminInsights",
+			                new {
+				                area = "Admin",
+				                page = i,
+				                sort = Context.Request.Query["sort"],
+				                desc = Context.Request.Query["desc"],
+				                league = Context.Request.Query["league"]
+			                }
+		                )!;
 	                }
 	                <ul class="pagination pagination-ivm mb-0 d-flex justify-content-center">
 		                <li class="page-item @(p == 1 ? "disabled" : null)">
@@ -196,16 +128,20 @@
 
 <script>
 
-	const leagueLogoMap = @Html.Raw(Json.Serialize(leagueLogos));
-
-
+const leagueLogoMap = @Html.Raw(
+	                      System.Text.Json.JsonSerializer.Serialize(leagueLogos ?? new Dictionary<string,int>())
+                      );
     (function(){
       const hubUrl = "/hubs/admin-insights";
+	 
+
 
       const connection = new signalR.HubConnectionBuilder()
         .withUrl(hubUrl)
         .withAutomaticReconnect()
         .build();
+
+	  window.adminInsightsConnection = connection;
 
       function rowFor(eventId) {
         return document.querySelector(`tr[data-event-id="${eventId}"]`);
@@ -353,7 +289,7 @@
 					badge.classList.add("zero");
 				}
 
-				btn.appendChild(badge);
+				btn.appendChild(badge);	
 			});
 		}
 
@@ -370,24 +306,52 @@
 
 		applyLeagueBadges();
 
-
 	});
 
-	@functions {
-		string Ordinal(int day)
-		{
-			if (day % 100 is >= 11 and <= 13)
-				return $"{day}th";
+	document.addEventListener("DOMContentLoaded", () => {
 
-			return (day % 10) switch
-			{
-				1 => $"{day}st",
-				2 => $"{day}nd",
-				3 => $"{day}rd",
-				_ => $"{day}th"
-			};
-		}
-	}
+		const table = document.querySelector(".admin-bets-spread-table table");
+		if (!table) return;
+
+		const tbody = table.querySelector("tbody");
+		const headers = table.querySelectorAll("th.sortable");
+
+		let sort = "TotalBets";
+		let desc = true;
+		let page = 1;
+
+		headers.forEach(th => {
+		th.style.cursor = "pointer";
+
+			th.addEventListener("click", async () => {
+				const key = th.dataset.sort;
+				if (!key) return;
+
+				desc = (sort === key) ? !desc : false;
+				sort = key;
+				page = 1;
+
+				const url = new URL("/Admin/AdminInsights/EventsSpreadRows", window.location.origin);
+				url.searchParams.set("sort", sort);
+				url.searchParams.set("desc", desc);
+				url.searchParams.set("page", page);
+
+				const league = new URLSearchParams(window.location.search).get("league");
+				if (league) url.searchParams.set("league", league);
+
+				const html = await fetch(url).then(r => r.text());
+				tbody.innerHTML = html;
+
+				document.querySelectorAll("tr[data-event-id]").forEach(tr => {
+				const id = tr.dataset.eventId;
+				if (id && window.adminInsightsConnection) {
+					window.adminInsightsConnection.invoke("JoinEvent", id);
+				}
+				});
+			});
+		});
+	});
+
 
 </script>
 
