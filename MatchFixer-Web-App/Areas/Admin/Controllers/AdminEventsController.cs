@@ -19,9 +19,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[HttpGet]
 		public async Task<IActionResult> History(AdminEventHistoryFilters filters)
 		{
-			var model = await _adminEventsService.GetFinishedEventsAsync(filters);
+			var events = await _adminEventsService.GetFinishedEventsAsync(filters);
+			var teamStats = await _adminEventsService.GetTeamBettingStatsAsync(filters);
 
-			return View(model);
+			ViewBag.TeamStats = teamStats;
+
+			return View(events);
 		}
 	}
 }
