@@ -39,7 +39,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			int page = 1,
 			int pageSize = 10,
 			EventSort sort = EventSort.TotalBets,
-			bool desc = false,
+			bool desc = true,
 			CancellationToken ct = default)
 		{
 			var model = await _svc.GetUpcomingEventBetStatsAsync(
