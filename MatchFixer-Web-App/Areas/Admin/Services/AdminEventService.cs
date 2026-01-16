@@ -138,5 +138,81 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			return result;
 		}
+
+		public async Task<List<AdminTeamBettingStatsDto>>
+	GetTeamBettingStatsAsync(AdminEventHistoryFilters filters)
+		{
+			var betsQuery = _db.Bets
+				.AsNoTracking()
+				.Where(b =>
+					!b.MatchEvent.IsPostponed &&
+					(b.MatchEvent.LiveResult != null || b.MatchEvent.IsCancelled));
+
+			if (filters.FromDate.HasValue)
+				betsQuery = betsQuery.Where(b =>
+					b.MatchEvent.MatchDate >= filters.FromDate.Value);
+
+			if (filters.ToDate.HasValue)
+				betsQuery = betsQuery.Where(b =>
+					b.MatchEvent.MatchDate <= filters.ToDate.Value);
+
+			if (!string.IsNullOrWhiteSpace(filters.League))
+				betsQuery = betsQuery.Where(b =>
+					b.MatchEvent.HomeTeam.LeagueName == filters.League ||
+					b.MatchEvent.AwayTeam.LeagueName == filters.League);
+
+			if (filters.TeamId.HasValue)
+				betsQuery = betsQuery.Where(b =>
+					b.MatchEvent.HomeTeamId == filters.TeamId ||
+					b.MatchEvent.AwayTeamId == filters.TeamId);
+
+			var raw = await betsQuery
+				.Select(b => new
+				{
+					TeamId =
+						b.Pick == MatchPick.Home
+							? (Guid?)b.MatchEvent.HomeTeamId
+							: b.Pick == MatchPick.Away
+								? (Guid?)b.MatchEvent.AwayTeamId
+								: null,
+
+					TeamName =
+						b.Pick == MatchPick.Home
+							? b.MatchEvent.HomeTeam.Name
+							: b.Pick == MatchPick.Away
+								? b.MatchEvent.AwayTeam.Name
+								: null,
+
+					Logo =
+						b.Pick == MatchPick.Home
+							? b.MatchEvent.HomeTeam.LogoUrl
+							: b.Pick == MatchPick.Away
+								? b.MatchEvent.AwayTeam.LogoUrl
+								: null,
+
+					Stake = b.BetSlip.Amount,
+					Payout = b.BetSlip.WinAmount
+				})
+				.Where(x => x.TeamId != null) // ignore Draws
+				.ToListAsync();
+
+			// 4️⃣ Aggregate per team
+			var teamStats = raw
+				.GroupBy(x => new { x.TeamId, x.TeamName, x.Logo })
+				.Select(g => new AdminTeamBettingStatsDto
+				{
+					TeamId = g.Key.TeamId!.Value,
+					TeamName = g.Key.TeamName!,
+					LogoUrl = g.Key.Logo!,
+					TotalBets = g.Count(),
+					TotalStake = g.Sum(x => x.Stake),
+					TotalPayout = g.Sum(x => x.Payout ?? 0m)
+				})
+				.OrderByDescending(x => x.TotalBets)
+				.ToList();
+
+			return teamStats;
+		}
+
 	}
 }
