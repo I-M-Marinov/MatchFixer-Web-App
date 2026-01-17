@@ -1,7 +1,8 @@
-﻿using MatchFixer.Infrastructure.Security;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Infrastructure.Security;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
-using MatchFixer.Common.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing.Printing;
 
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
@@ -37,7 +38,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> EventsSpreadRows(
 			string? league,
 			int page = 1,
-			int pageSize = 10,
 			EventSort sort = EventSort.TotalBets,
 			bool desc = true,
 			CancellationToken ct = default)
@@ -45,7 +45,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			var model = await _svc.GetUpcomingEventBetStatsAsync(
 				league,
 				page,
-				pageSize,
+				100,
 				sort,
 				desc,
 				ct);
