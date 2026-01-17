@@ -169,16 +169,17 @@ public class BettingService : IBettingService
 	{
 		var betSlips = await _dbContext.BetSlips
 			.Include(bs => bs.Bets)
-			.ThenInclude(b => b.MatchEvent)
-			.ThenInclude(me => me.HomeTeam)
+				.ThenInclude(b => b.MatchEvent)
+					.ThenInclude(me => me.HomeTeam)
 			.Include(bs => bs.Bets)
-			.ThenInclude(b => b.MatchEvent)
-			.ThenInclude(me => me.AwayTeam)
+				.ThenInclude(b => b.MatchEvent)
+					.ThenInclude(me => me.AwayTeam)
 			.Include(bs => bs.Bets)
-			.ThenInclude(b => b.MatchEvent)
-			.ThenInclude(me => me.LiveResult)
+				.ThenInclude(b => b.MatchEvent)
+					.ThenInclude(me => me.LiveResult)
 			.Where(bs => bs.UserId == userId)
 			.OrderByDescending(bs => bs.BetTime)
+			.AsNoTracking()
 			.ToListAsync();
 
 		var timeZoneId = _sessionService.GetUserTimezone();
@@ -197,21 +198,20 @@ public class BettingService : IBettingService
 				UserId = bs.UserId,
 				WinAmount = bs.WinAmount,
 				TotalOdds = totalOdds,
-
-				Status = slipStatus.ToString(),
+				Status = slipStatus,
 
 				Bets = bs.Bets.Select(b =>
 				{
+					var computedStatus = ResolveBetStatus(b);
 					var result = b.MatchEvent.LiveResult;
-					string? outcome = null;
 
-					if (result != null)
-					{
-						outcome =
-							result.HomeScore > result.AwayScore ? MatchPick.Home.ToString() :
-							result.HomeScore < result.AwayScore ? MatchPick.Away.ToString() :
-							MatchPick.Draw.ToString();
-					}
+					string? outcome = result == null
+						? null
+						: result.HomeScore > result.AwayScore
+							? MatchPick.Home.ToString()
+							: result.HomeScore < result.AwayScore
+								? MatchPick.Away.ToString()
+								: MatchPick.Draw.ToString();
 
 					return new SingleBetDto
 					{
@@ -221,30 +221,54 @@ public class BettingService : IBettingService
 						SelectedOption = b.Pick.ToString(),
 						Odds = b.Odds,
 						Outcome = outcome,
-						Status = b.Status.ToString() 
+						Status = computedStatus
 					};
 				}).ToList()
 			};
 		});
 	}
 
-	static BetStatus ComputeSlipStatus(BetSlip slip)
+
+	private static string ComputeSlipStatus(BetSlip slip)
 	{
-		// 1. Any lost = lost (immediate)
-		if (slip.Bets.Any(b => b.Status == BetStatus.Lost))
-			return BetStatus.Lost;
+		var statuses = slip.Bets
+			.Select(ResolveBetStatus)
+			.ToList();
 
-		// 2. Any voided
-		if (slip.Bets.Any(b => b.Status == BetStatus.Voided))
-			return BetStatus.Voided;
+		if (statuses.Any(s => s == "Voided"))
+			return "Voided";
 
-		// 3. All won
-		if (slip.Bets.All(b => b.Status == BetStatus.Won))
-			return BetStatus.Won;
+		if (statuses.Any(s => s == "Lost"))
+			return "Lost";
 
-		// 4. Otherwise pending
-		return BetStatus.Pending;
+		if (statuses.All(s => s == "Won"))
+			return "Won";
+
+		// All pending OR mixed won + pending
+		return "Pending";
 	}
+
+	private static string ResolveBetStatus(Bet b)
+	{
+		var result = b.MatchEvent.LiveResult;
+
+		if (b.MatchEvent.IsCancelled)
+			return "Voided";
+
+		if (!b.BetSlip.IsSettled)
+			return "Pending";
+
+		if (result == null)
+			return "Pending";
+
+		bool won =
+			(b.Pick == MatchPick.Home && result.HomeScore > result.AwayScore) ||
+			(b.Pick == MatchPick.Away && result.AwayScore > result.HomeScore) ||
+			(b.Pick == MatchPick.Draw && result.HomeScore == result.AwayScore);
+
+		return won ? "Won" : "Lost";
+	}
+
 
 
 	static decimal ComputeTotalOdds(IEnumerable<Bet> bets)
