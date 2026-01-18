@@ -243,7 +243,7 @@
 			["Dobrudzha"] = "FC Dobrudzha Dobrich",
 			["Arda Kardzhali"] = "FC Arda Kardzhali",
 			["Botev Vratsa"] = "POFC Botev Vratsa",
-			["Montana"] = "FC Montana",
+			["Montana"] = "PFC Montana",
 
 		};
 
