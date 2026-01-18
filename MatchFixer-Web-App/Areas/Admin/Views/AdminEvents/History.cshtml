@@ -211,22 +211,22 @@
 						<h6 class="text-center fw-bold mb-3">🔥 Most Bet On</h6>
 						@foreach (var t in mostBetTeams)
 						{
-							<div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+							<div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2" style="font-size: 0.75em;">
 								<div class="d-flex align-items-center gap-2">
 									<img src="@t.LogoUrl" height="26" />
 									<span>@t.TeamName</span>
 								</div>
-								<span class="badge bg-primary">@t.TotalBets</span>
+								<span class="badge bg-info">@t.TotalBets</span>
 							</div>
 						}
 					</div>
 
 					<!-- Users Lost Most -->
 					<div class="col-md-4">
-						<h6 class="text-center fw-bold mb-3 text-success">😈 Users Lost Most</h6>
+						<h6 class="text-center fw-bold mb-4 text-success">😈 Users Lost Most</h6>
 						@foreach (var t in usersLostMostOn)
 						{
-							<div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+							<div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2" style="font-size: 0.75em;">
 								<div class="d-flex align-items-center gap-2">
 									<img src="@t.LogoUrl" height="26" />
 									<span>@t.TeamName</span>
@@ -240,10 +240,10 @@
 
 					<!-- Users Won Most -->
 					<div class="col-md-4">
-						<h6 class="text-center fw-bold mb-3 text-danger">🏆 Users Won Most</h6>
+						<h6 class="text-center fw-bold mb-4 text-danger">🏆 Users Won Most</h6>
 						@foreach (var t in usersWonMostOn)
 						{
-							<div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+							<div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2" style="font-size: 0.75em;">
 								<div class="d-flex align-items-center gap-2">
 									<img src="@t.LogoUrl" height="26" />
 									<span>@t.TeamName</span>
