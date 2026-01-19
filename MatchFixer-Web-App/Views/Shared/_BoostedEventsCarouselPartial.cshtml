@@ -246,29 +246,30 @@ document.addEventListener("DOMContentLoaded", function () {
               const card = el("div", { id: carouselCardId(id), className: "boost-card animate__animated animate__zoomIn",
           dataset:{ boostId: id, kind:"boost", dup:"0" } });
 
-        const teams = el("div", { className: "teams" }, [
-          el("span", { className: "home-name" }),
-              el("span", {style: "color: red;"}, [" vs "]),
-          el("span", { className: "away-name" })
+        const teams = el("div", { className: "teams teams-with-logos" }, [
+            el("div", { className: "team team-home" }, [
+            el("img", {
+                className: "team-logo home-logo",
+                attrs: {
+                src: "/images/default-home.png",
+                alt: "Home team",
+                title: ""
+                }
+            })
+            ]),
+            el("span", { className: "vs-text", text: "vs" }),
+            el("div", { className: "team team-away" }, [
+            el("img", {
+                className: "team-logo away-logo",
+                attrs: {
+                src: "/images/default-away.png",
+                alt: "Away team",
+                title: ""
+                }
+            })
+            ])
         ]);
 
-        // const teams = el("div", { className: "teams" }, [
-        //   el("div", { className: "team-block text-center" }, [
-        //     el("img", {
-        //       className: "team-logo home-logo",
-        //           attrs: { src: msg.homeName || "/images/default-home.png", alt: msg.homeName }
-        //     }),
-        //     el("div", { className: "team-name", text: msg.homeName || "" })
-        //   ]),
-        //   el("span", { className: "vs-text fw-bold", text: "vs" }),
-        //   el("div", { className: "team-block text-center" }, [
-        //     el("img", {
-        //       className: "team-logo away-logo",
-        //           attrs: { src: msg.awayName || "/images/default-away.png", alt: msg.awayName }
-        //     }),
-        //     el("div", { className: "team-name", text: msg.awayName || "" })
-        //   ])
-        // ]);
 
         const boostValue = el("div",
             { className: "boost-value badge animate__animated animate__tada animate__infinite animate__slower animate__delay-3s" });
@@ -317,32 +318,78 @@ document.addEventListener("DOMContentLoaded", function () {
         return card;
       }
 
-      function ensureCarouselCard(msg){
-        const id = toId(msg.matchEventId);
+         function ensureCarouselCard(msg) {
+      const id = toId(msg.matchEventId);
 
-        let card = document.getElementById(carouselCardId(id));
-        if (card && card.dataset.dup === "1") card = null; // ignore clones
+      let card = document.getElementById(carouselCardId(id));
+      if (card && card.dataset.dup === "1") card = null;
 
-        if (!card) {
-          clearEmptyState();
-          clearInfoCard();
-          card = buildCarouselCard(id);
-        }
-
-        const matchCard = document.querySelector(cardSelector(id));
-        const homeName = msg.homeName || matchCard?.querySelector(".home-team-name")?.textContent || "";
-        const awayName = msg.awayName || matchCard?.querySelector(".away-team-name")?.textContent || "";
-        const hn = card?.querySelector(".home-name");
-        const an = card?.querySelector(".away-name");
-        if (hn) hn.textContent = homeName;
-        if (an) an.textContent = awayName;
-
-        const label = msg.label || "BOOST";
-        const b = card?.querySelector(".badge");
-        if (b) b.textContent = label;
-
-        return card;
+      if (!card) {
+        clearEmptyState();
+        clearInfoCard();
+        card = buildCarouselCard(id);
       }
+
+      // --- Resolve names (used for tooltips) ---
+      const matchCard = document.querySelector(cardSelector(id));
+
+      const homeName =
+        msg.homeName ||
+        matchCard?.querySelector(".home-team-name")?.textContent ||
+        "";
+
+      const awayName =
+        msg.awayName ||
+        matchCard?.querySelector(".away-team-name")?.textContent ||
+        "";
+
+      const homeLogo =
+        msg.homeTeamLogo?.trim() ||
+        matchCard?.querySelector(".home-team-logo")?.getAttribute("src") ||
+        "/images/fallback-team.png";
+
+      const awayLogo =
+        msg.awayTeamLogo?.trim() ||
+        matchCard?.querySelector(".away-team-logo")?.getAttribute("src") ||
+        "/images/fallback-team.png";
+
+ 
+      const hl = card.querySelector(".home-logo");
+      const al = card.querySelector(".away-logo");
+
+      if (hl) {
+        hl.src = homeLogo;
+        hl.alt = homeName || "Home team";
+        hl.title = homeName;
+        hl.dataset.bsToggle = "tooltip";
+      }
+
+      if (al) {
+        al.src = awayLogo;
+        al.alt = awayName || "Away team";
+        al.title = awayName;
+        al.dataset.bsToggle = "tooltip";
+      }
+
+      initBootstrapTooltips(card);
+
+      const label = msg.label || "BOOST";
+      const badge = card.querySelector(".badge");
+      if (badge) badge.textContent = label;
+
+      return card;
+    }
+
+
+    function initBootstrapTooltips(root = document) {
+      root
+        .querySelectorAll('[data-bs-toggle="tooltip"]')
+        .forEach(el => {
+          if (!el._tooltipInstance) {
+            el._tooltipInstance = new bootstrap.Tooltip(el);
+          }
+        });
+    }
 
       function updateCarouselOdds(card, msg){
         if (!card) return;
@@ -508,6 +555,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // }
       }
 
+        function resolveLogo(msgLogo, matchCardSelector, fallback) {
+          return (
+            msgLogo ||
+            document.querySelector(matchCardSelector)?.getAttribute("src") ||
+            fallback
+          );
+        }
 
         function setInfoCardText(text){
           ensureInfoCard(text);
@@ -522,7 +576,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
       // ---------- SHARED HANDLERS ----------
-          function handleBoostStarted(msg) {
+    function handleBoostStarted(msg) {
       const id = String(msg.matchEventId);
 
       if (activeOriginalIds.has(id)) {
