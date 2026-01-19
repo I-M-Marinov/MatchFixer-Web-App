@@ -57,7 +57,9 @@ namespace MatchFixer.Core.Services
 					m.DrawOdds,
 					m.AwayOdds,
 					HomeTeamName = m.HomeTeam != null ? m.HomeTeam.Name : null,
-					AwayTeamName = m.AwayTeam != null ? m.AwayTeam.Name : null
+					AwayTeamName = m.AwayTeam != null ? m.AwayTeam.Name : null,
+					HomeTeamLogo = m.HomeTeam != null ? m.HomeTeam.LogoUrl : null,
+					AwayTeamLogo = m.AwayTeam != null ? m.AwayTeam.LogoUrl : null
 				});
 
 
@@ -84,7 +86,9 @@ namespace MatchFixer.Core.Services
 					MaxUses = b.MaxUsesPerUser,
 					Label = string.IsNullOrWhiteSpace(b.Note) ? "" : b.Note,
 					HomeTeamName = m?.HomeTeamName,
-					AwayTeamName = m?.AwayTeamName
+					AwayTeamName = m?.AwayTeamName,
+					HomeTeamLogo = m?.HomeTeamLogo,
+					AwayTeamLogo = m?.AwayTeamLogo
 				};
 			}).ToList();
 
@@ -122,7 +126,9 @@ namespace MatchFixer.Core.Services
 					m.DrawOdds,
 					m.AwayOdds,
 					HomeTeamName = m.HomeTeam != null ? m.HomeTeam.Name : null,
-					AwayTeamName = m.AwayTeam != null ? m.AwayTeam.Name : null
+					AwayTeamName = m.AwayTeam != null ? m.AwayTeam.Name : null,
+					HomeTeamLogo = m.HomeTeam != null ? m.HomeTeam.LogoUrl : null,
+					AwayTeamLogo = m.AwayTeam != null ? m.AwayTeam.LogoUrl : null
 				});
 
 
@@ -149,7 +155,9 @@ namespace MatchFixer.Core.Services
 					MaxUses = b.MaxUsesPerUser,
 					Label = string.IsNullOrWhiteSpace(b.Note) ? "BOOSTED" : b.Note,
 					HomeTeamName = m?.HomeTeamName,
-					AwayTeamName = m?.AwayTeamName
+					AwayTeamName = m?.AwayTeamName,
+					HomeTeamLogo = m?.HomeTeamLogo,
+					AwayTeamLogo = m?.AwayTeamLogo
 				};
 			}).ToList();
 
