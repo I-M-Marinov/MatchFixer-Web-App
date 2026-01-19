@@ -952,3 +952,71 @@ border: 2px #0DAB76 solid;
     background-color: #7d07b4 !important;
     color: white !important;
 }
+
+.boost-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.boost-header-row {
+    justify-content: center;
+}
+
+.meta {
+    display: flex;
+    justify-content: center;
+}
+
+.teams-with-logos {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+/* Individual team */
+.team {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.team-logo-index-card {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+}
+
+/* VS */
+.vs-text {
+    font-weight: 700;
+    margin: 0 0.25rem;
+}
+
+/* Boost value pill (+0.2) */
+.boost-value {
+    background: #6f42c1;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+/* Meta (timer + limits) */
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+/* Lightning icon */
+.boost-header-row .lightning-icon {
+    margin-right: 0.25rem;
+}
