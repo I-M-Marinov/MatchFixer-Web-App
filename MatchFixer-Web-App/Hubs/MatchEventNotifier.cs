@@ -99,7 +99,9 @@ namespace MatchFixer_Web_App.Hubs
 				MaxUses = msg.MaxUses,
 				Label = msg.Label,
 				HomeName = msg.HomeName,
-				AwayName = msg.AwayName
+				AwayName = msg.AwayName,
+				HomeTeamLogo = msg.HomeTeamLogo,
+				AwayTeamLogo = msg.AwayTeamLogo
 			};
 
 			await Task.WhenAll(
