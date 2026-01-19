@@ -46,6 +46,8 @@ namespace MatchFixer.Core.Contracts
 			public string? Label { get; init; }
 			public string? HomeName { get; init; }
 			public string? AwayName { get; init; }
+			public string? HomeTeamLogo { get; init; }
+			public string? AwayTeamLogo { get; init; }
 		}
 	}
 }
