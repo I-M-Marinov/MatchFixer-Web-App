@@ -255,9 +255,7 @@ public class BettingService : IBettingService
 		if (b.MatchEvent.IsCancelled)
 			return "Voided";
 
-		if (!b.BetSlip.IsSettled)
-			return "Pending";
-
+		// Match not finished yet
 		if (result == null)
 			return "Pending";
 
@@ -268,7 +266,6 @@ public class BettingService : IBettingService
 
 		return won ? "Won" : "Lost";
 	}
-
 
 
 	static decimal ComputeTotalOdds(IEnumerable<Bet> bets)
