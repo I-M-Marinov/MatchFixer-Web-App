@@ -9,10 +9,12 @@
 		public decimal EffectiveAwayOdds { get; init; }
 		public DateTime StartUtc { get; init; }
 		public DateTime EndUtc { get; init; }
-		public decimal? MaxStake { get; init; }   // ← nullable to match OddsBoost
-		public int? MaxUses { get; init; }        // ← nullable to match OddsBoost
-		public string? Label { get; init; }       // we’ll use OddsBoost.Note here
+		public decimal? MaxStake { get; init; }  
+		public int? MaxUses { get; init; }        
+		public string? Label { get; init; }       
 		public string? HomeTeamName { get; init; }
 		public string? AwayTeamName { get; init; }
+		public string? HomeTeamLogo { get; init; }
+		public string? AwayTeamLogo { get; init; }
 	}
 }
