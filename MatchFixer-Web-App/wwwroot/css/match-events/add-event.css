@@ -645,6 +645,11 @@ table.responsive-stack td {
     width: auto;
 }
 
+.team-logo-matchfix-game {
+    height: 64px;
+    width: auto;
+}
+
 .team-name {
     font-weight: 500;
 }
