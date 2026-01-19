@@ -118,7 +118,9 @@ namespace MatchFixer.Core.Services
 					MaxUses = maxUsesPerUser,
 					Label = string.IsNullOrWhiteSpace(note) ? "BOOST" : note,
 					HomeName = match.HomeTeam.Name,
-					AwayName = match.AwayTeam.Name
+					AwayName = match.AwayTeam.Name,
+					HomeTeamLogo = match.HomeTeam.LogoUrl,
+					AwayTeamLogo = match.AwayTeam.LogoUrl
 				}, ct);
 			}
 
