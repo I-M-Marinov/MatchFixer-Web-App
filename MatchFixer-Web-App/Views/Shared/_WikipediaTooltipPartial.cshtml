@@ -142,6 +142,82 @@
          });
      });
 
+    document.addEventListener("mouseenter", (e) => {
+      const logo = e.target.closest(".hoverable-logo[data-team-name]");
+      if (!logo || logo._hoverTooltip) return;
+
+      const teamName = logo.dataset.teamName;
+      const teamSide = logo.dataset.teamSide; // "home" | "away"
+
+
+      // Tooltip container
+      const tooltip = document.createElement("div");
+      tooltip.className = "hover-text-tooltip";
+
+     const sponsoredTeams = {
+      "Manchester United": "tooltip-manutd",
+      "Real Madrid": "tooltip-realmadrid"
+     };
+
+    const sponsorClass = sponsoredTeams[teamName];
+    if (sponsorClass) {
+      tooltip.classList.add(sponsorClass);
+    } else if (teamSide === "home") {
+      tooltip.classList.add("tooltip-home");
+    } else if (teamSide === "away") {
+      tooltip.classList.add("tooltip-away");
+    }
+
+      // Row container
+      const row = document.createElement("div");
+      row.className = "d-flex align-items-center gap-1";
+
+      // Icon
+      const icon = document.createElement("i");
+      icon.className = "bx bxs-info-circle";
+
+      // Text
+      const text = document.createElement("span");
+      text.textContent = 'Info';
+
+      row.appendChild(icon);
+      row.appendChild(text);
+      tooltip.appendChild(row);
+
+      document.body.appendChild(tooltip);
+      logo._hoverTooltip = tooltip;
+
+      // Position tooltip
+
+        requestAnimationFrame(() => {
+          const rect = logo.getBoundingClientRect();
+          const tRect = tooltip.getBoundingClientRect();
+          const gap = 3;
+
+          tooltip.style.left = `${rect.left + rect.width / 2 - tRect.width / 2}px`;
+          tooltip.style.top  = `${rect.top - tRect.height - gap}px`;
+        });
+
+    }, true);
+
+    document.addEventListener("mouseleave", (e) => {
+      const logo = e.target.closest(".hoverable-logo[data-team-name]");
+      if (!logo || !logo._hoverTooltip) return;
+
+      const tooltip = logo._hoverTooltip;
+
+      tooltip.classList.add("fade-out");
+
+      setTimeout(() => {
+        tooltip.remove();
+      }, 120);
+
+      logo._hoverTooltip = null;
+    }, true);
+
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
       const spinners = document.querySelectorAll('.spinner-grow');
 
