@@ -140,13 +140,16 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		}
 
 		public async Task<List<AdminTeamBettingStatsDto>>
-	GetTeamBettingStatsAsync(AdminEventHistoryFilters filters)
+		GetTeamBettingStatsAsync(AdminEventHistoryFilters filters)
 		{
 			var betsQuery = _db.Bets
 				.AsNoTracking()
 				.Where(b =>
 					!b.MatchEvent.IsPostponed &&
-					(b.MatchEvent.LiveResult != null || b.MatchEvent.IsCancelled));
+					(b.MatchEvent.LiveResult != null || b.MatchEvent.IsCancelled) &&
+					(b.Status == BetStatus.Won || b.Status == BetStatus.Lost) && 
+					b.Pick != MatchPick.Draw);  // ignore draws
+
 
 			if (filters.FromDate.HasValue)
 				betsQuery = betsQuery.Where(b =>
@@ -166,37 +169,40 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					b.MatchEvent.HomeTeamId == filters.TeamId ||
 					b.MatchEvent.AwayTeamId == filters.TeamId);
 
+
 			var raw = await betsQuery
 				.Select(b => new
 				{
 					TeamId =
 						b.Pick == MatchPick.Home
 							? (Guid?)b.MatchEvent.HomeTeamId
-							: b.Pick == MatchPick.Away
-								? (Guid?)b.MatchEvent.AwayTeamId
-								: null,
+							: (Guid?)b.MatchEvent.AwayTeamId,
 
 					TeamName =
 						b.Pick == MatchPick.Home
 							? b.MatchEvent.HomeTeam.Name
-							: b.Pick == MatchPick.Away
-								? b.MatchEvent.AwayTeam.Name
-								: null,
+							: b.MatchEvent.AwayTeam.Name,
 
 					Logo =
 						b.Pick == MatchPick.Home
 							? b.MatchEvent.HomeTeam.LogoUrl
-							: b.Pick == MatchPick.Away
-								? b.MatchEvent.AwayTeam.LogoUrl
-								: null,
+							: b.MatchEvent.AwayTeam.LogoUrl,
 
-					Stake = b.BetSlip.Amount,
-					Payout = b.BetSlip.WinAmount
+					BetCount = 1,
+
+					Stake =
+						b.BetSlip.Bets.Count > 0
+							? b.BetSlip.Amount / b.BetSlip.Bets.Count
+							: 0m,
+
+					Payout =
+						b.Status == BetStatus.Won && b.BetSlip.Bets.Count > 0
+							? (b.BetSlip.Amount / b.BetSlip.Bets.Count) * b.Odds
+							: 0m
 				})
-				.Where(x => x.TeamId != null) // ignore Draws
 				.ToListAsync();
 
-			// 4️⃣ Aggregate per team
+
 			var teamStats = raw
 				.GroupBy(x => new { x.TeamId, x.TeamName, x.Logo })
 				.Select(g => new AdminTeamBettingStatsDto
@@ -204,15 +210,16 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					TeamId = g.Key.TeamId!.Value,
 					TeamName = g.Key.TeamName!,
 					LogoUrl = g.Key.Logo!,
-					TotalBets = g.Count(),
-					TotalStake = g.Sum(x => x.Stake),
-					TotalPayout = g.Sum(x => x.Payout ?? 0m)
+					TotalBets = g.Sum(x => x.BetCount),
+					TotalStake = Math.Round(g.Sum(x => x.Stake), 2),
+					TotalPayout = Math.Round(g.Sum(x => x.Payout), 2)
 				})
 				.OrderByDescending(x => x.TotalBets)
 				.ToList();
 
 			return teamStats;
 		}
+
 
 	}
 }
