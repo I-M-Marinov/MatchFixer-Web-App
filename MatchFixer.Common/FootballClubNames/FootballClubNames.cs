@@ -49,6 +49,7 @@
 			["SV Darmstadt 98"] = "SV Darmstadt 98",
 			["Vfl Bochum"] = "VfL Bochum",
 			["Union Berlin"] = "1. FC Union Berlin",
+			["FC St. Pauli"] = "FC St. Pauli",
 
 
 			// English clubs
