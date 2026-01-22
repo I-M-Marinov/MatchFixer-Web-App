@@ -93,7 +93,8 @@ namespace MatchFixer.Core.Services
 					IsDerby = e.IsDerby,
 					IsPostponed = e.IsPostponed,
 					UserTimeZone = user.TimeZone,
-					ApiFixtureId = e.ApiFixtureId
+					ApiFixtureId = e.ApiFixtureId,
+					CompetitionName = e.CompetitionName
 				});
 			}
 
@@ -149,6 +150,7 @@ namespace MatchFixer.Core.Services
 					EffectiveDrawOdds = activeBoostEntity != null ? (e.DrawOdds + activeBoostEntity.BoostValue) : e.DrawOdds,
 					EffectiveAwayWinOdds = activeBoostEntity != null ? (e.AwayOdds + activeBoostEntity.BoostValue) : e.AwayOdds,
 					ApiFixtureId = e.ApiFixtureId,
+					CompetitionName = e.CompetitionName,
 
 					ActiveBoost = activeBoostEntity,
 					BoostEndUtc = activeBoostEntity?.EndUtc,
@@ -207,7 +209,10 @@ namespace MatchFixer.Core.Services
 				HomeOdds = model.HomeOdds,
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
-				IsDerby = isDerby
+				IsDerby = isDerby,
+				CompetitionName = string.IsNullOrWhiteSpace(model.CompetitionName)
+					? null
+					: model.CompetitionName
 			};
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
@@ -233,7 +238,8 @@ namespace MatchFixer.Core.Services
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby,
-				ApiFixtureId = apiFixtureId  
+				ApiFixtureId = apiFixtureId,
+				CompetitionName = null // signifies that this is a domestic match only ! 
 			};
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
