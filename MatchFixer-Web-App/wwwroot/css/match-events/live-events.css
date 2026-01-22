@@ -129,8 +129,10 @@
     left: 1.2em;
 }
 
-.derby-negative-margin {
-    margin-top: -2.2em !important; 
+.derby-negative-margin,
+.competition-negative-margin {
+    margin-top: -2.2em !important;
+    z-index: 999 !important;
 }
 
 /* --------------------------------------------------------------
@@ -138,9 +140,15 @@
 --------------------------------------------------------------- */
 
 .custom-event-tooltip-wrapper,
-.derby-match-tooltip-wrapper {
+.derby-match-tooltip-wrapper,
+.competition-tooltip-wrapper {
     position: relative;
     display: inline-block;
+}
+
+.derby-match-tooltip-wrapper,
+.competition-tooltip-wrapper {
+    z-index: 1001;
 }
 
 .custom-event-tooltip {
@@ -161,7 +169,8 @@
     font-size: 0.75rem;
 }
 
-.derby-match-tooltip {
+.derby-match-tooltip,
+.competition-tooltip {
     visibility: hidden;
     background-color: #f1d302;
     color: black;
@@ -169,13 +178,23 @@
     padding: 0.3rem 0.3rem;
     border-radius: 9px;
     position: absolute;
-    z-index: 9999;
+    z-index: 999;
     bottom: 100%;
     right: -90%;
     opacity: 0;
     transition: opacity 0.2s;
     white-space: nowrap;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+}
+
+.derby-match-tooltip-wrapper img{
+    margin-left: 0.65em;
+    margin-top: 0.35em;
+}
+
+.competition-tooltip-wrapper img {
+    margin-left: 0.65em;
+    margin-top: 0.35em;
 }
 
 .custom-event-tooltip-wrapper:hover .custom-event-tooltip {
@@ -184,6 +203,11 @@
 }
 
 .derby-match-tooltip-wrapper:hover .derby-match-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.competition-tooltip-wrapper:hover .competition-tooltip {
     visibility: visible;
     opacity: 1;
 }
