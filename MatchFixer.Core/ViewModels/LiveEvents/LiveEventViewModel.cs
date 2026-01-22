@@ -27,6 +27,9 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public string? HomeTeamLogoUrl { get; set; }
 		public string? AwayTeamLogoUrl { get; set; }
 		public bool IsDerby { get; set; }
+		public string? CompetitionName { get; set; }
+		public bool IsCompetitionMatch =>
+			!string.IsNullOrWhiteSpace(CompetitionName);
 		public string UserTimeZone { get; set; }
 		public bool IsCancelled { get; set; }
 		public bool IsPostponed { get; set; }
@@ -34,6 +37,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public BoostViewModel? BoostActive { get; set; }
 		public int? ApiFixtureId { get; set; }
 		public bool IsFromApi => ApiFixtureId != null;
+
 
 	}
 }
