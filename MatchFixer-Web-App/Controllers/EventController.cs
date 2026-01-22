@@ -1,10 +1,12 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.FootballCompetitions;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.DTO;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure.Models.FootballAPI;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
 using static MatchFixer.Common.GeneralConstants.OddsBoostConstants;
 using static MatchFixer.Common.GeneralConstants.MatchEventsApiConstants;
@@ -34,6 +36,7 @@ namespace MatchFixer_Web_App.Controllers
 			var model = new MatchEventFormModel
 			{
 				TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync(),
+				AvailableCompetitions = GetCompetitionSelectList(),
 				CurrentEvents = await _matchEventService.GetAllEventsAsync(),
 				ApiLeagues = await _matchEventService.GetApiLeaguesAsync()
 			};
@@ -50,6 +53,8 @@ namespace MatchFixer_Web_App.Controllers
 			if (!ModelState.IsValid)
 			{
 				model.TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync();
+				model.AvailableCompetitions = GetCompetitionSelectList();
+
 				return View(model);
 			}
 
@@ -62,6 +67,8 @@ namespace MatchFixer_Web_App.Controllers
 				TempData["ErrorMessage"] = e.Message;
 
 				model.TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync();
+				model.AvailableCompetitions = GetCompetitionSelectList();
+
 				return View(model);
 			}
 
@@ -272,7 +279,32 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
-
+		private static List<SelectListItem> GetCompetitionSelectList()
+		{
+			return new()
+			{
+				new SelectListItem
+				{
+					Text = "Domestic League Match",
+					Value = "" // maps to null → league match
+				},
+				new SelectListItem
+				{
+					Text = FootballCompetitions.ChampionsLeague,
+					Value = FootballCompetitions.ChampionsLeague
+				},
+				new SelectListItem
+				{
+					Text = FootballCompetitions.EuropaLeague,
+					Value = FootballCompetitions.EuropaLeague
+				},
+				new SelectListItem
+				{
+					Text = FootballCompetitions.ConferenceLeague,
+					Value = FootballCompetitions.ConferenceLeague
+				}
+			};
+		}
 
 	}
 }
