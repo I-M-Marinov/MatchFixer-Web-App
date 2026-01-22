@@ -32,7 +32,13 @@ namespace MatchFixer.Infrastructure.Entities
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
 		public bool IsPostponed { get; set; } = false; // default to false ( match is not postponed ) 
 		public LiveMatchResult? LiveResult { get; set; }
-		public bool IsCancelled { get; set; } = false; 
+		public bool IsCancelled { get; set; } = false;
+
+		[StringLength(100)]
+		public string? CompetitionName { get; set; }
+		[NotMapped]
+		public bool IsCompetitionMatch => !string.IsNullOrWhiteSpace(CompetitionName);
+
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 		public ICollection<OddsBoost> OddsBoosts { get; set; } = new List<OddsBoost>();
 		public ICollection<MatchEventLog> MatchEventLogs { get; set; } = new List<MatchEventLog>();
