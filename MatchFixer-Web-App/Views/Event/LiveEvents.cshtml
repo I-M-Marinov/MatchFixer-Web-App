@@ -85,17 +85,51 @@
 									
 
 									<div id="oneVsOneContainer">
-										@if (match.IsDerby)
-										{
-											<span class="derby-match-tooltip-wrapper">
-												<img class="animate__animated animate__heartBeat animate__slower animate__infinite" id="derby-match-icon" src="/images/live-events/derby-match.png" alt="derby match" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
-												<span class="derby-match-tooltip">Derby Match
-												</span>
-											</span>
-										}
-									</div>
-									<div class="d-flex justify-content-around align-items-center mb-2 mt-2 @(match.IsDerby ? "derby-negative-margin" : "")">
 
+											@* Competition *@
+											@if (!string.IsNullOrWhiteSpace(match.CompetitionName))
+											{
+												<span class="competition-tooltip-wrapper">
+													<img class="animate__animated animate__heartBeat animate__slower animate__infinite"
+													     src="@GetCompetitionIcon(match.CompetitionName)"
+													     alt="@match.CompetitionName"
+													     style="height: 50px;" />
+
+													<span class="competition-tooltip">
+														@match.CompetitionName
+													</span>
+												</span>
+											}
+											@* Derby only *@
+											else if (match.IsDerby)
+											{
+												<span class="derby-match-tooltip-wrapper">
+													<img class="animate__animated animate__heartBeat animate__slower animate__infinite"
+													     src="/images/live-events/derby-match.png"
+													     alt="Derby Match"
+													     style="height: 40px;" />
+
+													<span class="derby-match-tooltip">
+														Derby Match
+													</span>
+												</span>
+											}
+											
+											@functions {
+												string GetCompetitionIcon(string competition)
+												{
+													return competition switch
+													{
+														"UEFA Champions League" => "/images/live-events/champions-league.png",
+														"UEFA Europa League" => "/images/live-events/europa-league.png",
+														"UEFA Europa Conference League" => "/images/live-events/conference-league.png",
+														_ => "/images/live-events/competition.png"
+													};
+												}
+											}
+
+									</div>
+									<div class="d-flex justify-content-around align-items-center mb-2 mt-2 @( !string.IsNullOrWhiteSpace(match.CompetitionName) ? "competition-negative-margin" : (match.IsDerby ? "derby-negative-margin" : "") )">
 										<div class="tw-flex tw-justify-around tw-items-center mb-2 gap-4">
 											<div class="text-center">
 												<div class="tw-flex  tw-flex-col  tw-items-center  tw-justify-center">
