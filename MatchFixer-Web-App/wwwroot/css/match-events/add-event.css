@@ -36,7 +36,8 @@
 }
 
 #home-team-select,
-#away-team-select {
+#away-team-select,
+#match-event-competition-select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -57,7 +58,8 @@
     margin: 0 auto;
 }
 
-#dateAndTime .form-label {
+#dateAndTime .form-label,
+.match-event-competiton .form-label{
     font-family: 'Inclusive Sans', sans-serif !important;
     font-weight: 550 !important;
     color: #124e86;
