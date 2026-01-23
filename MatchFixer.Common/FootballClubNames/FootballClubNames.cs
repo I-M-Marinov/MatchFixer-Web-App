@@ -246,6 +246,12 @@
 			["Botev Vratsa"] = "POFC Botev Vratsa",
 			["Montana"] = "PFC Montana",
 
+			// Rest of World clubs
+
+			["KuPS"] = "Kuopion Palloseura",
+			["Red Bull Salzburg"] = "FC Red Bull Salzburg",
+			["Bodo/Glimt"] = "FK Bodo/Glimt",
+
 		};
 
 		public static string GetOfficialName(string commonName)
