@@ -7,6 +7,7 @@ using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.DTO;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using MatchFixer.Common.VirtualLeagues;
 using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
 
 namespace MatchFixer_Web_App.Areas.Admin.Services
@@ -31,6 +32,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{ PolishLeagueId, PolishLeagueName },
 				{ SwissLeagueId, SwissLeagueName },
 				{ BulgarianLeagueId, BulgarianLeagueName },
+
+				// Competition-only virtual league 
+				{ VirtualLeagues.RestOfWorldId, VirtualLeagues.RestOfWorldName }
 			});
 
 		public AdminTeamsService(HttpClient http, MatchFixerDbContext db, IConfiguration config)
