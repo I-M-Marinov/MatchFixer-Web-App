@@ -251,6 +251,7 @@
 			["KuPS"] = "Kuopion Palloseura",
 			["Red Bull Salzburg"] = "FC Red Bull Salzburg",
 			["Bodo/Glimt"] = "FK Bodo/Glimt",
+			["Rangers"] = "Rangers F.C.",
 
 		};
 
