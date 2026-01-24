@@ -72,6 +72,7 @@
 					<div class="col">
 						<div class="event-card position-relative"
 						     data-match-id="@match.Id"
+						     data-competition="@match.CompetitionName"
 						     data-kickoff="@(match.KickoffTime?.ToString("o") ?? "")"
 						     data-user-tz="@match.UserTimeZone"
 						     data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
@@ -678,29 +679,25 @@
 		if (e.target.matches('#datePillContainer button')) {
 			const selected = e.target.dataset.date;
 
-			// toggle active class
-			document.querySelectorAll('#datePillContainer button').forEach(btn =>
-				btn.classList.remove('active'));
+			// Toggle date pill active
+			document.querySelectorAll('#datePillContainer button')
+				.forEach(btn => btn.classList.remove('active'));
 			e.target.classList.add('active');
 
-			// apply filter
-			document.querySelectorAll('.event-card').forEach(card => {
+			// Clear competition bubbles
+			document.querySelectorAll(".competition-bubble-wrapper")
+				.forEach(b => b.classList.remove("active"));
 
+			// Apply date filter
+			document.querySelectorAll('.event-card').forEach(card => {
 				const isPostponed = card.dataset.postponed === "true";
-				const isBoosted = card.dataset.hasBoost === "true";
 				let matches = false;
 
 				if (selected === 'all') {
 					matches = true;
-				}
-				else if (selected === 'boosted') {
-					matches = isBoosted;
-				}
-				else if (selected === 'postponed') {
+				} else if (selected === 'postponed') {
 					matches = isPostponed;
-				}
-				else {
-					// Date pills → NEVER include postponed
+				} else {
 					if (isPostponed || !card.dataset.kickoff) {
 						matches = false;
 					} else {
@@ -711,11 +708,15 @@
 
 				card.closest('.col').style.display = matches ? '' : 'none';
 			});
-				}
+
+			updateMatchCount();
+		}
 	});
+
 
 	document.addEventListener('DOMContentLoaded', () => {
 		renderDatePills();
+		renderCompetitionBubbles();
 		syncBoostedDatePill();
 
 	});
@@ -812,6 +813,7 @@
 			applyPostponedState(card);
 
 			renderDatePills();
+			renderCompetitionBubbles();  
 			updateMatchCount();
 		});
 
@@ -1268,6 +1270,131 @@
 		card.querySelector('.postponed-card')
 			?.classList.remove('d-none');
 	}
+
+	function getCompetitionIcon(name) {
+		switch (name) {
+			case "UEFA Champions League":
+				return "/images/live-events/champions-league.png";
+			case "UEFA Europa League":
+				return "/images/live-events/europa-league.png";
+			case "UEFA Europa Conference League":
+				return "/images/live-events/conference-league.png";
+			default:
+				return "/images/live-events/competition.png";
+		}
+	}
+
+	function getCompetitionClass(name) {
+		switch (name) {
+			case "UEFA Champions League":
+				return "bubble-champions";
+			case "UEFA Europa League":
+				return "bubble-europa";
+			case "UEFA Europa Conference League":
+				return "bubble-conference";
+			default:
+				return "bubble-generic";
+		}
+	}
+
+	function renderCompetitionBubbles() {
+		const container = document.getElementById("datePillContainer");
+		if (!container) return;
+
+		// Remove old bubbles
+		container.querySelectorAll(".competition-bubble-wrapper")
+			.forEach(e => e.remove());
+
+		const competitions = new Map();
+
+		const competitionPriority = [
+			"UEFA Champions League",
+			"UEFA Europa League",
+			"UEFA Europa Conference League"
+		];
+
+		competitionPriority.forEach(name => {
+			document.querySelectorAll(`.event-card[data-competition="${name}"]`)
+				.forEach(() => {
+					if (!competitions.has(name)) {
+						competitions.set(name, {
+							name,
+							icon: getCompetitionIcon(name),
+							cssClass: getCompetitionClass(name)
+						});
+					}
+				});
+		});
+
+		document.querySelectorAll(".event-card").forEach(card => {
+			const comp = card.dataset.competition;
+			if (!comp || competitions.has(comp)) return;
+
+			competitions.set(comp, {
+				name: comp,
+				icon: getCompetitionIcon(comp),
+				cssClass: getCompetitionClass(comp)
+			});
+		});
+
+		if (competitions.size === 0) return;
+
+		const allTab = document.getElementById("allTab");
+		if (!allTab) return;
+
+		let insertAfter = allTab;
+
+		competitions.forEach(c => {
+			const wrapper = document.createElement("div");
+			wrapper.className = "competition-bubble-wrapper";
+			wrapper.dataset.competition = c.name;
+
+			const bubble = document.createElement("div");
+			bubble.className = `competition-bubble ${c.cssClass}`;
+
+			const img = document.createElement("img");
+			img.src = c.icon;
+			img.alt = c.name;
+
+			bubble.appendChild(img);
+			wrapper.appendChild(bubble);
+
+			insertAfter.after(wrapper);
+			insertAfter = wrapper; // 👈 move the pointer forward
+		});
+	}
+
+
+
+	document.addEventListener("click", e => {
+		
+		if (!(e.target instanceof Element)) return;
+
+		const bubble = e.target.closest(".competition-bubble-wrapper");
+		if (!bubble) return;
+
+		const selectedCompetition = bubble.dataset.competition;
+
+		document.querySelectorAll(".competition-bubble-wrapper")
+			.forEach(b => b.classList.remove("active"));
+		bubble.classList.add("active");
+
+		document.querySelectorAll("#datePillContainer .custom-date-pill")
+			.forEach(p => p.classList.remove("active"));
+
+		document.querySelectorAll(".event-card").forEach(card => {
+			const matches =
+							card.dataset.competition &&
+							card.dataset.competition === selectedCompetition &&
+							card.dataset.postponed !== "true";
+
+			card.closest(".col").style.display = matches ? "" : "none";
+		});
+
+		updateMatchCount();
+	});
+
+
 
 </script>
 
