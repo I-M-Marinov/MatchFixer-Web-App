@@ -1,8 +1,10 @@
-﻿using System.Text.Json;
-using System.Web;
-using MatchFixer.Infrastructure.Contracts;
-using Microsoft.Extensions.Logging;
+﻿using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Models.Wikipedia;
+using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace MatchFixer.Infrastructure.Services
 {
@@ -20,49 +22,53 @@ namespace MatchFixer.Infrastructure.Services
 			_httpClient.DefaultRequestHeaders.Add("User-Agent", "MatchFixer/1.0");
 		}
 
+		private static readonly Dictionary<string, string> WikipediaTitleOverrides =
+			new(StringComparer.OrdinalIgnoreCase)
+			{
+				["Bodo/Glimt"] = "Bodø/Glimt",
+				["Malmo FF"] = "Malmö FF"
+			};
+
 		public async Task<WikiTeamInfo?> GetTeamInfoAsync(string teamName)
 		{
 			try
 			{
-				var cleanedName = CleanTeamName(teamName);
+				teamName = Uri.UnescapeDataString(teamName);
 
-				// Clean the team name before querying
-				var encodedTeamName = HttpUtility.UrlEncode(cleanedName);
+				var pageTitle = NormalizeTeamName(teamName);
 
-				// Get basic info with better image properties.
+				// Get summary via REST
+				var summary = await GetSummaryAsync(pageTitle)
+				              ?? "No summary available.";
 
-				//var url = $"api.php?action=query&prop=extracts|pageimages|images&exintro=true" +
-				//		 $"&explaintext=true&piprop=thumbnail|original&pithumbsize=300" +
-				//		 $"&imlimit=50&format=json&titles={encodedTeamName}";
+				// Query API for images
+				var encodedTitle = Uri.EscapeDataString(pageTitle);
 
-				var url = $"api.php?action=query&prop=extracts|pageimages|images" +
-				          $"&exchars=400" +
-				          $"&piprop=thumbnail|original&pithumbsize=300" +
-				          $"&imlimit=50&format=json&titles={encodedTeamName}";
-
+				var url =
+					$"api.php?action=query" +
+					$"&prop=pageimages|images" +
+					$"&piprop=thumbnail|original" +
+					$"&pithumbsize=300" +
+					$"&imlimit=50" +
+					$"&format=json" +
+					$"&titles={encodedTitle}";
 
 				var response = await _httpClient.GetAsync(url);
 				response.EnsureSuccessStatusCode();
-				var content = await response.Content.ReadAsStringAsync();
-				var jsonDoc = JsonDocument.Parse(content);
+
+				var jsonDoc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 				var pages = jsonDoc.RootElement.GetProperty("query").GetProperty("pages");
 				var page = pages.EnumerateObject().First();
 
 				if (page.Name == "-1") return null;
 
-
-				var pageTitle = page.Value.GetProperty("title").GetString() ?? cleanedName;
-
-				// Get team logo/crest
 				var imageUrl = await GetTeamLogoAsync(page.Value, pageTitle);
-
-				// Get players list
 				var players = await GetTeamPlayersAsync(pageTitle);
 
 				return new WikiTeamInfo
 				{
 					Name = pageTitle,
-					Summary = page.Value.GetProperty("extract").GetString() ?? "No summary available",
+					Summary = summary,
 					ImageUrl = imageUrl,
 					Players = players,
 					WikipediaUrl = $"https://en.wikipedia.org/wiki/{pageTitle.Replace(" ", "_")}"
@@ -70,23 +76,48 @@ namespace MatchFixer.Infrastructure.Services
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"Error fetching Wikipedia info for {teamName}");
+				_logger.LogError(ex, "Error fetching Wikipedia info for {TeamName}", teamName);
 				return null;
 			}
 		}
 
-		private string CleanTeamName(string teamName)
+
+		private string NormalizeTeamName(string teamName)
 		{
 			if (string.IsNullOrWhiteSpace(teamName))
 				return teamName;
 
-			// Clean up the Team name
 			var cleaned = teamName.Trim();
+			cleaned = Regex.Replace(cleaned, @"\s+", " ");
+			cleaned = cleaned.Normalize(NormalizationForm.FormC);
 
-			// Remove extra spaces
-			 cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\s+", " ");
+			if (WikipediaTitleOverrides.TryGetValue(cleaned, out var wikiTitle))
+				return wikiTitle;
 
 			return cleaned;
+		}
+
+		private async Task<string?> GetSummaryAsync(string pageTitle)
+		{
+			try
+			{
+				var encoded = Uri.EscapeDataString(pageTitle);
+				var url = $"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}";
+
+				var response = await _httpClient.GetAsync(url);
+				if (!response.IsSuccessStatusCode)
+					return null;
+
+				var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+
+				return json.RootElement.TryGetProperty("extract", out var extract)
+					? extract.GetString()
+					: null;
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		private async Task<string?> GetTeamLogoAsync(JsonElement pageElement, string pageTitle)
