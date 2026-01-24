@@ -143,6 +143,9 @@
      });
 
     document.addEventListener("mouseenter", (e) => {
+
+      if (!(e.target instanceof Element)) return;   
+
       const logo = e.target.closest(".hoverable-logo[data-team-name]");
       if (!logo || logo._hoverTooltip) return;
 
@@ -201,8 +204,13 @@
     }, true);
 
     document.addEventListener("mouseleave", (e) => {
-      const logo = e.target.closest(".hoverable-logo[data-team-name]");
-      if (!logo || !logo._hoverTooltip) return;
+
+    if (!(e.target instanceof Element)) return;
+
+    const logo = e.target.closest(".hoverable-logo[data-team-name]");
+
+    if (!logo) return;      
+    if (!logo || !logo._hoverTooltip) return;
 
       const tooltip = logo._hoverTooltip;
 
