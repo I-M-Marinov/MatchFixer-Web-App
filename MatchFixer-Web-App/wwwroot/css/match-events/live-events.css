@@ -446,6 +446,84 @@
     animation-timing-function: ease;
 }
 
+.competition-bubble-wrapper {
+    position: relative;
+    margin-top: 0.30em;
+    padding: 0em 0.15em;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    color: #1f2937;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    height: 40px;
+    line-height: 40px;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.competition-bubble-wrapper:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: #000;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
+}
+
+.competition-bubble-wrapper.active {
+    background-color: rgba(0, 0, 0, 0.06);
+    border-radius: 1.25rem;
+    color: #000;
+    text-shadow: 2px 1px 2px rgba(255,255,255,0.7);
+}
+
+.competition-bubble-wrapper.active:hover::before {
+    animation: none;
+}
+
+.competition-bubble {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.competition-bubble img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.competition-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.competition-bubble-wrapper:hover .competition-bubble {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.25), inset 0 0 0 2px rgba(255,255,255,0.8);
+}
+
+.competition-bubble-wrapper.active .competition-bubble {
+    transform: scale(1.12);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.9);
+}
+
+.bubble-champions {
+    background: radial-gradient(circle at top, #ffffff, #dbe8ff);
+    box-shadow: 0 0 12px rgba(10, 88, 202, 0.45), inset 0 0 0 2px rgba(10, 88, 202, 0.4);
+}
+
+.bubble-europa {
+    background: radial-gradient(circle at top, #fff1dc, #ffd4a3);
+    box-shadow: 0 0 12px rgba(255, 140, 0, 0.45), inset 0 0 0 2px rgba(255, 140, 0, 0.4);
+}
+
+.bubble-conference {
+    background: radial-gradient(circle at top, #e6fff4, #b6f0d4);
+    box-shadow: 0 0 12px rgba(0, 200, 120, 0.45), inset 0 0 0 2px rgba(0, 200, 120, 0.4);
+}
 
 .no-matches-message {
     visibility: hidden;
