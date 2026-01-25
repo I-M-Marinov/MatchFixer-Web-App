@@ -26,6 +26,7 @@
              const tooltip = document.createElement('div');  
              tooltip.className = `wiki-tooltip ${sponsorClass} loading`;
 
+             const textClass = isManUtd ? 'text-white' : 'text-black';
 
              const getTeamInfoHtml = (data) => {
                  const summaryText = data.summary || "";
@@ -42,7 +43,7 @@
                                  <img src="${data.imageUrl}"
                                       class="wiki-tooltip-img rounded"
                                       alt="${data.name} logo">` : ''}
-                             <p class="mb-2 text-black">${displayText}</p>
+                            <p class="mb-2 ${textClass}">${displayText}</p>
                              <div class="d-flex justify-content-end">
                                  <a href="${data.wikipediaUrl}"
                                     target="_blank"
