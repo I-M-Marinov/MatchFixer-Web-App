@@ -9,6 +9,7 @@
 		public string AwayTeamLogoUrl { get; set; } = "";
 		public string LeagueName { get; set; } = "";
 		public DateTime? KickoffUtc { get; set; }
+		public string? CompetitionName { get; set; }
 
 		// amounts
 		public decimal TotalStake { get; set; }
