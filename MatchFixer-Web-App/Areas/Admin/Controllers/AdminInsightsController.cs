@@ -2,7 +2,6 @@
 using MatchFixer.Infrastructure.Security;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing.Printing;
 
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
@@ -18,6 +17,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[HttpGet]
 		public async Task<IActionResult> EventsSpread(
 			string? league,
+			string? competition,               
 			int page = 1,
 			EventSort sort = EventSort.TotalBets,
 			bool desc = true,
@@ -25,6 +25,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			var model = await _svc.GetUpcomingEventBetStatsAsync(
 				league,
+				competition,                   
 				page,
 				PageSize,
 				sort,
@@ -37,6 +38,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[HttpGet]
 		public async Task<IActionResult> EventsSpreadRows(
 			string? league,
+			string? competition,               
 			int page = 1,
 			EventSort sort = EventSort.TotalBets,
 			bool desc = true,
@@ -44,6 +46,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			var model = await _svc.GetUpcomingEventBetStatsAsync(
 				league,
+				competition,                     
 				page,
 				100,
 				sort,
@@ -52,7 +55,5 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 			return PartialView("_EventsSpreadRows", model.Items);
 		}
-
-
 	}
 }
