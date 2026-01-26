@@ -14,6 +14,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		public async Task<PaginatedEventList<EventBetStatsRow>>
 			GetUpcomingEventBetStatsAsync(
 				string? league,
+				string? competition,
 				int page,
 				int pageSize,
 				EventSort sort,
@@ -25,32 +26,56 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			var now = DateTime.UtcNow;
 
-			var baseQ = _db.MatchEvents
+			var allEventsQ = _db.MatchEvents
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.AsNoTracking()
 				.Where(e => e.MatchDate > now && !e.IsCancelled);
 
-			var leagueCounts = await baseQ
+			var leagueCounts = await allEventsQ
+				.Where(e => e.CompetitionName == null)
 				.Select(e =>
 					!string.IsNullOrEmpty(e.HomeTeam.LeagueName)
 						? e.HomeTeam.LeagueName
 						: !string.IsNullOrEmpty(e.AwayTeam.LeagueName)
 							? e.AwayTeam.LeagueName
 							: "Unknown")
-				.GroupBy(leagueName => leagueName)
+				.GroupBy(x => x)
 				.Select(g => new { League = g.Key, Count = g.Count() })
 				.ToDictionaryAsync(x => x.League, x => x.Count, ct);
 
-			// League filter 
-			if (!string.IsNullOrWhiteSpace(league))
+
+			var baseQ = allEventsQ;
+
+			if (!string.IsNullOrWhiteSpace(competition))
 			{
+				// COMPETITION MODE
+				baseQ = baseQ.Where(e => e.CompetitionName == competition);
+			}
+			else if (!string.IsNullOrWhiteSpace(league))
+			{
+				// LEAGUE MODE 
 				baseQ = baseQ.Where(e =>
-					(e.HomeTeam.LeagueName != null && e.HomeTeam.LeagueName == league) ||
-					(e.AwayTeam.LeagueName != null && e.AwayTeam.LeagueName == league));
+					e.CompetitionName == null &&
+					e.HomeTeam.LeagueName == league &&
+					e.AwayTeam.LeagueName == league);
 			}
 
+			// Competition Counts 
+			var competitionCounts = await allEventsQ
+				.Where(e => e.CompetitionName != null)
+				.GroupBy(e => e.CompetitionName!)
+				.Select(g => new
+				{
+					Competition = g.Key,
+					Count = g.Count()
+				})
+				.ToDictionaryAsync(x => x.Competition, x => x.Count, ct);
+
+
+
 			var total = await baseQ.CountAsync(ct);
+
 
 			var raw = await baseQ
 				.Select(e => new
@@ -65,7 +90,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						!string.IsNullOrEmpty(e.HomeTeam.LeagueName) ? e.HomeTeam.LeagueName :
 						!string.IsNullOrEmpty(e.AwayTeam.LeagueName) ? e.AwayTeam.LeagueName :
 						"Unknown",
-
+					CompetitionName = string.IsNullOrWhiteSpace(e.CompetitionName)
+						? null
+						: e.CompetitionName,
 					KickoffUtc = e.MatchDate,
 
 					e.HomeOdds,
@@ -93,6 +120,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					LeagueName = x.LeagueName,
 					KickoffUtc = x.KickoffUtc,
 					TotalBets = x.TotalBets,
+					CompetitionName = x.CompetitionName,
 					HomeBets = x.HomeBets,
 					DrawBets = x.DrawBets,
 					AwayBets = x.AwayBets,
@@ -187,7 +215,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				Page = page,
 				PageSize = pageSize,
 				TotalCount = total,
-				LeagueEventCounts = leagueCounts
+				LeagueEventCounts = leagueCounts,
+				CompetitionCounts = competitionCounts 
+
 			};
 		}
 
