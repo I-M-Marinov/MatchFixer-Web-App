@@ -28,13 +28,17 @@
 <div class="card events-spread-card p-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em; z-index: 2;">
 	<h3 class="h5 mb-3 text-center text-black">Upcoming Events — Bet Distribution</h3>
 
-    <div id="leagueFilterPills" class="league-pills">
-	    <button class="league-pill active" data-league="all" title="All leagues">
-		    <i class="bi bi-globe"></i>
-	    </button>
-    </div>
+	<div id="leagueFilterPills" class="league-pills">
+		<button class="league-pill active" data-league="all" title="All leagues">
+			<i class="bi bi-globe"></i>
+		</button>
+	</div>
+	
+	<div id="competitionFilterBubbles"
+		 class="d-flex justify-content-center align-items-center gap-2 mt-1 mb-2">
+	</div>
 
-    <div class="table-responsive admin-bets-spread-table">
+	<div class="table-responsive admin-bets-spread-table">
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -82,7 +86,8 @@
 				                page = i,
 				                sort = Context.Request.Query["sort"],
 				                desc = Context.Request.Query["desc"],
-				                league = Context.Request.Query["league"]
+				                league = Context.Request.Query["league"],
+				                competition = Context.Request.Query["competition"]
 			                }
 		                )!;
 	                }
@@ -255,17 +260,22 @@ const leagueLogoMap = @Html.Raw(
 			if (!btn) return;
 
 			const league = btn.dataset.league;
-
 			const url = new URL(window.location.href);
+
+			//  clear competition when league changes
+			url.searchParams.delete("competition");
+
 			if (league === "all") {
 				url.searchParams.delete("league");
 			} else {
 				url.searchParams.set("league", league);
-				url.searchParams.set("page", 1);
 			}
 
+			url.searchParams.set("page", 1);
 			window.location.href = url.toString();
 		});
+
+
 
 		function applyLeagueBadges() {
 			const leagueCounts = getLeagueCounts();
@@ -336,8 +346,14 @@ const leagueLogoMap = @Html.Raw(
 				url.searchParams.set("desc", desc);
 				url.searchParams.set("page", page);
 
-				const league = new URLSearchParams(window.location.search).get("league");
+				const params = new URLSearchParams(window.location.search);
+
+				const league = params.get("league");
+				const competition = params.get("competition");
+
 				if (league) url.searchParams.set("league", league);
+				if (competition) url.searchParams.set("competition", competition);
+
 
 				const html = await fetch(url).then(r => r.text());
 				tbody.innerHTML = html;
@@ -352,11 +368,111 @@ const leagueLogoMap = @Html.Raw(
 		});
 	});
 
+	function getCompetitionIcon(name) {
+		switch (name) {
+			case "UEFA Champions League":
+				return "/images/live-events/champions-league.png";
+			case "UEFA Europa League":
+				return "/images/live-events/europa-league.png";
+			case "UEFA Europa Conference League":
+				return "/images/live-events/conference-league.png";
+			default:
+				return "/images/live-events/competition.png";
+		}
+	}
+
+	function getCompetitionClass(name) {
+		switch (name) {
+			case "UEFA Champions League":
+				return "bubble-champions";
+			case "UEFA Europa League":
+				return "bubble-europa";
+			case "UEFA Europa Conference League":
+				return "bubble-conference";
+			default:
+				return "bubble-generic";
+		}
+	}
+
+	function getCompetitionCounts() {
+	  const el = document.getElementById("competition-counts-data");
+	  return el ? JSON.parse(el.textContent) : {};
+	}
+
+	function renderAdminCompetitionBubbles() {
+		const container = document.getElementById("competitionFilterBubbles");
+		if (!container) return;
+
+		container.innerHTML = "";
+
+		const counts = getCompetitionCounts();
+
+		const competitionPriority = [
+			"UEFA Champions League",
+			"UEFA Europa League",
+			"UEFA Europa Conference League"
+		];
+
+		competitionPriority.forEach(name => {
+			const wrapper = document.createElement("div");
+			wrapper.className = "competition-bubble-wrapper";
+			wrapper.dataset.competition = name;
+
+			if (!counts[name]) {
+				wrapper.classList.add("disabled");
+			}
+
+			const bubble = document.createElement("div");
+			bubble.className = `competition-bubble ${getCompetitionClass(name)}`;
+
+			const img = document.createElement("img");
+			img.src = getCompetitionIcon(name);
+			img.alt = name;
+
+			bubble.appendChild(img);
+			wrapper.appendChild(bubble);
+			container.appendChild(wrapper);
+		});
+	}
+
+
+
+	document.addEventListener("DOMContentLoaded", () => {
+		renderAdminCompetitionBubbles();
+	});
+
+		document.addEventListener("click", e => {
+		const bubble = e.target.closest(".competition-bubble-wrapper");
+		if (!bubble || bubble.classList.contains("disabled")) return;
+
+		const competition = bubble.dataset.competition;
+		const url = new URL(window.location.href);
+
+		// competitions are GLOBAL → clear league
+		url.searchParams.delete("league");
+
+		// reset paging + replace competition
+		url.searchParams.delete("page");
+		url.searchParams.delete("competition");
+
+		url.searchParams.set("competition", competition);
+		url.searchParams.set("page", 1);
+
+		window.location.href = url.toString();
+	});
+
+
+
+
 
 </script>
 
 <script id="league-counts-data" type="application/json">
 	@Json.Serialize(Model.LeagueEventCounts)
+</script>
+
+<script id="competition-counts-data" type="application/json">
+	@Json.Serialize(Model.CompetitionCounts)
 </script>
 
 <script id="league-total-count" type="application/json">
