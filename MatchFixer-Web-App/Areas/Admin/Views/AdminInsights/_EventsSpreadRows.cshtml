@@ -16,12 +16,14 @@
 		{ "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
 		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
 	};
+
 }
 
 @foreach (var r in Model)
 {
 	<tr data-event-id="@r.EventId"
 	    data-league="@r.LeagueName"
+	    data-competition="@r.CompetitionName"
 	    data-kickoff="@(r.KickoffUtc?.ToString("o") ?? "")"
 	    data-stake="@r.TotalStake"
 	    data-bets="@r.TotalBets">
@@ -32,14 +34,38 @@
 			<img src="@r.AwayTeamLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain;" title="@r.AwayTeam" />
 		</td>
 		@{
-			string flag = leagueFlags.TryGetValue(r.LeagueName, out var url)
-			? url
-			: "https://media.api-sports.io/flags/eu.svg";
+			var isCompetition = !string.IsNullOrWhiteSpace(r.CompetitionName);
+
+			string label;
+			string icon;
+
+			if (isCompetition)
+			{
+				label = r.CompetitionName!;
+				icon = r.CompetitionName switch
+				{
+					"UEFA Champions League" => "/images/live-events/champions-league.png",
+					"UEFA Europa League" => "/images/live-events/europa-league.png",
+					"UEFA Europa Conference League" => "/images/live-events/conference-league.png",
+					_ => "/images/live-events/competition.png"
+				};
+			}
+			else
+			{
+				label = r.LeagueName;
+				icon = leagueFlags.TryGetValue(r.LeagueName, out var url)
+					? url
+					: "https://media.api-sports.io/flags/eu.svg";
+			}
 		}
 		<td class="league-name d-flex align-items-center justify-content-center gap-2 p-3">
-			<img src="@flag" alt="@r.LeagueName flag" title="@r.LeagueName" style="width:25px;height:25px;object-fit:contain;" />
-			<span class="mb-0">@r.LeagueName</span>
+			<img src="@icon"
+			     alt="@label"
+			     title="@label"
+			     style="width:25px;height:25px;object-fit:contain;" />
+			<span class="mb-0">@label</span>
 		</td>
+
 		<td>
 			@{
 				string formatted;
