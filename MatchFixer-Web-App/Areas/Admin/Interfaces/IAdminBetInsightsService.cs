@@ -8,6 +8,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 		Task<PaginatedEventList<EventBetStatsRow>>
 			GetUpcomingEventBetStatsAsync(
 				string? league,
+				string? competition, 
 				int page,
 				int pageSize,
 				EventSort sort,
