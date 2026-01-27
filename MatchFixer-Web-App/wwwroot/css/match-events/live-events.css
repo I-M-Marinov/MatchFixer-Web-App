@@ -185,9 +185,63 @@
     transition: opacity 0.2s;
     white-space: nowrap;
     font-size: 0.65rem;
+    box-shadow: 0 0 10px rgba(30, 79, 255, 0.6);
 }
 
-.derby-match-tooltip-wrapper img{
+/* Champions League */
+.competition-ucl {
+    background: linear-gradient(135deg, #1e4fff, #0a1a66);
+    box-shadow: 0 0 10px rgba(30, 79, 255, 0.6);
+    color: ghostwhite;
+}
+
+/* Europa League */
+.competition-uel {
+    background: linear-gradient(135deg, #ff8c00, #7a3e00);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.6);
+    color: ghostwhite;
+}
+
+/* Conference League */
+.competition-uecl {
+    background: linear-gradient(135deg, #00c878, #00663f);
+    box-shadow: 0 0 10px rgba(0, 200, 120, 0.6);
+    color: ghostwhite;
+}
+
+#matchCount{
+	min-width: 110px;          
+	text-align: left;
+	font-size: 0.75em;
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+}
+
+.match-count-pill {
+    min-width: 150px;
+    padding: 0 1em;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.12);
+    font-size: 0.75em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.match-count-pill:hover {
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+
+.derby-match-tooltip-wrapper img {
     margin-left: 0.65em;
     margin-top: 0.35em;
 }
