@@ -47,7 +47,7 @@
 
 			<div class="d-flex flex-column align-items-center gap-3 mb-4 position-relative">
 
-				<div class="w-100 d-flex justify-content-center">
+				<div class="w-100 d-flex justify-content-center gap-1">
 					<div class="input-group" style="max-width: 400px;">
 						<span class="input-group-text bg-white border-end-0">
 							<i class="bi bi-search animate__animated animate__flipInX"></i>
@@ -55,7 +55,7 @@
 						<input type="text" id="matchSearch" class="form-control border-start-0" placeholder="Search team name..." oninput="filterMatches()" />
 					</div>
 					<div id="matchCount"
-					     class="text-muted fw-semibold text-center" style="font-size: 0.75em; margin-left: 1em; display: flex; justify-content: center; align-items: center;">
+						 class="text-muted fw-semibold text-center match-count-pill" style="font-size: 0.75em; margin-left: 1em; display: flex; justify-content: center; align-items: center;">
 						Available matches: 0
 					</div>
 				</div>
@@ -101,15 +101,17 @@
 											@* Competition *@
 											@if (!string.IsNullOrWhiteSpace(match.CompetitionName))
 											{
+												var cssClass = GetCompetitionCssClass(match.CompetitionName);
+
 												<span class="competition-tooltip-wrapper">
 													<img class="animate__animated animate__heartBeat animate__slower animate__infinite"
 													     src="@GetCompetitionIcon(match.CompetitionName)"
 													     alt="@match.CompetitionName"
 													     style="height: 50px;" />
 
-													<span class="competition-tooltip">
+												<span class="competition-tooltip @cssClass">
 														@match.CompetitionName
-													</span>
+												</span>
 												</span>
 											}
 											@* Derby only *@
@@ -693,18 +695,28 @@
 				const isPostponed = card.dataset.postponed === "true";
 				let matches = false;
 
-				if (selected === 'all') {
-					matches = true;
-				} else if (selected === 'postponed') {
-					matches = isPostponed;
-				} else {
-					if (isPostponed || !card.dataset.kickoff) {
-						matches = false;
+					if (selected === 'all') {
+						matches = true;
+
+					} else if (selected === 'boosted') {
+						// Boosted
+						matches =
+							card.dataset.hasBoost === "true" &&
+							card.dataset.postponed !== "true";
+
+					} else if (selected === 'postponed') {
+						matches = isPostponed;
+
 					} else {
-						const kickoffDate = card.dataset.kickoff.split('T')[0];
-						matches = kickoffDate === selected;
+						// Date-based 
+						if (isPostponed || !card.dataset.kickoff) {
+							matches = false;
+						} else {
+							const kickoffDate = card.dataset.kickoff.split('T')[0];
+							matches = kickoffDate === selected;
+						}
 					}
-				}
+
 
 				card.closest('.col').style.display = matches ? '' : 'none';
 			});
@@ -1003,9 +1015,27 @@
 		// 4. Reset container visuals
 		cardBody.classList.remove("boosted-match-container-effects");
 
-		if (cardBody.dataset.isDerby === "true") {
+		// Restore competition visuals FIRST
+		const competition = cardEl?.dataset.competition;
+
+		if (competition) {
+			switch (competition) {
+				case "UEFA Champions League":
+					cardBody.classList.add("champions-match-container-effects");
+					break;
+				case "UEFA Europa League":
+					cardBody.classList.add("europa-match-container-effects");
+					break;
+				case "UEFA Europa Conference League":
+					cardBody.classList.add("conference-match-container-effects");
+					break;
+			}
+		}
+		// Otherwise restore derby
+		else if (cardBody.dataset.isDerby === "true") {
 			cardBody.classList.add("derby-match-container-effects");
 		}
+
 
 		// 5. Reset card dataset
 		if (cardEl) {
@@ -1205,7 +1235,7 @@
 
 	// Match count
 
-		function updateMatchCount() {
+	function updateMatchCount() {
 
 		const cards = document.querySelectorAll('.event-card');
 		let count = 0;
@@ -1397,6 +1427,19 @@
 
 
 </script>
+
+@functions {
+	string GetCompetitionCssClass(string competition)
+	{
+		return competition switch
+		{
+			"UEFA Champions League" => "competition-ucl",
+			"UEFA Europa League" => "competition-uel",
+			"UEFA Europa Conference League" => "competition-uecl",
+			_ => "competition-generic"
+		};
+	}
+}
 
 <style>
 	.odds-up {
