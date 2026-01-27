@@ -253,6 +253,7 @@
 			["Bodo/Glimt"] = "FK Bodo/Glimt",
 			["Rangers"] = "Rangers F.C.",
 			["Kairat Almaty"] = "FC Kairat",
+			["Qarabag"] = "Qarabağ FK",
 
 		};
 
