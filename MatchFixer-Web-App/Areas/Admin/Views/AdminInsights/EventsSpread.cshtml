@@ -35,9 +35,8 @@
 	</div>
 	
 	<div id="competitionFilterBubbles"
-		 class="d-flex justify-content-center align-items-center gap-2 mt-1 mb-2">
+	     class="d-flex justify-content-center align-items-center gap-2 mt-1 mb-2">
 	</div>
-
 	<div class="table-responsive admin-bets-spread-table">
         <table class="table align-middle">
             <thead>
@@ -288,7 +287,7 @@ const leagueLogoMap = @Html.Raw(
 
 				const count =
 					league === "all"
-						? totalCount
+						? getGlobalEventTotal()
 						: (leagueCounts[league] ?? 0);
 
 				const badge = document.createElement("span");
@@ -303,9 +302,17 @@ const leagueLogoMap = @Html.Raw(
 			});
 		}
 
+		applyLeagueBadges();
+
+	});
 
 		function getLeagueCounts() {
 			const el = document.getElementById("league-counts-data");
+			return el ? JSON.parse(el.textContent) : {};
+		}
+
+		function getCompetitionCounts() {
+			const el = document.getElementById("competition-counts-data");
 			return el ? JSON.parse(el.textContent) : {};
 		}
 
@@ -313,10 +320,6 @@ const leagueLogoMap = @Html.Raw(
 			const el = document.getElementById("league-total-count");
 			return el ? Number(el.textContent) : 0;
 		}
-
-		applyLeagueBadges();
-
-	});
 
 	document.addEventListener("DOMContentLoaded", () => {
 
@@ -414,12 +417,16 @@ const leagueLogoMap = @Html.Raw(
 		];
 
 		competitionPriority.forEach(name => {
+			const count = counts[name] ?? 0;
+
 			const wrapper = document.createElement("div");
 			wrapper.className = "competition-bubble-wrapper";
 			wrapper.dataset.competition = name;
 
-			if (!counts[name]) {
+			if (count === 0) {
 				wrapper.classList.add("disabled");
+				wrapper.title = "No upcoming matches";
+				wrapper.setAttribute("aria-disabled", "true");
 			}
 
 			const bubble = document.createElement("div");
@@ -429,11 +436,18 @@ const leagueLogoMap = @Html.Raw(
 			img.src = getCompetitionIcon(name);
 			img.alt = name;
 
+			// badge
+			const badge = document.createElement("span");
+			badge.className = "competition-count-badge";
+			badge.textContent = count;
+
 			bubble.appendChild(img);
 			wrapper.appendChild(bubble);
+			wrapper.appendChild(badge);
 			container.appendChild(wrapper);
 		});
 	}
+
 
 
 
@@ -441,7 +455,7 @@ const leagueLogoMap = @Html.Raw(
 		renderAdminCompetitionBubbles();
 	});
 
-		document.addEventListener("click", e => {
+	document.addEventListener("click", e => {
 		const bubble = e.target.closest(".competition-bubble-wrapper");
 		if (!bubble || bubble.classList.contains("disabled")) return;
 
@@ -462,8 +476,15 @@ const leagueLogoMap = @Html.Raw(
 	});
 
 
+	function getGlobalEventTotal() {
+		const leagues = getLeagueCounts();
+		const competitions = getCompetitionCounts();
 
+		const leagueTotal = Object.values(leagues).reduce((a, b) => a + b, 0);
+		const competitionTotal = Object.values(competitions).reduce((a, b) => a + b, 0);
 
+		return leagueTotal + competitionTotal;
+	}
 
 </script>
 
