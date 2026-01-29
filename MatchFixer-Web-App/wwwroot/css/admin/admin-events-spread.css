@@ -106,11 +106,13 @@
     box-shadow: 0 6px 18px rgba(13,110,253,.35);
 }
 
-.league-filter-pill {
+.league-filter-pill,
+.competition-bubble-wrapper {
     position: relative;
 }
 
-.league-count-badge {
+.league-count-badge,
+.competition-count-badge {
     position: absolute;
     top: -3px;
     right: -6px;
@@ -126,10 +128,11 @@
     text-align: center;
     border-radius: 999px;
     box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
-    pointer-events: none; 
+    pointer-events: none;
 }
 
-.league-count-badge.zero {
+.league-count-badge.zero,
+.competition-bubble-wrapper.disabled .competition-count-badge {
     min-width: 18px;
     height: 18px;
     padding: 0 5px;
@@ -143,7 +146,6 @@
     box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
     pointer-events: none;
 }
-
 
 @media (max-width: 989px) {
 
