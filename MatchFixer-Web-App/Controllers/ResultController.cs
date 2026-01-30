@@ -54,9 +54,9 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> EventsResults(int count = 10)
+		public async Task<IActionResult> EventsResults(int day = 0)
 		{
-			var model = await _eventsResultsService.GetLatestAsync(count);
+			var model = await _eventsResultsService.GetByDayAsync(day);
 			return View(model);
 		}
 
