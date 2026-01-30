@@ -12,32 +12,76 @@ namespace MatchFixer.Core.Services
 
 		public EventsResultsService(MatchFixerDbContext dbContext) => _dbContext = dbContext;
 
-		public async Task<IReadOnlyList<EventsResults>> GetLatestAsync(int count = 10)
+		public async Task<PagedDayEventResult<EventsResults>> GetByDayAsync(int offset = 0)
 		{
-			// Not cancelled + has result
-			var query = _dbContext.MatchEvents
-				.AsNoTracking()
-				.Include(e => e.HomeTeam)
-				.Include(e => e.AwayTeam)
-				.Include(e => e.LiveResult)
-				.Where(e => !e.IsCancelled && e.LiveResult != null);
+			if (offset < 0)
+				offset = 0;
 
-			var items = await query
+			// Get all distinct result days (latest first)
+			var days = await _dbContext.MatchEvents
+				.AsNoTracking()
+				.Where(e => !e.IsCancelled && e.LiveResult != null)
+				.Select(e => DateOnly.FromDateTime(e.MatchDate.Value))
+				.Distinct()
+				.OrderByDescending(d => d)
+				.ToListAsync();
+
+			if (days.Count == 0)
+			{
+				return new PagedDayEventResult<EventsResults>
+				{
+					DayIndex = 0,
+					TotalDays = 0,
+					Items = []
+				};
+			}
+
+			// Clamp index 
+			offset = Math.Clamp(offset, 0, days.Count - 1);
+			var day = days[offset];
+
+			// Load all results for that day
+			var items = await _dbContext.MatchEvents
+				.AsNoTracking()
+				.Where(e =>
+					!e.IsCancelled &&
+					e.LiveResult != null &&
+					DateOnly.FromDateTime(e.MatchDate.Value) == day)
 				.OrderByDescending(e => e.MatchDate)
-				.Take(count)
 				.Select(e => new EventsResults
 				{
 					MatchEventId = e.Id,
+
 					HomeTeam = e.HomeTeam!.Name,
 					AwayTeam = e.AwayTeam!.Name,
+
 					HomeScore = e.LiveResult!.HomeScore,
 					AwayScore = e.LiveResult!.AwayScore,
+
 					HomeLogoUrl = e.HomeTeam!.LogoUrl,
-					AwayLogoUrl = e.AwayTeam!.LogoUrl
+					AwayLogoUrl = e.AwayTeam!.LogoUrl,
+
+					CompetitionName = string.IsNullOrWhiteSpace(e.CompetitionName)
+						? null
+						: e.CompetitionName,
+
+					LeagueName =
+						!string.IsNullOrEmpty(e.HomeTeam.LeagueName)
+							? e.HomeTeam.LeagueName
+							: !string.IsNullOrEmpty(e.AwayTeam.LeagueName)
+								? e.AwayTeam.LeagueName
+								: "Unknown"
 				})
 				.ToListAsync();
 
-			return items;
+			return new PagedDayEventResult<EventsResults>
+			{
+				Day = day,
+				Items = items,
+				DayIndex = offset,
+				TotalDays = days.Count
+			};
 		}
+
 	}
 }
