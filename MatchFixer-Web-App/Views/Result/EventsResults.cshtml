@@ -1,21 +1,125 @@
-﻿@using MatchFixer.Core.ViewModels.EventsResults;
-@model IReadOnlyList<EventsResults>
+﻿@using MatchFixer.Common.FootballCompetitions.MatchFixer.Common.Football
+@using MatchFixer.Core.ViewModels.EventsResults;
+@model PagedDayEventResult<EventsResults>
 
 @{
     ViewData["Title"] = "Latest Results";
 
-    // Split into two halves (5 & 5)
-    var half = (int)Math.Ceiling(Model.Count / 2.0);
-    var firstHalf = Model.Take(half).ToList();
-    var secondHalf = Model.Skip(half).ToList();
+    var indexedItems = Model.Items
+	    .Select((item, index) => new { item, index })
+	    .ToList();
+
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var yesterday = today.AddDays(-1);
+
+    string dayLabel =
+	    Model.Day == today
+		    ? "Today"
+		    : Model.Day == yesterday
+			    ? "Yesterday"
+			    : Model.Day.ToString("dd MMM yyyy");
+
+    var competitionLogos = Model.Items
+	    .Where(x => x.CompetitionName != null)
+	    .Select(x => FootballCompetitionLogos.GetCompetitionLogo(x.CompetitionName!))
+	    .Where(x => x != null)
+	    .Distinct()
+	    .ToList();
+
+    var leagueLogos = Model.Items
+	    .Where(x => x.CompetitionName == null)
+	    .Select(x => FootballCompetitionLogos.GetLeagueLogo(x.LeagueName))
+	    .Where(x => x != null)
+	    .Distinct()
+	    .ToList();
 }
 
 <div class="background-profile"></div>
 
 <div class="container mt-4">
-    <h3 class="mb-4 text-center">Latest results are just in:</h3>
+
+	<div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+
+		@foreach (var logo in competitionLogos)
+		{
+			var name = Model.Items
+				.First(x => x.CompetitionName != null &&
+				            FootballCompetitionLogos.GetCompetitionLogo(x.CompetitionName!) == logo)
+				.CompetitionName;
+
+			<img src="@logo"
+			     class="competition-logo-badge"
+			     data-competition="@name"
+			     alt="@name"
+			     loading="lazy" />
+		}
+
+
+		@foreach (var logo in leagueLogos)
+		{
+			var name = Model.Items
+				.First(x => x.CompetitionName == null &&
+				            FootballCompetitionLogos.GetLeagueLogo(x.LeagueName) == logo)
+				.LeagueName;
+
+			<img src="@logo"
+			     class="league-logo-badge"
+			     data-league="@name"
+			     alt="@name"
+			     loading="lazy" />
+		}
+
+
+	</div>
+	
+	<div class="text-center mb-4">
+
+		<!-- Day navigation -->
+		<nav class="event-results-pagination-nav pagination-ivm d-flex justify-content-center">
+			<ul class="pagination pagination-sm mb-0">
+
+				<li class="page-item @(Model.HasPreviousDay ? "" : "disabled")">
+					@if (Model.HasPreviousDay)
+					{
+						<a class="page-link"
+						   asp-route-day="@(Model.DayIndex + 1)">
+							Previous day
+						</a>
+					}
+					else
+					{
+						<span class="page-link">Previous day</span>
+					}
+				</li>
+
+				<li class="page-item disabled">
+					<span class="page-link">
+						@dayLabel
+					</span>
+				</li>
+
+				<li class="page-item @(Model.HasNextDay ? "" : "disabled")">
+					@if (Model.HasNextDay)
+					{
+						<a class="page-link"
+						   asp-route-day="@(Model.DayIndex - 1)">
+							Next day
+						</a>
+					}
+					else
+					{
+						<span class="page-link">Next day</span>
+					}
+				</li>
+
+			</ul>
+		</nav>
+
+	</div>
 
     <div class="row justify-content-center g-4">
+
+        <!-- LEFT COLUMN -->
         <div class="col-md-6">
             <div class="table-responsive past-results-table">
                 <table class="table table-sm table-hover align-middle">
@@ -27,31 +131,52 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (!firstHalf.Any())
+                        @{
+                            var leftItems = indexedItems.Where(x => x.index % 2 == 0).ToList();
+                        }
+
+                        @if (!leftItems.Any())
                         {
-                            <tr><td colspan="3" class="text-muted text-center">No recent results.</td></tr>
+                            <tr>
+                                <td colspan="3" class="text-muted text-center">
+                                    No recent results.
+                                </td>
+                            </tr>
                         }
                         else
                         {
-                            foreach (var r in firstHalf)
+                            foreach (var x in leftItems)
                             {
-	                            <tr>
-		                            <td>
-			                            <div class="d-flex align-items-center justify-content-center gap-2" title="@r.HomeTeam">
-				                            <span class="logo-box" title="@r.HomeTeam"><img src="@r.HomeLogoUrl" alt="@r.HomeTeam" /></span>
-				                            <span class="text-truncate">@r.HomeTeam</span>
-			                            </div>
-		                            </td>
-		                            <td class="ft-cell badge status-box bg-info text-dark">
-			                            <span class="score-pill">@r.HomeScore&nbsp;–&nbsp;@r.AwayScore</span>
-		                            </td>                                    
-		                            <td>
-			                            <div class="d-flex align-items-center justify-content-center gap-2">
-				                            <span class="logo-box" title="@r.AwayTeam"><img src="@r.AwayLogoUrl" alt="@r.AwayTeam" /></span>
-				                            <span class="text-truncate">@r.AwayTeam</span>
-			                            </div>
-		                            </td>
-	                            </tr>
+                                var r = x.item;
+                                <tr class="result-row"
+                                    data-league="@r.LeagueName"
+                                    data-competition="@r.CompetitionName">
+
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center gap-2" title="@r.HomeTeam">
+                                            <span class="logo-box">
+                                                <img src="@r.HomeLogoUrl" alt="@r.HomeTeam" />
+                                            </span>
+                                            <span class="text-truncate">@r.HomeTeam</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="ft-cell badge status-box bg-info text-dark">
+                                        <span class="score-pill">
+                                            @r.HomeScore&nbsp;–&nbsp;@r.AwayScore
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center gap-2" title="@r.AwayTeam">
+                                            <span class="logo-box">
+                                                <img src="@r.AwayLogoUrl" alt="@r.AwayTeam" />
+                                            </span>
+                                            <span class="text-truncate">@r.AwayTeam</span>
+                                        </div>
+                                    </td>
+
+                                </tr>
                             }
                         }
                     </tbody>
@@ -59,6 +184,7 @@
             </div>
         </div>
 
+        <!-- RIGHT COLUMN -->
         <div class="col-md-6">
             <div class="table-responsive past-results-table">
                 <table class="table table-sm table-hover align-middle">
@@ -70,36 +196,98 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (!secondHalf.Any())
+                        @{
+                            var rightItems = indexedItems.Where(x => x.index % 2 != 0).ToList();
+                        }
+
+                        @if (!rightItems.Any())
                         {
-                            <tr><td colspan="3" class="text-muted text-center">No more results.</td></tr>
+                            <tr>
+                                <td colspan="3" class="text-muted text-center">
+                                    No more results.
+                                </td>
+                            </tr>
                         }
                         else
                         {
-                            foreach (var r in secondHalf)
+                            foreach (var x in rightItems)
                             {
-	                            <tr>
-		                            <td>
+                                var r = x.item;
+                                <tr class="result-row"
+                                    data-league="@r.LeagueName"
+                                    data-competition="@r.CompetitionName">
+
+                                    <td>
                                         <div class="d-flex align-items-center justify-content-center gap-2" title="@r.HomeTeam">
-                                            <span class="logo-box" title="@r.HomeTeam"><img src="@r.HomeLogoUrl" alt="@r.HomeTeam" /></span>
-				                            <span class="text-truncate">@r.HomeTeam</span>
-			                            </div>
-		                            </td>
-		                            <td class="ft-cell badge status-box bg-info text-dark">
-			                            <span class="score-pill">@r.HomeScore&nbsp;–&nbsp;@r.AwayScore</span>
-		                            </td>                                    
-		                            <td>
-			                            <div class="d-flex align-items-center justify-content-center gap-2">
-                                            <span class="logo-box" title="@r.AwayTeam"><img src="@r.AwayLogoUrl" alt="@r.AwayTeam" /></span>
-				                            <span class="text-truncate">@r.AwayTeam</span>
-			                            </div>
-		                            </td>
-	                            </tr>
+                                            <span class="logo-box">
+                                                <img src="@r.HomeLogoUrl" alt="@r.HomeTeam" />
+                                            </span>
+                                            <span class="text-truncate">@r.HomeTeam</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="ft-cell badge status-box bg-info text-dark">
+                                        <span class="score-pill">
+                                            @r.HomeScore&nbsp;–&nbsp;@r.AwayScore
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center gap-2" title="@r.AwayTeam">
+                                            <span class="logo-box">
+                                                <img src="@r.AwayLogoUrl" alt="@r.AwayTeam" />
+                                            </span>
+                                            <span class="text-truncate">@r.AwayTeam</span>
+                                        </div>
+                                    </td>
+
+                                </tr>
                             }
                         }
                     </tbody>
                 </table>
             </div>
         </div>
+
     </div>
-</div>
+</div> 
+
+<script>
+(function () {
+
+    const rows = document.querySelectorAll('.result-row');
+
+    function highlight(predicate) {
+        rows.forEach(row => {
+            const match = predicate(row);
+            row.classList.toggle('highlighted', match);
+            row.classList.toggle('dimmed', !match);
+        });
+    }
+
+    function reset() {
+        rows.forEach(row => {
+            row.classList.remove('highlighted', 'dimmed');
+        });
+    }
+
+    document.querySelectorAll('.league-logo-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', () => {
+            const league = badge.dataset.league;
+            highlight(row => row.dataset.league === league);
+        });
+        badge.addEventListener('mouseleave', reset);
+    });
+
+    document.querySelectorAll('.competition-logo-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', () => {
+            const competition = badge.dataset.competition;
+            highlight(row => row.dataset.competition === competition);
+        });
+        badge.addEventListener('mouseleave', reset);
+    });
+
+})();
+</script>
+   
+
