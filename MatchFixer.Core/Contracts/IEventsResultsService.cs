@@ -4,7 +4,6 @@ namespace MatchFixer.Core.Contracts
 {
 	public interface IEventsResultsService
 	{
-		Task<IReadOnlyList<EventsResults>> GetLatestAsync(int count = 10);
-
+		Task<PagedDayEventResult<EventsResults>> GetByDayAsync(int offset = 0);
 	}
 }
