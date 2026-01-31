@@ -1,8 +1,8 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Orbitron:wght@400..900&family=Special+Gothic+Expanded+One&display=swap');
 
 .logo-box {
-    width: 28px;
-    height: 28px;
+    width: 38px;
+    height: 38px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -130,7 +130,7 @@ nav.event-results-pagination-nav {
     box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
 }
 
-/* Hover effect when user hovers over the league or competition logo*/
+/* Hover effect when user hovers over the league or competition logo */
 
 .past-results-table tbody tr:hover td,
 .past-results-table tbody tr.highlighted td {
