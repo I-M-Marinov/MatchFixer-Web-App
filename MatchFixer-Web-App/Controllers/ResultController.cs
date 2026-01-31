@@ -1,6 +1,8 @@
 ﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Services;
 using MatchFixer.Core.ViewModels.MatchResults;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
+using MatchFixer.Infrastructure.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +15,15 @@ namespace MatchFixer_Web_App.Controllers
 	{
 		private readonly ILiveMatchResultService _resultService;
 		private readonly IEventsResultsService _eventsResultsService;
+		private readonly ISessionService _sessionService;
+		private readonly ITimezoneService _timezoneService;
 
-		public ResultController(ILiveMatchResultService resultService, IEventsResultsService eventsResultsService)
+		public ResultController(ILiveMatchResultService resultService, IEventsResultsService eventsResultsService, ISessionService sessionService, ITimezoneService timezoneService)
 		{
 			_resultService = resultService;
 			_eventsResultsService = eventsResultsService;
-
+			_sessionService = sessionService;
+			_timezoneService = timezoneService;
 		}
 
 		[HttpGet]
@@ -57,6 +62,12 @@ namespace MatchFixer_Web_App.Controllers
 		public async Task<IActionResult> EventsResults(int day = 0)
 		{
 			var model = await _eventsResultsService.GetByDayAsync(day);
+
+			var userTimeZoneId = _sessionService.GetUserTimezone(); 
+			var userNow = _timezoneService.ConvertToUserTime(DateTime.UtcNow, userTimeZoneId)!;
+
+			model.TodayLocal = DateOnly.FromDateTime(userNow.Value);
+
 			return View(model);
 		}
 
