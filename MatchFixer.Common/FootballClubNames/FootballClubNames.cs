@@ -254,6 +254,8 @@
 			["Rangers"] = "Rangers F.C.",
 			["Kairat Almaty"] = "FC Kairat",
 			["Qarabag"] = "Qarabağ FK",
+			["Galatasaray"] = "Galatasaray S.K. (football)",
+			["Olympiakos Piraeus"] = "Olympiacos F.C.",
 
 		};
 
