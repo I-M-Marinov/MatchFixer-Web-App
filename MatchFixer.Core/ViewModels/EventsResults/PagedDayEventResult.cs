@@ -7,7 +7,7 @@
 
 		public int DayIndex { get; init; }          
 		public int TotalDays { get; init; }
-
+		public DateOnly TodayLocal { get; set; }
 		public bool HasPreviousDay => DayIndex < TotalDays - 1;
 		public bool HasNextDay => DayIndex > 0;
 	}
