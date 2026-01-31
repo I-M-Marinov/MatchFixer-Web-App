@@ -8,8 +8,7 @@
     var indexedItems = Model.Items
 	    .Select((item, index) => new { item, index })
 	    .ToList();
-
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var today = Model.TodayLocal;
     var yesterday = today.AddDays(-1);
 
     string dayLabel =
