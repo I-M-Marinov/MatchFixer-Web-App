@@ -218,7 +218,6 @@ namespace MatchFixer.Infrastructure.Services
 
 			string url;
 
-			// 🔥 Bulgaria: get ALL fixtures from today to season end
 			if (SupportedApiLeagues.UnreliableNsStatusLeagues.Contains(leagueId))
 			{
 				var fromDate = DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
@@ -228,7 +227,6 @@ namespace MatchFixer.Infrastructure.Services
 			}
 			else
 			{
-				// Normal leagues (NS works fine)
 				url = limit.HasValue
 					? $"{baseUrl}&next={limit.Value}"
 					: $"{baseUrl}&status=NS";
