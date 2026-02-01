@@ -1,0 +1,138 @@
+﻿@model List<MatchFixer.Core.ViewModels.LeagueTables.LeagueTableRowViewModel>
+@using MatchFixer.Common.Enums
+@using MatchFixer.Common.FootballCompetitions
+
+@{
+	var selectedLeague =
+		ViewData["SelectedLeague"] as InternalLeague?
+		?? InternalLeague.PremierLeague;
+
+	var leagues = new[]
+	{
+		new { League = InternalLeague.PremierLeague, Name = "Premier League" },
+		new { League = InternalLeague.Bundesliga, Name = "Bundesliga" },
+		new { League = InternalLeague.LaLiga, Name = "La Liga" },
+		new { League = InternalLeague.Eredivisie, Name = "Eredivisie" },
+		new { League = InternalLeague.Ligue1, Name = "Ligue 1" },
+		new { League = InternalLeague.SerieA, Name = "Serie A" },
+		new { League = InternalLeague.LigaPortugal, Name = "Liga Portugal" },
+	};
+
+}
+
+<div class="background-profile"></div>
+
+<div class="league-table-wrapper league-@selectedLeague.ToString().ToLower()">
+
+	<div class="league-selector mb-3">
+		@foreach (var league in leagues)
+		{
+			var isActive = league.League == selectedLeague;
+			var logo = FootballCompetitionLogos.GetLeagueLogo(league.Name);
+
+			<a asp-action="LeagueTables"
+			   asp-route-league="@league.League"
+			   class="league-badge @(isActive ? "active" : "")"
+			   title="@league.Name">
+				<img src="@logo" />
+			</a>
+		}
+	</div>
+	
+	<div class="league-legend">
+		<div class="legend-item">
+			<span class="legend-dot cl"></span>
+			<span>Champions League</span>
+		</div>
+
+		<div class="legend-item">
+			<span class="legend-dot el"></span>
+			<span>Europa League</span>
+		</div>
+
+		<div class="legend-item">
+			<span class="legend-dot ecl"></span>
+			<span>Conference League</span>
+		</div>
+
+		<div class="legend-item">
+			<span class="legend-dot playoff"></span>
+			<span>Playoff</span>
+		</div>
+
+		<div class="legend-item">
+			<span class="legend-dot relegation"></span>
+			<span>Relegation</span>
+		</div>
+	</div>
+
+
+
+	<table class="table table-dark table-striped align-middle league-table">
+		<thead>
+		<tr>
+			<th>
+				#
+			</th>
+
+			<th>
+				Team
+			</th>
+
+			<th data-bs-toggle="tooltip" title="Matches played">
+				P
+			</th>
+
+			<th data-bs-toggle="tooltip" title="Matches won">
+				W
+			</th>
+
+			<th data-bs-toggle="tooltip" title="Matches drawn">
+				D
+			</th>
+
+			<th data-bs-toggle="tooltip" title="Matches lost">
+				L
+			</th>
+
+			<th data-bs-toggle="tooltip" title="Goal difference (Goals For − Goals Against)">
+				GD
+			</th>
+
+			<th data-bs-toggle="tooltip" title="Total points">
+				Pts
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var row in Model)
+		{
+			<tr>
+				<td>@row.Rank</td>
+				<td>
+					<img src="@row.Badge" width="22" class="me-2" />
+					@row.Team
+				</td>
+				<td>@row.Played</td>
+				<td>@row.Wins</td>
+				<td>@row.Draws</td>
+				<td>@row.Losses</td>
+				<td>@row.GoalDiff</td>
+				<td class="fw-bold">@row.Points</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tooltipTriggerList = [].slice.call(
+            document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        );
+
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
