@@ -93,6 +93,8 @@ builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// A
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      // Add the Events Results Service
+builder.Services.AddHttpClient<ITheSportsDbApiService, TheSportsDbApiService>();// Add the SportsDBApi Service
+builder.Services.AddScoped<ILeagueTableService, LeagueTableService>();			// Add the League Table Service 
 
 
 
