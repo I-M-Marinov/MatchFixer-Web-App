@@ -277,64 +277,30 @@ public class BettingService : IBettingService
 
 	public async Task<bool> CancelBetsForMatchAsync(Guid matchEventId)
 	{
-		var relatedBets = await _dbContext.Bets
-			.Include(b => b.BetSlip)
-			.Where(b => b.MatchEventId == matchEventId && b.Status == BetStatus.Pending)
+		var bets = await _dbContext.Bets
+			.Where(b => b.MatchEventId == matchEventId)
 			.ToListAsync();
 
-		if (!relatedBets.Any())
+		if (!bets.Any())
 			return true;
 
-		var betSlipGroups = relatedBets.GroupBy(b => b.BetSlipId);
-
-		foreach (var group in betSlipGroups)
+		foreach (var bet in bets)
 		{
-			var betSlip = group.First().BetSlip;
-
-			// Void only the bets for the canceled match
-			foreach (var bet in group)
-				bet.Status = BetStatus.Voided;
-
-			// Load all bets for this slip (regardless of status)
-			var allBetsInSlip = await _dbContext.Bets
-				.Where(b => b.BetSlipId == betSlip.Id)
-				.ToListAsync();
-
-			bool anyVoided = allBetsInSlip.Any(b => b.Status == BetStatus.Voided);
-			bool anyPending = allBetsInSlip.Any(b => b.Status == BetStatus.Pending);
-			bool allWon = allBetsInSlip.All(b => b.Status == BetStatus.Won || b.Status == BetStatus.Voided);
-			bool anyLost = allBetsInSlip.Any(b => b.Status == BetStatus.Lost);
-
-			if (!anyPending)
-			{
-				// Settle the slip because no more pending bets
-				betSlip.IsSettled = true;
-
-				if (anyVoided)
-				{
-					betSlip.WinAmount = 0;
-					await _walletService.RefundBetAsync(betSlip.UserId, betSlip.Amount, betSlip.Id);
-				}
-				else if (allWon && !anyLost)
-				{
-					// Calculate winnings from only the WON bets (skip voided ones)
-					var totalOdds = allBetsInSlip
-						.Where(b => b.Status == BetStatus.Won)
-						.Aggregate(1m, (acc, bet) => acc * bet.Odds);
-
-					betSlip.WinAmount = Math.Round(betSlip.Amount * totalOdds, 2);
-
-					await _walletService.AwardWinningsAsync(betSlip.UserId, betSlip.WinAmount.Value, betSlip.Id.ToString());
-				}
-				else
-				{
-					// Some bet lost, no win
-					betSlip.WinAmount = 0;
-				}
-			}
+			bet.Status = BetStatus.Voided;
 		}
 
 		await _dbContext.SaveChangesAsync();
+
+		var affectedSlipIds = bets
+			.Select(b => b.BetSlipId)
+			.Distinct()
+			.ToList();
+
+		foreach (var slipId in affectedSlipIds)
+		{
+			await EvaluateBetSlipAsync(slipId);
+		}
+
 		return true;
 	}
 
