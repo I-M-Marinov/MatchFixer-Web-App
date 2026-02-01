@@ -1,7 +1,5 @@
 ﻿namespace MatchFixer.Common.FootballCompetitions
 {
-	namespace MatchFixer.Common.Football
-	{
 		public static class FootballCompetitionLogos
 		{
 			// Domestic leagues
@@ -45,6 +43,6 @@
 				return null;
 			}
 		}
-	}
-
 }
+
+
