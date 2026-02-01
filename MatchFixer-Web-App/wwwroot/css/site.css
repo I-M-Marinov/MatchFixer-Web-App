@@ -28,6 +28,7 @@
 @import "/css/results/match-results.css";
 @import "/css/results/events-results.css";
 @import "/css/trophy-catalog/trophy-catalog.css";
+@import "/css/league-tables/league-tables.css";
 
 * {
     font-family: "Nunito", sans-serif !important;
