@@ -256,6 +256,10 @@
 			["Qarabag"] = "Qarabağ FK",
 			["Galatasaray"] = "Galatasaray S.K. (football)",
 			["Olympiakos Piraeus"] = "Olympiacos F.C.",
+			["Ferencváros "] = "Ferencvárosi TC",
+			["Celtic "] = "Celtic F.C.",
+			["Genk"] = "KRC Genk",
+			["Zrinjski"] = "HŠK Zrinjski Mostar",
 
 		};
 
