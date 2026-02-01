@@ -1,0 +1,420 @@
+﻿.competition-selector {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+
+.league-badge.competition {
+    background: rgba(13,110,253,0.15);
+}
+
+.league-badge.competition:hover {
+    box-shadow: 0 0 12px rgba(13,110,253,0.55);
+}
+
+.league-selector {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient( 180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02) );
+    border-radius: 14px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.league-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.25);
+    transition: all 180ms ease;
+    position: relative;
+}
+
+.league-badge img {
+    max-height: 42px;
+    max-width: 42px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+.league-badge:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+}
+
+.league-badge.active {
+    background: linear-gradient( 135deg, rgba(0,255,170,0.35), rgba(0,180,255,0.35) );
+    box-shadow: 0 0 18px rgba(0,255,170,0.6), inset 0 0 0 1px rgba(255,255,255,0.25);
+}
+
+/* ===============================
+   LEAGUE TABLE 
+   =============================== */
+
+.league-table-wrapper .league-table {
+    border-collapse: separate;
+    border-spacing: 0 6px;
+}
+
+.league-table-wrapper .league-table thead th {
+    background: rgba(0,0,0,0.55);
+    border: none;
+    font-size: 0.79rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+}
+
+.league-table-wrapper .league-table tbody tr {
+    background: linear-gradient( 90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02) );
+    border-radius: 10px;
+    transition: background 140ms ease;
+}
+
+    .league-table-wrapper .league-table tbody tr:hover {
+        background: linear-gradient( 90deg, rgba(0,255,170,0.08), rgba(0,180,255,0.06) );
+    }
+
+.league-table-wrapper .league-table td {
+    border: none;
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+/* Rounded row edges */
+.league-table-wrapper .league-table td:first-of-type {
+    border-radius: 0.35em 0 0 0.35em;
+}
+
+.league-table-wrapper .league-table td:last-of-type {
+    border-radius: 0 0.35em 0.35em 0;
+}
+
+.league-table-wrapper {
+    max-width: 900px; 
+    margin: 0 auto; 
+    padding: 0 16px;
+}
+
+.league-table tbody tr {
+    position: relative;
+}
+
+.league-table tbody td:first-child {
+    position: relative;
+    padding-left: 30px; /* space for the color bar */
+}
+
+.league-table tbody td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 6px;
+    bottom: 6px;
+    width: 10px;
+    border-radius: 2px;
+    opacity: 0.9;
+}
+
+
+/* =====================================================
+   PREMIER LEAGUE (England)
+   Top 4 → Champions League
+   5th → Europa League
+   6th → Conference League
+   Bottom 3 → Relegation
+===================================================== */
+
+.league-premierleague tbody tr:nth-child(-n+4)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-premierleague tbody tr:nth-child(5)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League */
+}
+
+.league-premierleague tbody tr:nth-child(6)
+td:first-child::before {
+    background: #3ddc84; /* Conference League */
+}
+
+.league-premierleague tbody tr:nth-last-child(-n+3)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+
+/* =====================================================
+   BUNDESLIGA (Germany)
+   Top 4 → Champions League
+   5th → Europa League
+   6th → Conference League
+   16th → Relegation Playoff
+   Bottom 2 → Relegation
+===================================================== */
+
+.league-bundesliga tbody tr:nth-child(-n+4)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-bundesliga tbody tr:nth-child(5)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League */
+}
+
+.league-bundesliga tbody tr:nth-child(6)
+td:first-child::before {
+    background: #3ddc84; /* Conference League */
+}
+
+.league-bundesliga tbody tr:nth-child(16)
+td:first-child::before {
+    background: #ffb020; /* Relegation Playoff */
+}
+
+.league-bundesliga tbody tr:nth-last-child(-n+2)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+
+/* =====================================================
+   LA LIGA (Spain)
+   Top 4 → Champions League
+   5th–6th → Europa League
+   7th → Conference League
+   Bottom 3 → Relegation
+===================================================== */
+
+.league-laliga tbody tr:nth-child(-n+4)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-laliga tbody tr:nth-child(5)
+td:first-child::before,
+.league-laliga tbody tr:nth-child(6)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League */
+}
+
+.league-laliga tbody tr:nth-child(7)
+td:first-child::before {
+    background: #3ddc84; /* Conference League */
+}
+
+.league-laliga tbody tr:nth-last-child(-n+3)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+
+/* =====================================================
+   SERIE A (Italy)
+   Top 4 → Champions League
+   5th–6th → Europa League
+   7th → Conference League
+   Bottom 3 → Relegation
+===================================================== */
+
+.league-seriea tbody tr:nth-child(-n+4)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-seriea tbody tr:nth-child(5)
+td:first-child::before,
+.league-seriea tbody tr:nth-child(6)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League */
+}
+
+.league-seriea tbody tr:nth-child(7)
+td:first-child::before {
+    background: #3ddc84; /* Conference League */
+}
+
+.league-seriea tbody tr:nth-last-child(-n+3)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+
+/* =====================================================
+   LIGUE 1 (France)
+   Top 3 → Champions League
+   4th → Champions League Qualifier
+   5th → Europa League
+   6th → Conference League
+   Bottom 2 → Relegation
+===================================================== */
+
+.league-ligue1 tbody tr:nth-child(-n+3)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-ligue1 tbody tr:nth-child(4)
+td:first-child::before {
+    background: #5dade2; /* CL Qualifier */
+}
+
+.league-ligue1 tbody tr:nth-child(5)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League */
+}
+
+.league-ligue1 tbody tr:nth-child(6)
+td:first-child::before {
+    background: #3ddc84; /* Conference League */
+}
+
+.league-ligue1 tbody tr:nth-last-child(-n+2)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+
+/* =====================================================
+   LIGA PORTUGAL
+   Top 2 → Champions League
+   3rd → Champions League Qualifier
+   4th → Europa League
+   5th → Conference League
+   16th → Relegation Playoff
+   Bottom 2 → Relegation
+===================================================== */
+
+.league-ligaportugal tbody tr:nth-child(-n+2)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-ligaportugal tbody tr:nth-child(3)
+td:first-child::before {
+    background: #5dade2; /* CL Qualifier */
+}
+
+.league-ligaportugal tbody tr:nth-child(4)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League */
+}
+
+.league-ligaportugal tbody tr:nth-child(5)
+td:first-child::before {
+    background: #3ddc84; /* Conference League */
+}
+
+.league-ligaportugal tbody tr:nth-child(16)
+td:first-child::before {
+    background: #ffb020; /* Relegation Playoff */
+}
+
+.league-ligaportugal tbody tr:nth-last-child(-n+2)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+
+/* =====================================================
+   EREDIVISIE (Netherlands)
+   Top 3 → Champions League
+   4th → Europa League Qualifier
+   5th–8th → Conference League Playoffs
+   16th–17th → Relegation Playoffs
+   18th → Relegation
+===================================================== */
+
+.league-eredivisie tbody tr:nth-child(-n+3)
+td:first-child::before {
+    background: #2d8cff; /* Champions League */
+}
+
+.league-eredivisie tbody tr:nth-child(4)
+td:first-child::before {
+    background: #ff9f1a; /* Europa League Qualifier */
+}
+
+.league-eredivisie tbody tr:nth-child(n+5):nth-child(-n+8)
+td:first-child::before {
+    background: #3ddc84; /* Conference League Playoffs */
+}
+
+.league-eredivisie tbody tr:nth-child(16)
+td:first-child::before,
+.league-eredivisie tbody tr:nth-child(17)
+td:first-child::before {
+    background: #ffb020; /* Relegation Playoffs */
+}
+
+.league-eredivisie tbody tr:nth-child(18)
+td:first-child::before {
+    background: #ff4d4f; /* Relegation */
+}
+
+
+.league-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 14px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.8);
+    white-space: nowrap;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    box-shadow: 0 0 6px currentColor;
+}
+
+/* Color meanings */
+.legend-dot.cl {
+    background: #2d8cff;
+}
+
+.legend-dot.el {
+    background: #ff9f1a;
+}
+
+.legend-dot.ecl {
+    background: #3ddc84;
+}
+
+.legend-dot.playoff {
+    background: #ffb020;
+}
+
+.legend-dot.relegation {
+    background: #ff4d4f;
+}
