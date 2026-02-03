@@ -252,41 +252,75 @@
 </div> 
 
 <script>
-(function () {
+    (function () {
 
-    const rows = document.querySelectorAll('.result-row');
+        const rows = document.querySelectorAll('.result-row');
+        const badges = document.querySelectorAll(
+            '.league-logo-badge, .competition-logo-badge'
+        );
 
-    function highlight(predicate) {
-        rows.forEach(row => {
-            const match = predicate(row);
-            row.classList.toggle('highlighted', match);
-            row.classList.toggle('dimmed', !match);
+        let lockedBadge = null;
+
+        function applyHighlight(predicate) {
+            rows.forEach(row => {
+                const match = predicate(row);
+                row.classList.toggle('highlighted', match);
+                row.classList.toggle('dimmed', !match);
+            });
+        }
+
+        function clearHighlight() {
+            rows.forEach(row => {
+                row.classList.remove('highlighted', 'dimmed');
+            });
+            badges.forEach(b => b.classList.remove('active'));
+            lockedBadge = null;
+        }
+
+        badges.forEach(badge => {
+
+            const isLeague = badge.classList.contains('league-logo-badge');
+
+            badge.addEventListener('mouseenter', () => {
+                if (lockedBadge) return;
+
+                if (isLeague) {
+                    const league = badge.dataset.league;
+                    applyHighlight(r => r.dataset.league === league);
+                } else {
+                    const competition = badge.dataset.competition;
+                    applyHighlight(r => r.dataset.competition === competition);
+                }
+            });
+
+            badge.addEventListener('mouseleave', () => {
+                if (!lockedBadge) clearHighlight();
+            });
+
+            badge.addEventListener('click', () => {
+
+                if (lockedBadge === badge) {
+                    clearHighlight();
+                    return;
+                }
+
+                clearHighlight();
+                lockedBadge = badge;
+                badge.classList.add('active');
+
+                if (isLeague) {
+                    const league = badge.dataset.league;
+                    applyHighlight(r => r.dataset.league === league);
+                } else {
+                    const competition = badge.dataset.competition;
+                    applyHighlight(r => r.dataset.competition === competition);
+                }
+            });
         });
-    }
 
-    function reset() {
-        rows.forEach(row => {
-            row.classList.remove('highlighted', 'dimmed');
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') clearHighlight();
         });
-    }
 
-    document.querySelectorAll('.league-logo-badge').forEach(badge => {
-        badge.addEventListener('mouseenter', () => {
-            const league = badge.dataset.league;
-            highlight(row => row.dataset.league === league);
-        });
-        badge.addEventListener('mouseleave', reset);
-    });
-
-    document.querySelectorAll('.competition-logo-badge').forEach(badge => {
-        badge.addEventListener('mouseenter', () => {
-            const competition = badge.dataset.competition;
-            highlight(row => row.dataset.competition === competition);
-        });
-        badge.addEventListener('mouseleave', reset);
-    });
-
-})();
+    })();
 </script>
-   
-
