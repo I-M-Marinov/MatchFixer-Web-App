@@ -76,5 +76,57 @@ namespace MatchFixer.Infrastructure.Services
 
 			return parsed?.Table ?? new();
 		}
+
+		public async Task<List<LiveEventApiDto>> GetLiveEventsByLeagueAsync(
+			int leagueId,
+			CancellationToken ct = default)
+		{
+			var url =
+				$"{BaseUrl}/{_apiKey}/eventsnowleague.php?id={leagueId}";
+
+			HttpResponseMessage response;
+
+			try
+			{
+				response = await _http.GetAsync(url, ct);
+			}
+			catch
+			{
+				return new();
+			}
+
+			if (!response.IsSuccessStatusCode)
+				return new();
+
+			string content;
+
+			try
+			{
+				content = await response.Content.ReadAsStringAsync(ct);
+			}
+			catch
+			{
+				return new();
+			}
+
+			if (string.IsNullOrWhiteSpace(content))
+				return new();
+
+			try
+			{
+				var parsed = JsonSerializer.Deserialize<LiveEventsApiResponse>(
+					content,
+					new JsonSerializerOptions
+					{
+						PropertyNameCaseInsensitive = true
+					});
+
+				return parsed?.Events ?? new();
+			}
+			catch (JsonException)
+			{
+				return new();
+			}
+		}
 	}
 }
