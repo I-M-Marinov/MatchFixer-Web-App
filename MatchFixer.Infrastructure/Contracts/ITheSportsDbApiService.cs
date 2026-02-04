@@ -1,4 +1,5 @@
-﻿using MatchFixer.Infrastructure.Models.TheSportsDBAPI;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Infrastructure.Models.TheSportsDBAPI;
 
 namespace MatchFixer.Infrastructure.Contracts
 {
@@ -7,6 +8,10 @@ namespace MatchFixer.Infrastructure.Contracts
 		Task<List<LeagueTableRowApiDto>> GetLeagueTableAsync(
 			int leagueId,
 			string season,
+			CancellationToken ct = default);
+
+		Task<List<LiveEventApiDto>> GetLiveEventsByLeagueAsync(
+			int leagueId,
 			CancellationToken ct = default);
 	}
 }
