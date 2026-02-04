@@ -11,6 +11,12 @@
 		public int Losses { get; set; }
 		public int GoalDiff { get; set; }
 		public int Points { get; set; }
+
+		public bool IsPlayingLive { get; set; }
+
+		public string? LiveOpponent { get; set; }
+		public int? LiveGoalsFor { get; set; }
+		public int? LiveGoalsAgainst { get; set; }
 	}
 
 }
