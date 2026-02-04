@@ -3,6 +3,8 @@
 @using MatchFixer.Common.FootballCompetitions
 
 @{
+	ViewData["Title"] = "Top League Tables";
+
 	var selectedLeague =
 		ViewData["SelectedLeague"] as InternalLeague?
 		?? InternalLeague.PremierLeague;
@@ -107,11 +109,23 @@
 		<tbody>
 		@foreach (var row in Model)
 		{
-			<tr>
+			<tr class="@(row.IsPlayingLive ? "live" : "")">
+
 				<td>@row.Rank</td>
 				<td>
 					<img src="@row.Badge" width="22" class="me-2" />
 					@row.Team
+
+					@if (row.IsPlayingLive)
+					{
+						<span class="live-dot"
+						      data-bs-toggle="tooltip"
+						      title="Live vs @row.LiveOpponent"></span>
+
+						<span class="live-score">
+							(@row.LiveGoalsFor–@row.LiveGoalsAgainst)
+						</span>
+					}
 				</td>
 				<td>@row.Played</td>
 				<td>@row.Wins</td>
