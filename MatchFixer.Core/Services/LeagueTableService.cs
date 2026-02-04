@@ -9,16 +9,20 @@ namespace MatchFixer.Core.Services
 	public class LeagueTableService : ILeagueTableService
 	{
 		private readonly ITheSportsDbApiService _api;
+		private readonly ILiveMatchQueryService _liveQueryService;
 
-		public LeagueTableService(ITheSportsDbApiService api)
+		public LeagueTableService(
+			ITheSportsDbApiService api,
+			ILiveMatchQueryService liveQueryService)
 		{
 			_api = api;
+			_liveQueryService = liveQueryService;
 		}
 
 		public async Task<List<LeagueTableRowViewModel>> GetLeagueTableAsync(
-			InternalLeague league,
-			string? season = null,
-			CancellationToken ct = default)
+				InternalLeague league,
+				string? season = null,
+				CancellationToken ct = default)
 		{
 			// Resolve internal → external mapping
 			if (!FootballLeagueMappings.Leagues.TryGetValue(league, out var mapping))
@@ -46,12 +50,12 @@ namespace MatchFixer.Core.Services
 					ct);
 			}
 
-			// No data available → return empty 
+			// No data available
 			if (!apiTable.Any())
 				return new();
 
 			// Map API DTO → ViewModel
-			return apiTable
+			var table = apiTable
 				.OrderBy(r =>
 					int.TryParse(r.Rank, out var rank)
 						? rank
@@ -69,9 +73,36 @@ namespace MatchFixer.Core.Services
 					Losses = int.TryParse(r.Losses, out var losses) ? losses : 0,
 					GoalDiff = int.TryParse(r.GoalDifference, out var gd) ? gd : 0,
 					Points = int.TryParse(r.Points, out var pts) ? pts : 0,
+
+					// defaults
+					IsPlayingLive = false
 				})
 				.ToList();
+
+			// LIVE MATCH MERGE 
+			var liveMatches = await _liveQueryService
+				.GetLiveMatchesForLeagueAsync(league, ct);
+
+			if (liveMatches.Count > 0)
+			{
+				var liveLookup = liveMatches
+					.ToDictionary(x => x.TeamName, StringComparer.OrdinalIgnoreCase);
+
+				foreach (var row in table)
+				{
+					if (liveLookup.TryGetValue(row.Team, out var live))
+					{
+						row.IsPlayingLive = true;
+						row.LiveOpponent = live.Opponent;
+						row.LiveGoalsFor = live.GoalsFor;
+						row.LiveGoalsAgainst = live.GoalsAgainst;
+					}
+				}
+			}
+
+			return table;
 		}
+
 		private static string GetCurrentSeasonForTheSportsDb()
 		{
 			var now = DateTime.UtcNow;
