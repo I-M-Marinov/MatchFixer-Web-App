@@ -5,7 +5,7 @@
     background: #ffffff;
     padding: 0.15em 1.5em;
     border: 2px dotted #0dab76;
-    border-radius: 0.5em 1em 0.5em 1em;
+    border-radius: 0.5rem 1em 0.5rem 1em;
 }
 
 .betslip-submitted p {
@@ -25,25 +25,44 @@
     box-shadow: 0 0 0 0.11rem #3370a8, 0 0 0 0.22rem #0dab76 !important;
 }
 
+.slip-enclosure {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
 .slip-border-won {
     border: 1px solid #056301 !important;
+    border-radius: 0.65rem;
     box-shadow: 0 0 0 0.11rem #198754, 0 0 0 0.22rem #28a745 !important;
 }
 
 .slip-border-lost {
     border: 1px solid #b55656 !important;
+    border-radius: 0.65rem;
     box-shadow: 0 0 0 0.11rem #dc3545, 0 0 0 0.22rem #a71d2a !important;
 }
 
 .slip-border-pending {
     border: 1px solid #ffcc00 !important;
+    border-radius: 0.65rem;
     box-shadow: 0 0 0 0.11rem #ffc107, 0 0 0 0.22rem #ffdd57 !important;
 }
 
 .slip-border-void {
-    border: 1px solid #6c757d !important; 
+    border: 1px solid #6c757d !important;
+    border-radius: 0.65rem;
     box-shadow: 0 0 0 0.11rem #adb5bd, 0 0 0 0.22rem #ced4da !important;
     opacity: 0.9;
+}
+
+.slip-enclosure:has(.collapse.show) {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.slip-enclosure:has(.collapse.show) .fuzzy-points {
+    border-bottom-left-radius: 0.65rem !important;
+    border-bottom-right-radius: 0.65rem !important;
 }
 
 .slip-border-void .card-body {
@@ -150,8 +169,10 @@
     border-radius: 0em 0em 0.375rem 0.375rem;
 }
 
-.card-header-bet-totals{
-    border-radius: 0.25em !important;
+.card-header-bet-totals {
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
 }
 
 .card-header-bet-totals.open {
@@ -235,4 +256,38 @@
 
 .betslip-grid{
     max-width: 60%;
+}
+
+.betslip-events-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem; 
+    font-size: 0.7rem; 
+    font-weight: 600;
+    border-radius: 999px;
+    letter-spacing: 0.35px;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.25); 
+    text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+}
+.status-pending {
+    background-color: #b38f00; 
+    color: black;
+}
+
+.status-won {
+    background-color: #0f5132; 
+    color: #d1e7dd;
+}
+
+.status-lost {
+    background-color: #842029; 
+    color: #f8d7da;
+}
+
+.status-void {
+    background-color: #495057;
+    color: #e9ecef;
 }
