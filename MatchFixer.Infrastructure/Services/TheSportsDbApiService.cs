@@ -10,6 +10,7 @@ namespace MatchFixer.Infrastructure.Services
 		private readonly HttpClient _http;
 
 		private const string BaseUrl = "https://www.thesportsdb.com/api/v1/json";
+		private const string BaseUrlV2 = "https://www.thesportsdb.com/api/v2/json/livescore/soccer";
 		private readonly string _apiKey;
 
 
@@ -77,56 +78,36 @@ namespace MatchFixer.Infrastructure.Services
 			return parsed?.Table ?? new();
 		}
 
-		public async Task<List<LiveEventApiDto>> GetLiveEventsByLeagueAsync(
-			int leagueId,
+		public async Task<List<LiveEventApiDto>> GetLiveSoccerEventsAsync(
 			CancellationToken ct = default)
 		{
-			var url =
-				$"{BaseUrl}/{_apiKey}/eventsnowleague.php?id={leagueId}";
+			var request = new HttpRequestMessage(
+				HttpMethod.Get,
+				BaseUrlV2
+			);
 
-			HttpResponseMessage response;
+			request.Headers.Add("X-API-KEY", _apiKey);
 
-			try
-			{
-				response = await _http.GetAsync(url, ct);
-			}
-			catch
-			{
-				return new();
-			}
+			var response = await _http.SendAsync(request, ct);
 
 			if (!response.IsSuccessStatusCode)
 				return new();
 
-			string content;
-
-			try
-			{
-				content = await response.Content.ReadAsStringAsync(ct);
-			}
-			catch
-			{
-				return new();
-			}
-
+			var content = await response.Content.ReadAsStringAsync(ct);
 			if (string.IsNullOrWhiteSpace(content))
 				return new();
 
-			try
-			{
-				var parsed = JsonSerializer.Deserialize<LiveEventsApiResponse>(
-					content,
-					new JsonSerializerOptions
-					{
-						PropertyNameCaseInsensitive = true
-					});
+			var parsed = JsonSerializer.Deserialize<LiveScoreApiResponse>(
+				content,
+				new JsonSerializerOptions
+				{
+					PropertyNameCaseInsensitive = true
+				});
 
-				return parsed?.Events ?? new();
-			}
-			catch (JsonException)
-			{
-				return new();
-			}
+			return parsed?.Livescore ?? new();
 		}
+
+
+
 	}
 }
