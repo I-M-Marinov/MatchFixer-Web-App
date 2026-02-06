@@ -10,8 +10,7 @@ namespace MatchFixer.Infrastructure.Contracts
 			string season,
 			CancellationToken ct = default);
 
-		Task<List<LiveEventApiDto>> GetLiveEventsByLeagueAsync(
-			int leagueId,
+		Task<List<LiveEventApiDto>> GetLiveSoccerEventsAsync(
 			CancellationToken ct = default);
 	}
 }
