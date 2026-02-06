@@ -23,12 +23,9 @@ namespace MatchFixer.Infrastructure.Services
 			if (!FootballLeagueMappings.Leagues.TryGetValue(league, out var mapping))
 				return Array.Empty<LiveTeamMatchInfo>();
 
-			if (!mapping.TheSportsDbLeagueId.HasValue)
-				return Array.Empty<LiveTeamMatchInfo>();
+			// Get all live match events 
+			var liveEvents = await _api.GetLiveSoccerEventsAsync(ct);
 
-			var liveEvents = await _api.GetLiveEventsByLeagueAsync(
-				mapping.TheSportsDbLeagueId.Value,
-				ct);
 
 			var result = new List<LiveTeamMatchInfo>();
 
@@ -41,7 +38,7 @@ namespace MatchFixer.Infrastructure.Services
 				int.TryParse(e.intHomeScore, out var homeScore);
 				int.TryParse(e.intAwayScore, out var awayScore);
 
-				// Home team perspective
+				// Home team view
 				result.Add(new LiveTeamMatchInfo
 				{
 					TeamName = e.strHomeTeam,
@@ -50,7 +47,7 @@ namespace MatchFixer.Infrastructure.Services
 					GoalsAgainst = awayScore
 				});
 
-				// Away team perspective
+				// Away team view
 				result.Add(new LiveTeamMatchInfo
 				{
 					TeamName = e.strAwayTeam,
@@ -62,6 +59,8 @@ namespace MatchFixer.Infrastructure.Services
 
 			return result;
 		}
+
+
 	}
 
 }
