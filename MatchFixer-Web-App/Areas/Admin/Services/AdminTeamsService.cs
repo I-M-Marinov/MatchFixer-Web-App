@@ -1,5 +1,4 @@
-﻿using Azure;
-using MatchFixer.Infrastructure;
+﻿using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams;
@@ -167,6 +166,107 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.ToDictionary(kv => kv.Key, kv => kv.Value);
 			return Task.FromResult(dict);
 		}
+
+		public async Task<TeamEditorVm?> GetTeamEditorVmAsync(Guid teamId, CancellationToken ct)
+		{
+			var team = await _db.Teams
+				.Include(t => t.Aliases)
+				.FirstOrDefaultAsync(t => t.Id == teamId, ct);
+
+			if (team == null)
+				return null;
+
+			// Resolve LeagueId from LeagueName
+			var leagueId = _leagueMap
+				.FirstOrDefault(kv =>
+					kv.Value.Equals(team.LeagueName, StringComparison.OrdinalIgnoreCase))
+				.Key;
+
+			return new TeamEditorVm
+			{
+				TeamId = team.Id,
+				Name = team.Name,
+				LogoUrl = team.LogoUrl, 
+				LeagueName = team.LeagueName, 
+				LeagueId = leagueId, 
+				ApiTeamId = team.TeamId,
+
+				Leagues = _leagueMap
+					.OrderBy(kv => kv.Value)
+					.Select(kv => new LeagueOptionVm
+					{
+						Id = kv.Key,
+						Name = kv.Value
+					})
+					.ToList(),
+
+				Aliases = team.Aliases
+					.OrderBy(a => a.Alias)
+					.Select(a => new TeamAliasVm
+					{
+						Id = a.Id,
+						Alias = a.Alias
+					})
+					.ToList()
+			};
+		}
+
+
+		public async Task<bool> UpdateTeamAsync(TeamEditorVm vm)
+		{
+			var team = await _db.Teams
+				.Include(t => t.Aliases)
+				.FirstOrDefaultAsync(t => t.Id == vm.TeamId);
+
+			if (team == null)
+				return false;
+
+			team.Name = vm.Name.Trim();
+
+			// Resolve league name from static map
+			if (!_leagueMap.TryGetValue(vm.LeagueId, out var leagueName))
+				return false;
+
+			team.LeagueName = leagueName;
+
+			// ---- SINGLE ALIAS RULE ----
+			var newAlias = vm.Aliases
+				.Select(a => a.Alias?.Trim())
+				.FirstOrDefault(a => !string.IsNullOrWhiteSpace(a));
+
+			var existingAlias = team.Aliases.FirstOrDefault();
+
+			if (string.IsNullOrWhiteSpace(newAlias))
+			{
+				// Remove alias if input cleared
+				if (existingAlias != null)
+					team.Aliases.Remove(existingAlias);
+			}
+			else
+			{
+				if (existingAlias == null)
+				{
+					// Add new alias
+					team.Aliases.Add(new TeamAlias
+					{
+						Alias = newAlias,
+						Source = "AdminUpdate"
+					});
+				}
+				else
+				{
+					// Update existing alias
+					existingAlias.Alias = newAlias;
+					existingAlias.Source = "AdminUpdate";
+				}
+			}
+
+			await _db.SaveChangesAsync();
+			return true;
+		}
+
+
+
 	}
 
 }
