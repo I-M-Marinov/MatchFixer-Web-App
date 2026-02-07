@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260207112048_Add_The_TeamAlias_Entity_To_DB")]
+    partial class Add_The_TeamAlias_Entity_To_DB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -510,7 +513,7 @@ namespace MatchFixer.Infrastructure.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("TeamAliases");
+                    b.ToTable("TeamAlias");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Trophy", b =>
