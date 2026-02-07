@@ -1,0 +1,92 @@
+﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.TeamEditorVm
+
+<div class="team-editor-wrapper">
+
+    <div class="team-editor-title">
+        @Model.Name
+    </div>
+
+    <div class="team-editor-layout">
+
+        <!-- LEFT -->
+        <div class="team-editor-logo">
+            <img src="@Model.LogoUrl" alt="@Model.Name" />
+            <div class="team-editor-logo-hint">
+                Logo managed by API
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="team-editor-fields">
+            <form id="teamEditorForm">
+	            @Html.AntiForgeryToken()
+                <input type="hidden" name="TeamId" value="@Model.TeamId" />
+
+                <div class="mb-3">
+                    <label>Team name</label>
+                    <input class="form-control"
+                           name="Name"
+                           value="@Model.Name" />
+                </div>
+
+                <div class="mb-3">
+                    <label>League</label>
+                    <select class="form-select" name="LeagueId">
+                        @foreach (var l in Model.Leagues)
+                        {
+                            <option value="@l.Id"
+                                    selected="@(l.Id == Model.LeagueId)">
+                                @l.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="team-editor-aliases">
+	                <h6>Aliases</h6>
+
+	                <div id="aliasList">
+		                @if (Model.Aliases.Any())
+		                {
+			                @for (var i = 0; i < Model.Aliases.Count; i++)
+			                {
+				                <div class="team-alias-row">
+					                <input class="form-control"
+					                       name="Aliases[@i].Alias"
+					                       value="@Model.Aliases[i].Alias" />
+				                </div>
+			                }
+		                }
+		                else
+		                {
+			                @if (!Model.Aliases.Any())
+			                {
+				                <div class="team-alias-row">
+					                <input class="form-control"
+					                       name="Aliases[0].Alias"
+					                       placeholder="Add an alias…" />
+				                </div>
+			                }
+		                }
+	                </div>
+
+	                <button type="button"
+	                        class="btn btn-sm btn-outline-success team-alias-add">
+		                Add alias
+	                </button>
+                </div>
+
+
+                <div class="team-editor-save">
+                    <button class="btn btn-primary">
+                        Save team
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
