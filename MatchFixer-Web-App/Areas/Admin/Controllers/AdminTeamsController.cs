@@ -1,6 +1,5 @@
 ﻿using MatchFixer.Infrastructure.Security;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
-using MatchFixer_Web_App.Areas.Admin.Services;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,6 +65,33 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Team added." : "Already exists.";
 
 			return RedirectToAction(nameof(TeamsIndex));
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Edit(Guid teamId, CancellationToken ct)
+		{
+			var vm = await _svc.GetTeamEditorVmAsync(teamId, ct);
+			if (vm == null)
+				return NotFound();
+
+			return PartialView("_TeamEditorModal", vm);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateTeam(
+			TeamEditorVm vm,
+			CancellationToken ct)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest("Invalid team data.");
+
+			var ok = await _svc.UpdateTeamAsync(vm);
+
+			if (!ok)
+				return BadRequest("Failed to update team.");
+
+			return Ok();
 		}
 	}
 
