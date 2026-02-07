@@ -86,7 +86,12 @@ namespace MatchFixer.Core.Services
 			if (liveMatches.Count > 0)
 			{
 				var liveLookup = liveMatches
-					.ToDictionary(x => x.TeamName, StringComparer.OrdinalIgnoreCase);
+					.GroupBy(x => x.TeamName, StringComparer.OrdinalIgnoreCase)
+					.ToDictionary(
+						g => g.Key,
+						g => g.First(),
+						StringComparer.OrdinalIgnoreCase
+					);
 
 				foreach (var row in table)
 				{
