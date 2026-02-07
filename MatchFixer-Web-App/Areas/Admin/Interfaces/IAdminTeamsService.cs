@@ -20,5 +20,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 			CancellationToken ct = default);
 
 		Task<Dictionary<int, string>> GetAllLeaguesAsync(CancellationToken ct = default);
+
+		Task<TeamEditorVm?> GetTeamEditorVmAsync(Guid teamId, CancellationToken ct);
+
+		Task<bool> UpdateTeamAsync(TeamEditorVm vm);
+
 	}
 }
