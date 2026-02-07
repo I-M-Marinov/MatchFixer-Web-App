@@ -1,14 +1,13 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.FootballClubNames;
 using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Common.Identity;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
-using MatchFixer.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Security.Claims;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
@@ -497,6 +496,54 @@ namespace MatchFixer.Infrastructure.SeedData
 			}
 
 			await seeder.SeedUpcomingMatchesAsync();
+		}
+
+		public static async Task SeedTeamAliasesAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			if (await dbContext.TeamAliases.AnyAsync())
+			{
+				return;
+			}
+
+			var teams = await dbContext.Teams
+				.AsNoTracking()
+				.ToListAsync();
+
+			var aliasesToInsert = new List<TeamAlias>();
+
+			foreach (var kvp in FootballClubNames.ClubNameMap)
+			{
+				var officialName = kvp.Key.Trim();   
+				var alias = kvp.Value.Trim();      
+
+				var team = teams.FirstOrDefault(t =>
+					string.Equals(t.Name, officialName, StringComparison.OrdinalIgnoreCase));
+
+				if (team == null)
+				{
+					continue;
+				}
+
+				if (string.Equals(alias, officialName, StringComparison.OrdinalIgnoreCase))
+				{
+					continue;
+				}
+
+				aliasesToInsert.Add(new TeamAlias
+				{
+					Alias = alias,
+					TeamId = team.Id,
+					Source = "StaticDictionarySeed"
+				});
+			}
+
+			if (aliasesToInsert.Count > 0)
+			{
+				await dbContext.TeamAliases.AddRangeAsync(aliasesToInsert);
+				await dbContext.SaveChangesAsync();
+			}
 		}
 
 	}
