@@ -130,6 +130,7 @@
 			["Levante"] = "Levante UD",
 			["Elche"] = "Elche CF",
 			["Espanyol"] = "RCD Espanyol",
+			["Oviedo"] = "Real Oviedo",
 
 			// French clubs
 
