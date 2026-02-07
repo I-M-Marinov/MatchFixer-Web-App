@@ -12,11 +12,14 @@ namespace MatchFixer.Infrastructure.Services
 	{
 		private readonly HttpClient _httpClient;
 		private readonly ILogger<WikipediaService> _logger;
+		private readonly ITeamNameResolver _teamNameResolver;
 
-		public WikipediaService(HttpClient httpClient, ILogger<WikipediaService> logger)
+
+		public WikipediaService(HttpClient httpClient, ILogger<WikipediaService> logger, ITeamNameResolver teamNameResolver)
 		{
 			_httpClient = httpClient;
 			_logger = logger;
+			_teamNameResolver = teamNameResolver;
 
 			_httpClient.BaseAddress = new Uri("https://en.wikipedia.org/w/");
 			_httpClient.DefaultRequestHeaders.Add("User-Agent", "MatchFixer/1.0");
@@ -35,7 +38,15 @@ namespace MatchFixer.Infrastructure.Services
 			{
 				teamName = Uri.UnescapeDataString(teamName);
 
-				var pageTitle = NormalizeTeamName(teamName);
+				var resolvedTeam = await _teamNameResolver.ResolveTeamAsync(teamName);
+
+				var canonicalName =
+					resolvedTeam?.Aliases?.FirstOrDefault()?.Alias
+					?? resolvedTeam?.Name
+					?? teamName;
+
+				// Wikipedia-specific cleanup only
+				var pageTitle = NormalizeTeamName(canonicalName);
 
 				// Get summary via REST
 				var summary = await GetSummaryAsync(pageTitle)
