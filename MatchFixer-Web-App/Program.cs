@@ -96,6 +96,7 @@ builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      
 builder.Services.AddHttpClient<ITheSportsDbApiService, TheSportsDbApiService>();// Add the SportsDBApi Service
 builder.Services.AddScoped<ILiveMatchQueryService, LiveMatchQueryService>();	// Add the Live Match Query Service
 builder.Services.AddScoped<ILeagueTableService, LeagueTableService>();			// Add the League Table Service 
+builder.Services.AddScoped<ITeamNameResolver, TeamNameResolver>();				// Add the Team Name Resolver Service
 
 
 
@@ -174,12 +175,14 @@ using (var scope = app.Services.CreateScope())
 	await SeedDeletedUsersProfilePicture(userManager, services);       // Seed the Deleted User Image ( when user deletes their profile ) 
 	// teams 
 	await SeedTeams(services);                                       // Seed the Teams in the Teams Table
+	// team aliases
+	await SeedTeamAliasesAsync(services);						   // Seed the Teams Aliases	
 	// upcoming events 
-	await SeedUpcomingMatchEventsAsync(services);                   // UpcomingMatchEvent (API)
+	await SeedUpcomingMatchEventsAsync(services);                // UpcomingMatchEvent (API)
 	// historical match results
-	await SeedMatchResultsAsync(services);                        // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
+	await SeedMatchResultsAsync(services);                     // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 	// seed the Admin & Moderator Roles
-	await SeedRolesAndAdminAsync(services);						// Seed the Roles ( Admin and Moderator ) and the Admin account
+	await SeedRolesAndAdminAsync(services);					 // Seed the Roles ( Admin and Moderator ) and the Admin account
 
 }
 
