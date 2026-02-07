@@ -20,6 +20,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<Bet> Bets { get; set; }
 		public virtual DbSet<BetSlip> BetSlips { get; set; }
 		public virtual DbSet<Team> Teams { get; set; }
+		public virtual DbSet<TeamAlias> TeamAliases { get; set; }
 		public virtual DbSet<MatchResult> MatchResults { get; set; }
 		public virtual DbSet<Wallet> Wallets { get; set; }
 		public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
@@ -29,7 +30,6 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<MatchEventLog> MatchEventLogs { get; set; }
 		public virtual DbSet<OddsBoost> OddsBoosts { get; set; }
 		public virtual DbSet<UpcomingMatchEvent> UpcomingMatchEvents { get; set; }
-
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -126,6 +126,24 @@ namespace MatchFixer.Infrastructure
 				entity.HasIndex(e => e.ApiFixtureId)
 					.IsUnique();
 			});
+
+			builder.Entity<TeamAlias>()
+				.HasIndex(a => a.Alias)
+				.IsUnique();
+
+			builder.Entity<Team>()
+				.HasIndex(t => t.Name)
+				.IsUnique();
+
+			builder.Entity<TeamAlias>()
+				.HasOne(a => a.Team)
+				.WithMany(t => t.Aliases)
+				.HasForeignKey(a => a.TeamId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.Entity<TeamAlias>()
+				.HasIndex(a => a.Alias)
+				.IsUnique();
 		}
 	}
 }
