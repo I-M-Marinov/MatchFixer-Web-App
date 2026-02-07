@@ -630,10 +630,10 @@ table.responsive-stack td {
     vertical-align: middle;
 }
 
-.team-row {
+.team-cell .team-row {
     display: flex;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
     gap: 3px;
 }
 
