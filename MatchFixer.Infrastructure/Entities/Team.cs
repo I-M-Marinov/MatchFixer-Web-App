@@ -28,5 +28,7 @@ namespace MatchFixer.Infrastructure.Entities
 		// Navigation properties for matches
 		public ICollection<MatchResult> HomeMatches { get; set; } = new List<MatchResult>();
 		public ICollection<MatchResult> AwayMatches { get; set; } = new List<MatchResult>();
+		public ICollection<TeamAlias> Aliases { get; set; } = new List<TeamAlias>();
+
 	}
 }
