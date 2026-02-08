@@ -15,6 +15,7 @@
 .stat-label {
     display: flex;
     align-items: center;
+    flex-direction: column;
     gap: 6px;
     font-size: 0.65rem;
     font-weight: 600;
@@ -68,6 +69,13 @@
     }
 }
 
+.stat-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
 
 .stat-wrapper:hover {
     transform: translateY(-2px);
