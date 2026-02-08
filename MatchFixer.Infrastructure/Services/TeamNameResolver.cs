@@ -18,14 +18,17 @@ namespace MatchFixer.Infrastructure.Services
 			if (string.IsNullOrWhiteSpace(inputName))
 				return null;
 
+			inputName = inputName.Trim();
+
 			var alias = await _db.TeamAliases
-				.AsNoTracking()
 				.Include(a => a.Team)
-				.FirstOrDefaultAsync(a => a.Alias.ToLower() == inputName.ToLower());
+				.ThenInclude(t => t.Aliases)
+				.FirstOrDefaultAsync(a =>
+					a.Alias.ToLower() == inputName.ToLower());
 
 			return alias?.Team;
-
 		}
+
 	}
 
 }
