@@ -37,7 +37,7 @@ namespace MatchFixer.Core.Services
 			// Load ONCE
 			var existingFixtureIds = new HashSet<int>(
 				await _dbContext.MatchEvents
-					.Where(m => m.ApiFixtureId.HasValue)
+					.Where(m => m.ApiFixtureId.HasValue && !m.IsCancelled)
 					.Select(m => m.ApiFixtureId.Value)
 					.ToListAsync()
 			);
