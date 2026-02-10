@@ -67,11 +67,15 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var matchResult = e.LiveResult;
 
+				string leagueName = string.IsNullOrWhiteSpace(e.CompetitionName)
+										? e.HomeTeam.LeagueName
+										: "Rest of World";
+
 				return new AdminEventOverviewDto
 				{
 					EventId = e.Id,
 					MatchName = $"{e.HomeTeam.Name} vs {e.AwayTeam.Name}",
-					LeagueName = e.HomeTeam.LeagueName,
+					LeagueName = leagueName,
 					MatchDate = e.MatchDate,
 					HomeScore = matchResult?.HomeScore,
 					AwayScore = matchResult?.AwayScore,
