@@ -20,13 +20,11 @@ namespace MatchFixer.Infrastructure.Services
 
 			inputName = inputName.Trim();
 
-			var alias = await _db.TeamAliases
-				.Include(a => a.Team)
-				.ThenInclude(t => t.Aliases)
-				.FirstOrDefaultAsync(a =>
-					a.Alias.ToLower() == inputName.ToLower());
+			var team = await _db.Teams
+				.Include(t => t.Aliases)
+				.FirstOrDefaultAsync(t => t.Name == inputName);
 
-			return alias?.Team;
+			return team;
 		}
 
 	}
