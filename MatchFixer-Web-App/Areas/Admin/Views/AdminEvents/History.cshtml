@@ -160,12 +160,18 @@
 											int logoId = leagueLogos.ContainsKey(league.League) ? leagueLogos[league.League] : 39;
 											string logoUrl = $"https://media.api-sports.io/football/leagues/{logoId}.png";
 										}
-
-										<img src="@logoUrl"
-										     alt="@league.League logo"
-										     class="img-fluid mb-2"
-										     style="height:40px; width:auto; object-fit:contain;" />
-
+										
+										@if (league.League == "Rest of World")
+										{
+											<span style="font-size: 1.8rem;">🌍</span>
+										}
+										else
+										{
+											<img src="@logoUrl"
+											     alt="@league.League logo"
+											     class="img-fluid mb-2"
+											     style="height:40px; width:auto; object-fit:contain;" />											
+										}
 										<!-- League name -->
 										<h6 class="mb-1">@league.League</h6>
 
