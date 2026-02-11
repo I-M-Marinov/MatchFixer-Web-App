@@ -425,7 +425,7 @@ namespace MatchFixer.Core.Services
 		public async Task<bool> MatchExistsByApiFixtureAsync(int apiFixtureId)
 		{
 			return await _dbContext.MatchEvents
-				.AnyAsync(e => e.ApiFixtureId == apiFixtureId);
+				.AnyAsync(e => e.ApiFixtureId == apiFixtureId && !e.IsCancelled);
 		}
 
 		public async Task AddEventFromUpcomingAsync(UpcomingMatchDto m)
@@ -436,11 +436,16 @@ namespace MatchFixer.Core.Services
 			var homeId = await ResolveTeamIdAsync(m.HomeName);
 			var awayId = await ResolveTeamIdAsync(m.AwayName);
 
+			var utc = DateTime.SpecifyKind(
+				m.KickoffUtc.DateTime,
+				DateTimeKind.Utc
+			);
+
 			var model = new MatchEventFormModel
 			{
 				HomeTeamId = homeId,
 				AwayTeamId = awayId,
-				MatchDate = m.KickoffUtc.UtcDateTime,
+				MatchDate = utc,
 				HomeOdds = m.HomeOdds,
 				DrawOdds = m.DrawOdds,
 				AwayOdds = m.AwayOdds
