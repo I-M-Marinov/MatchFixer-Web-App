@@ -1219,5 +1219,35 @@
 		}
 
 
+		document.addEventListener("DOMContentLoaded", function () {
+
+			document.querySelectorAll(".kickoff-display").forEach(displayInput => {
+
+				displayInput.addEventListener("change", function () {
+
+					const index = this.dataset.index;
+					const hiddenInput = document.querySelector(
+						`.kickoff-hidden[data-index='${index}']`
+					);
+
+					if (!hiddenInput) return;
+
+					const parsed = new Date(this.value);
+
+					if (isNaN(parsed)) {
+						alert("Invalid date format. Please use a valid date/time.");
+						return;
+					}
+
+					// Convert to ISO yyyy-MM-ddTHH:mm
+					const iso = parsed.toISOString().slice(0, 16);
+
+					hiddenInput.value = iso;
+				});
+			});
+
+		});
+
+
 	</script>
 }
