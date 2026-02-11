@@ -19,8 +19,8 @@
 		    <input type="hidden" name="Selected[@i].AwayName" value="@Model.Selected[i].AwayName" />
 		    <input type="hidden" name="Selected[@i].HomeLogo" value="@Model.Selected[i].HomeLogo" />
 		    <input type="hidden" name="Selected[@i].AwayLogo" value="@Model.Selected[i].AwayLogo" />
-		    <input type="hidden" name="Selected[@i].KickoffUtc" value="@Model.Selected[i].KickoffUtc.ToString("o")" />  
-	    </td>
+
+		</td>
         
 	    <td class="text-center" style="font-size: 1.2em;">
 		    @if (Model.Selected[i].IsAlreadyImported)
@@ -51,12 +51,15 @@
 			    </i>
 		    }
 	    </td>
-
-
 	    <td>
-            @Model.Selected[i].KickoffUtc.ToString("g")
-        </td>
 
+		    <input type="datetime-local"
+		           name="Selected[@i].KickoffUtc"
+		           value="@Model.Selected[i].KickoffUtc.UtcDateTime.ToString("yyyy-MM-ddTHH:mm")"
+		           class="form-control form-control-sm"
+		           @(Model.Selected[i].IsAlreadyImported ? "disabled" : "") />
+
+	    </td>
         <td>
             <img src="@Model.Selected[i].HomeLogo" height="24" />
             @Model.Selected[i].HomeName
