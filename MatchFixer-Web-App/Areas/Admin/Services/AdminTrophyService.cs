@@ -137,6 +137,7 @@ namespace MatchFixer.Core.Services.Admin
 					UserId = u.Id,
 					Email = u.Email,
 					FullName = u.FirstName + " " + u.LastName,
+					UserImageUrl = u.ProfilePicture.ImageUrl,
 					Trophies = u.UserTrophies
 						.Select(ut => new AdminTrophyItemViewModel
 						{
@@ -164,6 +165,7 @@ namespace MatchFixer.Core.Services.Admin
 					UserId = u.Id,
 					Email = u.Email,
 					FullName = u.FirstName + " " + u.LastName,
+					UserImageUrl = u.ProfilePicture.ImageUrl,
 					Trophies = u.UserTrophies
 						.Select(ut => new AdminTrophyItemViewModel
 						{
