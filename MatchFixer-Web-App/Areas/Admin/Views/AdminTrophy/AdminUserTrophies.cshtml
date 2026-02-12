@@ -6,7 +6,9 @@
 	ViewData["Title"] = "User Trophies";
 }
 
-@await Html.PartialAsync("_BackToUsersButton", "Users")
+<div class="back-to-users-btn-container">
+	@await Html.PartialAsync("_BackToUsersButton", "Users")
+</div>
 
 <div class="background-profile"></div>
 
@@ -18,115 +20,92 @@
 	<form asp-action="ReevaluateAll" method="post" class="mb-4 text-center">
 		@Html.AntiForgeryToken()
 		<button class="btn btn-danger">
-			Re-evaluate ALL users
+			Re-evaluate all users
 		</button>
 	</form>
 }
 
-
-<table class="table table-bordered table-striped align-middle admin-user-trophies-table">
-	<thead>
-	<tr>
-		<th>User</th>
-		<th>Email</th>
-		<th>Trophies</th>
-		<th>Actions</th>
-	</tr>
-	</thead>
-	<tbody>
-	@foreach (var user in Model)
-	{
+<div class="table-section d-flex flex-column mb-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 2em; border-radius: 0.35em;">
+	<table class="table table-bordered table-striped align-middle admin-user-trophies-table">
+		<thead>
 		<tr>
-			<td>@user.FullName</td>
-			<td>@user.Email</td>
-			<td>
-				@if (!user.Trophies.Any())
-				{
-					<span class="text-muted">No trophies</span>
-				}
-				else
-				{
-					<div class="d-flex flex-wrap gap-2">
-						@foreach (var t in user.Trophies)
-						{
-							<img src="@t.IconUrl"
-							     alt="@t.Name"
-							     class="admin-trophy-icon rarity-@t.Level.ToString().ToLower()"
-							     data-bs-toggle="tooltip"
-							     data-bs-html="true"
-								title="
-									 <strong>@t.Name</strong><br/>
-									 <small>@t.Description</small><br/>
-									 <hr class='my-1'/>
-									 <small><em>Awarded:</em> @t.AwardedOn.ToString("dd MMM yyyy")</small>
-									 " />
-						}
-					</div>
-
-
-
-				}
-			</td>
-			<td class="text-center">
-				<form asp-action="ReevaluateUser" method="post">
-					@Html.AntiForgeryToken()
-					<input type="hidden" name="userId" value="@user.UserId" />
-					<button class="btn btn-sm btn-warning">
-						Re-evaluate
-					</button>
-				</form>
-			</td>
+			<th>Image</th>
+			<th>User</th>
+			<th>Email</th>
+			<th>Trophies</th>
+			<th>Actions</th>
 		</tr>
-	}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+		@foreach (var user in Model)
+		{
+			<tr>
+				<td>
+					<img src="@user.UserImageUrl"
+					     id="admin-user-image-trophy-view"/>
+				</td>
+				<td>@user.FullName</td>
+				<td>@user.Email</td>
+				<td>
+					@if (!user.Trophies.Any())
+					{
+						<span class="text-muted">No trophies</span>
+					}
+					else
+					{
+						var grouped = user.Trophies
+							.GroupBy(t => t.Level)
+							.OrderBy(g => g.Key);
+
+						<div class="trophy-tier-grid">
+
+							@foreach (var group in grouped)
+							{
+								<div class="trophy-tier-block tier-@group.Key.ToString().ToLower()">
+									<div class="tier-title">
+										@group.Key
+									</div>
+
+									<div class="tier-icons">
+										@foreach (var t in group)
+										{
+											<img src="@t.IconUrl"
+											     alt="@t.Name"
+											     class="admin-trophy-icon"
+											     data-bs-toggle="tooltip"
+											     data-bs-html="true"
+											     title="
+                                     <strong>@t.Name</strong><br/>
+                                     <small>@t.Description</small><br/>
+                                     <hr class='my-1'/>
+                                     <small><em>Awarded:</em> @t.AwardedOn.ToString("dd MMM yyyy")</small>
+                                 " />
+										}
+									</div>
+								</div>
+							}
+
+						</div>
+					}
+				</td>
+				<td class="text-center">
+					<form asp-action="ReevaluateUser" method="post">
+						@Html.AntiForgeryToken()
+						<input type="hidden" name="userId" value="@user.UserId"/>
+						<button class="btn btn-sm btn-warning" id="re-evaluate-btn">
+							Re-evaluate
+						</button>
+					</form>
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+
+</div>
 
 <style>
-	.admin-user-trophies-heading{
-		margin-top: 3.75em;
-		text-align: center;
-	}
-
-	.admin-user-trophies-table{
-		margin-top: 1em;
-		margin-left: 1.5em;
-	}
-
-	.admin-trophy-icon {
-		width: 50px;
-		height: 50px;
-		object-fit: contain;
-		padding: 4px;
-		background: #0f172a;
-		cursor: help;
-		transition: transform .15s ease, box-shadow .15s ease;
-	}
-
-	/* Rarity rings */
-	.rarity-bronze {
-		box-shadow: 0 0 0 2px #cd7f32;
-	}
-
-	.rarity-silver {
-		box-shadow: 0 0 0 2px #cbd5e1;
-	}
-
-	.rarity-gold {
-		box-shadow: 0 0 0 2px #facc15;
-	}
-
-	.rarity-platinum {
-		box-shadow: 0 0 0 2px #38bdf8;
-	}
-
-	.rarity-legendary {
-		box-shadow: 0 0 0 2px #a855f7;
-	}
-
-	.admin-trophy-icon:hover {
-		transform: scale(1.08);
-		box-shadow: 0 0 0 2px currentColor, 0 2px 2px rgba(0,0,0,.45);
-	}
+	
 
 
 </style>
