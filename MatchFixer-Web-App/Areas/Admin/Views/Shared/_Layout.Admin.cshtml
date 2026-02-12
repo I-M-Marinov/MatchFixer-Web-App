@@ -48,19 +48,31 @@
 
 <body>
 <header>
-	 @if (SignInManager.IsSignedIn(User))
-	    {
-		    @await Html.PartialAsync("_LoggedInUser")
-	    }
-	    else
-	    {
-		    @await Html.PartialAsync("_GuestPartial")
-        }
+	@if (SignInManager.IsSignedIn(User))
+	{
+		@await Html.PartialAsync("_LoggedInUser")
+	}
+	else
+	{
+		@await Html.PartialAsync("_GuestPartial")
+	}
 </header>
 <main class="container">
 	@RenderBody()
 </main>
 @await Html.PartialAsync("_BetSlipPartial", betSlip)
-	@RenderSection("Scripts", required: false)
+@RenderSection("Scripts", required: false)
 </body>
+
+<footer class="footer text-muted">
+	<div>
+		&copy; 2025
+		@if (DateTime.UtcNow.Year > 2025)
+		{
+		@("-" + DateTime.UtcNow.Year)
+		}
+		MatchFixer. All rights reserved.
+	</div>
+</footer>
+
 </html>
