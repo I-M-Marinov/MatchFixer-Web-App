@@ -171,9 +171,16 @@
 	
     <footer class="footer text-muted">
 	    <div>
-		    &copy; 2025 MatchFixer. All rights reserved.
+		    &copy; 2025
+
+		    @if (DateTime.UtcNow.Year > 2025)
+		    {
+			    @("-" + DateTime.UtcNow.Year)
+		    }
+		    MatchFixer. All rights reserved.
 	    </div>
     </footer>
+
 
     </body>
 </html>
