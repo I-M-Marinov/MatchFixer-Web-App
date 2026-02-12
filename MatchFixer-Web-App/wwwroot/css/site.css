@@ -124,13 +124,13 @@ body {
 .footer {
     position: absolute;
     bottom: 1%;
-    right: 2%;
+    right: 1%;
     z-index: -1;
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
     margin-top: 2rem;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     color: rgba(255,255,255,.8);
 }
 
