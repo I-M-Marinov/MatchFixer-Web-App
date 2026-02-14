@@ -1,5 +1,4 @@
-﻿
-using MatchFixer.Common.Enums;
+﻿using MatchFixer.Common.Enums;
 using MatchFixer.Common.FootballCompetitions;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Models.TheSportsDBAPI;
@@ -23,18 +22,25 @@ namespace MatchFixer.Infrastructure.Services
 			if (!FootballLeagueMappings.Leagues.TryGetValue(league, out var mapping))
 				return Array.Empty<LiveTeamMatchInfo>();
 
-			// Get all live soccer events (v2)
+			if (!mapping.TheSportsDbLeagueId.HasValue)
+				return Array.Empty<LiveTeamMatchInfo>();
+
+			var leagueId = mapping.TheSportsDbLeagueId.Value.ToString();
+
 			var liveEvents = await _api.GetLiveSoccerEventsAsync(ct);
+
+			liveEvents = liveEvents
+				.Where(e => !string.IsNullOrWhiteSpace(e.idLeague) &&
+				            e.idLeague == leagueId)
+				.ToList();
 
 			var result = new List<LiveTeamMatchInfo>();
 
 			foreach (var e in liveEvents)
 			{
-				// Exclude matches that already finished 
 				if (IsFinished(e.strStatus))
 					continue;
 
-				// Validate teams
 				if (string.IsNullOrWhiteSpace(e.strHomeTeam) ||
 				    string.IsNullOrWhiteSpace(e.strAwayTeam))
 					continue;
@@ -42,7 +48,6 @@ namespace MatchFixer.Infrastructure.Services
 				int.TryParse(e.intHomeScore, out var homeScore);
 				int.TryParse(e.intAwayScore, out var awayScore);
 
-				// Home team view
 				result.Add(new LiveTeamMatchInfo
 				{
 					TeamName = e.strHomeTeam,
@@ -51,7 +56,6 @@ namespace MatchFixer.Infrastructure.Services
 					GoalsAgainst = awayScore
 				});
 
-				// Away team view
 				result.Add(new LiveTeamMatchInfo
 				{
 					TeamName = e.strAwayTeam,
@@ -63,6 +67,7 @@ namespace MatchFixer.Infrastructure.Services
 
 			return result;
 		}
+
 
 		private static bool IsFinished(string? status)
 		{
