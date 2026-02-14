@@ -6,6 +6,12 @@
   <img src="./screen.jpg" align="center" border="10" width="500px"/>
 </p>
 
+<h3 align="center">MatchFixer Confirmation Email</h3>
+
+<p align="center">
+  <img src="./matchfixer-confirmation-email.png" align="center" border="10" width="600px"/>
+</p>
+
 <p align="center">
   <img src="./matfixer-game.jpg" align="center" border="10" width="500px"/>
 </p>
@@ -47,3 +53,5 @@
 <p align="center">
   <img src="./league-table-view.png" align="center" border="10" width="600px"/>
 </p>
+
+
