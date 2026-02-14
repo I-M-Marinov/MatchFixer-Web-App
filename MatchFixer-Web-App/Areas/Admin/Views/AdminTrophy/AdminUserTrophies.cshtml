@@ -19,10 +19,24 @@
 {
 	<form asp-action="ReevaluateAll" method="post" class="mb-4 text-center">
 		@Html.AntiForgeryToken()
-		<button class="btn btn-danger">
+		<button class="btn btn-warning">
 			Re-evaluate all users
+			
 		</button>
 	</form>
+}
+
+
+@if (Model.Count == 1)
+{
+	<div class="text-center mb-3">
+		<a asp-action="AdminUserTrophies"
+		   asp-controller="AdminTrophy"
+		   class="btn btn-light btn-sm">
+			Show All Users
+			<i class="bi bi-file-person-fill"></i>
+		</a>
+	</div>
 }
 
 <div class="table-section d-flex flex-column mb-3" style="background-color: rgba(0, 0, 0, 0.3); padding: 2em; border-radius: 0.35em;">
