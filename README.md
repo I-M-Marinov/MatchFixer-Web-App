@@ -48,6 +48,12 @@
   <img src="./conference-league.gif" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">Style of events that already started</h3>
+
+<p align="center">
+  <img src="./matchfixer-started-events.png" align="center" border="10" width="600px"/>
+</p>
+
 <h3 align="center">League Tables View for the TOP 7 Leagues</h3>
 
 <p align="center">
