@@ -1,4 +1,6 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer_Web_App.Areas.Admin.Interfaces;
+using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
@@ -58,6 +60,10 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				TempData["ErrorMessage"] = WalletNotFound;
 			}
+			catch (WalletLockedException ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
 
 			return RedirectToAction("WalletDetails");
 		}
@@ -87,6 +93,10 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				TempData["ErrorMessage"] = WalletNotFound;
 			}
+			catch (WalletLockedException ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+			}
 
 			return RedirectToAction("WalletDetails");
 		}
@@ -108,7 +118,6 @@ namespace MatchFixer_Web_App.Controllers
 
 			return RedirectToAction("WalletDetails");
 		}
-
 
 	}
 }
