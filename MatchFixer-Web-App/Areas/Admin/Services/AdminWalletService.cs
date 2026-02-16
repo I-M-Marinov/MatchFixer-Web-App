@@ -100,6 +100,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				Email = user?.Email,
 				HasWallet = true,
 				Balance = wallet.Balance,
+				IsLocked = wallet.IsLocked,
 				Currency = wallet.Currency,
 				Transactions = list.OrderByDescending(x => x.CreatedUtc).ToList()
 			};
@@ -190,5 +191,32 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			await _dbContext.SaveChangesAsync();
 			return (true, TransactionHistoryCleared);
 		}
+
+		public async Task<bool> ToggleWalletLockAsync(Guid userId, string? reason = null)
+		{
+			var wallet = await _dbContext.Wallets
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return false;
+
+			wallet.IsLocked = !wallet.IsLocked;
+
+			if (wallet.IsLocked)
+			{
+				wallet.LockedAtUtc = DateTime.UtcNow;
+				wallet.ReasonForLock = reason;
+			}
+			else
+			{
+				wallet.LockedAtUtc = null;
+				wallet.ReasonForLock = null;
+			}
+
+			await _dbContext.SaveChangesAsync();
+
+			return true;
+		}
+
 	}
 }
