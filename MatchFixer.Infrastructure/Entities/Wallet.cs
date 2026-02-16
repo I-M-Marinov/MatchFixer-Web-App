@@ -15,7 +15,10 @@ namespace MatchFixer.Infrastructure.Entities
 		public ApplicationUser User { get; set; }
 
 		[Column(TypeName = "decimal(18,2)")]
-		public decimal Balance { get; set; } = 0m;		
+		public decimal Balance { get; set; } = 0m;
+		public bool IsLocked { get; set; } = false;
+		public DateTime? LockedAtUtc { get; set; } // locked time in UTC
+		public string? ReasonForLock { get; set; } // reason for the lock 
 
 		[MaxLength(3)]
 		public string Currency { get; set; } = "EUR"; // default currently Euro
