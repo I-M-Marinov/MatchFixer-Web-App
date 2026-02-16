@@ -12,6 +12,7 @@
 		public DateTimeOffset? LockoutEnd { get; set; }
 		public string[] Roles { get; set; } = Array.Empty<string>();
 		public decimal? WalletBalance { get; set; }
+		public bool IsWalletLocked { get; set; } = false;
 		public int BetsCount { get; set; }
 		public bool IsActive { get; set; }
 		public bool IsDeleted { get; set; }
