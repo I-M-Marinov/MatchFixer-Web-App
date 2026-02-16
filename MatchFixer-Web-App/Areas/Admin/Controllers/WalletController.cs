@@ -78,5 +78,24 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
 			return RedirectToAction(nameof(ByUser), new { id });
 		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ToggleLock(Guid id)
+		{
+			var success = await _adminWalletService.ToggleWalletLockAsync(id);
+
+			if (!success)
+			{
+				TempData["ErrorMessage"] = "Wallet not found.";
+			}
+			else
+			{
+				TempData["SuccessMessage"] = "Wallet lock status updated successfully.";
+			}
+
+			return RedirectToAction(nameof(ByUser), new { id });
+		}
+
 	}
 }
