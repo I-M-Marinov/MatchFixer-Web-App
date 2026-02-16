@@ -1,5 +1,6 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
+using MatchFixer.Core.Exceptions;
 using MatchFixer.Core.ViewModels.Wallet;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
@@ -115,6 +116,9 @@ namespace MatchFixer.Core.Services
 			if (wallet == null)
 				throw new InvalidOperationException(WalletNotFound);
 
+			if (wallet.IsLocked)
+				throw new WalletLockedException();
+
 			wallet.Balance += amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
@@ -131,7 +135,12 @@ namespace MatchFixer.Core.Services
 			if (amount <= 0) throw new ArgumentException(MoneyAmountMustBePositive);
 
 			var wallet = await GetWalletAsync();
-			if (wallet == null) throw new InvalidOperationException(WalletNotFound);
+
+			if (wallet == null) 
+				throw new InvalidOperationException(WalletNotFound);
+
+			if (wallet.IsLocked)
+				throw new WalletLockedException();
 
 			if (wallet.Balance < amount)
 				return false;
