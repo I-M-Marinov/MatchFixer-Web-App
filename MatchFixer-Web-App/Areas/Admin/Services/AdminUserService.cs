@@ -101,11 +101,16 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					rolesMap[u.Id] = roles.ToArray();
 				}
 
-				var walletBalances = await _db.Wallets
+				var walletInfo = await _db.Wallets
 					.Where(w => userIds.Contains(w.UserId))
 					.GroupBy(w => w.UserId)
-					.Select(g => new { UserId = g.Key, Balance = g.Sum(x => x.Balance) })
-					.ToDictionaryAsync(x => x.UserId, x => (decimal?)x.Balance);
+					.Select(g => new
+					{
+						UserId = g.Key,
+						Balance = g.Sum(x => x.Balance),
+						IsLocked = g.Any(x => x.IsLocked)
+					})
+					.ToDictionaryAsync(x => x.UserId);
 
 				var betsCount = await _db.Bets
 					.Where(b => userIds.Contains(b.BetSlip.UserId))
@@ -131,7 +136,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd.Value > now,
 						LockoutEnd = u.LockoutEnd,
 						Roles = rolesMap.TryGetValue(u.Id, out var r) ? r : Array.Empty<string>(),
-						WalletBalance = walletBalances.TryGetValue(u.Id, out var bal) ? bal : null,
+						WalletBalance = walletInfo.TryGetValue(u.Id, out var info)
+							? (decimal?)info.Balance
+							: null,
+
+						IsWalletLocked = walletInfo.TryGetValue(u.Id, out var info2)
+						                 && info2.IsLocked,
 						BetsCount = betsCount.TryGetValue(u.Id, out var cnt) ? cnt : 0,
 						IsActive = u.IsActive,
 						IsDeleted = u.IsDeleted
