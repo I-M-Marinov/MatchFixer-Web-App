@@ -1,5 +1,5 @@
 ﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminUsersListViewModel
-@using MatchFixer.Common.Identity
+
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
     ViewData["Title"] = "Administrate Users";
@@ -10,301 +10,302 @@
 }
 
 <div class="border-0 rounded-4 p-3 mt-4 ">
-    @if (TempData["SuccessMessage"] is string s)
-    {
-		<div class="alert success-message" id="success-message" >@s</div>
-    }
-    @if (TempData["ErrorMessage"] is string e)
-    {
-		<div class="alert error-message" id="error-message">@e</div>
-    }
+@if (TempData["SuccessMessage"] is string s)
+{
+	<div class="alert success-message" id="success-message" >@s</div>
+}
+@if (TempData["ErrorMessage"] is string e)
+{
+	<div class="alert error-message" id="error-message">@e</div>
+}
 
-    <div class="admin-users-background"></div>
+<div class="admin-users-background"></div>
 
-    <!-- SEARCH FORM: -->
-    <form id="admin-users-form"
-          asp-area="Admin"
-          asp-controller="Users"
-          asp-action="ShowUsers"
-          method="get"
-          class="row g-2 mb-3">
+<!-- SEARCH FORM: -->
+<form id="admin-users-form"
+      asp-area="Admin"
+      asp-controller="Users"
+      asp-action="ShowUsers"
+      method="get"
+      class="row g-2 mb-3">
 
-	    <div class="col-sm-8 col-md-6">
-			<input name="query" value="@Model.Query" class="form-control admin-users-search" placeholder="Search by email or name..." />
-	    </div>
+	<div class="col-sm-8 col-md-6">
+		<input name="query" value="@Model.Query" class="form-control admin-users-search" placeholder="Search by email or name..." />
+	</div>
 
-	    <div class="col-auto">
-		    <select name="status" class="form-select admin-users-filter">
-			    <option value=""           selected="@(currentStatus == "" ? "selected" : null)">All statuses</option>
-			    <option value="active"     selected="@(currentStatus == "active" ? "selected" : null)">Active</option>
-			    <option value="unconfirmed"selected="@(currentStatus == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
-			    <option value="locked"     selected="@(currentStatus == "locked" ? "selected" : null)">Locked</option>
-			    <option value="deleted"    selected="@(currentStatus == "deleted" ? "selected" : null)">Deleted</option>
-		    </select>
-	    </div>
+	<div class="col-auto">
+		<select name="status" class="form-select admin-users-filter">
+			<option value=""           selected="@(currentStatus == "" ? "selected" : null)">All statuses</option>
+			<option value="active"     selected="@(currentStatus == "active" ? "selected" : null)">Active</option>
+			<option value="unconfirmed"selected="@(currentStatus == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
+			<option value="locked"     selected="@(currentStatus == "locked" ? "selected" : null)">Locked</option>
+			<option value="deleted"    selected="@(currentStatus == "deleted" ? "selected" : null)">Deleted</option>
+		</select>
+	</div>
 
-	    <div class="col-auto">
-		    <input type="hidden" name="pageSize" value="@Model.PageSize" />
-		    <button class="btn btn-primary filter-search-button"><i class="bi bi-search"></i> Filter</button>
-	    </div>
-	    <div class="col-auto">
-		    <a class="btn btn-warning" 
-		       asp-area="Admin" 
-		       asp-controller="Email" 
-		       asp-action="Compose" 
-		       title="Send email blast">
-			    <i class="bi bi-megaphone"></i> Email blast
-		    </a>
-	    </div>
+	<div class="col-auto">
+		<input type="hidden" name="pageSize" value="@Model.PageSize" />
+		<button class="btn btn-primary filter-search-button"><i class="bi bi-search"></i> Filter</button>
+	</div>
+	<div class="col-auto">
+		<a class="btn btn-warning" 
+		   asp-area="Admin" 
+		   asp-controller="Email" 
+		   asp-action="Compose" 
+		   title="Send email blast">
+			<i class="bi bi-megaphone"></i> Email blast
+		</a>
+	</div>
 
-    </form>
+</form>
 
-	<div class="table-section d-flex flex-column" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
-        <div class="table-holder flex-grow-1">
-            <div class="table-responsive admin-user-table">
-                <table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
-                    <thead class="table-dark">
-                    <tr>
-	                    <th>User Id</th>
-	                    <th>User</th>
-	                    <th>Avatar</th>
-	                    <th>Email</th>
-	                    <th>Status</th>
-	                    <th>Role</th>
-	                    <th>Wallet</th>
-	                    <th>Bets</th>
-	                    <th style="min-width:260px;">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @if (Model.Users.Count == 0)
-                    {
-	                    <tr>
-		                    <td colspan="9" class="text-muted">
-			                    No users with status '@(string.IsNullOrEmpty(Model.Status) ? "any" : Model.Status)' were found!
-		                    </td>
-	                    </tr>                    }
-                    else
-                    {
-	                    foreach (var u in Model.Users)
-	                    {
+<div class="table-section d-flex flex-column" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
+	<div class="table-holder flex-grow-1">
+		<div class="table-responsive admin-user-table">
+			<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
+				<thead class="table-dark">
+				<tr>
+					<th>User Id</th>
+					<th>User</th>
+					<th>Avatar</th>
+					<th>Email</th>
+					<th>Status</th>
+					<th>Role</th>
+					<th>Wallet</th>
+					<th>Bets</th>
+					<th style="min-width:260px;">Actions</th>
+				</tr>
+				</thead>
+				<tbody>
+				@if (Model.Users.Count == 0)
+				{
+					<tr>
+						<td colspan="9" class="text-muted">
+							No users with status '@(string.IsNullOrEmpty(Model.Status) ? "any" : Model.Status)' were found!
+						</td>
+					</tr>                    }
+				else
+				{
+					foreach (var u in Model.Users)
+					{
 
 		                    
 
-		                    <tr>
+						<tr>
 
-			                    <td class="text-center">
-				                    <div style="font-size: 0.65em;">@u.Id</div>
-			                    </td>
+							<td class="text-center">
+								<div style="font-size: 0.65em;">@u.Id</div>
+							</td>
 
-									<td class="text-center" style="font-size: 0.75em;">
-				                    <div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "").Trim())</div>
-			                    </td>
+							<td class="text-center" style="font-size: 0.75em;">
+								<div class="fw-semibold">@((u.FirstName ?? "") + " " + (u.LastName ?? "").Trim())</div>
+							</td>
 								
-			                    @{
-				                    var imgUrl = string.IsNullOrWhiteSpace(u.UserImage) || u.UserImage == "N/A"
-				                    ? Url.Content("~/images/default-user-image.png")
-				                    : u.UserImage;
-			                    }
+							@{
+								var imgUrl = string.IsNullOrWhiteSpace(u.UserImage) || u.UserImage == "N/A"
+									? Url.Content("~/images/default-user-image.png")
+									: u.UserImage;
+							}
 
-			                    <td class="align-middle">
-				                    <div class="avatar">
-					                    <img
-						                    src="@imgUrl"
-						                    alt="@($"{u.FirstName} {u.LastName}")"
-						                    class="user-avatar-img"
-						                    loading="lazy"
-						                    decoding="async"
-						                    width="60" height="60"/>
-				                    </div>
-			                    </td>
+							<td class="align-middle">
+								<div class="avatar">
+									<img
+										src="@imgUrl"
+										alt="@($"{u.FirstName} {u.LastName}")"
+										class="user-avatar-img"
+										loading="lazy"
+										decoding="async"
+										width="60" height="60"/>
+								</div>
+							</td>
 
-			                    <td class="text-break" style="font-size: 0.50em;">
-				                    @u.Email
-			                    </td>
+							<td class="text-break" style="font-size: 0.50em;">
+								@u.Email
+							</td>
 
-									<td style="font-size: 0.65em;">
-				                    @if (!u.IsDeleted)
-				                    {
-					                    @if (u.EmailConfirmed)
-					                    {
-						                    <span class="badge bg-success">Email ✓</span>
-					                    }
-					                    else
-					                    {
-						                    <span class="badge bg-secondary">Unconfirmed</span>
-					                    }
-				                    }
+							<td style="font-size: 0.65em;">
+								@if (!u.IsDeleted)
+								{
+									@if (u.EmailConfirmed)
+									{
+										<span class="badge bg-success">Email ✓</span>
+									}
+									else
+									{
+										<span class="badge bg-secondary">Unconfirmed</span>
+									}
+								}
 
-				                    @if (u.IsLockedOut)
-				                    {
-					                    <div><span class="badge bg-danger">Locked</span></div>
-					                    if (u.LockoutEnd is not null)
-					                    {
-						                    <small class="text-muted">until @u.LockoutEnd.Value.LocalDateTime:g</small>
-					                    }
-				                    }
-				                    else if(u.IsDeleted)
-				                    {
-					                    <div><span class="badge bg-danger text-white mt-1">Deleted</span></div>
-				                    }
-				                    else if(u.IsActive)
-				                    {
-					                    <div><span class="badge bg-info text-dark">Active</span></div>
-				                    }
-			                    </td>
-			                    <td>
-				                    @if (u.Roles?.Length > 0)
-				                    {
-					                    foreach (var r in u.Roles)
-					                    {
-						                    <span class="badge bg-dark me-1">@r</span>
-					                    }
-				                    }
-				                    else
-				                    {
-					                    <span class="text-muted">N/A</span>
-				                    }
-			                    </td>
-								<td style="font-size: 0.75em;">€@(u.WalletBalance?.ToString() ?? "0")</td>
-								<td style="font-size: 0.75em;">@u.BetsCount</td>
-			                    <td class="text-nowrap">
-				                    <div class="d-flex gap-1 justify-content-center">
-					                    @if (!u.IsDeleted)
-					                    {
-												@* Confirm email *@
-												@if (!u.EmailConfirmed)
-												{
-													<form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@u.Id" />
-														<button class="btn btn-success btn-sm" title="Mark email confirmed">
-															<i class="bi bi-check2-circle"></i>
-														</button>
-													</form>
-												}
+								@if (u.IsLockedOut)
+								{
+									<div><span class="badge bg-danger">Locked</span></div>
+									if (u.LockoutEnd is not null)
+									{
+										<small class="text-muted">until @u.LockoutEnd.Value.LocalDateTime:g</small>
+									}
+								}
+								else if(u.IsDeleted)
+								{
+									<div><span class="badge bg-danger text-white mt-1">Deleted</span></div>
+								}
+								else if(u.IsActive)
+								{
+									<div><span class="badge bg-info text-dark">Active</span></div>
+								}
+							</td>
+							<td>
+								@if (u.Roles?.Length > 0)
+								{
+									foreach (var r in u.Roles)
+									{
+										<span class="badge bg-dark me-1">@r</span>
+									}
+								}
+								else
+								{
+									<span class="text-muted">N/A</span>
+								}
+							</td>
+							<td style="font-size: 0.75em;">€@(u.WalletBalance?.ToString() ?? "0")</td>
+							<td style="font-size: 0.75em;">@u.BetsCount</td>
+							<td class="text-nowrap">
+								<div class="d-flex gap-1 justify-content-center">
+									@if (!u.IsDeleted)
+									{
+										@* Confirm email *@
+										@if (!u.EmailConfirmed)
+										{
+											<form asp-area="Admin" asp-controller="Users" asp-action="ConfirmEmail" method="post" class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@u.Id" />
+												<button class="btn btn-success btn-sm" title="Mark email confirmed">
+													<i class="bi bi-check2-circle"></i>
+												</button>
+											</form>
+										}
 
-												@* Lock/Unlock *@
-												@if (!u.IsLockedOut)
-												{
-													<form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@u.Id" />
-														<button class="btn btn-danger btn-sm" title="Lock user">
-															<i class="bi bi-lock"></i>
-														</button>
-													</form>
-												}
-												else
-												{
-													<form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@u.Id" />
-														<button class="btn btn-warning btn-sm" title="Unlock user">
-															<i class="bi bi-unlock"></i>
-														</button>
-													</form>
-												}
+										@* Lock/Unlock *@
+										@if (!u.IsLockedOut)
+										{
+											<form asp-area="Admin" asp-controller="Users" asp-action="Lock" method="post" class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@u.Id" />
+												<button class="btn btn-danger btn-sm" title="Lock user">
+													<i class="bi bi-lock"></i>
+												</button>
+											</form>
+										}
+										else
+										{
+											<form asp-area="Admin" asp-controller="Users" asp-action="Unlock" method="post" class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@u.Id" />
+												<button class="btn btn-warning btn-sm" title="Unlock user">
+													<i class="bi bi-unlock"></i>
+												</button>
+											</form>
+										}
 
-												@* Reset link *@
-												<form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
-													@Html.AntiForgeryToken()
-													<input type="hidden" name="id" value="@u.Id" />
-													<button class="btn btn-primary btn-sm" title="Generate reset link">
-														<i class="bi bi-link-45deg"></i>
-													</button>
-												</form>
+										@* Reset link *@
+										<form asp-area="Admin" asp-controller="Users" asp-action="ResetPasswordLink" method="post" class="d-inline">
+											@Html.AntiForgeryToken()
+											<input type="hidden" name="id" value="@u.Id" />
+											<button class="btn btn-primary btn-sm" title="Generate reset link">
+												<i class="bi bi-link-45deg"></i>
+											</button>
+										</form>
 
-												@* Roles (Admin) *@
-												@if (!(u.Roles?.Contains(Roles.Admin) ?? false))
-												{
-													<form asp-area="Admin" asp-controller="Users" asp-action="AddRole" method="post" class="d-inline">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@u.Id" />
-														<input type="hidden" name="role" value="@Roles.Admin" />
-														<button class="btn btn-purple btn-sm" title="Make Admin">
-															<i class="bi bi-person-gear"></i>
-														</button>
-													</form>
-												}
-												else
-												{
-													<form asp-area="Admin" asp-controller="Users" asp-action="RemoveRole" method="post" class="d-inline">
-														@Html.AntiForgeryToken()
-														<input type="hidden" name="id" value="@u.Id" />
-														<input type="hidden" name="role" value="@Roles.Admin" />
-														<button class="btn btn-outline-purple btn-sm" title="Remove Admin">
-															<i class="bi bi-person-dash"></i>
-														</button>
-													</form>
-												}
+										@* Roles (Admin) *@
+										@if (!(u.Roles?.Contains(Roles.Admin) ?? false))
+										{
+											<form asp-area="Admin" asp-controller="Users" asp-action="AddRole" method="post" class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@u.Id" />
+												<input type="hidden" name="role" value="@Roles.Admin" />
+												<button class="btn btn-purple btn-sm" title="Make Admin">
+													<i class="bi bi-person-gear"></i>
+												</button>
+											</form>
+										}
+										else
+										{
+											<form asp-area="Admin" asp-controller="Users" asp-action="RemoveRole" method="post" class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@u.Id" />
+												<input type="hidden" name="role" value="@Roles.Admin" />
+												<button class="btn btn-outline-purple btn-sm" title="Remove Admin">
+													<i class="bi bi-person-dash"></i>
+												</button>
+											</form>
+										}
 
 
-												<a class="btn btn-warning btn-sm"
-												   asp-area="Admin"
-												   asp-controller="Email"
-												   asp-action="Compose"
-												   asp-route-userId="@u.Id"
-												   title="Email this user">
-													<i class="bi bi-envelope"></i>
-												</a>
-											}
-											<div class="d-flex gap-1 justify-content-center">
-							                    <a class="btn btn-mint btn-sm"
-							                       asp-area="Admin"
-							                       asp-controller="Wallet"
-							                       asp-action="ByUser"
-							                       asp-route-id="@u.Id"
-							                       title="View wallet">
-								                    <i class="bi bi-wallet2"></i>
-							                    </a>
+										<a class="btn btn-warning btn-sm"
+										   asp-area="Admin"
+										   asp-controller="Email"
+										   asp-action="Compose"
+										   asp-route-userId="@u.Id"
+										   title="Email this user">
+											<i class="bi bi-envelope"></i>
+										</a>
+									}
+									<div class="d-flex gap-1 justify-content-center">
+										<a class="btn btn-sm @(u.IsWalletLocked ? "btn-wallet-locked" : "btn-mint")"
+										   asp-area="Admin"
+										   asp-controller="Wallet"
+										   asp-action="ByUser"
+										   asp-route-id="@u.Id"
+										   title="@(u.IsWalletLocked ? "Wallet Locked" : "View wallet")">
+											<i class="bi bi-wallet2"></i>
+										</a>
 
-							                    <a class="btn btn-ocean btn-sm"
-							                       asp-area="Admin"
-							                       asp-controller="AdminUserBets"
-							                       asp-action="Details"
-							                       asp-route-userId="@u.Id"
-							                       title="View bets">
-								                    <i class="bi bi-bar-chart"></i>
-							                    </a>
+										<a class="btn btn-ocean btn-sm"
+										   asp-area="Admin"
+										   asp-controller="AdminUserBets"
+										   asp-action="Details"
+										   asp-route-userId="@u.Id"
+										   title="View bets">
+											<i class="bi bi-bar-chart"></i>
+										</a>
 											
-							                    <a class="btn btn-gold btn-sm"
-							                       asp-area="Admin"
-							                       asp-controller="AdminTrophy"
-							                       asp-action="User"
-							                       asp-route-userId="@u.Id"
-							                       title="View trophies">
-								                    <i class="bi bi-trophy-fill"></i>
-							                    </a>
-											</div>
+										<a class="btn btn-gold btn-sm"
+										   asp-area="Admin"
+										   asp-controller="AdminTrophy"
+										   asp-action="User"
+										   asp-route-userId="@u.Id"
+										   title="View trophies">
+											<i class="bi bi-trophy-fill"></i>
+										</a>
+									</div>
 
-				                    </div>
-			                    </td>
-		                    </tr>
-	                    }
-                    }
-                    </tbody>
-                </table>
-                <nav aria-label="Users pages" class="pager-holder mt-2 d-flex justify-content-center">
-					<ul class="pagination pagination-sm pagination-ivm mb-0">
-		                @for (int p = 1; p <= pages; p++)
-		                {
-			                <li class="page-item @(p == Model.Page ? "active" : "")">
-				                <a class="page-link"
-				                   asp-area="Admin"
-				                   asp-controller="Users"
-				                   asp-action="ShowUsers"
-				                   asp-route-query="@Model.Query"
-				                   asp-route-status="@Model.Status"
-				                   asp-route-page="@p"
-				                   asp-route-pageSize="@Model.PageSize">
-					                @p
-				                </a>
-			                </li>
-		                }
-	                </ul>
-                </nav>
-            </div>
-        </div>
-    </div>
+								</div>
+							</td>
+						</tr>
+						}
+						}
+						</tbody>
+			</table>
+			<nav aria-label="Users pages" class="pager-holder mt-2 d-flex justify-content-center">
+				<ul class="pagination pagination-sm pagination-ivm mb-0">
+					@for (int p = 1; p <= pages; p++)
+					{
+						<li class="page-item @(p == Model.Page ? "active" : "")">
+							<a class="page-link"
+							   asp-area="Admin"
+							   asp-controller="Users"
+							   asp-action="ShowUsers"
+							   asp-route-query="@Model.Query"
+							   asp-route-status="@Model.Status"
+							   asp-route-page="@p"
+							   asp-route-pageSize="@Model.PageSize">
+								@p
+							</a>
+						</li>
+					}
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
+</div>
+
