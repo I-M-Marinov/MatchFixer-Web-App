@@ -15,5 +15,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 		Task<(bool Success, string Message)> AdminWithdrawAsync(Guid userId, decimal amount, string? description = null, Guid? adminActorId = null);
 
 		Task<(bool Success, string Message)> ClearTransactionHistoryAsync(Guid userId);
+
+		Task<bool> ToggleWalletLockAsync(Guid userId, string? reason = null);
+
 	}
 }
