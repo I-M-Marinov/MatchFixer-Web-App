@@ -9,6 +9,7 @@
         "Pending" => Model.Sum(x => x.Amount * x.TotalOdds),
         "Won" => Model.Sum(x => x.WinAmount ?? 0),
         "Lost" => Model.Sum(x => x.Amount),
+        "Voided" => Model.Sum(x => x.Amount),
         _ => 0
     };
 
@@ -17,6 +18,7 @@
         "Pending" => "Total Potential Win",
         "Won" => "Total Won",
         "Lost" => "Total Lost",
+        "Voided" => "Total Refunded",
         _ => "Summary"
     };
 
