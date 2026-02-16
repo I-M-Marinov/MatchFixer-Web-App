@@ -93,3 +93,15 @@
 	padding-left: 1rem;
 	padding-right: 1rem;
 }
+
+.btn-wallet-locked {
+	background-color: #cc6a00 !important;
+	color: #fff !important;
+	border: none !important;
+}
+
+.btn-wallet-locked:hover {
+	background-color: #a55300 !important;
+	color: #fff !important;
+}
+
