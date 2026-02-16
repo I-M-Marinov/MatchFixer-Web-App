@@ -10,6 +10,7 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet
 		public bool HasWallet { get; set; }
 		public decimal Balance { get; set; }
 		public string Currency { get; set; } = "EUR";
+		public bool IsLocked { get; set; }
 		public List<WalletTransactionDto> Transactions { get; set; } = new();
 	}
 }
