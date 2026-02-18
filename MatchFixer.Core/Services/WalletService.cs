@@ -183,7 +183,7 @@ namespace MatchFixer.Core.Services
 			return (true, TransactionHistoryCleared);
 		}
 
-		public async Task<(bool Success, string Message)> DeductForBetAsync(Guid userId, decimal amount)
+		public async Task<(bool Success, string Message)> DeductForBetAsync(Guid userId, decimal amount, Guid betslipId)
 		{
 			var wallet = await _dbContext.Wallets
 				.Include(w => w.Transactions)
@@ -197,14 +197,14 @@ namespace MatchFixer.Core.Services
 
 			wallet.Balance -= amount;
 
-			var transaction = WalletTransactionFactory.CreateBetPlacedTransaction(wallet.Id, userId, amount);
+			var transaction = WalletTransactionFactory.CreateBetPlacedTransaction(wallet.Id, userId, amount, betslipId);
 
 			await _dbContext.WalletTransactions.AddAsync(transaction);
 			// intentionally does not save changes when adding the transaction, that is handled in the betting service only if all legs are valid 
 			return (true, AmountDeductedForTheBet);
 		}
 
-		public async Task AwardWinningsAsync(Guid userId, decimal amount, string matchDescription)
+		public async Task AwardWinningsAsync(Guid userId, decimal amount, string betslipDescription)
 		{
 			if (amount <= 0)
 				throw new ArgumentException(WinAmountMustBeGreaterThanZero);
@@ -219,7 +219,7 @@ namespace MatchFixer.Core.Services
 			wallet.UpdatedAt = DateTime.UtcNow;
 
 			var winningsTransaction =
-				WalletTransactionFactory.CreateWinningsTransaction(wallet.Id, userId, amount, matchDescription);
+				WalletTransactionFactory.CreateWinningsTransaction(wallet.Id, userId, amount, betslipDescription);
 
 			await _dbContext.WalletTransactions.AddAsync(winningsTransaction);
 			await _dbContext.SaveChangesAsync();
