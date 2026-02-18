@@ -11,20 +11,17 @@ namespace MatchFixer.Core.Services
 	public class LiveMatchResultService : ILiveMatchResultService
 	{
 		private readonly MatchFixerDbContext _dbContext;
-		private readonly IWalletService _walletService;
 		private readonly IBettingService _bettingService;
 		private readonly ITimezoneService _timezoneService;
 		private readonly ISessionService _sessionService;
 
 		public LiveMatchResultService(
 			MatchFixerDbContext dbContext, 
-			IWalletService walletService,
 			ITimezoneService timezoneService,
 			ISessionService sessionService,
 			IBettingService bettingService)
 		{
 			_dbContext = dbContext;
-			_walletService = walletService;
 			_timezoneService = timezoneService;
 			_sessionService = sessionService;
 			_bettingService = bettingService;
