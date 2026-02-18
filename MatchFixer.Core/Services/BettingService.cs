@@ -58,7 +58,7 @@ public class BettingService : IBettingService
 		};
 
 		// Deduct once for the whole slip
-		var (success, message) = await _walletService.DeductForBetAsync(userId, betSlipDto.Amount);
+		var (success, message) = await _walletService.DeductForBetAsync(userId, betSlipDto.Amount, betSlip.Id);
 		if (!success)
 			return (message, false);
 
@@ -415,7 +415,7 @@ public class BettingService : IBettingService
 				await _walletService.AwardWinningsAsync(
 					betSlip.UserId,
 					winnings,
-					$"BetSlip {betSlip.Id}"
+					$"BetSlip # {betSlip.Id}"
 				);
 
 				await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
