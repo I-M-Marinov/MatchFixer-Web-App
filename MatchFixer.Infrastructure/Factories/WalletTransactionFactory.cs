@@ -37,7 +37,7 @@ namespace MatchFixer.Infrastructure.Factories
 			);
 		}
 
-		public static WalletTransaction CreateWinningsTransaction(Guid walletId, Guid userId, decimal amount, string matchDescription)
+		public static WalletTransaction CreateWinningsTransaction(Guid walletId, Guid userId, decimal amount, string betslipDescription)
 		{
 			return new WalletTransaction
 			{
@@ -46,7 +46,7 @@ namespace MatchFixer.Infrastructure.Factories
 				Amount = amount,
 				TransactionType = WalletTransactionType.Winnings,
 				Reference = $"User: {userId} - Wallet: {walletId} - Winnings",
-				Description = $"Winnings from {matchDescription}",
+				Description = $"Winnings from {betslipDescription}",
 				CreatedAt = DateTime.UtcNow
 			};
 		}
@@ -65,7 +65,7 @@ namespace MatchFixer.Infrastructure.Factories
 			};
 		}
 
-		public static WalletTransaction CreateBetPlacedTransaction(Guid walletId, Guid userId, decimal amount)
+		public static WalletTransaction CreateBetPlacedTransaction(Guid walletId, Guid userId, decimal amount, Guid betslipId)
 		{
 			return new WalletTransaction
 			{
@@ -73,7 +73,7 @@ namespace MatchFixer.Infrastructure.Factories
 				WalletId = walletId,
 				Amount = -amount, 
 				TransactionType = WalletTransactionType.BetPlaced,
-				Description = "Bet placed",
+				Description = $"Bet placed for slip # {betslipId}",
 				Reference = $"User: {userId} - Wallet: {walletId} - Bet Placed",
 				CreatedAt = DateTime.UtcNow
 			};
