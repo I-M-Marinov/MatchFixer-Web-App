@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Factories;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet;
+using MatchFixer.Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
 
@@ -54,24 +55,20 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{
 					t.Id,
 					t.CreatedAt,
-					TypeText = t.TransactionType!.ToString(),
+					TypeText = t.TransactionType,
 					t.Amount,
 					t.Description,
 				})
 				.ToList();
 
-			var debitTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-			{
-				"BetPlaced", "Withdrawal", "Withdraw", "AdminWithdrawal", "ManualWithdrawal", "Fee"
-			};
 
-			decimal Signed(string type, decimal amount)
+			decimal Signed(WalletTransactionType type, decimal amount)
 			{
-				var abs = Math.Abs(amount);                 
-				return debitTypes.Contains((type ?? "").Trim()) ? -abs : +abs;
+				var abs = Math.Abs(amount);
+				return IsDebit(type) ? -abs : +abs;
 			}
 
-			
+
 			var totalDelta = txAsc.Sum(t => Signed(t.TypeText, t.Amount));
 			decimal running = wallet.Balance - totalDelta;
 
@@ -86,7 +83,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					Id = t.Id,
 					CreatedUtc = DateTime.SpecifyKind(t.CreatedAt, DateTimeKind.Utc),
 					DisplayTime = _timezoneService.FormatForUser(t.CreatedAt, timeZoneId, "en-US"),
-					Type = t.TypeText ?? string.Empty,
+					Type = t.TypeText.ToString() ?? string.Empty,
 					Amount = signed,
 					BalanceAfter = running,
 					Note = t.Description,
@@ -216,6 +213,18 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			await _dbContext.SaveChangesAsync();
 
 			return true;
+		}
+
+		bool IsDebit(WalletTransactionType type)
+		{
+			return type switch
+			{
+				WalletTransactionType.BetPlaced or
+				WalletTransactionType.Withdrawal or
+				WalletTransactionType.AdminWithdrawal => true,
+
+				_ => false
+			};
 		}
 
 	}
