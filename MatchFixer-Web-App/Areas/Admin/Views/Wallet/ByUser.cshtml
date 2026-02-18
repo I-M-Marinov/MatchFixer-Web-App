@@ -196,7 +196,7 @@
 
 						    var amountAbs = Math.Abs(t.Amount);
 						    var amtSign = t.Amount >= 0 ? "+" : "−";
-						    var amtText = $"{amtSign}€{amountAbs:0.00}";
+						    var amtText = $"{amtSign} €{amountAbs:0.00}";
 						    var amtClass = t.Amount >= 0 ? "text-success" : "text-danger";
 
 						    var typeLower = (t.Type ?? "").ToLowerInvariant();
