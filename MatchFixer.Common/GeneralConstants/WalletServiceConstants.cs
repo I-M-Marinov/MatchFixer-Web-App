@@ -11,7 +11,7 @@
 		public const string WinAmountMustBeGreaterThanZero = "Amount won must be greater than zero.";
 		public const string AmountDeductedForTheBet = "The amount was deducted for the bet.";
 
-		// Wallet Controller
+		// <<-------------- Wallet Controller -------------------->>
 
 		public const string WalletCreatedSuccessfully = "Wallet created successfully.";
 		public const string InsufficientBalanceForWithdrawal = "Insufficient balance for this withdrawal.";
@@ -23,6 +23,11 @@
 		{
 			return $"Successfully withdrew {amount:0.00} EUR.";
 		}
+
+							// Transaction constants
+
+		public const string UserManualDeposit = "User manual deposit";
+		public const string UserManualWithdrawal = "User manual withdrawal";
 
 	}
 }
