@@ -1,5 +1,4 @@
-﻿using MatchFixer_Web_App.Areas.Admin.Interfaces;
-using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,7 +48,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			try
 			{
-				await _walletService.DepositAsync(amount, "Manual deposit");
+				await _walletService.DepositAsync(amount, UserManualDeposit);
 				TempData["SuccessMessage"] = SuccessfullyDeposited(amount);
 			}
 			catch (ArgumentException ex)
@@ -74,7 +73,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			try
 			{
-				var success = await _walletService.WithdrawAsync(amount, "Manual withdrawal");
+				var success = await _walletService.WithdrawAsync(amount, UserManualWithdrawal);
 
 				if (success)
 				{
