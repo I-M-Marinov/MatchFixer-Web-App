@@ -74,7 +74,7 @@ namespace MatchFixer.Infrastructure.Factories
 				Amount = -amount, 
 				TransactionType = WalletTransactionType.BetPlaced,
 				Description = $"Bet placed for slip # {betslipId}",
-				Reference = $"User: {userId} - Wallet: {walletId} - Bet Placed",
+				Reference = $"User: {userId} - Wallet: {walletId} - Bet Slip Id: {betslipId}",
 				CreatedAt = DateTime.UtcNow
 			};
 		}
