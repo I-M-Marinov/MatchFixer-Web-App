@@ -6,6 +6,8 @@ using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Bets;
 using Microsoft.EntityFrameworkCore;
 
+using static MatchFixer.Common.Admin.AdminUserBetsConstants;
+
 namespace MatchFixer_Web_App.Areas.Admin.Services
 {
 	public class AdminUserBetsService : IAdminUserBetsService
@@ -148,11 +150,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					Status = b.Status.ToString(),
 					StatusBadge = b.Status switch
 					{
-						BetStatus.Won => "bg-success",
-						BetStatus.Lost => "bg-danger",
-						BetStatus.Voided => "bg-secondary text-white",
-						BetStatus.Pending => "bg-warning text-dark",
-						_ => "bg-light text-dark"
+						BetStatus.Won => UserBetWonStatusBadge,
+						BetStatus.Lost => UserBetLostStatusBadge,
+						BetStatus.Voided => UserBetVoidedStatusBadge,
+						BetStatus.Pending => UserBetPendingStatusBadge,
+						_ => UserBetStatusBadgeFallback
 					}
 				}).ToList()
 			};
