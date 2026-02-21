@@ -207,8 +207,8 @@
 }
 
 .tw-py-4 {
-  padding-top: 1rem;
-  padding-bottom: 1rem
+  padding-top: 0.65rem !important;
+  padding-bottom: 1rem;
 }
 
 .tw-text-center {
