@@ -26,7 +26,7 @@
 	    { "Parva Liga", "https://media.api-sports.io/flags/bg.svg" },
 		{ "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
 		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" },
-		{ "Rest of World", "https://media.api-sports.io/flags/eu.svg" } // virtual league for competitions only 
+		{ "Rest of World", "https://res.cloudinary.com/doorb7d6i/image/upload/v1771689175/rest-of-world2_tczptr.png" } // virtual league for competitions only
 
     };
 
@@ -124,14 +124,25 @@
 									</td>
 									<td class="text-center">
 										@{
+											bool isRestOfWorld = t.LeagueName == "Rest of World";
+
 											string flag = leagueFlags.TryGetValue(t.LeagueName, out var url)
 												? url
 												: "https://media.api-sports.io/flags/eu.svg";
 										}
-										<img src="@flag"
-										     alt="@t.LeagueName flag"
-										     title="@t.LeagueName"
-										     style="width:18px;height:16px;object-fit:contain;margin-right:3px;margin-bottom:2px;"/>
+
+										@if (isRestOfWorld)
+										{
+											<span style="font-size:16px;margin-right:4px;">🌍</span>
+										}
+										else
+										{
+											<img src="@flag"
+											     alt="@t.LeagueName flag"
+											     title="@t.LeagueName"
+											     style="width:18px;height:16px;object-fit:contain;margin-right:3px;margin-bottom:2px;" />
+										}
+
 										@t.LeagueName
 									</td>
 							</tr>
