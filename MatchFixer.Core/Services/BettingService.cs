@@ -198,7 +198,7 @@ public class BettingService : IBettingService
 				UserId = bs.UserId,
 				WinAmount = bs.WinAmount,
 				TotalOdds = totalOdds,
-				Status = slipStatus,
+				Status = slipStatus.ToString(),
 
 				Bets = bs.Bets.Select(b =>
 				{
@@ -221,7 +221,7 @@ public class BettingService : IBettingService
 						SelectedOption = b.Pick.ToString(),
 						Odds = b.Odds,
 						Outcome = outcome,
-						Status = computedStatus
+						Status = computedStatus.ToString()
 					};
 				}).ToList()
 			};
@@ -229,42 +229,40 @@ public class BettingService : IBettingService
 	}
 
 
-	private static string ComputeSlipStatus(BetSlip slip)
+	private static BetStatus ComputeSlipStatus(BetSlip slip)
 	{
 		var statuses = slip.Bets
 			.Select(ResolveBetStatus)
 			.ToList();
 
-		if (statuses.Any(s => s == "Voided"))
-			return "Voided";
+		if (statuses.Any(s => s == BetStatus.Voided))
+			return BetStatus.Voided;
 
-		if (statuses.Any(s => s == "Lost"))
-			return "Lost";
+		if (statuses.Any(s => s == BetStatus.Lost))
+			return BetStatus.Lost;
 
-		if (statuses.All(s => s == "Won"))
-			return "Won";
+		if (statuses.All(s => s == BetStatus.Won))
+			return BetStatus.Won;
 
-		// All pending OR mixed won + pending
-		return "Pending";
+		return BetStatus.Pending;
 	}
 
-	private static string ResolveBetStatus(Bet b)
+	private static BetStatus ResolveBetStatus(Bet b)
 	{
 		var result = b.MatchEvent.LiveResult;
 
 		if (b.MatchEvent.IsCancelled)
-			return "Voided";
+			return BetStatus.Voided;
 
-		// Match not finished yet
 		if (result == null)
-			return "Pending";
+			return BetStatus.Pending;
 
 		bool won =
 			(b.Pick == MatchPick.Home && result.HomeScore > result.AwayScore) ||
 			(b.Pick == MatchPick.Away && result.AwayScore > result.HomeScore) ||
 			(b.Pick == MatchPick.Draw && result.HomeScore == result.AwayScore);
 
-		return won ? "Won" : "Lost";
+		return won ? BetStatus.Won : BetStatus.Lost;
 	}
 
 
