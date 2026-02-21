@@ -1,0 +1,98 @@
+﻿.event-details-box {
+    background-color: tomato !important;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: .5rem;
+}
+
+.match-events-history-header {
+    margin-top: 3.75em;
+    text-align: center;
+}
+
+.event-history-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    background-color: #000 !important;
+}
+
+.event-history-card h6 {
+    color: #fefefe !important;
+}
+
+#eventFilterPills {
+    border-bottom: none;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+}
+
+#eventFilterPills .nav-link {
+    border: none;
+    border-radius: 999px;
+    padding: 0.55rem 1.3rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0b5ed7;
+    background: transparent;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+#eventFilterPills .nav-link:hover {
+    background: rgba(13, 110, 253, 0.12);
+    transform: translateY(-1px);
+}
+
+#eventFilterPills .nav-link.active {
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35), inset 0 -2px 0 rgba(255,255,255,0.2);
+}
+
+#eventFilterPills .nav-link:active {
+    transform: translateY(1px) scale(0.95);
+    box-shadow: 0 3px 8px rgba(13, 110, 253, 0.4), inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+#eventFilterPills .nav-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13,110,253,.35);
+}
+
+#eventFilterPills .nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+#eventFilterPills .nav-link::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: width 0.45s ease, height 0.45s ease, opacity 0.6s;
+}
+
+#eventFilterPills .nav-link:active::after {
+    width: 160%;
+    height: 160%;
+    opacity: 0;
+}
+
+.accordion-button {
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+.accordion-button::after {
+    position: absolute;
+    right: 1rem;
+}
