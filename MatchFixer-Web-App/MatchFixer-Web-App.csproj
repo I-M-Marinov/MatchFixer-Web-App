@@ -45,6 +45,7 @@
     <Folder Include="wwwroot\images\leaderboard\" />
     <Folder Include="wwwroot\images\live-events\" />
     <Folder Include="wwwroot\images\bet-slip\" />
+    <Folder Include="wwwroot\images\textures\" />
     <Folder Include="wwwroot\images\wiki-tooltip\" />
     <Folder Include="wwwroot\images\wallet\" />
   </ItemGroup>

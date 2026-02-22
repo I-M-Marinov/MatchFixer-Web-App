@@ -209,6 +209,10 @@
     color: ghostwhite;
 }
 
+.derby-match-tooltip {
+    box-shadow: 0 0 10px rgba(30, 79, 255, 0.6);
+}
+
 #matchCount{
 	min-width: 110px;          
 	text-align: left;
@@ -707,8 +711,8 @@
         z-index: -2;
         border-radius: 5% 10%;
         background: radial-gradient(circle at top, rgba(255, 215, 0, 0.35), transparent 55%), linear-gradient(360deg, #0b3c91 0% 6%, transparent 50%);
-        animation: championsGlow 6s ease-in-out infinite;
-    }
+/*        animation: championsGlow 6s ease-in-out infinite;
+*/    }
 
 @keyframes championsGlow {
     0%, 100% {
@@ -737,8 +741,8 @@
     z-index: -2;
     border-radius: 5% 10%;
     background: linear-gradient(135deg, rgba(255, 102, 0, 0.35), transparent 60%), linear-gradient(360deg, #ff6600 0% 6%, transparent 50%);
-    animation: europaPulse 4s ease-in-out infinite;
-}
+/*    animation: europaPulse 4s ease-in-out infinite;
+*/}
 
 @keyframes europaPulse {
     0%, 100% {
@@ -767,8 +771,8 @@
     z-index: -2;
     border-radius: 5% 10%;
     background: radial-gradient( circle at bottom, rgba(0, 140, 90, 0.55), transparent 55% ), linear-gradient( 360deg, #007a4d 0%, rgba(0, 122, 77, 0.85) 6%, transparent 52% );
-    animation: conferenceBreathe 5s ease-in-out infinite;
-}
+/*    animation: conferenceBreathe 5s ease-in-out infinite;
+*/}
 
 @keyframes conferenceBreathe {
     0%, 100% {
@@ -783,6 +787,26 @@
 .boosted-match-container-effects {
     position: relative;
     z-index: 1;
+    border-radius: 5% 10%;
+}
+
+.boosted-match-container-effects::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 5% 10%;
+    background-color: rgba(120, 80, 0, 0.6); 
+
+    -webkit-mask-image: url('/images/textures/gplay.png');
+    -webkit-mask-repeat: repeat;
+    -webkit-mask-size: 150px;
+    mask-image: url('/images/textures/gplay.png');
+    mask-repeat: repeat;
+    mask-size: 150px;
+    opacity: 1; 
+
+    pointer-events: none;
+    z-index: -1;
 }
 
 .boosted-match-container-effects::after {
@@ -1175,4 +1199,18 @@ odds-up {
 .tooltip-away span {
     opacity: 1;
     font-size: 1.1em;
+}
+
+.live-event-card .card-body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 5% 10%;
+    background-image: url('/images/textures/cubes.png');
+    background-repeat: repeat;
+    background-size: 55px;
+    overflow: hidden;
+    opacity: 1;
+    pointer-events: none;
+    z-index: -1;
 }
