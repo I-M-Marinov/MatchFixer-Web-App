@@ -36,16 +36,22 @@
 
 <h3 align="center">Competition Cards Styling and Animations ( UCL / UEL / UECL )</h3>
 
-<p align="center">
-  <img src="./champions-league.gif" align="center" border="10" width="600px"/>
-</p>
+<h4 align="center">Champions League</h4>
 
 <p align="center">
-  <img src="./europa-league.gif" align="center" border="10" width="600px"/>
+  <img src="./updated-ucl-event-cards.png" align="center" border="10" width="600px"/>
 </p>
 
+<h4 align="center">Europa League</h4>
+
 <p align="center">
-  <img src="./conference-league.gif" align="center" border="10" width="600px"/>
+  <img src="./updated-uel-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">Conference League</h4>
+
+<p align="center">
+  <img src="./updated-uecl-event-cards.png" align="center" border="10" width="600px"/>
 </p>
 
 <h3 align="center">Style of events that already started</h3>
