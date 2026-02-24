@@ -1,10 +1,10 @@
-﻿using MatchFixer.Infrastructure;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Factories;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet;
-using MatchFixer.Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
 
@@ -108,7 +108,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		public async Task<(bool Success, string Message)> CreateWalletForUserAsync(Guid userId, string currency = "EUR")
 		{
 			var existing = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
-			if (existing != null) return (true, "Wallet already exists.");
+			if (existing != null) return (true, WalletAlreadyExists);
 
 			var wallet = new Wallet
 			{
@@ -122,7 +122,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			await _dbContext.Wallets.AddAsync(wallet);
 			await _dbContext.SaveChangesAsync();
-			return (true, "Wallet created.");
+			return (true, WalletCreatedSuccessfully);
 		}
 
 		public async Task<(bool Success, string Message)> AdminDepositAsync(Guid userId, decimal amount, string? description = null, Guid? adminActorId = null)
@@ -143,7 +143,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			await _dbContext.WalletTransactions.AddAsync(tx);
 
 			await _dbContext.SaveChangesAsync();
-			return (true, "Deposit added.");
+			return (true, DepositAddedSuccessfully);
 		}
 
 		public async Task<(bool Success, string Message)> AdminWithdrawAsync(Guid userId, decimal amount, string? description = null, Guid? adminActorId = null)
@@ -157,15 +157,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			wallet.Balance -= amount;
 			wallet.UpdatedAt = DateTime.UtcNow;
 
-			var note = string.IsNullOrWhiteSpace(description)
-				? "Admin withdrawal"
-				: $"Admin withdrawal: {description}";
+			var note = AdminWithdrawalNote(description);
 
 			var tx = WalletTransactionFactory.CreateWithdrawalTransaction(wallet.Id, userId, amount, note);
 			await _dbContext.WalletTransactions.AddAsync(tx);
 
 			await _dbContext.SaveChangesAsync();
-			return (true, "Withdrawal completed.");
+			return (true, WithdrawalCompletedSuccessfully);
 		}
 
 		public async Task<(bool Success, string Message)> ClearTransactionHistoryAsync(Guid userId)
