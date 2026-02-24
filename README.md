@@ -81,4 +81,13 @@
   <img src="./league-table-view.png" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">Admin Teams View</h3>
 
+<p align="center">
+  <img src="./admin-teams-view.png" align="center" border="10" width="600px"/>
+</p>
+<h4 align="center">Team View Modal</h4>
+
+<p align="center">
+  <img src="./admin-edit-team.png" align="center" border="10" width="600px"/>
+</p>
