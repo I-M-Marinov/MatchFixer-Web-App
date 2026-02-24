@@ -91,11 +91,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 						if (e.IsCancelled)
 						{
-							computedStatus = "Voided";
+							computedStatus = BetStatus.Voided.ToString();
 						}
 						else if (!b.BetSlip.IsSettled)
 						{
-							computedStatus = "Pending";
+							computedStatus = BetStatus.Pending.ToString();
 						}
 						else if (matchResult != null)
 						{
@@ -104,11 +104,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 								(b.Pick == MatchPick.Away && matchResult.AwayScore > matchResult.HomeScore) ||
 								(b.Pick == MatchPick.Draw && matchResult.HomeScore == matchResult.AwayScore);
 
-							computedStatus = won ? "Won" : "Lost";
+							computedStatus = won ? BetStatus.Won.ToString() : BetStatus.Lost.ToString();
 						}
 						else
 						{
-							computedStatus = "Pending";
+							computedStatus = BetStatus.Pending.ToString();
 						}
 
 						return new AdminBetSummaryDto
@@ -120,7 +120,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							Odds = b.Odds,
 							Status = computedStatus,
 							Stake = b.BetSlip.Amount,
-							Payout = computedStatus == "Won" ? b.BetSlip.Amount * b.Odds : null
+							Payout = computedStatus == BetStatus.Won.ToString() ? b.BetSlip.Amount * b.Odds : null
 						};
 					}).ToList(),
 
