@@ -165,7 +165,39 @@ namespace MatchFixer.Core.Services
 					HasLossStreakThenWin(ctx.UserBets, 5)),
 
 				[TrophyNames.RollercoasterRigger] = ctx => Task.FromResult(
-					HasAlternatingOutcomes(ctx.UserBets, 4))
+					HasAlternatingOutcomes(ctx.UserBets, 4)),
+
+				[TrophyNames.HighRoller] = ctx => Task.FromResult(
+					ctx.UserBets
+						.Select(b => b.BetSlip)
+						.Distinct()
+						.Any(slip => slip.Amount >= 250)
+				),
+
+				[TrophyNames.SyndicateBanker] = async ctx =>
+					await ctx.DbContext.Set<WalletTransaction>()
+						.Where(t =>
+							t.Wallet.UserId == ctx.UserId &&
+							t.TransactionType == WalletTransactionType.Deposit)
+						.SumAsync(t => (decimal?)t.Amount) >= 5000m,
+
+				[TrophyNames.AllInManiac] = async ctx =>
+				{
+					var totalDeposited = await ctx.DbContext.Set<WalletTransaction>()
+						.Where(t =>
+							t.Wallet.UserId == ctx.UserId &&
+							t.TransactionType == WalletTransactionType.Deposit)
+						.SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+					if (totalDeposited <= 0)
+						return false;
+
+					return ctx.UserBets
+						.Select(b => b.BetSlip)
+						.Distinct()
+						.Any(slip =>
+							slip.Amount >= totalDeposited * 0.9m);
+				}
 			};
 		}
 
