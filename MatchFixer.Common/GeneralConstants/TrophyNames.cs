@@ -122,5 +122,32 @@
 		// public const string RollercoasterRiggerImagePath = "/images/trophies/rollercoaster-rigger.png";
 		public const string RollercoasterRiggerImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1754776638/rollercoaster-rigger_msfupe.png";
 
+		public const string HighRoller = "High Roller";
+		public const string HighRollerDescription = "Placed a single bet of 250 EUR or more.";
+		public const string HighRollerImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053133/high-roller-trophy_w9jcyc.png";
+
+		public const string SyndicateBanker = "Syndicate Banker";
+		public const string SyndicateBankerDescription = "Deposited a total of 5000 EUR.";
+		public const string SyndicateBankerImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053133/syndicate-banker-trophy_ewpd13.png";
+
+		public const string AllInManiac = "All-In Maniac";
+		public const string AllInManiacDescription = "Placed a bet worth 90% or more of your wallet balance.";
+		public const string AllInManiacImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053132/all-in-maniac-trophy_uwvzn2.png";
+
+
+		//TODO: need images uploaded to Cloudinary for those trophies below ! 
+
+		//public const string TripleThreat = "Triple Threat";
+		//public const string TripleThreatDescription = "Placed a bet with 3 selections.";
+		//public const string TripleThreatImagePath = "/images/trophies/triple-threat.png";
+
+		//public const string FiveFoldFix = "Five-Fold Fix";
+		//public const string FiveFoldFixDescription = "Placed a bet with 5 selections.";
+		//public const string FiveFoldFixImagePath = "/images/trophies/five-fold-fix.png";
+
+		//public const string SyndicateArchitect = "Syndicate Architect";
+		//public const string SyndicateArchitectDescription = "Placed a bet with 10 or more selections.";
+		//public const string SyndicateArchitectImagePath = "/images/trophies/syndicate-architect.png";
+
 	}
 }
