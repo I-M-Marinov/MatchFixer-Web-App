@@ -25,6 +25,7 @@ namespace MatchFixer.Infrastructure.SeedData
 			await SeedTimeBasedTrophiesAsync(serviceProvider);
 			await SeedSpecialEventTrophiesAsync(serviceProvider);
 			await SeedOutcomeTrophiesAsync(serviceProvider);
+			await SeedWalletAndComboTrophiesAsync(serviceProvider); // new trophies 2026
 		}
 		public static async Task SeedMilestoneTrophiesAsync(IServiceProvider serviceProvider)
 		{
@@ -198,6 +199,84 @@ namespace MatchFixer.Infrastructure.SeedData
 			};
 
 			foreach (var trophy in specialEventTrophies)
+			{
+				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
+				if (!exists)
+				{
+					dbContext.Trophies.Add(trophy);
+				}
+			}
+
+			await dbContext.SaveChangesAsync();
+		}
+
+		public static async Task SeedWalletAndComboTrophiesAsync(IServiceProvider serviceProvider)
+		{
+			var dbContext = serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var trophies = new List<Trophy>
+			{
+				// WALLET BASED 
+				new Trophy
+				{
+					Name = TrophyNames.HighRoller,
+					Description = TrophyNames.HighRollerDescription,
+					Type = TrophyType.WalletBased,
+					Level = TrophyLevel.Silver,
+					IconUrl = TrophyNames.HighRollerImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.SyndicateBanker,
+					Description = TrophyNames.SyndicateBankerDescription,
+					Type = TrophyType.WalletBased,
+					Level = TrophyLevel.Gold,
+					IconUrl = TrophyNames.SyndicateBankerImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.AllInManiac,
+					Description = TrophyNames.AllInManiacDescription,
+					Type = TrophyType.WalletBased,
+					Level = TrophyLevel.Platinum,
+					IconUrl = TrophyNames.AllInManiacImagePath,
+					IsHiddenUntilEarned = true
+				},
+
+				// MORE MILESTONES
+
+				//new Trophy
+				//{
+				//	Name = TrophyNames.TripleThreat,
+				//	Description = TrophyNames.TripleThreatDescription,
+				//	Type = TrophyType.Milestone,
+				//	Level = TrophyLevel.Bronze,
+				//	IconUrl = TrophyNames.TripleThreatImagePath,
+				//	IsHiddenUntilEarned = false
+				//},
+				//new Trophy
+				//{
+				//	Name = TrophyNames.FiveFoldFix,
+				//	Description = TrophyNames.FiveFoldFixDescription,
+				//	Type = TrophyType.Milestone,
+				//	Level = TrophyLevel.Silver,
+				//	IconUrl = TrophyNames.FiveFoldFixImagePath,
+				//	IsHiddenUntilEarned = false
+				//},
+				//new Trophy
+				//{
+				//	Name = TrophyNames.SyndicateArchitect,
+				//	Description = TrophyNames.SyndicateArchitectDescription,
+				//	Type = TrophyType.Milestone,
+				//	Level = TrophyLevel.Gold,
+				//	IconUrl = TrophyNames.SyndicateArchitectImagePath,
+				//	IsHiddenUntilEarned = true
+				//}
+			};
+
+			foreach (var trophy in trophies)
 			{
 				bool exists = await dbContext.Trophies.AnyAsync(t => t.Name == trophy.Name);
 				if (!exists)
