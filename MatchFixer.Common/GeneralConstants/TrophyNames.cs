@@ -137,15 +137,15 @@
 
 		public const string TripleThreat = "Triple Threat";
 		public const string TripleThreatDescription = "Placed a bet with 3 selections.";
-		public const string TripleThreatImagePath = "/images/trophies/triple-threat.png";
+		public const string TripleThreatImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772142935/triple-threat-badge_eq90jz.png";
 
 		public const string FiveFoldFix = "Five-Fold Fix";
 		public const string FiveFoldFixDescription = "Placed a bet with 5 selections.";
-		public const string FiveFoldFixImagePath = "/images/trophies/five-fold-fix.png";
+		public const string FiveFoldFixImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772142935/five-fold-fix-badge_mkr3vo.png";
 
 		public const string SyndicateArchitect = "Syndicate Architect";
 		public const string SyndicateArchitectDescription = "Placed a bet with 10 or more selections.";
-		public const string SyndicateArchitectImagePath = "/images/trophies/syndicate-architect.png";
+		public const string SyndicateArchitectImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772142935/syndicate-architect-badge_uvfojc.png";
 
 	}
 }
