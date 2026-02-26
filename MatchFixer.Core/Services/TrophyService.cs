@@ -197,7 +197,25 @@ namespace MatchFixer.Core.Services
 						.Distinct()
 						.Any(slip =>
 							slip.Amount >= totalDeposited * 0.9m);
-				}
+				},
+
+				[TrophyNames.TripleThreat] = ctx => Task.FromResult(
+					ctx.UserBets
+						.GroupBy(b => b.BetSlipId)
+						.Any(g => g.Count() >= 3)
+				),
+
+				[TrophyNames.FiveFoldFix] = ctx => Task.FromResult(
+					ctx.UserBets
+						.GroupBy(b => b.BetSlipId)
+						.Any(g => g.Count() >= 5)
+				),
+
+				[TrophyNames.SyndicateArchitect] = ctx => Task.FromResult(
+					ctx.UserBets
+						.GroupBy(b => b.BetSlipId)
+						.Any(g => g.Count() >= 10)
+				),
 			};
 		}
 
