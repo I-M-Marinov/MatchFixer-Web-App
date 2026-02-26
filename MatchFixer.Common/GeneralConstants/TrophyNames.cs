@@ -135,19 +135,17 @@
 		public const string AllInManiacImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053132/all-in-maniac-trophy_uwvzn2.png";
 
 
-		//TODO: need images uploaded to Cloudinary for those trophies below ! 
+		public const string TripleThreat = "Triple Threat";
+		public const string TripleThreatDescription = "Placed a bet with 3 selections.";
+		public const string TripleThreatImagePath = "/images/trophies/triple-threat.png";
 
-		//public const string TripleThreat = "Triple Threat";
-		//public const string TripleThreatDescription = "Placed a bet with 3 selections.";
-		//public const string TripleThreatImagePath = "/images/trophies/triple-threat.png";
+		public const string FiveFoldFix = "Five-Fold Fix";
+		public const string FiveFoldFixDescription = "Placed a bet with 5 selections.";
+		public const string FiveFoldFixImagePath = "/images/trophies/five-fold-fix.png";
 
-		//public const string FiveFoldFix = "Five-Fold Fix";
-		//public const string FiveFoldFixDescription = "Placed a bet with 5 selections.";
-		//public const string FiveFoldFixImagePath = "/images/trophies/five-fold-fix.png";
-
-		//public const string SyndicateArchitect = "Syndicate Architect";
-		//public const string SyndicateArchitectDescription = "Placed a bet with 10 or more selections.";
-		//public const string SyndicateArchitectImagePath = "/images/trophies/syndicate-architect.png";
+		public const string SyndicateArchitect = "Syndicate Architect";
+		public const string SyndicateArchitectDescription = "Placed a bet with 10 or more selections.";
+		public const string SyndicateArchitectImagePath = "/images/trophies/syndicate-architect.png";
 
 	}
 }
