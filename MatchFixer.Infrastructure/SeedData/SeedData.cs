@@ -247,33 +247,33 @@ namespace MatchFixer.Infrastructure.SeedData
 
 				// MORE MILESTONES
 
-				//new Trophy
-				//{
-				//	Name = TrophyNames.TripleThreat,
-				//	Description = TrophyNames.TripleThreatDescription,
-				//	Type = TrophyType.Milestone,
-				//	Level = TrophyLevel.Bronze,
-				//	IconUrl = TrophyNames.TripleThreatImagePath,
-				//	IsHiddenUntilEarned = false
-				//},
-				//new Trophy
-				//{
-				//	Name = TrophyNames.FiveFoldFix,
-				//	Description = TrophyNames.FiveFoldFixDescription,
-				//	Type = TrophyType.Milestone,
-				//	Level = TrophyLevel.Silver,
-				//	IconUrl = TrophyNames.FiveFoldFixImagePath,
-				//	IsHiddenUntilEarned = false
-				//},
-				//new Trophy
-				//{
-				//	Name = TrophyNames.SyndicateArchitect,
-				//	Description = TrophyNames.SyndicateArchitectDescription,
-				//	Type = TrophyType.Milestone,
-				//	Level = TrophyLevel.Gold,
-				//	IconUrl = TrophyNames.SyndicateArchitectImagePath,
-				//	IsHiddenUntilEarned = true
-				//}
+				new Trophy
+				{
+					Name = TrophyNames.TripleThreat,
+					Description = TrophyNames.TripleThreatDescription,
+					Type = TrophyType.Milestone,
+					Level = TrophyLevel.Bronze,
+					IconUrl = TrophyNames.TripleThreatImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.FiveFoldFix,
+					Description = TrophyNames.FiveFoldFixDescription,
+					Type = TrophyType.Milestone,
+					Level = TrophyLevel.Silver,
+					IconUrl = TrophyNames.FiveFoldFixImagePath,
+					IsHiddenUntilEarned = false
+				},
+				new Trophy
+				{
+					Name = TrophyNames.SyndicateArchitect,
+					Description = TrophyNames.SyndicateArchitectDescription,
+					Type = TrophyType.Milestone,
+					Level = TrophyLevel.Gold,
+					IconUrl = TrophyNames.SyndicateArchitectImagePath,
+					IsHiddenUntilEarned = true
+				}
 			};
 
 			foreach (var trophy in trophies)
