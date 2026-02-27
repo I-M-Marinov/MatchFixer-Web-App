@@ -127,24 +127,24 @@
 		public const string HighRollerImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053133/high-roller-trophy_w9jcyc.png";
 
 		public const string SyndicateBanker = "Syndicate Banker";
-		public const string SyndicateBankerDescription = "Deposited a total of 5000 EUR.";
+		public const string SyndicateBankerDescription = "Liquidity King. You’ve moved a massive 5000 EUR into your war chest.";
 		public const string SyndicateBankerImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053133/syndicate-banker-trophy_ewpd13.png";
 
 		public const string AllInManiac = "All-In Maniac";
-		public const string AllInManiacDescription = "Placed a bet worth 90% or more of your wallet balance.";
+		public const string AllInManiacDescription = "Calculated chaos. You’ve pushed 90% of your stack into the middle.";
 		public const string AllInManiacImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772053132/all-in-maniac-trophy_uwvzn2.png";
 
 
 		public const string TripleThreat = "Triple Threat";
-		public const string TripleThreatDescription = "Placed a bet with 3 selections.";
+		public const string TripleThreatDescription = "The classic trio. You have submitted a slip with 3 lethal selections.";
 		public const string TripleThreatImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772142935/triple-threat-badge_eq90jz.png";
 
 		public const string FiveFoldFix = "Five-Fold Fix";
-		public const string FiveFoldFixDescription = "Placed a bet with 5 selections.";
+		public const string FiveFoldFixDescription = "The full hand. You’ve stacked your betslip with 5 distinct plays.";
 		public const string FiveFoldFixImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772142935/five-fold-fix-badge_mkr3vo.png";
 
 		public const string SyndicateArchitect = "Syndicate Architect";
-		public const string SyndicateArchitectDescription = "Placed a bet with 10 or more selections.";
+		public const string SyndicateArchitectDescription = "Pure structural brilliance. You've built a 10+ leg monster of a slip.";
 		public const string SyndicateArchitectImagePath = "https://res.cloudinary.com/doorb7d6i/image/upload/v1772142935/syndicate-architect-badge_uvfojc.png";
 
 	}
