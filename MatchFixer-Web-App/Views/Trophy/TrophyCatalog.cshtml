@@ -2,6 +2,9 @@
 @model IEnumerable<MatchFixer.Core.ViewModels.Profile.TrophyViewModel>
 
 @{
+
+	ViewData["Title"] = "Trophy Catalog";
+
 	var bronze = Model.Where(t => t.Level == TrophyLevel.Bronze).ToList();
 	var silver = Model.Where(t => t.Level == TrophyLevel.Silver).ToList();
 	var gold = Model.Where(t => t.Level == TrophyLevel.Gold).ToList();
