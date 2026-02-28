@@ -1,4 +1,5 @@
-﻿using MatchFixer.Infrastructure.Entities;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Infrastructure.Entities;
 
 namespace MatchFixer.Core.ViewModels.LiveEvents
 {
@@ -33,7 +34,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public string UserTimeZone { get; set; }
 		public bool IsCancelled { get; set; }
 		public bool IsPostponed { get; set; }
-		public string MatchStatus { get; set; } = "Scheduled";
+		public MatchStatus MatchStatus { get; set; } = MatchStatus.Scheduled;
 		public BoostViewModel? BoostActive { get; set; }
 		public int? ApiFixtureId { get; set; }
 		public bool IsFromApi => ApiFixtureId != null;
