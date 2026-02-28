@@ -1,4 +1,5 @@
-﻿@using MatchFixer.Core.ViewModels.LiveEvents
+﻿@using MatchFixer.Common.Enums
+@using MatchFixer.Core.ViewModels.LiveEvents
 @model MatchEventFormModel
 
 @{
@@ -255,49 +256,67 @@
 					<tbody>
 					@foreach (var ev in Model.CurrentEvents)
 					{
-						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "manually-added-match") @(ev.MatchStatus == "Started" ? "event-started-match" : "")"
+						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "manually-added-match") @(ev.MatchStatus == MatchStatus.Live ? "event-started-match" : "")"
 						    data-date="@(ev.KickoffTime.HasValue 
 							               ? ev.KickoffTime.Value.ToString("yyyy-MM-dd") 
 							               : "tba")"
 						    data-postponed="@ev.IsPostponed">
 							<td>
-								@if (ev.IsPostponed || !ev.KickoffTime.HasValue)
+								@switch (ev.MatchStatus)
 								{
-									<span class="badge bg-secondary ms-1">
-										<i class="bi bi-pause-circle-fill me-1"></i>
-										Postponed
-									</span>
-								}
-								else if (ev.MatchStatus != "Started" && ev.IsCancelled != true)
-								{
-									<form asp-action="PostponeMatchEvent"
-									      asp-controller="Event"
-									      method="post"
-									      class="d-inline">
-										@Html.AntiForgeryToken()
-										<input type="hidden" name="id" value="@ev.Id" />
+									case MatchStatus.Postponed:
+										<span class="badge bg-secondary ms-1">
+											<i class="bi bi-pause-circle-fill me-1"></i>
+											Postponed
+										</span>
+										break;
 
-										<button type="submit"
-										        class="btn btn-sm btn-secondary text-center"
-										        onclick="return confirm('Are you sure you want to postpone this match?')"
-												title="Postpone this match">
-											<i class="bi bi-pause-circle"></i>
-										</button>
-									</form>
-								}
-								else if (ev.MatchStatus == "Started" && ev.IsCancelled != true)
-								{
-									<span class="badge ms-1">
-										<i class="bi bi-play-circle-fill me-1"></i>
-										Started
-									</span>
+									case MatchStatus.Live:
+
+										<form asp-action="MarkEventAsFullTime"
+										      asp-controller="Event"
+										      method="post"
+										      class="d-inline ms-2">
+											@Html.AntiForgeryToken()
+											<input type="hidden" name="id" value="@ev.Id" />
+
+											<button type="button"
+											        class="btn btn-sm btn-dark mark-ft-btn mb-1"
+											        data-match-id="@ev.Id"
+											        data-bs-toggle="modal"
+											        data-bs-target="#confirmFullTimeModal">
+												<i class="bi bi-flag-fill"></i>
+											</button>
+										</form>
+
+										<span class="badge bg-danger ms-1">
+											<i class="bi bi-play-circle-fill me-1"></i>
+											Live
+										</span>
+										break;
+
+									case MatchStatus.Scheduled:
+										<form asp-action="PostponeMatchEvent"
+										      asp-controller="Event"
+										      method="post"
+										      class="d-inline">
+											@Html.AntiForgeryToken()
+											<input type="hidden" name="id" value="@ev.Id" />
+
+											<button type="submit"
+											        class="btn btn-sm btn-secondary"
+											        onclick="return confirm('Are you sure you want to postpone this match?')">
+												<i class="bi bi-pause-circle"></i>
+											</button>
+										</form>
+										break;
 								}
 
-								@if (ev.ApiFixtureId != null && ev.MatchStatus != "Started" && ev.KickoffTime.HasValue)
+								@if (ev.ApiFixtureId != null && ev.MatchStatus != MatchStatus.Live && ev.KickoffTime.HasValue)
 								{
 									<span class="badge bg-info ms-1">auto</span>
 								}
-								else if (ev.ApiFixtureId == null && ev.MatchStatus != "Started" && ev.KickoffTime.HasValue)
+								else if (ev.ApiFixtureId == null && ev.MatchStatus != MatchStatus.Live && ev.KickoffTime.HasValue)
 								{
 									<span class="badge bg-manual ms-1">manual</span>
 								}
@@ -359,7 +378,7 @@
 								else
 								{
 									<span class="custom-tooltip-wrapper">
-										@if (ev.MatchStatus == "Started" || ev.IsPostponed || !ev.KickoffTime.HasValue)
+										@if (ev.MatchStatus == MatchStatus.Live || ev.IsPostponed || !ev.KickoffTime.HasValue)
 										{
 											<button type="button" class="btn btn-sm btn-outline-danger create-boost-btn text-muted"
 											        data-match-id="@ev.Id" disabled>
@@ -387,7 +406,7 @@
 									<div class="d-flex flex-column gap-1">
 
 										@{
-											var isDisabled = (ev.MatchStatus == "Started" || ev.ActiveBoost != null || ev.IsPostponed) ? "disabled" : "";
+											var isDisabled = (ev.MatchStatus == MatchStatus.Live || ev.ActiveBoost != null || ev.IsPostponed) ? "disabled" : "";
 
 										}
 
@@ -414,7 +433,8 @@
 									</div>
 
 									<div class="d-flex flex-column gap-1 align-items-end">
-										@if (ev.MatchStatus != "Started")
+
+										@if (ev.MatchStatus != MatchStatus.Live)
 										{
 											<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
 												@Html.AntiForgeryToken()
@@ -616,7 +636,35 @@
 	</div>
 </div>
 
-
+<div class="modal fade" id="confirmFullTimeModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Confirm Full Time</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				Confirm that the match event has concluded ?
+			</div>
+			<div class="modal-footer">
+				<form id="confirmFullTimeForm"
+				      asp-action="MarkEventAsFullTime"
+				      asp-controller="Event"
+				      method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="fullTimeMatchId" />
+					<button type="submit" class="btn btn-danger">
+						Yes
+					</button>
+				</form>
+				<button type="button" class="btn btn-secondary"
+				        data-bs-dismiss="modal">
+					No, go back
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 @section Scripts {
@@ -1246,6 +1294,17 @@
 				});
 			});
 
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+			const modal = document.getElementById("confirmFullTimeModal");
+
+			modal.addEventListener("show.bs.modal", function (event) {
+				const button = event.relatedTarget;
+				const matchId = button.getAttribute("data-match-id");
+
+				document.getElementById("fullTimeMatchId").value = matchId;
+			});
 		});
 
 
