@@ -137,6 +137,15 @@ namespace MatchFixer.Core.Services
 				maxUses: maxUsesPerUser ?? 0
 			);
 
+			await LogBoostLifecycleAsync(
+				matchEventId,
+				"BOOST_STARTED",
+				createdByUserId,
+				boostValue,
+				start,
+				end
+			);
+
 			return boost;
 		}
 
@@ -194,7 +203,35 @@ namespace MatchFixer.Core.Services
 				activeBoostId: null
 			);
 
+			await LogBoostLifecycleAsync(
+				boost.MatchEventId,
+				"BOOST_STOPPED",
+				stoppedByUserId,
+				boost.BoostValue,
+				boost.StartUtc,
+				now
+			);
+
 			return boost;
+		}
+
+		private async Task LogBoostLifecycleAsync(
+			Guid matchEventId,
+			string action,
+			Guid userId,
+			decimal boostValue,
+			DateTime start,
+			DateTime end)
+		{
+			await _dbContext.MatchEventLogs.AddAsync(new MatchEventLog
+			{
+				MatchEventId = matchEventId,
+				PropertyName = "OddsBoost",
+				OldValue = null,
+				NewValue = $"{action} | +{boostValue} | {start:u} → {end:u}",
+				ChangedByUserId = userId,
+				ChangedAt = DateTime.UtcNow
+			});
 		}
 	}
 }
