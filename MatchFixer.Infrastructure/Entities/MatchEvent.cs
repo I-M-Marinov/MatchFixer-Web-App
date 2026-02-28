@@ -1,4 +1,5 @@
 ﻿
+using MatchFixer.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static MatchFixer.Common.GeneralConstants.MatchEventValidation;
@@ -31,6 +32,8 @@ namespace MatchFixer.Infrastructure.Entities
 		public int? ApiFixtureId { get; set; } // only for admin-imported matches ( manual matches leave it null ) 
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
 		public bool IsPostponed { get; set; } = false; // default to false ( match is not postponed ) 
+		public MatchStatus Status { get; set; } = MatchStatus.Scheduled; // default all match events to scheduled at first 
+		public DateTime? FinishedAtUtc { get; set; } // optional utc time the event finished
 		public LiveMatchResult? LiveResult { get; set; }
 		public bool IsCancelled { get; set; } = false;
 
