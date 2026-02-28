@@ -1,4 +1,5 @@
-﻿using MatchFixer.Common.FootballLeagues;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.FootballLeagues;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.ViewModels.LiveEvents;
@@ -105,7 +106,6 @@ namespace MatchFixer.Core.Services
 		{
 			var now = DateTime.UtcNow;
 			var user = await _userContextService.GetCurrentUserAsync();
-			var cutoff = now.AddHours(-2.5);
 
 			var events = await _dbContext.MatchEvents
 				.Include(e => e.HomeTeam)
@@ -114,11 +114,8 @@ namespace MatchFixer.Core.Services
 				.Include(e => e.OddsBoosts)
 				.Where(e =>
 					e.LiveResult == null &&
-					e.IsCancelled != true &&
-					(
-						e.IsPostponed ||
-						e.MatchDate > cutoff
-					)
+					e.Status != MatchStatus.Cancelled &&
+					e.Status != MatchStatus.FullTime
 				)
 				.OrderBy(e => e.IsPostponed)
 				.ThenBy(e => e.MatchDate)
@@ -171,14 +168,11 @@ namespace MatchFixer.Core.Services
 					IsDerby = e.IsDerby,
 					UserTimeZone = user.TimeZone,
 					IsCancelled = e.IsCancelled,
-					MatchStatus = e.IsCancelled
-						? "Cancelled"
-						: e.IsPostponed
-							? "Postponed"
-							: e.MatchDate <= now
-								? "Started"
-								: "Live"
-
+					MatchStatus = e.Status == MatchStatus.Scheduled &&
+					              e.MatchDate.HasValue &&
+					              e.MatchDate <= now
+						? MatchStatus.Live
+						: e.Status
 				};
 			}).ToList();
 
@@ -210,6 +204,7 @@ namespace MatchFixer.Core.Services
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby,
+				Status = MatchStatus.Scheduled, // on creation mark events as scheduled
 				CompetitionName = string.IsNullOrWhiteSpace(model.CompetitionName)
 					? null
 					: model.CompetitionName
@@ -239,6 +234,7 @@ namespace MatchFixer.Core.Services
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby,
 				ApiFixtureId = apiFixtureId,
+				Status = MatchStatus.Scheduled, // on creation mark events as scheduled
 				CompetitionName = null // signifies that this is a domestic match only ! 
 			};
 
@@ -284,7 +280,7 @@ namespace MatchFixer.Core.Services
 			var userId = _userContextService.GetUserId();
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
 
-			if (match == null || match.IsCancelled)
+			if (match == null || match.IsCancelled || match.Status == MatchStatus.Cancelled || match.Status == MatchStatus.FullTime)
 				throw new Exception(MatchUpdateFailed);
 
 			bool anyChange = false;
@@ -319,10 +315,14 @@ namespace MatchFixer.Core.Services
 				anyChange = true;
 
 				// ---- UNPOSTPONE THE MATCH IF A NEW DATE IS PRESENT ----
-				if (kickoffTime.HasValue && match.IsPostponed)
+				if (kickoffTime.HasValue && match.IsPostponed && match.Status == MatchStatus.Postponed)
 				{
-					LogChange(match.Id, nameof(match.IsPostponed), true, false, userId);
+					LogChange(match.Id, nameof(match.Status),
+						MatchStatus.Postponed,
+						MatchStatus.Scheduled,
+						userId); 
 					match.IsPostponed = false;
+					match.Status = MatchStatus.Scheduled;
 				}
 			}
 
@@ -345,10 +345,11 @@ namespace MatchFixer.Core.Services
 		public async Task<bool> CancelMatchEventAsync(Guid matchEventId)
 		{
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
-			if (match == null || match.IsCancelled)
+			if (match == null || match.IsCancelled || match.Status == MatchStatus.Cancelled)
 				return false;
 
 			match.IsCancelled = true;
+			match.Status = MatchStatus.Cancelled;
 
 			var betsCancelled = await _bettingService.CancelBetsForMatchAsync(matchEventId);
 
@@ -364,7 +365,7 @@ namespace MatchFixer.Core.Services
 			if (Equals(oldValue, newValue))
 				return;
 
-			_dbContext.MatchEventLogs.Add(new MatchEventLog()
+			_dbContext.MatchEventLogs.AddAsync(new MatchEventLog()
 			{
 				MatchEventId = matchEventId,
 				PropertyName = property,
@@ -502,6 +503,7 @@ namespace MatchFixer.Core.Services
 				return true;
 
 			match.IsPostponed = true;
+			match.Status = MatchStatus.Postponed;
 			match.MatchDate = null;
 
 			// Hard stop any boosts (clean state)
