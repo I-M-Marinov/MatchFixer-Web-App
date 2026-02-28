@@ -19,13 +19,21 @@ namespace MatchFixer_Web_App.Controllers
 		private readonly IUpcomingMatchService _upcomingMatchService;
 		private readonly IUserContextService _userContextService;
 		private readonly IOddsBoostService _oddsBoostService;
+		private readonly ILiveMatchResultService _liveMatchResultService;
 
-		public EventController(IMatchEventService matchEventService, IUpcomingMatchService upcomingMatchService, IUserContextService userContextService, IOddsBoostService oddsBoostService)
+
+		public EventController(
+			IMatchEventService matchEventService, 
+			IUpcomingMatchService upcomingMatchService, 
+			IUserContextService userContextService, 
+			IOddsBoostService oddsBoostService,
+			ILiveMatchResultService liveMatchResultService)
 		{
 			_matchEventService = matchEventService;
 			_upcomingMatchService = upcomingMatchService;
 			_userContextService = userContextService;
 			_oddsBoostService = oddsBoostService;
+			_liveMatchResultService = liveMatchResultService;
 		}
 
 		[HttpGet]
@@ -274,6 +282,29 @@ namespace MatchFixer_Web_App.Controllers
 			catch (Exception ex)
 			{
 				TempData["ErrorMessage"] = ex.Message;
+			}
+
+			return RedirectToAction(nameof(AddMatchEvent));
+		}
+
+		[Authorize]
+		[AdminOnly]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> MarkEventAsFullTime(Guid id)
+		{
+			var success = await _liveMatchResultService
+				.MarkMatchAsFullTimeAsync(id);
+
+			if (!success)
+			{
+				TempData["ErrorMessage"] =
+					"Unable to mark match as Full Time.";
+			}
+			else
+			{
+				TempData["SuccessMessage"] =
+					"Match successfully marked as Full Time.";
 			}
 
 			return RedirectToAction(nameof(AddMatchEvent));
