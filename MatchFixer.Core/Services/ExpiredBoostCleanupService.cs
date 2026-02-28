@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -58,7 +59,16 @@ namespace MatchFixer.Core.Services
 			foreach (var boost in expiredBoosts)
 			{
 				boost.IsActive = false;
-				boost.EndUtc = now;
+
+				db.MatchEventLogs.Add(new MatchEventLog
+				{
+					MatchEventId = boost.MatchEventId,
+					PropertyName = "OddsBoost",
+					OldValue = "Active",
+					NewValue = $"BOOST_EXPIRED | +{boost.BoostValue} | {boost.StartUtc:u} → {boost.EndUtc:u}",
+					ChangedByUserId = boost.CreatedByUserId, 
+					ChangedAt = now
+				});
 			}
 
 			await db.SaveChangesAsync(ct);
