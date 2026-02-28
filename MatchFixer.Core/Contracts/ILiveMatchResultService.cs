@@ -6,6 +6,7 @@ namespace MatchFixer.Core.Contracts
 	{
 		Task<bool> AddMatchResultAsync(Guid matchEventId, int homeScore, int awayScore, string? notes = null);
 		Task<List<MatchResultInputViewModel>> GetUnresolvedMatchResultsAsync();
+		Task<bool> MarkMatchAsFullTimeAsync(Guid matchId);
 	}
 
 }
