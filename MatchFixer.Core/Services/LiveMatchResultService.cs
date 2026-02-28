@@ -27,19 +27,25 @@ namespace MatchFixer.Core.Services
 			_bettingService = bettingService;
 		}
 
-		public async Task<bool> AddMatchResultAsync(Guid matchEventId, int homeScore, int awayScore, string? notes = null)
+		public async Task<bool> AddMatchResultAsync(
+			Guid matchEventId,
+			int homeScore,
+			int awayScore,
+			string? notes = null)
 		{
 			var match = await _dbContext.MatchEvents
 				.Include(m => m.LiveResult)
 				.FirstOrDefaultAsync(m => m.Id == matchEventId);
 
-			if (match == null || match.IsCancelled)
-				return false;
+			if (match == null)
+				return false; // match event was not found 
+
+			if (match.Status != MatchStatus.FullTime)
+				return false; // Only FullTime matches can be scored
 
 			if (match.LiveResult != null)
-				return false; // prevent duplicate results
+				return false; // already has a result recorded
 
-			// Save live result
 			var result = new LiveMatchResult
 			{
 				MatchEventId = match.Id,
@@ -54,13 +60,11 @@ namespace MatchFixer.Core.Services
 
 			await _dbContext.SaveChangesAsync();
 
-			// Get all affected slips (settled or not – evaluator handles this)
 			var relatedSlips = await _dbContext.BetSlips
 				.Where(bs => bs.Bets.Any(b => b.MatchEventId == match.Id))
 				.Select(bs => bs.Id)
 				.ToListAsync();
 
-			// Evaluate each slip fresh
 			foreach (var slipId in relatedSlips)
 			{
 				await _bettingService.EvaluateBetSlipAsync(slipId);
@@ -75,15 +79,13 @@ namespace MatchFixer.Core.Services
 		{
 			var timeZoneId = _sessionService.GetUserTimezone();
 
-			var cutoffTime = DateTime.UtcNow.AddHours(-2.5);
-
 			var matches = await _dbContext.MatchEvents
 				.Include(m => m.HomeTeam)
 				.Include(m => m.AwayTeam)
 				.Include(m => m.LiveResult)
 				.Where(m => m.LiveResult == null)
-				.Where(m => m.MatchDate <= cutoffTime) // Only matches that started more than two and a half hours ago 
-				.Where(m => m.IsCancelled != true)
+				.Where(m => m.Status == MatchStatus.FullTime 
+				)
 				.OrderBy(m => m.MatchDate)
 				.ToListAsync();
 
@@ -95,6 +97,30 @@ namespace MatchFixer.Core.Services
 				MatchDate = m.MatchDate,
 				DisplayTime = _timezoneService.FormatForUserBets(m.MatchDate, timeZoneId)
 			}).ToList();
+		}
+
+		public async Task<bool> MarkMatchAsFullTimeAsync(Guid matchId)
+		{
+			var match = await _dbContext.MatchEvents.FindAsync(matchId);
+
+			if (match == null)
+				return false;
+
+			if (match.Status == MatchStatus.Cancelled ||
+			    match.Status == MatchStatus.Postponed ||
+			    match.Status == MatchStatus.FullTime)
+				return false;
+
+			if (match.MatchDate.HasValue &&
+			    match.MatchDate > DateTime.UtcNow)
+				return false;
+
+			match.Status = MatchStatus.FullTime;
+			match.FinishedAtUtc = DateTime.UtcNow;
+
+			await _dbContext.SaveChangesAsync();
+
+			return true;
 		}
 	}
 }
