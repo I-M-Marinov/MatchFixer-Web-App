@@ -257,7 +257,8 @@ table.responsive-stack td {
     font-size: 1.1rem !important;
 }
 
-#confirmCancelModal .btn-close {
+#confirmCancelModal .btn-close,
+#confirmFullTimeModal .btn-close{
     font-size: 0.85em;
     margin: 0.35em;
 }
