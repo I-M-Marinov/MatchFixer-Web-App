@@ -1,9 +1,11 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.GeneralConstants;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer.Core.Contracts.IMatchEventNotifier;
+using static MatchFixer.Common.GeneralConstants.OddsBoostConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -58,9 +60,9 @@ namespace MatchFixer.Core.Services
 			// Validate input
 
 			if (boostValue <= 0)
-				throw new ArgumentException("Boost value must be greater than zero.", nameof(boostValue));
+				throw new ArgumentException(BoostValueMustBePositive, nameof(boostValue));
 			if (duration <= TimeSpan.Zero)
-				throw new ArgumentException("Duration must be greater than zero.", nameof(duration));
+				throw new ArgumentException(DurationMustBePositive, nameof(duration));
 
 			var match = await _dbContext.MatchEvents
 				.AsNoTracking()
@@ -69,7 +71,7 @@ namespace MatchFixer.Core.Services
 				.FirstOrDefaultAsync(m => m.Id == matchEventId, ct);
 
 			if (match == null)
-				throw new InvalidOperationException("Match event not found.");
+				throw new InvalidOperationException(MatchEventNotFound);
 
 			// Disallow overlapping active boosts
 			var overlapExists = await _dbContext.OddsBoosts
@@ -79,7 +81,7 @@ namespace MatchFixer.Core.Services
 							   b.StartUtc < end, ct);
 
 			if (overlapExists)
-				throw new InvalidOperationException("An active boost already overlaps with this timeframe.");
+				throw new InvalidOperationException(OverlappingBoostExists);
 
 			var boost = new OddsBoost
 			{
@@ -139,12 +141,14 @@ namespace MatchFixer.Core.Services
 
 			await LogBoostLifecycleAsync(
 				matchEventId,
-				"BOOST_STARTED",
+				BoostLifecycleAction.Started,
 				createdByUserId,
 				boostValue,
 				start,
 				end
 			);
+
+			await _dbContext.SaveChangesAsync(ct);
 
 			return boost;
 		}
@@ -161,7 +165,7 @@ namespace MatchFixer.Core.Services
 				.FirstOrDefaultAsync(b => b.Id == oddsBoostId, ct);
 
 			if (boost is null)
-				throw new InvalidOperationException("Odds boost not found.");
+				throw new InvalidOperationException(BoostNotFound);
 
 			// If already ended, ensure flag is consistent and return
 			if (!boost.IsActive || boost.EndUtc <= now)
@@ -205,19 +209,21 @@ namespace MatchFixer.Core.Services
 
 			await LogBoostLifecycleAsync(
 				boost.MatchEventId,
-				"BOOST_STOPPED",
+				BoostLifecycleAction.Stopped,
 				stoppedByUserId,
 				boost.BoostValue,
 				boost.StartUtc,
 				now
 			);
 
+			await _dbContext.SaveChangesAsync(ct);
+
 			return boost;
 		}
 
 		private async Task LogBoostLifecycleAsync(
 			Guid matchEventId,
-			string action,
+			BoostLifecycleAction action,
 			Guid userId,
 			decimal boostValue,
 			DateTime start,
@@ -226,9 +232,9 @@ namespace MatchFixer.Core.Services
 			await _dbContext.MatchEventLogs.AddAsync(new MatchEventLog
 			{
 				MatchEventId = matchEventId,
-				PropertyName = "OddsBoost",
+				PropertyName = MatchEventLogConstants.OddsBoostProperty,
 				OldValue = null,
-				NewValue = $"{action} | +{boostValue} | {start:u} → {end:u}",
+				NewValue = $"{action.ToString().ToUpperInvariant()} | +{boostValue} | {start:u} → {end:u}",
 				ChangedByUserId = userId,
 				ChangedAt = DateTime.UtcNow
 			});
