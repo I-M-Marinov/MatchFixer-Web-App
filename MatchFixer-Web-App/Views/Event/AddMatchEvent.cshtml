@@ -273,26 +273,27 @@
 
 									case MatchStatus.Live:
 
-										<form asp-action="MarkEventAsFullTime"
-										      asp-controller="Event"
-										      method="post"
-										      class="d-inline ms-2">
-											@Html.AntiForgeryToken()
-											<input type="hidden" name="id" value="@ev.Id" />
+										<div class="d-flex flex-column justify-content-center align-items-center">
+											<form asp-action="MarkEventAsFullTime"
+											      asp-controller="Event"
+											      method="post"
+											      class="d-inline ms-2">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@ev.Id" />
 
-											<button type="button"
-											        class="btn btn-sm btn-dark mark-ft-btn mb-1"
-											        data-match-id="@ev.Id"
-											        data-bs-toggle="modal"
-											        data-bs-target="#confirmFullTimeModal">
-												<i class="bi bi-flag-fill"></i>
-											</button>
-										</form>
-
-										<span class="badge bg-danger ms-1">
-											<i class="bi bi-play-circle-fill me-1"></i>
-											Live
-										</span>
+												<button type="button"
+												        class="btn btn-sm btn-dark mark-ft-btn mb-1"
+												        data-match-id="@ev.Id"
+												        data-bs-toggle="modal"
+												        data-bs-target="#confirmFullTimeModal">
+													<i class="bi bi-flag-fill"></i>
+												</button>
+											</form>
+											<span class="badge bg-danger ms-1">
+												<i class="bi bi-play-circle-fill me-1"></i>
+												Live
+											</span>
+										</div>
 										break;
 
 									case MatchStatus.Scheduled:
