@@ -3,6 +3,7 @@
 	public enum BoostLifecycleAction
 	{
 		Started = 1,
-		Stopped = 2
+		Stopped = 2,
+		Expired = 3
 	}
 }
