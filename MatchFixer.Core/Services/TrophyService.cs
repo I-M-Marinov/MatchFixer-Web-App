@@ -95,11 +95,39 @@ namespace MatchFixer.Core.Services
 						.AnyAsync(),
 
 				// Special dates
-				[TrophyNames.SilentBetShadyNight] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
-					b.BetTime.Date == new DateTime(2025, 12, 25))),
+				[TrophyNames.SilentBetShadyNight] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
 
-				[TrophyNames.FixmasMiracle] = ctx => Task.FromResult(ctx.UserBets.Count(b =>
-					b.BetTime.Date == new DateTime(2025, 12, 25)) >= 3),
+					return Task.FromResult(
+						ctx.UserBets.Any(b =>
+						{
+							var local = _timezoneService
+								.ConvertToUserTime(b.BetTime, ctx.User.TimeZone)
+								.Value;
+
+							return local.Month == 12 && local.Day == 25;
+						})
+					);
+				},
+
+				[TrophyNames.FixmasMiracle] = ctx =>
+				{
+					if (ctx.User == null || string.IsNullOrEmpty(ctx.User.TimeZone))
+						return Task.FromResult(false);
+
+					return Task.FromResult(
+						ctx.UserBets.Count(b =>
+						{
+							var local = _timezoneService
+								.ConvertToUserTime(b.BetTime, ctx.User.TimeZone)
+								.Value;
+
+							return local.Month == 12 && local.Day == 25;
+						}) >= 3
+					);
+				},
 
 				[TrophyNames.NewYearNewFix] = ctx => Task.FromResult(ctx.UserBets.Any(b =>
 					b.BetTime.Month == 1 && b.BetTime.Day == 1)),
@@ -180,23 +208,33 @@ namespace MatchFixer.Core.Services
 							t.Wallet.UserId == ctx.UserId &&
 							t.TransactionType == WalletTransactionType.Deposit)
 						.SumAsync(t => (decimal?)t.Amount) >= 5000m,
-
 				[TrophyNames.AllInManiac] = async ctx =>
 				{
-					var totalDeposited = await ctx.DbContext.Set<WalletTransaction>()
-						.Where(t =>
-							t.Wallet.UserId == ctx.UserId &&
-							t.TransactionType == WalletTransactionType.Deposit)
-						.SumAsync(t => (decimal?)t.Amount) ?? 0m;
+					var walletTransactions = await ctx.DbContext.Set<WalletTransaction>()
+						.Where(t => t.Wallet.UserId == ctx.UserId)
+						.OrderBy(t => t.CreatedAt)
+						.ToListAsync();
 
-					if (totalDeposited <= 0)
-						return false;
+					var slips = ctx.UserBets
+						.GroupBy(b => b.BetSlipId)
+						.Select(g => g.First().BetSlip)
+						.OrderBy(s => s.BetTime)
+						.ToList();
 
-					return ctx.UserBets
-						.Select(b => b.BetSlip)
-						.Distinct()
-						.Any(slip =>
-							slip.Amount >= totalDeposited * 0.9m);
+					foreach (var slip in slips)
+					{
+						var balanceBeforeSlip = walletTransactions
+							.Where(t => t.CreatedAt < slip.BetTime)
+							.Sum(t => t.Amount);
+
+						if (balanceBeforeSlip <= 0)
+							continue;
+
+						if (slip.Amount >= balanceBeforeSlip * 0.9m)
+							return true;
+					}
+
+					return false;
 				},
 
 				[TrophyNames.TripleThreat] = ctx => Task.FromResult(
