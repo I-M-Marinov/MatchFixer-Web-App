@@ -1,9 +1,11 @@
-﻿using MatchFixer.Infrastructure;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using static MatchFixer.Common.GeneralConstants.MatchEventLogConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -23,7 +25,16 @@ namespace MatchFixer.Core.Services
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			_logger.LogInformation("********************** ExpiredBoostCleanupService started. **********************");
+			_logger.LogInformation(
+				"""
+				===========================================
+				Expired Boost Cleanup Service STARTED
+				Interval: {Interval}
+				Started At (UTC): {UtcNow}
+				===========================================
+				""",
+				_interval,
+				DateTime.UtcNow);
 
 			while (!stoppingToken.IsCancellationRequested)
 			{
@@ -33,13 +44,27 @@ namespace MatchFixer.Core.Services
 				}
 				catch (Exception ex)
 				{
-					_logger.LogError(ex, "********************** Error while cleaning expired odds boosts. **********************");
+					_logger.LogError(ex,
+						"""
+						===========================================
+						ERROR during expired boost cleanup
+						Time (UTC): {UtcNow}
+						===========================================
+						""",
+						DateTime.UtcNow);
 				}
 
 				await Task.Delay(_interval, stoppingToken);
 			}
 
-			_logger.LogInformation("********************** ExpiredBoostCleanupService stopped. **********************");
+			_logger.LogInformation(
+				"""
+				===========================================
+				Expired Boost Cleanup Service STOPPED
+				Stopped At (UTC): {UtcNow}
+				===========================================
+				""",
+				DateTime.UtcNow);
 		}
 
 		private async Task CleanupExpiredBoostsAsync(CancellationToken ct)
@@ -63,10 +88,10 @@ namespace MatchFixer.Core.Services
 				db.MatchEventLogs.Add(new MatchEventLog
 				{
 					MatchEventId = boost.MatchEventId,
-					PropertyName = "OddsBoost",
-					OldValue = "Active",
-					NewValue = $"BOOST_EXPIRED | +{boost.BoostValue} | {boost.StartUtc:u} → {boost.EndUtc:u}",
-					ChangedByUserId = boost.CreatedByUserId, 
+					PropertyName = OddsBoostProperty,
+					OldValue = null,
+					NewValue = $"{BoostLifecycleAction.Expired.ToString().ToUpperInvariant()} | +{boost.BoostValue} | {boost.StartUtc:u} → {boost.EndUtc:u}",
+					ChangedByUserId = boost.CreatedByUserId,
 					ChangedAt = now
 				});
 			}
@@ -74,7 +99,13 @@ namespace MatchFixer.Core.Services
 			await db.SaveChangesAsync(ct);
 
 			_logger.LogInformation(
-				"||||||||||||********************** Cleaned {Count} expired odds boost(s) at {UtcNow}. **********************||||||||||||",
+				"""
+				-------------------------------------------
+				Expired Boost Cleanup Completed
+				Expired Boosts Processed: {Count}
+				Processed At (UTC): {UtcNow}
+				-------------------------------------------
+				""",
 				expiredBoosts.Count,
 				now);
 		}
