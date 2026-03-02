@@ -91,6 +91,8 @@ namespace MatchFixer.Core.Services
 					BoostEndUtc = boost?.EndUtc,  
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
+					HomeTeamLocalLogoUrl = e.HomeTeam.LocalLogoUrl,
+					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
 					IsDerby = e.IsDerby,
 					IsPostponed = e.IsPostponed,
 					UserTimeZone = user.TimeZone,
@@ -165,6 +167,8 @@ namespace MatchFixer.Core.Services
 
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
+					HomeTeamLocalLogoUrl = e.HomeTeam.LocalLogoUrl,
+					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
 					IsDerby = e.IsDerby,
 					UserTimeZone = user.TimeZone,
 					IsCancelled = e.IsCancelled,
