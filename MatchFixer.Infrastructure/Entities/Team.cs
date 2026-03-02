@@ -21,6 +21,10 @@ namespace MatchFixer.Infrastructure.Entities
 		[StringLength(250)]
 		public string LogoUrl { get; set; } = null!;
 
+		[StringLength(250)]
+		public string? LocalLogoUrl { get; set; }
+		public DateTime? LogoLastSyncedUtc { get; set; }
+
 		[Required]
 		[StringLength(LeagueNameMaxLength, ErrorMessage = LeagueNameCannotExceed100Characters)]
 		public string LeagueName { get; set; } = null!;
