@@ -1,4 +1,5 @@
-﻿using MatchFixer.Infrastructure.Security;
+﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Infrastructure.Security;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,15 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 	public class AdminTeamsController : Controller
 	{
 		private readonly IAdminTeamsService _svc;
+		private readonly ITeamLogoSyncService _logoSyncService;
 		private const int DefaultPageSize = 10;
 
 
-		public AdminTeamsController(IAdminTeamsService svc)
+		public AdminTeamsController(IAdminTeamsService svc, ITeamLogoSyncService logoSyncService)
 		{
 			_svc = svc;
+			_logoSyncService = logoSyncService;
+
 		}
 
 		[HttpGet]
@@ -92,6 +96,19 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				return BadRequest("Failed to update team.");
 
 			return Ok();
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> SyncLogos(bool force = false, CancellationToken ct = default)
+		{
+			var result = await _logoSyncService.SyncAllTeamLogosAsync(force, ct);
+
+			TempData["SuccessMessage"] =
+				$"Logo sync completed. Downloaded: {result.Downloaded}, " +
+				$"Skipped: {result.Skipped}, Failed: {result.Failed}.";
+
+			return RedirectToAction(nameof(TeamsIndex));
 		}
 	}
 
