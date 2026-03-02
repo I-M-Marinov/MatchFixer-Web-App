@@ -88,6 +88,27 @@
 					<button type="button" class="btn btn-primary btn-sm ms-1" id="leagueClear">Clear</button>
 					<button type="button" class="btn btn-primary btn-sm" id="leagueSelectAll">Select all</button>
 				</div>
+				
+				<form asp-action="SyncLogos"
+				      asp-controller="AdminTeams"
+				      asp-area="Admin"
+				      method="post"
+				      class="d-flex justify-content-center gap-2 mb-3 mt-2">
+
+					@Html.AntiForgeryToken()
+
+					<button type="submit"
+					        class="btn btn-outline-light btn-sm">
+						Sync Missing Logos
+					</button>
+
+					<button type="submit"
+					        name="force"
+					        value="true"
+					        class="btn btn-outline-warning btn-sm">
+						Force Re-Download All
+					</button>
+				</form>
 				<h3 class="h5 mb-1 mt-1 text-center text-white">Existing Teams</h3>
 				<div class="table-responsive existing-teams-table">
 					<table class="table align-middle table-fixed w-100">
@@ -114,7 +135,7 @@
 							    role="button"
 							    tabindex="0">
 
-									<td class="text-center" ><img src="@t.LogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name"/></td>
+									<td class="text-center"><img src="@t.EffectiveLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name" /></td>
 									<td class="text-center">@t.Name</td>
 									<td class="text-center align-middle">
 										<span class="badge api-id d-inline-flex align-items-center justify-content-center"
@@ -275,7 +296,7 @@
 							@foreach (var r in vm.Results)
 							{
 								<tr>
-									<td><img src="@r.LogoUrl" alt="" style="width:35px;height:35px;object-fit:contain"/></td>
+										<td><img src="@r.EffectiveLogoUrl" alt="" style="width:35px;height:35px;object-fit:contain" /></td>
 									<td>@r.Name</td>
 									<td>@r.ApiTeamId</td>
 									<td class="text-end">
@@ -283,7 +304,7 @@
 											@Html.AntiForgeryToken()
 											<input type="hidden" name="apiTeamId" value="@r.ApiTeamId"/>
 											<input type="hidden" name="name" value="@r.Name"/>
-											<input type="hidden" name="logoUrl" value="@r.LogoUrl"/>
+											<input type="hidden" name="logoUrl" value="@r.EffectiveLogoUrl" />
 											<input type="hidden" name="leagueId" value="@r.LeagueId" data-bind-league/>
 											<button class="btn btn-success btn-sm">Add</button>
 										</form>
