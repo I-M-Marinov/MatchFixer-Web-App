@@ -25,8 +25,19 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public OddsBoost? ActiveBoost { get; set; }
 		public DateTime? BoostEndUtc { get; set; }  // passing the end time of the odds boost for countdown timer
 
-		public string? HomeTeamLogoUrl { get; set; }
-		public string? AwayTeamLogoUrl { get; set; }
+		public string? HomeTeamLogoUrl { get; set; } // API
+		public string? AwayTeamLogoUrl { get; set; } // API
+		public string? HomeTeamLocalLogoUrl { get; set; } // LOCAL
+		public string? AwayTeamLocalLogoUrl { get; set; } // LOCAL
+		public string? EffectiveHomeTeamLogo =>
+			!string.IsNullOrWhiteSpace(HomeTeamLocalLogoUrl)
+				? HomeTeamLocalLogoUrl
+				: HomeTeamLogoUrl;
+
+		public string? EffectiveAwayTeamLogo =>
+			!string.IsNullOrWhiteSpace(AwayTeamLocalLogoUrl)
+				? AwayTeamLocalLogoUrl
+				: AwayTeamLogoUrl;
 		public bool IsDerby { get; set; }
 		public string? CompetitionName { get; set; }
 		public bool IsCompetitionMatch =>
