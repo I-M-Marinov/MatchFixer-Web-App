@@ -56,6 +56,7 @@ builder.Services.AddHttpClient();                                               
 
 builder.Services.AddHttpClient<IFootballApiService, FootballApiService>();				// Add the FootballAPI Service ( newly added interface here )
 builder.Services.AddScoped<IUpcomingMatchSeederService, UpcomingMatchSeederService>();  // Upcoming Matches Seeder Service
+builder.Services.AddScoped<ITeamLogoSyncService, TeamLogoSyncService>();				// Team Logo Sync Service
 
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();			// Add the Admin Dashboard Service
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();						// Add the Admin User Service
