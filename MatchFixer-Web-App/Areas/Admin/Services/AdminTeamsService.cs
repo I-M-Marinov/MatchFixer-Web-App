@@ -56,6 +56,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				ApiTeamId = r.Team.Id,
 				Name = r.Team.Name,
 				LogoUrl = r.Team.Logo,
+				LocalLogoUrl = r.Team.LocalLogoUrl, 
 				LeagueId = 0,           
 				LeagueName = string.Empty 
 			}).ToList();
@@ -126,6 +127,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					ApiTeamId = t.TeamId,
 					Name = t.Name,
 					LogoUrl = t.LogoUrl,
+					LocalLogoUrl = t.LocalLogoUrl,
 					LeagueName = t.LeagueName
 				})
 				.ToListAsync(ct);
@@ -187,6 +189,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				TeamId = team.Id,
 				Name = team.Name,
 				LogoUrl = team.LogoUrl, 
+				LocalLogoUrl = team.LocalLogoUrl,
 				LeagueName = team.LeagueName, 
 				LeagueId = leagueId, 
 				ApiTeamId = team.TeamId,
