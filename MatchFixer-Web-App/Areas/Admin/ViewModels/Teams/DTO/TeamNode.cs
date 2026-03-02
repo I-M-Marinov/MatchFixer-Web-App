@@ -5,5 +5,10 @@
 		public int Id { get; set; }
 		public string Name { get; set; } = "";
 		public string Logo { get; set; } = "";
+		public string? LocalLogoUrl { get; init; } // Local stored logo
+		public string EffectiveLogoUrl =>
+			!string.IsNullOrWhiteSpace(LocalLogoUrl)
+				? LocalLogoUrl
+				: Logo;
 	}
 }

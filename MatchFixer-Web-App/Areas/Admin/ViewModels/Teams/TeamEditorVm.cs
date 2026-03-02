@@ -9,6 +9,11 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Teams
 		// Team fields
 		public string Name { get; set; } = "";
 		public string LogoUrl { get; set; } = "";
+		public string? LocalLogoUrl { get; init; }         // Local stored logo
+		public string EffectiveLogoUrl =>
+			!string.IsNullOrWhiteSpace(LocalLogoUrl)
+				? LocalLogoUrl
+				: LogoUrl;
 		public string LeagueName { get; set; } = "";
 		public int? ApiTeamId { get; set; }
 
