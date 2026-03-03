@@ -93,20 +93,22 @@
 				      asp-controller="AdminTeams"
 				      asp-area="Admin"
 				      method="post"
-				      class="d-flex justify-content-center gap-2 mb-3 mt-2">
+				      class="d-flex justify-content-center gap-3 mb-3 mt-2">
 
 					@Html.AntiForgeryToken()
 
 					<button type="submit"
-					        class="btn btn-outline-light btn-sm">
+					        class="btn btn-sync">
+						<i class="ri-refresh-line me-1"></i>
 						Sync Missing Logos
 					</button>
 
 					<button type="submit"
 					        name="force"
 					        value="true"
-					        class="btn btn-outline-warning btn-sm">
-						Force Re-Download All
+					        class="btn btn-sync-danger">
+						<i class="ri-download-cloud-2-line me-1"></i>
+						Logos Re-Download
 					</button>
 				</form>
 				<h3 class="h5 mb-1 mt-1 text-center text-white">Existing Teams</h3>
