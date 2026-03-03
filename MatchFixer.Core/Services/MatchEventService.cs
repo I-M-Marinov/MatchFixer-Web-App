@@ -269,10 +269,18 @@ namespace MatchFixer.Core.Services
 				.GroupBy(t => t.LeagueName)
 				.ToDictionary(
 					group => group.Key,
-					group => group.Select(t => new SelectListItem
+					group => group.Select(t =>
 					{
-						Value = t.Id.ToString(),
-						Text = $"{t.Name}|{t.LogoUrl}"
+						var effectiveLogo =
+							!string.IsNullOrWhiteSpace(t.LocalLogoUrl)
+								? t.LocalLogoUrl
+								: t.LogoUrl;
+
+						return new SelectListItem
+						{
+							Value = t.Id.ToString(),
+							Text = $"{t.Name}|{effectiveLogo}"
+						};
 					}).ToList()
 				);
 
