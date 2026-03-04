@@ -4,9 +4,20 @@
 	{
 		public Guid EventId { get; set; }
 		public string HomeTeam { get; set; } = "";
-		public string AwayTeam { get; set; } = "";	
-		public string HomeTeamLogoUrl { get; set; } = "";
-		public string AwayTeamLogoUrl { get; set; } = "";
+		public string AwayTeam { get; set; } = "";
+		public string? HomeTeamLogoUrl { get; set; } = ""; // API
+		public string? AwayTeamLogoUrl { get; set; } = ""; // API
+		public string? HomeTeamLocalLogoUrl { get; set; } // LOCAL
+		public string? AwayTeamLocalLogoUrl { get; set; } // LOCAL
+		public string? EffectiveHomeTeamLogo =>
+			!string.IsNullOrWhiteSpace(HomeTeamLocalLogoUrl)
+				? HomeTeamLocalLogoUrl
+				: HomeTeamLogoUrl;
+
+		public string? EffectiveAwayTeamLogo =>
+			!string.IsNullOrWhiteSpace(AwayTeamLocalLogoUrl)
+				? AwayTeamLocalLogoUrl
+				: AwayTeamLogoUrl;
 		public string LeagueName { get; set; } = "";
 		public DateTime? KickoffUtc { get; set; }
 		public string? CompetitionName { get; set; }
