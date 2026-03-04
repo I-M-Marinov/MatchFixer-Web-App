@@ -85,6 +85,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					AwayTeam = e.AwayTeam.Name,
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
+					HomeTeamLocalLogoUrl = e.HomeTeam.LocalLogoUrl,
+					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
 
 					LeagueName =
 						!string.IsNullOrEmpty(e.HomeTeam.LeagueName) ? e.HomeTeam.LeagueName :
@@ -117,6 +119,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					AwayTeam = x.AwayTeam,
 					HomeTeamLogoUrl = x.HomeTeamLogoUrl,
 					AwayTeamLogoUrl = x.AwayTeamLogoUrl,
+					HomeTeamLocalLogoUrl = x.HomeTeamLocalLogoUrl,
+					AwayTeamLocalLogoUrl = x.AwayTeamLocalLogoUrl,
 					LeagueName = x.LeagueName,
 					KickoffUtc = x.KickoffUtc,
 					TotalBets = x.TotalBets,
