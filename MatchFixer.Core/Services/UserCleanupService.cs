@@ -22,6 +22,19 @@ namespace MatchFixer.Core.Services
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
+			_logger.LogInformation(
+				"""
+				===========================================
+				User Cleanup Background Service STARTED
+				Cleanup Interval: {Interval}
+				Account Expiration: {Expiration}
+				Started At (UTC): {UtcNow}
+				===========================================
+				""",
+				CleanupInterval,
+				AccountExpiration,
+				DateTime.UtcNow);
+
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				await CleanupUnconfirmedUsersAsync();
@@ -31,7 +44,14 @@ namespace MatchFixer.Core.Services
 
 		private async Task CleanupUnconfirmedUsersAsync()
 		{
-			_logger.LogInformation("------------------------------------Starting unconfirmed users cleanup task------------------------------------");
+			_logger.LogInformation(
+				"""
+				-------------------------------------------
+				Starting Unconfirmed User Cleanup
+				Execution Time (UTC): {UtcNow}
+				-------------------------------------------
+				""",
+				DateTime.UtcNow);
 
 			using (var scope = _serviceProvider.CreateScope())
 			{
@@ -43,25 +63,60 @@ namespace MatchFixer.Core.Services
 					.Where(u => !u.EmailConfirmed && u.CreatedOn < expirationTime)
 					.ToList();
 
+				_logger.LogInformation(
+					"""
+					Users eligible for cleanup: {UserCount}
+					Expiration Threshold (UTC): {ExpirationThreshold}
+					""",
+					users.Count,
+					expirationTime);
+
 				foreach (var user in users)
 				{
 					if (user.CreatedOn < expirationTime)
 					{
 						var result = await userManager.DeleteAsync(user);
+
 						if (result.Succeeded)
 						{
-							_logger.LogInformation($"------------------------------------Deleted unconfirmed user: {user.Email}------------------------------------");
+							_logger.LogInformation(
+								"""
+								Deleted Unconfirmed User
+								Email: {Email}
+								UserId: {UserId}
+								Created On: {CreatedOn}
+								""",
+								user.Email,
+								user.Id,
+								user.CreatedOn);
 						}
 						else
 						{
-							_logger.LogWarning($"Failed to delete user: {user.Email}. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+							_logger.LogWarning(
+								"""
+								Failed to delete unconfirmed user
+								Email: {Email}
+								UserId: {UserId}
+								Errors: {Errors}
+								""",
+								user.Email,
+								user.Id,
+								string.Join(", ", result.Errors.Select(e => e.Description)));
 						}
 					}
+
+					_logger.LogInformation(
+						"""
+						-------------------------------------------
+						Finished Unconfirmed User Cleanup
+						Deleted Users: {DeletedCount}
+						Finished At (UTC): {UtcNow}
+						-------------------------------------------
+						""",
+						users.Count,
+						DateTime.UtcNow);
 				}
 			}
-
-			_logger.LogInformation("------------------------------------Finished unconfirmed users cleanup task.------------------------------------");
 		}
-
 	}
 }
