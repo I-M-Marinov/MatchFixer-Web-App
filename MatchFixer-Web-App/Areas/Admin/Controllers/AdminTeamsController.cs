@@ -4,6 +4,8 @@ using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams;
 using Microsoft.AspNetCore.Mvc;
 
+using static MatchFixer.Common.Admin.AdminTeamsConstants;
+
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
@@ -11,14 +13,14 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 	public class AdminTeamsController : Controller
 	{
-		private readonly IAdminTeamsService _svc;
+		private readonly IAdminTeamsService _teamService;
 		private readonly ITeamLogoSyncService _logoSyncService;
 		private const int DefaultPageSize = 10;
 
 
-		public AdminTeamsController(IAdminTeamsService svc, ITeamLogoSyncService logoSyncService)
+		public AdminTeamsController(IAdminTeamsService teamService, ITeamLogoSyncService logoSyncService)
 		{
-			_svc = svc;
+			_teamService = teamService;
 			_logoSyncService = logoSyncService;
 
 		}
@@ -31,8 +33,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			var selected = leagueIds ?? Array.Empty<int>();
 
-			var leagues = await _svc.GetAllLeaguesAsync(ct);
-			var existing = await _svc.GetTeamsPageAsync(page, DefaultPageSize, selected, ct);
+			var leagues = await _teamService.GetAllLeaguesAsync(ct);
+			var existing = await _teamService.GetTeamsPageAsync(page, DefaultPageSize, selected, ct);
 
 			var searchVm = new TeamSearchVm
 			{
@@ -50,13 +52,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Search(TeamSearchVm searchVm, CancellationToken ct)
 		{
-			searchVm.Leagues = await _svc.GetAllLeaguesAsync(ct);
+			searchVm.Leagues = await _teamService.GetAllLeaguesAsync(ct);
 
 			searchVm.Results = string.IsNullOrWhiteSpace(searchVm.Query)
 				? Array.Empty<TeamSearchResult>()
-				: await _svc.SearchTeamsAsync(searchVm.Query!, ct);
+				: await _teamService.SearchTeamsAsync(searchVm.Query!, ct);
 
-			var existing = await _svc.GetTeamsPageAsync(1, DefaultPageSize, null, ct);
+			var existing = await _teamService.GetTeamsPageAsync(1, DefaultPageSize, null, ct);
 
 			return View("TeamsIndex", Tuple.Create(searchVm, existing));
 		}
@@ -65,8 +67,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Add(int apiTeamId, int leagueId, string name, string logoUrl, CancellationToken ct)
 		{
-			var ok = await _svc.AddTeamFromSearchAsync(apiTeamId, name, logoUrl, leagueId, ct);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Team added." : "Already exists.";
+			var ok = await _teamService.AddTeamFromSearchAsync(apiTeamId, name, logoUrl, leagueId, ct);
+			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? TeamAddedSuccessfully : TeamAlreadyExists;
 
 			return RedirectToAction(nameof(TeamsIndex));
 		}
@@ -74,7 +76,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Edit(Guid teamId, CancellationToken ct)
 		{
-			var vm = await _svc.GetTeamEditorVmAsync(teamId, ct);
+			var vm = await _teamService.GetTeamEditorVmAsync(teamId, ct);
 			if (vm == null)
 				return NotFound();
 
@@ -88,12 +90,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			CancellationToken ct)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest("Invalid team data.");
+				return BadRequest(InvalidTeamData);
 
-			var ok = await _svc.UpdateTeamAsync(vm);
+			var ok = await _teamService.UpdateTeamAsync(vm);
 
 			if (!ok)
-				return BadRequest("Failed to update team.");
+				return BadRequest(TeamUpdateFailed);
 
 			return Ok();
 		}
