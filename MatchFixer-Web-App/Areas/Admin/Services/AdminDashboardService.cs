@@ -2,6 +2,7 @@
 using MatchFixer.Infrastructure;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels;
+using MatchFixer_Web_App.Areas.Admin.ViewModels.Dashboard;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.MatchEvents;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			public async Task<AdminDashboardViewModel> GetDashboardAsync()
 			{
 				var now = DateTime.UtcNow;
+				var todayStart = now.Date;
+				var yesterdayStart = todayStart.AddDays(-1);
+				var weekStart = todayStart.AddDays(-7);
+
+				/* -----------------------------
+				   USERS
+				----------------------------- */
 
 				var totalUsers = await _dbContext.Users.CountAsync();
 				var activeUsers = await _dbContext.Users.CountAsync(u => u.EmailConfirmed && !u.IsDeleted);
@@ -29,15 +37,158 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var lockedUsers = await _dbContext.Users.CountAsync(u => u.LockoutEnd > now);
 				var bannedUsers = await _dbContext.Users.CountAsync(u => !u.IsActive && u.WasDeactivatedByAdmin);
 
+				/* -----------------------------
+				   WALLET
+				----------------------------- */
+
 				var totalWalletBalance = await _dbContext.Wallets.SumAsync(w => (decimal?)w.Balance) ?? 0m;
 				var totalTransactions = await _dbContext.WalletTransactions.CountAsync();
+
+				/* -----------------------------
+				   BETS
+				----------------------------- */
 
 				var totalBets = await _dbContext.Bets.CountAsync();
 				var pendingBets = await _dbContext.Bets.CountAsync(b => b.Status == BetStatus.Pending);
 				var wonBets = await _dbContext.Bets.CountAsync(b => b.Status == BetStatus.Won);
 				var lostBets = await _dbContext.Bets.CountAsync(b => b.Status == BetStatus.Lost);
 
-				var eventsVm = await BuildEventsSummaryAsync();
+				/* -----------------------------
+				   PLATFORM EXPOSURE
+				----------------------------- */
+
+				var stakesToday = await _dbContext.Bets
+					.Where(b => b.BetTime >= todayStart)
+					.SumAsync(b => (decimal?)b.BetSlip.Amount) ?? 0m;
+
+				var potentialPayout = await _dbContext.Bets
+					.Where(b => b.Status == BetStatus.Pending)
+					.SumAsync(b => (decimal?)(b.BetSlip.Amount * b.Odds)) ?? 0m;
+
+				var exposureVm = new PlatformExposureViewModel
+				{
+					TotalStakesToday = stakesToday,
+					PotentialPayout = potentialPayout
+				};
+
+				/* -----------------------------
+				   BETS ACTIVITY
+				----------------------------- */
+
+				var betsToday = await _dbContext.Bets
+					.CountAsync(b => b.BetTime >= todayStart);
+
+				var betsYesterday = await _dbContext.Bets
+					.CountAsync(b => b.BetTime >= yesterdayStart && b.BetTime < todayStart);
+
+				var betsThisWeek = await _dbContext.Bets
+					.CountAsync(b => b.BetTime >= weekStart);
+
+				var betsActivity = new BetsActivityViewModel
+				{
+					BetsToday = betsToday,
+					BetsYesterday = betsYesterday,
+					BetsThisWeek = betsThisWeek
+				};
+
+				/* -----------------------------
+				   WALLET FLOW
+				----------------------------- */
+
+				var depositsToday = await _dbContext.WalletTransactions
+					.Where(t => t.TransactionType == WalletTransactionType.Deposit && t.CreatedAt >= todayStart)
+					.SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+				var withdrawalsToday = await _dbContext.WalletTransactions
+					.Where(t => t.TransactionType == WalletTransactionType.Withdrawal && t.CreatedAt >= todayStart)
+					.SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+				var walletActivity = new WalletActivityViewModel
+				{
+					DepositsToday = depositsToday,
+					WithdrawalsToday = withdrawalsToday
+				};
+
+				/* -----------------------------
+				   TOP WINNERS (48h)
+				----------------------------- */
+
+				var yesterday = now.AddDays(-2);
+
+				var topWinners = await _dbContext.Bets
+					.Where(b => b.Status == BetStatus.Won && b.BetTime >= yesterday)
+					.GroupBy(b => new
+					{
+						b.BetSlip.UserId,
+						b.BetSlip.User.FirstName,
+						b.BetSlip.User.LastName,
+						b.BetSlip.User.Email
+					})
+					.Select(g => new TopUserWinLossRow
+					{
+						UserId = g.Key.UserId,
+						Username = g.Key.FirstName + " " + g.Key.LastName,
+						Profit = g.Sum(x => (x.BetSlip.Amount * x.Odds) - x.BetSlip.Amount),
+						Email = g.Key.Email
+					})
+					.OrderByDescending(x => x.Profit)
+					.Take(5)
+					.ToListAsync();
+
+				/* -----------------------------
+				   TOP LOSERS (48h)
+				----------------------------- */
+
+				var topLosers = await _dbContext.Bets
+					.Where(b => b.Status == BetStatus.Lost && b.BetTime >= yesterday)
+					.GroupBy(b => new
+					{
+						b.BetSlip.UserId,
+						b.BetSlip.User.FirstName,
+						b.BetSlip.User.LastName,
+						b.BetSlip.User.Email
+					})
+					.Select(g => new TopUserWinLossRow
+					{
+						UserId = g.Key.UserId,
+						Username = g.Key.FirstName + " " + g.Key.LastName,
+						Profit = g.Sum(x => x.BetSlip.Amount),
+						Email = g.Key.Email
+					})
+					.OrderByDescending(x => x.Profit)
+					.Take(5)
+					.ToListAsync();
+
+				/* -----------------------------
+				   HOT MATCHES
+				----------------------------- */
+
+				var hotMatches = await _dbContext.Bets
+					.GroupBy(b => b.MatchEventId)
+					.Select(g => new
+					{
+						MatchId = g.Key,
+						BetsCount = g.Count()
+					})
+					.OrderByDescending(x => x.BetsCount)
+					.Take(5)
+					.Join(_dbContext.MatchEvents,
+						g => g.MatchId,
+						m => m.Id,
+						(g, m) => new HotMatchRow
+						{
+							MatchId = m.Id,
+							HomeTeam = m.HomeTeam.Name,
+							AwayTeam = m.AwayTeam.Name,
+							HomeLogo = m.HomeTeam.LogoUrl,
+							AwayLogo = m.AwayTeam.LogoUrl,
+							BetsCount = g.BetsCount
+						})
+					.ToListAsync();
+
+				/* -----------------------------
+				   RETURN MODEL
+				----------------------------- */
 
 				return new AdminDashboardViewModel
 				{
@@ -46,13 +197,22 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					DeletedUsers = deletedUsers,
 					LockedUsers = lockedUsers,
 					BannedUsers = bannedUsers,
+
 					TotalWalletBalance = totalWalletBalance,
 					TotalTransactions = totalTransactions,
+
 					TotalBets = totalBets,
 					PendingBets = pendingBets,
 					WonBets = wonBets,
 					LostBets = lostBets,
-					Events = eventsVm
+
+					Exposure = exposureVm,
+					BetsActivity = betsActivity,
+					WalletActivity = walletActivity,
+
+					TopWinners = topWinners,
+					TopLosers = topLosers,
+					HotMatches = hotMatches
 				};
 			}
 
