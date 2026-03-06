@@ -115,21 +115,22 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var yesterday = now.AddDays(-2);
 
-				var topWinners = await _dbContext.Bets
-					.Where(b => b.Status == BetStatus.Won && b.BetTime >= yesterday)
-					.GroupBy(b => new
+				var topWinners = await _dbContext.BetSlips
+					.Where(s => s.BetTime >= yesterday)
+					.Where(s => s.Bets.All(b => b.Status == BetStatus.Won))
+					.GroupBy(s => new
 					{
-						b.BetSlip.UserId,
-						b.BetSlip.User.FirstName,
-						b.BetSlip.User.LastName,
-						b.BetSlip.User.Email
+						s.UserId,
+						s.User.FirstName,
+						s.User.LastName,
+						s.User.Email
 					})
 					.Select(g => new TopUserWinLossRow
 					{
 						UserId = g.Key.UserId,
 						Username = g.Key.FirstName + " " + g.Key.LastName,
-						Profit = g.Sum(x => (x.BetSlip.Amount * x.Odds) - x.BetSlip.Amount),
-						Email = g.Key.Email
+						Email = g.Key.Email,
+						Profit = g.Sum(s => (s.WinAmount ?? 0) - s.Amount)
 					})
 					.OrderByDescending(x => x.Profit)
 					.Take(5)
@@ -139,21 +140,22 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				   TOP LOSERS (48h)
 				----------------------------- */
 
-				var topLosers = await _dbContext.Bets
-					.Where(b => b.Status == BetStatus.Lost && b.BetTime >= yesterday)
-					.GroupBy(b => new
+				var topLosers = await _dbContext.BetSlips
+					.Where(s => s.BetTime >= yesterday)
+					.Where(s => s.Bets.Any(b => b.Status == BetStatus.Lost))
+					.GroupBy(s => new
 					{
-						b.BetSlip.UserId,
-						b.BetSlip.User.FirstName,
-						b.BetSlip.User.LastName,
-						b.BetSlip.User.Email
+						s.UserId,
+						s.User.FirstName,
+						s.User.LastName,
+						s.User.Email
 					})
 					.Select(g => new TopUserWinLossRow
 					{
 						UserId = g.Key.UserId,
 						Username = g.Key.FirstName + " " + g.Key.LastName,
-						Profit = g.Sum(x => x.BetSlip.Amount),
-						Email = g.Key.Email
+						Email = g.Key.Email,
+						Profit = g.Sum(s => s.Amount)
 					})
 					.OrderByDescending(x => x.Profit)
 					.Take(5)
