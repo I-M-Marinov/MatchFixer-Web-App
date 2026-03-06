@@ -1,157 +1,18 @@
-﻿.users-wallets-bets-table table tbody tr td {
-    font-size: 0.75em;
-}
+﻿
+/* ============================================================
+   GLOBAL DASHBOARD LAYOUT
+   ============================================================ */
 
-.stack {
-    display: flex;
-    width: 360px !important;
-    height: 30px !important;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #e9ecef;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-}
-
-.stack .seg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: black;
-    text-shadow: 1px 1px 2px white;
-    font-size: 0.90rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.seg-pending {
-    background: #ffd966;
-    color: #000;
-}
-
-.seg-won {
-    background: #5cb85c;
-}
-
-.seg-lost {
-    background: #dc3545;
-}
-
-    .seg-pending:hover,
-    .seg-won:hover,
-    .seg-lost:hover {
-        transform: scale(1.2);
-    }
-
-#total-users-count,
-#total-bets-count {
-    border: 2px solid black;
-    box-shadow: 0 0 0 1px rgba(0,0,0,.05);
-    color: #00038f;
-}
-
-.responsive-stack td, .responsive-stack th {
-    vertical-align: middle;
-}
-
-.mini-stacked .stack {
-    width: 240px;
-    height: 10px;
-    border-radius: 6px;
-    overflow: hidden;
-    display: inline-flex;
-    background: #e9ecef;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-}
-
-.mini-stacked .seg {
-    height: 100%;
-}
-
-.mini-stacked .seg-pending {
-    background: #ffd966;
-}
-
-.mini-stacked .seg-won {
-    background: #5cb85c;
-}
-
-.mini-stacked .seg-lost {
-    background: #dc3545;
-}
-
-.mini-stacked .stack {
-    display: flex;
-    width: 100%;
-    height: 22px; 
-    border-radius: 12px;
-    overflow: hidden;
-    background: #e9ecef;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-}
-
-.mini-stacked .seg {
-    position: relative;
-    height: 100%;
-    flex: 0 0 auto; 
-}
-
-.mini-stacked .seg small {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    color: #000;
-    font-size: 12px;
-    line-height: 1;
-    white-space: nowrap;
-    pointer-events: none;
-    text-shadow: 0 1px 2px rgba(255,255,255,.6);
+.admin-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
 }
 
 
-.upcoming-table-headers {
-    height: 60px !important;
-}
-
-.logo-cell {
-    width: 100px;
-}
-
-.logo-box {
-    width: 55px; 
-    height: 55px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden; 
-}
-
-.status-box{
-    width: auto;
-    height: 55px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.logo-box img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    display: block; 
-}
-
-.total-inactive-users {
-    border: 2px solid rgba(108,117,125,1)!important;
-    padding: 0.5rem;
-    border-radius: 0.5em;
-}
-
-/* =====================================================
-   ADMIN METRICS GRID
-   ===================================================== */
+/* ============================================================
+   METRICS GRID (TOP CARDS)
+   ============================================================ */
 
 .admin-metrics-grid {
     display: grid;
@@ -160,161 +21,226 @@
     margin-bottom: 2rem;
 }
 
+
+/* ============================================================
+   METRIC CARD
+   ============================================================ */
+
 .metric-card {
-    background: #fff;
-    border-radius: 1rem;
-    padding: 1.25rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    background: #0f172a;
+    border-radius: 16px;
+    padding: 22px;
+    color: #e2e8f0;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,.45);
+}
 /* Header */
+
 .metric-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 8px;
     font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: .05em;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    color: #6c757d;
+    opacity: .85;
 }
 
-/* Main number */
+/* Main Value */
+
 .metric-main {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .metric-value {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
-    color: #0d6efd;
+    margin-top: 4px;
 }
 
 .metric-label {
-    font-size: 0.75rem;
-    color: #6c757d;
+    font-size: .75rem;
+    opacity: .65;
 }
 
 /* Badges */
+
 .metric-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
     justify-content: center;
+    gap: 6px;
 }
 
     .metric-badges.center {
         justify-content: center;
     }
 
-/* Progress bar */
+
+/* ============================================================
+   SEGMENTED METRIC BAR
+   ============================================================ */
+
 .metric-bar {
-    position: relative;
-    height: 18px;
-    background: #e9ecef;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 0.25rem;
+    width: 100%;
+    margin-top: 10px;
 }
 
-.users-wallets-bets-table .stack {
-    display: flex;
-}
-
-.users-wallets-bets-table .seg {
-    flex-shrink: 0;
-}
-
-.metric-bar .bar-fill {
-    transition: width .4s ease;
-}
-
-.metric-bar .bar-fill {
-    height: 100%;
-    float: none !important;
-    display: block;
-}
-
-.metric-bar .bar-label {
-    position: absolute;
-    inset: 0;
+.metric-bar > .bar-fill {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: #000;
+    font-size: .65rem;
+    font-weight: 700;
+    color: #ffffff;
+    transition: width .3s ease;
+}
+
+.metric-bar > .bar-fill.text-dark {
+    color: #000000;
+}
+
+.metric-bar > .bar-fill span {
     pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,.35);
+}
+
+.metric-bar > .bar-fill[style*="width:0"] span {
+    display: none;
 }
 
 .metric-note {
-    font-size: 0.7rem;
+    font-size: .7rem;
     color: #6c757d;
     text-align: center;
 }
 
-/* ===============================
-   METRIC BAR 
-   =============================== */
 
-.metric-bar {
+/* ============================================================
+   DASHBOARD MINI CARDS
+   ============================================================ */
+
+.admin-mini-card {
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 18px;
+    color: #e2e8f0;
+    box-shadow: 0 12px 28px rgba(0,0,0,.35);
     display: flex;
-    height: 14px;
-    background: #e9ecef;
-    border-radius: 999px;
-    overflow: hidden;
+    flex-direction: column;
+    gap: 6px;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.metric-bar .bar-fill {
-    height: 100%;
-    flex: 0 0 auto;
+.admin-mini-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(0,0,0,.45);
 }
 
-.metric-bar-label {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: #495057;
-    text-align: center;
-    margin-top: 0.25rem;
-}
-
-/* =====================================================
-   SEGMENTED METRIC BAR 
-   ===================================================== */
-
-.metric-bar.segmented {
-    display: flex;
-    height: 20px;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #e9ecef;
-}
-
-.metric-bar.segmented > .bar-fill {
-    flex: 0 0 auto;
+.admin-mini-title {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
+    justify-content: center; /* centers horizontally */
+
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    opacity: .75;
+    text-align: center;
+}
+
+.admin-mini-value {
+    font-size: 1.6rem;
     font-weight: 700;
-    white-space: nowrap;
-    color: #fff;
-    transition: width 0.3s ease;
 }
 
-.metric-bar.segmented > .bar-fill.text-dark {
-    color: #000;
+.admin-mini-row {
+    display: flex;  
+    justify-content: space-between;
+    font-size: .9rem;
+
 }
 
-.metric-bar.segmented > .bar-fill > span {
-    pointer-events: none;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+.admin-mini-row:first-of-type{
+    margin-top: 0.2em !important;
 }
 
-.metric-bar.segmented > .bar-fill[style*="width:0"] > span {
-    display: none;
+.admin-mini-footer {
+    margin-top: 6px;
+    font-weight: 600;
+    opacity: .9;
 }
 
+
+/* ============================================================
+   SMALL UTILITY ELEMENTS
+   ============================================================ */
+
+.total-inactive-users {
+    border: 2px solid rgba(108,117,125,1);
+    padding: .5rem;
+    border-radius: .5rem;
+}
+
+
+/* ============================================================
+   OPTIONAL CARD COLOR VARIANTS
+   (easy visual separation)
+   ============================================================ */
+
+.metric-users .metric-header i {
+    color: #60a5fa;
+}
+
+.metric-wallets .metric-header i {
+    color: #34d399;
+}
+
+.metric-bets .metric-header i {
+    color: #fbbf24;
+}
+
+.metric-users {
+    border-top: 3px solid #3b82f6;
+}
+
+.metric-wallets {
+    border-top: 3px solid #10b981;
+}
+
+.metric-bets {
+    border-top: 3px solid #f59e0b;
+}
+
+
+/* ============================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    .metric-value {
+        font-size: 1.5rem;
+    }
+
+    .admin-mini-value {
+        font-size: 1.3rem;
+    }
+}
