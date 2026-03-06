@@ -40,256 +40,258 @@
 
 <h1>Admin Dashboard</h1>
 
-<div class="admin-metrics-grid">
+<div class="table-section d-flex flex-column" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
 
-	<!-- USERS -->
-    <div class="metric-card metric-users">
-		<div class="metric-header">
-			<i class="bi bi-people"></i>
-			<span>Users</span>
+	<div class="admin-metrics-grid">
+
+		<!-- USERS -->
+	    <div class="metric-card metric-users">
+			<div class="metric-header">
+				<i class="bi bi-people"></i>
+				<span>Users</span>
+			</div>
+
+			<div class="metric-main">
+				<div class="metric-value">@Model.TotalUsers</div>
+				<div class="metric-label">Total Users</div>
+			</div>
+
+			<div class="metric-badges">
+				<span class="badge bg-success">Active: @Model.ActiveUsers</span>
+				<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
+				<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
+				<span class="badge bg-dark">Deleted: @Model.DeletedUsers</span>
+				<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
+			</div>
+
+			<div class="metric-bar segmented">
+				<div class="bar-fill bg-success" style="width:@activePct%">
+					<span>@activePct%</span>
+				</div>
+				<div class="bar-fill bg-secondary" style="width:@inactivePct%">
+					<span>@inactivePct%</span>
+				</div>
+				<div class="bar-fill bg-warning text-dark" style="width:@lockedPct%">
+					<span>@lockedPct%</span>
+				</div>
+				<div class="bar-fill bg-danger" style="width:@bannedPct%">
+					<span>@bannedPct%</span>
+				</div>
+			</div>
+
 		</div>
 
-		<div class="metric-main">
-			<div class="metric-value">@Model.TotalUsers</div>
-			<div class="metric-label">Total Users</div>
+		<!-- WALLETS -->
+	    <div class="metric-card metric-wallets">
+			<div class="metric-header">
+				<i class="bi bi-wallet2"></i>
+				<span>Wallets</span>
+			</div>
+
+			<div class="metric-main">
+				<div class="metric-value">€@Model.TotalWalletBalance</div>
+				<div class="metric-label">Total Balance</div>
+			</div>
+
+			<div class="metric-badges center">
+				<span class="badge bg-info text-dark">
+					Transactions: @Model.TotalTransactions
+				</span>
+			</div>
+
+			<div class="metric-note">
+				Total wallet balance is a sum of all user wallets.
+			</div>
 		</div>
 
-		<div class="metric-badges">
-			<span class="badge bg-success">Active: @Model.ActiveUsers</span>
-			<span class="badge bg-secondary">Inactive: @(Model.TotalUsers - Model.ActiveUsers)</span>
-			<span class="badge bg-warning text-dark">Locked: @Model.LockedUsers</span>
-			<span class="badge bg-dark">Deleted: @Model.DeletedUsers</span>
-			<span class="badge bg-danger">Banned: @Model.BannedUsers</span>
-		</div>
+		<!-- BETS -->
+	    <div class="metric-card metric-bets">
+			<div class="metric-header">
+				<i class="bi bi-bar-chart-line"></i>
+				<span>Bets</span>
+			</div>
 
-		<div class="metric-bar segmented">
-			<div class="bar-fill bg-success" style="width:@activePct%">
-				<span>@activePct%</span>
+			<div class="metric-main">
+				<div class="metric-value">@Model.TotalBets</div>
+				<div class="metric-label">Total Bets Placed</div>
 			</div>
-			<div class="bar-fill bg-secondary" style="width:@inactivePct%">
-				<span>@inactivePct%</span>
+
+			<div class="metric-badges">
+				<span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
+				<span class="badge bg-success">Won: @Model.WonBets</span>
+				<span class="badge bg-danger">Lost: @Model.LostBets</span>
 			</div>
-			<div class="bar-fill bg-warning text-dark" style="width:@lockedPct%">
-				<span>@lockedPct%</span>
+
+			<div class="metric-bar segmented">
+				<div class="bar-fill bg-warning text-dark" style="width:@pendingPct%">
+					<span>@pendingPct%</span>
+				</div>
+				<div class="bar-fill bg-success" style="width:@wonPct%">
+					<span>@wonPct%</span>
+				</div>
+				<div class="bar-fill bg-danger" style="width:@lostPct%">
+					<span>@lostPct%</span>
+				</div>
 			</div>
-			<div class="bar-fill bg-danger" style="width:@bannedPct%">
-				<span>@bannedPct%</span>
-			</div>
+
+
 		</div>
 
 	</div>
 
-	<!-- WALLETS -->
-    <div class="metric-card metric-wallets">
-		<div class="metric-header">
-			<i class="bi bi-wallet2"></i>
-			<span>Wallets</span>
-		</div>
+	<div class="admin-dashboard-grid mt-4">
 
-		<div class="metric-main">
-			<div class="metric-value">€@Model.TotalWalletBalance</div>
-			<div class="metric-label">Total Balance</div>
-		</div>
-
-		<div class="metric-badges center">
-			<span class="badge bg-info text-dark">
-				Transactions: @Model.TotalTransactions
-			</span>
-		</div>
-
-		<div class="metric-note">
-			Total wallet balance is a sum of all user wallets.
-		</div>
-	</div>
-
-	<!-- BETS -->
-    <div class="metric-card metric-bets">
-		<div class="metric-header">
-			<i class="bi bi-bar-chart-line"></i>
-			<span>Bets</span>
-		</div>
-
-		<div class="metric-main">
-			<div class="metric-value">@Model.TotalBets</div>
-			<div class="metric-label">Total Bets Placed</div>
-		</div>
-
-		<div class="metric-badges">
-			<span class="badge bg-warning text-dark">Pending: @Model.PendingBets</span>
-			<span class="badge bg-success">Won: @Model.WonBets</span>
-			<span class="badge bg-danger">Lost: @Model.LostBets</span>
-		</div>
-
-		<div class="metric-bar segmented">
-			<div class="bar-fill bg-warning text-dark" style="width:@pendingPct%">
-				<span>@pendingPct%</span>
-			</div>
-			<div class="bar-fill bg-success" style="width:@wonPct%">
-				<span>@wonPct%</span>
-			</div>
-			<div class="bar-fill bg-danger" style="width:@lostPct%">
-				<span>@lostPct%</span>
-			</div>
-		</div>
-
-
-	</div>
-
-</div>
-
-<div class="admin-dashboard-grid mt-4">
-
-    <!-- PLATFORM EXPOSURE -->
-    <div class="admin-mini-card">
-        <div class="admin-mini-title">
-            <i class="bi bi-exclamation-triangle"></i>
-            Platform Exposure
-        </div>
-
-        <div>Total stakes today</div>
-        <div class="admin-mini-value">
-            €@Model.Exposure.TotalStakesToday.ToString("N2")
-        </div>
-
-        <div>Potential payout</div>
-        <div class="admin-mini-value text-danger">
-            €@Model.Exposure.PotentialPayout.ToString("N2")
-        </div>
-
-        <div class="admin-mini-footer">
-            Exposure: €@Model.Exposure.Exposure.ToString("N2")
-        </div>
-    </div>
-
-
-    <!-- BET ACTIVITY -->
-    <div class="admin-mini-card">
-        <div class="admin-mini-title">
-            <i class="bi bi-activity"></i>
-            Bet Activity
-        </div>
-
-        <div class="admin-mini-row mt-5">
-            <span>Today</span>
-            <span>@Model.BetsActivity.BetsToday</span>
-        </div>
-
-        <div class="admin-mini-row">
-            <span>Yesterday</span>
-            <span>@Model.BetsActivity.BetsYesterday</span>
-        </div>
-
-        <div class="admin-mini-row">
-            <span>This week</span>
-            <span>@Model.BetsActivity.BetsThisWeek</span>
-        </div>
-    </div>
-
-
-    <!-- WALLET FLOW -->
-    <div class="admin-mini-card">
-        <div class="admin-mini-title">
-            <i class="bi bi-cash-stack"></i>
-            Wallet Flow Today
-        </div>
-
-        <div class="admin-mini-row mt-5">
-            <span>Deposits</span>
-            <span class="text-success">
-                €@Model.WalletActivity.DepositsToday.ToString("N2")
-            </span>
-        </div>
-
-        <div class="admin-mini-row">
-            <span>Withdrawals</span>
-            <span class="text-danger">
-                €@Model.WalletActivity.WithdrawalsToday.ToString("N2")
-            </span>
-        </div>
-
-        <div class="admin-mini-row fw-bold">
-            <span>Net</span>
-            <span>
-                €@Model.WalletActivity.NetFlow.ToString("N2")
-            </span>
-        </div>
-    </div>
-
-
-    <!-- TOP WINNERS -->
-    <div class="admin-mini-card">
-        <div class="admin-mini-title">
-            <i class="bi bi-trophy text-warning"></i>
-            Top Winners (48h)
-        </div>
-        @foreach (var w in Model.TopWinners)
-        {
-	        <div class="admin-mini-row">
-
-		        <a asp-area="Admin"
-		           asp-controller="Users"
-		           asp-action="ShowUsers"
-		           asp-route-query="@w.Email"
-				   class="text-decoration-none">
-			        @w.Username
-		        </a>
-
-		        <span class="text-success">
-			        +€@w.Profit.ToString("N2")
-		        </span>
-
+	    <!-- PLATFORM EXPOSURE -->
+	    <div class="admin-mini-card">
+	        <div class="admin-mini-title">
+	            <i class="bi bi-exclamation-triangle"></i>
+	            Platform Exposure
 	        </div>
-        }
-    </div>
+
+	        <div>Total stakes today</div>
+	        <div class="admin-mini-value">
+	            €@Model.Exposure.TotalStakesToday.ToString("N2")
+	        </div>
+
+	        <div>Potential payout</div>
+	        <div class="admin-mini-value text-danger">
+	            €@Model.Exposure.PotentialPayout.ToString("N2")
+	        </div>
+
+	        <div class="admin-mini-footer">
+	            Exposure: €@Model.Exposure.Exposure.ToString("N2")
+	        </div>
+	    </div>
 
 
-    <!-- TOP LOSERS -->
-    <div class="admin-mini-card">
-        <div class="admin-mini-title">
-            <i class="bi bi-emoji-frown text-danger"></i>
-            Top Losers (48h)
-        </div>
+	    <!-- BET ACTIVITY -->
+	    <div class="admin-mini-card">
+	        <div class="admin-mini-title">
+	            <i class="bi bi-activity"></i>
+	            Bet Activity
+	        </div>
 
-        @foreach (var l in Model.TopLosers)
-        {
-            <div class="admin-mini-row">
-	            <a asp-area="Admin"
-	               asp-controller="Users"
-	               asp-action="ShowUsers"
-	               asp-route-query="@l.Email"
-				   class="text-decoration-none">
-		            @l.Username
-	            </a>
-                <span class="text-danger">
-                    -€@l.Profit.ToString("N2")
-                </span>
-            </div>
-        }
-    </div>
+	        <div class="admin-mini-row mt-5">
+	            <span>Today</span>
+	            <span>@Model.BetsActivity.BetsToday</span>
+	        </div>
+
+	        <div class="admin-mini-row">
+	            <span>Yesterday</span>
+	            <span>@Model.BetsActivity.BetsYesterday</span>
+	        </div>
+
+	        <div class="admin-mini-row">
+	            <span>This week</span>
+	            <span>@Model.BetsActivity.BetsThisWeek</span>
+	        </div>
+	    </div>
 
 
-    <!-- HOT MATCHES -->
-    <div class="admin-mini-card">
-        <div class="admin-mini-title">
-            <i class="bi bi-fire"></i>
-            Hot Matches
-        </div>
+	    <!-- WALLET FLOW -->
+	    <div class="admin-mini-card">
+	        <div class="admin-mini-title">
+	            <i class="bi bi-cash-stack"></i>
+	            Wallet Flow Today
+	        </div>
 
-        @foreach (var m in Model.HotMatches)
-        {
-            <div class="admin-mini-row">
-                <span>
-                    @m.HomeTeam vs @m.AwayTeam
-                </span>
+	        <div class="admin-mini-row mt-5">
+	            <span>Deposits</span>
+	            <span class="text-success">
+	                €@Model.WalletActivity.DepositsToday.ToString("N2")
+	            </span>
+	        </div>
 
-                <span class="badge bg-dark">
-                    @m.BetsCount bets
-                </span>
-            </div>
-        }
-    </div>
+	        <div class="admin-mini-row">
+	            <span>Withdrawals</span>
+	            <span class="text-danger">
+	                €@Model.WalletActivity.WithdrawalsToday.ToString("N2")
+	            </span>
+	        </div>
+
+	        <div class="admin-mini-row fw-bold">
+	            <span>Net</span>
+	            <span>
+	                €@Model.WalletActivity.NetFlow.ToString("N2")
+	            </span>
+	        </div>
+	    </div>
+
+
+	    <!-- TOP WINNERS -->
+	    <div class="admin-mini-card">
+	        <div class="admin-mini-title">
+	            <i class="bi bi-trophy text-warning"></i>
+	            Top Winners (48h)
+	        </div>
+	        @foreach (var w in Model.TopWinners)
+	        {
+		        <div class="admin-mini-row">
+
+			        <a asp-area="Admin"
+			           asp-controller="Users"
+			           asp-action="ShowUsers"
+			           asp-route-query="@w.Email"
+					   class="text-decoration-none">
+				        @w.Username
+			        </a>
+
+			        <span class="text-success">
+				        +€@w.Profit.ToString("N2")
+			        </span>
+
+		        </div>
+	        }
+	    </div>
+
+
+	    <!-- TOP LOSERS -->
+	    <div class="admin-mini-card">
+	        <div class="admin-mini-title">
+	            <i class="bi bi-emoji-frown text-danger"></i>
+	            Top Losers (48h)
+	        </div>
+
+	        @foreach (var l in Model.TopLosers)
+	        {
+	            <div class="admin-mini-row">
+		            <a asp-area="Admin"
+		               asp-controller="Users"
+		               asp-action="ShowUsers"
+		               asp-route-query="@l.Email"
+					   class="text-decoration-none">
+			            @l.Username
+		            </a>
+	                <span class="text-danger">
+	                    -€@l.Profit.ToString("N2")
+	                </span>
+	            </div>
+	        }
+	    </div>
+
+
+	    <!-- HOT MATCHES -->
+	    <div class="admin-mini-card">
+	        <div class="admin-mini-title">
+	            <i class="bi bi-fire"></i>
+	            Hot Matches
+	        </div>
+
+	        @foreach (var m in Model.HotMatches)
+	        {
+	            <div class="admin-mini-row">
+	                <span>
+	                    @m.HomeTeam vs @m.AwayTeam
+	                </span>
+
+	                <span class="badge bg-dark">
+	                    @m.BetsCount bets
+	                </span>
+	            </div>
+	        }
+	    </div>
+
+	</div>
 
 </div>
-
-
 
