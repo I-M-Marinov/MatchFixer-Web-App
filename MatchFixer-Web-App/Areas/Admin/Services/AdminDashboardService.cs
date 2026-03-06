@@ -113,10 +113,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				   TOP WINNERS (48h)
 				----------------------------- */
 
-				var yesterday = now.AddDays(-2);
+				var twoDaysAgo = now.AddDays(-2);
 
 				var topWinners = await _dbContext.BetSlips
-					.Where(s => s.BetTime >= yesterday)
+					.Where(s => s.BetTime >= twoDaysAgo)
 					.Where(s => s.Bets.All(b => b.Status == BetStatus.Won))
 					.GroupBy(s => new
 					{
@@ -141,7 +141,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				----------------------------- */
 
 				var topLosers = await _dbContext.BetSlips
-					.Where(s => s.BetTime >= yesterday)
+					.Where(s => s.BetTime >= twoDaysAgo)
 					.Where(s => s.Bets.Any(b => b.Status == BetStatus.Lost))
 					.GroupBy(s => new
 					{
