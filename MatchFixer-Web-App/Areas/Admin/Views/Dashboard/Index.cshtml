@@ -43,7 +43,7 @@
 <div class="admin-metrics-grid">
 
 	<!-- USERS -->
-	<div class="metric-card">
+    <div class="metric-card metric-users">
 		<div class="metric-header">
 			<i class="bi bi-people"></i>
 			<span>Users</span>
@@ -80,7 +80,7 @@
 	</div>
 
 	<!-- WALLETS -->
-	<div class="metric-card">
+    <div class="metric-card metric-wallets">
 		<div class="metric-header">
 			<i class="bi bi-wallet2"></i>
 			<span>Wallets</span>
@@ -103,7 +103,7 @@
 	</div>
 
 	<!-- BETS -->
-	<div class="metric-card">
+    <div class="metric-card metric-bets">
 		<div class="metric-header">
 			<i class="bi bi-bar-chart-line"></i>
 			<span>Bets</span>
@@ -137,152 +137,159 @@
 
 </div>
 
+<div class="admin-dashboard-grid mt-4">
 
-@{
-	var ev = Model.Events;
-	var denom = ev.TotalEvents == 0 ? 1 : ev.TotalEvents;
-	var upPct   = (int)Math.Round(ev.Upcoming * 100.0 / denom);
-	var livePct = (int)Math.Round(ev.Live     * 100.0 / denom);
-	var finPct  = (int)Math.Round(ev.Finished * 100.0 / denom);
-
-	// ensure they sum to 100 (fix rounding drift)
-	var sum = upPct + livePct + finPct;
-	if (sum != 100)
-	{
-		var diff = 100 - sum;
-		// add remainder to the largest slice (stable look)
-		if (finPct >= livePct && finPct >= upPct) finPct += diff;
-		else if (livePct >= upPct)                livePct += diff;
-		else                                      upPct += diff;
-	}
-
-	bool showUp   = upPct   >= 12;  // hide labels if slice too narrow
-	bool showLive = livePct >= 12;
-	bool showFin  = finPct  >= 12;
-}
-
-<div class="mt-4 card shadow-sm border-0 rounded-3">
-    <div class="card-body">
-        <h5 class="card-title mb-3"><i class="bi bi-calendar2-event me-1"></i> Match Events</h5>
-
-        <div class="row g-3 align-items-center mb-3">
-            <div class="col-md-3">
-                <div class="p-3 rounded bg-light text-center">
-                    <div class="small text-muted">Total</div>
-                    <div class="fs-5 fw-semibold">@ev.TotalEvents</div>
-                    <div class="small text-muted">
-	                    Today:
-	                    <span class="@(ev.Today == 0 ? "text-danger" : "text-primary")">
-		                    @ev.Today
-	                    </span>
-	                    · Last 7d: 
-	                    <span class="@(ev.Last7Days == 0 ? "text-danger" : "text-primary")">
-		                    @ev.Last7Days
-	                    </span>
-                    </div>          
-                </div>
-            </div>
-
-            <div class="col-md-6">
-	            <div class="mini-stacked d-inline-flex align-items-center justify-content-center w-100">
-		            <div class="stack">
-			            <div class="seg" style="width:@upPct%; background:#0d6efd;">
-				            @if (showUp) { <small>@upPct% upcoming</small> }
-			            </div>
-			            <div class="seg" style="width:@livePct%; background:#ffc107;">
-				            @if (showLive) { <small>@livePct% live</small> }
-			            </div>
-			            <div class="seg" style="width:@finPct%; background:#198754;">
-				            @if (showFin) { <small>@finPct% finished</small> }
-			            </div>
-		            </div>
-	            </div>
-            </div>
-
-            <div class="col-md-3 text-center">
-                <div class="d-flex flex-wrap gap-2 justify-content-center">
-                    @if (ev.Canceled > 0)
-                    {
-                        <span class="badge bg-danger">Canceled: @ev.Canceled</span>
-                    }
-                    @if (ev.Postponed > 0)
-                    {
-                        <span class="badge bg-secondary">Postponed: @ev.Postponed</span>
-                    }
-                    @if (ev.EventsWithVoidedBets > 0)
-                    {
-                        <span class="badge bg-dark">Voided bets on: @ev.EventsWithVoidedBets</span>
-                    }
-                </div>
-            </div>
+    <!-- PLATFORM EXPOSURE -->
+    <div class="admin-mini-card">
+        <div class="admin-mini-title">
+            <i class="bi bi-exclamation-triangle"></i>
+            Platform Exposure
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light upcoming-table-headers">
-                    <tr>
-                        <th>Match Start (UTC)</th>
-                        <th>Home Team</th>
-                        <th>    </th>
-                        <th>Away Team</th>
-						<th class="text-center status-header">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (ev.RecentUpdated.Count == 0)
-                    {
-                        <tr><td colspan="5" class="text-muted">No recent updates.</td></tr>
-                    }
-                    else
-                    {
-                        foreach (var r in ev.RecentUpdated)
-                        {
-	                        <tr>
-		                        @{
-			                        var matchStartUtc = r.MatchUtc.HasValue
-				                        ? r.MatchUtc.Value.ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture)
-				                        : "TBA";
-		                        }
-								
+        <div>Total stakes today</div>
+        <div class="admin-mini-value">
+            €@Model.Exposure.TotalStakesToday.ToString("N2")
+        </div>
 
-								<td>@matchStartUtc</td>
+        <div>Potential payout</div>
+        <div class="admin-mini-value text-danger">
+            €@Model.Exposure.PotentialPayout.ToString("N2")
+        </div>
 
-								
-								<td class="logo-cell">
-									<div class="logo-box">
-										<img src="@r.HomeTeamLogo" alt="@r.HomeTeam" title="@r.HomeTeam" />
-									</div>
-								</td>
-								<td class="logo-cell">
-									<div class="fw-semibold">
-										<img src="\images\live-events\versus.png" style="width: 25px; height: auto;" />
-									</div>
-								</td>
-								<td class="logo-cell">
-									<div class="logo-box">
-										<img src="@r.AwayTeamLogo" alt="@r.AwayTeam" title="@r.AwayTeam" />
-									</div>
-								</td>
-								<td class="d-flex justify-content-center align-items-center" >
-			                        @{
-				                        var badge = r.Status switch
-				                        {
-					                        "Finished" => "bg-success",
-					                        "Live" => "bg-warning text-dark",
-					                        "Upcoming" => "bg-primary",
-					                        "Cancelled" => "bg-danger",
-					                        "Postponed" => "bg-secondary",
-					                        _ => "bg-info text-dark"
-				                        };
-			                        }
-									<span class="badge status-box @badge">@r.Status </span>
-		                        </td>
-	                        </tr>
-						}
-					}
-                </tbody>
-            </table>
+        <div class="admin-mini-footer">
+            Exposure: €@Model.Exposure.Exposure.ToString("N2")
         </div>
     </div>
+
+
+    <!-- BET ACTIVITY -->
+    <div class="admin-mini-card">
+        <div class="admin-mini-title">
+            <i class="bi bi-activity"></i>
+            Bet Activity
+        </div>
+
+        <div class="admin-mini-row mt-5">
+            <span>Today</span>
+            <span>@Model.BetsActivity.BetsToday</span>
+        </div>
+
+        <div class="admin-mini-row">
+            <span>Yesterday</span>
+            <span>@Model.BetsActivity.BetsYesterday</span>
+        </div>
+
+        <div class="admin-mini-row">
+            <span>This week</span>
+            <span>@Model.BetsActivity.BetsThisWeek</span>
+        </div>
+    </div>
+
+
+    <!-- WALLET FLOW -->
+    <div class="admin-mini-card">
+        <div class="admin-mini-title">
+            <i class="bi bi-cash-stack"></i>
+            Wallet Flow Today
+        </div>
+
+        <div class="admin-mini-row mt-5">
+            <span>Deposits</span>
+            <span class="text-success">
+                €@Model.WalletActivity.DepositsToday.ToString("N2")
+            </span>
+        </div>
+
+        <div class="admin-mini-row">
+            <span>Withdrawals</span>
+            <span class="text-danger">
+                €@Model.WalletActivity.WithdrawalsToday.ToString("N2")
+            </span>
+        </div>
+
+        <div class="admin-mini-row fw-bold">
+            <span>Net</span>
+            <span>
+                €@Model.WalletActivity.NetFlow.ToString("N2")
+            </span>
+        </div>
+    </div>
+
+
+    <!-- TOP WINNERS -->
+    <div class="admin-mini-card">
+        <div class="admin-mini-title">
+            <i class="bi bi-trophy text-warning"></i>
+            Top Winners (48h)
+        </div>
+        @foreach (var w in Model.TopWinners)
+        {
+	        <div class="admin-mini-row">
+
+		        <a asp-area="Admin"
+		           asp-controller="Users"
+		           asp-action="ShowUsers"
+		           asp-route-query="@w.Email"
+				   class="text-decoration-none">
+			        @w.Username
+		        </a>
+
+		        <span class="text-success">
+			        +€@w.Profit.ToString("N2")
+		        </span>
+
+	        </div>
+        }
+    </div>
+
+
+    <!-- TOP LOSERS -->
+    <div class="admin-mini-card">
+        <div class="admin-mini-title">
+            <i class="bi bi-emoji-frown text-danger"></i>
+            Top Losers (48h)
+        </div>
+
+        @foreach (var l in Model.TopLosers)
+        {
+            <div class="admin-mini-row">
+	            <a asp-area="Admin"
+	               asp-controller="Users"
+	               asp-action="ShowUsers"
+	               asp-route-query="@l.Email"
+				   class="text-decoration-none">
+		            @l.Username
+	            </a>
+                <span class="text-danger">
+                    -€@l.Profit.ToString("N2")
+                </span>
+            </div>
+        }
+    </div>
+
+
+    <!-- HOT MATCHES -->
+    <div class="admin-mini-card">
+        <div class="admin-mini-title">
+            <i class="bi bi-fire"></i>
+            Hot Matches
+        </div>
+
+        @foreach (var m in Model.HotMatches)
+        {
+            <div class="admin-mini-row">
+                <span>
+                    @m.HomeTeam vs @m.AwayTeam
+                </span>
+
+                <span class="badge bg-dark">
+                    @m.BetsCount bets
+                </span>
+            </div>
+        }
+    </div>
+
 </div>
+
+
 
