@@ -27,6 +27,7 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels
 		public List<TopUserWinLossRow> TopLosers { get; set; } = new();
 
 		public List<HotMatchRow> HotMatches { get; set; } = new();
+		public List<AverageBetSizeViewModel> AverageBetSizes { get; set; } = new();
 
 	}
 }
