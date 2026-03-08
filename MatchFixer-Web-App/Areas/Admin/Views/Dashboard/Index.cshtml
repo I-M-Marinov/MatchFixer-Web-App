@@ -17,6 +17,7 @@
 
 	inactivePct = Math.Clamp(inactivePct, 0, 100);
 
+	var first = true;
 }
 
 <div class="border-0 rounded-4 p-4 flex-fill">
@@ -139,14 +140,16 @@
 
 	</div>
 
-	<div class="admin-dashboard-grid mt-4">
+	<div class="admin-dashboard-grid mt-2">
 
 	    <!-- PLATFORM EXPOSURE -->
 	    <div class="admin-mini-card">
-	        <div class="admin-mini-title">
-	            <i class="bi bi-exclamation-triangle"></i>
-	            Platform Exposure
-	        </div>
+		    <div class="admin-mini-title">
+			    <span class="text-warning animate__animated animate__heartBeat">
+				    <i class="bi bi-exclamation-triangle"></i>
+			    </span>
+			    Platform Exposure
+		    </div>
 
 	        <div>Total stakes today</div>
 	        <div class="admin-mini-value">
@@ -166,10 +169,13 @@
 
 	    <!-- BET ACTIVITY -->
 	    <div class="admin-mini-card">
-	        <div class="admin-mini-title">
-	            <i class="bi bi-activity"></i>
-	            Bet Activity
-	        </div>
+		    <div class="admin-mini-title">
+			    <span class="text-info animate__animated animate__heartBeat">
+				    <i class="bi bi-activity"></i>
+				</span>
+			   
+			    Bet Activity
+		    </div>
 
 	        <div class="admin-mini-row mt-5">
 	            <span>Today</span>
@@ -191,7 +197,7 @@
 	    <!-- WALLET FLOW -->
 	    <div class="admin-mini-card">
 	        <div class="admin-mini-title">
-	            <i class="bi bi-cash-stack"></i>
+				<i class="bi bi-wallet text-tomato animate__animated animate__heartBeat"></i>
 	            Wallet Flow Today
 	        </div>
 
@@ -216,64 +222,102 @@
 	            </span>
 	        </div>
 	    </div>
+		
+	    <!-- AVERAGE BET SIZE -->
 
+	    <div class="admin-mini-card">
+		    <div class="admin-mini-title">
+				<i class="bi bi-graph-up text-primary animate__animated animate__heartBeat"></i>
+			    Average Bet Size
+		    </div>
+
+		    @foreach (var avg in Model.AverageBetSizes)
+		    {
+			    <div class="admin-mini-row @(first ? "mt-5" : "")">
+				    <span>@avg.Period</span>
+				    <span>€@avg.AverageAmount.ToString("N2")</span>
+			    </div>
+
+			    first = false;
+		    }
+	    </div>
 
 	    <!-- TOP WINNERS -->
+	    @{
+		    var winnersMargin = Model.TopWinners.Count <= 3 ? "mt-5" : "";
+	    }
+
 	    <div class="admin-mini-card">
-	        <div class="admin-mini-title">
-	            <i class="bi bi-trophy text-warning"></i>
-	            Top Winners (48h)
-	        </div>
-	        @foreach (var w in Model.TopWinners)
-	        {
-		        <div class="admin-mini-row">
+		    <div class="admin-mini-title">
+			    <i class="bi bi-trophy text-warning animate__animated animate__heartBeat"></i>
+			    Top Winners (48h)
+		    </div>
 
-			        <a asp-area="Admin"
-			           asp-controller="Users"
-			           asp-action="ShowUsers"
-			           asp-route-query="@w.Email"
-					   class="text-decoration-none">
-				        @w.Username
-			        </a>
+		    @foreach (var w in Model.TopWinners)
+		    {
+				<div class="admin-mini-row @winnersMargin @(first ? "mt-5" : "")">
 
-			        <span class="text-success">
-				        +€@w.Profit.ToString("N2")
-			        </span>
+				    <a asp-area="Admin"
+				       asp-controller="Users"
+				       asp-action="ShowUsers"
+				       asp-route-query="@w.Email"
+				       class="text-decoration-none">
 
-		        </div>
-	        }
+					    @w.Username
+				    </a>
+
+				    <span class="text-success">
+					    +€@w.Profit.ToString("N2")
+				    </span>
+
+			    </div>
+
+			    first = false;
+		    }
 	    </div>
 
 
 	    <!-- TOP LOSERS -->
-	    <div class="admin-mini-card">
-	        <div class="admin-mini-title">
-	            <i class="bi bi-emoji-frown text-danger"></i>
-	            Top Losers (48h)
-	        </div>
+	    @{
+		    var losersMargin = Model.TopLosers.Count <= 3 ? "mt-5" : "";
+	    }
 
-	        @foreach (var l in Model.TopLosers)
-	        {
-	            <div class="admin-mini-row">
-		            <a asp-area="Admin"
-		               asp-controller="Users"
-		               asp-action="ShowUsers"
-		               asp-route-query="@l.Email"
-					   class="text-decoration-none">
-			            @l.Username
-		            </a>
-	                <span class="text-danger">
-	                    -€@l.Profit.ToString("N2")
-	                </span>
-	            </div>
-	        }
+	    <div class="admin-mini-card">
+		    <div class="admin-mini-title">
+				<i class="bi bi-emoji-frown text-danger animate__animated animate__heartBeat"></i>
+			    Top Losers (48h)
+		    </div>
+
+		    @foreach (var l in Model.TopLosers)
+		    {
+			    <div class="admin-mini-row @losersMargin @(first ? "mt-5" : "")">
+
+				    <a asp-area="Admin"
+				       asp-controller="Users"
+				       asp-action="ShowUsers"
+				       asp-route-query="@l.Email"
+				       class="text-decoration-none">
+
+					    @l.Username
+				    </a>
+
+				    <span class="text-danger">
+					    -€@l.Profit.ToString("N2")
+				    </span>
+
+			    </div>
+			    first = false;
+
+		    }
 	    </div>
 
 
 	    <!-- HOT MATCHES -->
 	    <div class="admin-mini-card">
 	        <div class="admin-mini-title">
-	            <i class="bi bi-fire"></i>
+		        <span class="boost-fire-icon">
+			        <i class="bi bi-fire "></i>
+		        </span>
 	            Hot Matches
 	        </div>
 
