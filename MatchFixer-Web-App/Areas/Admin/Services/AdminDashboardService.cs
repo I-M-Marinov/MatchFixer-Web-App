@@ -189,8 +189,24 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					.ToListAsync();
 
 				/* -----------------------------
-				   RETURN MODEL
+				   AVERAGE BET SIZES
 				----------------------------- */
+
+				var avgBetToday = await _dbContext.BetSlips
+					.AsNoTracking()
+					.Where(s => s.BetTime >= todayStart)
+					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
+
+				var avgBetYesterday = await _dbContext.BetSlips
+					.AsNoTracking()
+					.Where(s => s.BetTime >= yesterdayStart && s.BetTime < todayStart)
+					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
+
+				var avgBetWeek = await _dbContext.BetSlips
+					.AsNoTracking()
+					.Where(s => s.BetTime >= weekStart)
+					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
+
 
 				return new AdminDashboardViewModel
 				{
@@ -214,7 +230,25 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 					TopWinners = topWinners,
 					TopLosers = topLosers,
-					HotMatches = hotMatches
+					HotMatches = hotMatches,
+					AverageBetSizes = new List<AverageBetSizeViewModel>
+					{
+						new AverageBetSizeViewModel
+						{
+							Period = "Today",
+							AverageAmount = avgBetToday
+						},
+						new AverageBetSizeViewModel
+						{
+							Period = "Yesterday",
+							AverageAmount = avgBetYesterday
+						},
+						new AverageBetSizeViewModel
+						{
+							Period = "This week",
+							AverageAmount = avgBetWeek
+						}
+					}
 				};
 			}
 
