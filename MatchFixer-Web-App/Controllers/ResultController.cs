@@ -26,36 +26,29 @@ namespace MatchFixer_Web_App.Controllers
 			_timezoneService = timezoneService;
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> LiveMatchResults()
-		{
-			var viewModel = await _resultService.GetUnresolvedMatchResultsAsync();
-			return View(viewModel);
-		}
-
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> SubmitResult(MatchResultInputViewModel input)
+		public async Task<IActionResult> SubmitResult(ScoreMatchInputModel input)
 		{
 			if (!ModelState.IsValid)
 			{
-				var allMatches = await _resultService.GetUnresolvedMatchResultsAsync();
-
-				var updatedList = allMatches.Select(m =>
-					m.MatchId == input.MatchId ? input : m
-				).ToList();
-
-				return View("LiveMatchResults", updatedList); // Make sure view name matches
+				TempData["ErrorMessage"] = InvalidResultSubmitted;
+				return RedirectToAction("AddMatchEvent", "Event");
 			}
 
-			var success = await _resultService.AddMatchResultAsync(input.MatchId, input.HomeScore, input.AwayScore, input.Notes);
+			var success = await _resultService.AddMatchResultAsync(
+				input.MatchId,
+				input.HomeScore,
+				input.AwayScore,
+				input.Notes
+			);
 
 			if (success)
 				TempData["SuccessMessage"] = MatchResultSavedSuccessfully;
 			else
 				TempData["ErrorMessage"] = MatchResultSaveFailed;
 
-			return RedirectToAction(nameof(LiveMatchResults));
+			return RedirectToAction("AddMatchEvent", "Event");
 		}
 
 		[HttpGet]
