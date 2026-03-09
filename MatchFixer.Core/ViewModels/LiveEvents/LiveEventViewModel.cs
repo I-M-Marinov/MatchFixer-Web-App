@@ -45,6 +45,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public string UserTimeZone { get; set; }
 		public bool IsCancelled { get; set; }
 		public bool IsPostponed { get; set; }
+		public bool HasResult { get; set; }
 		public MatchStatus MatchStatus { get; set; } = MatchStatus.Scheduled;
 		public BoostViewModel? BoostActive { get; set; }
 		public int? ApiFixtureId { get; set; }
