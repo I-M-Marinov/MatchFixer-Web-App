@@ -95,6 +95,7 @@ namespace MatchFixer.Core.Services
 					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
 					IsDerby = e.IsDerby,
 					IsPostponed = e.IsPostponed,
+					HasResult = e.LiveResult != null,
 					UserTimeZone = user.TimeZone,
 					ApiFixtureId = e.ApiFixtureId,
 					CompetitionName = e.CompetitionName
@@ -117,7 +118,7 @@ namespace MatchFixer.Core.Services
 				.Where(e =>
 					e.LiveResult == null &&
 					e.Status != MatchStatus.Cancelled &&
-					e.Status != MatchStatus.FullTime
+					e.LiveResult == null
 				)
 				.OrderBy(e => e.IsPostponed)
 				.ThenBy(e => e.MatchDate)
@@ -172,6 +173,7 @@ namespace MatchFixer.Core.Services
 					IsDerby = e.IsDerby,
 					UserTimeZone = user.TimeZone,
 					IsCancelled = e.IsCancelled,
+					HasResult = e.LiveResult != null,
 					MatchStatus = e.Status == MatchStatus.Scheduled &&
 					              e.MatchDate.HasValue &&
 					              e.MatchDate <= now
