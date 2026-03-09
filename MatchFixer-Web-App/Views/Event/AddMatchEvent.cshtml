@@ -311,6 +311,29 @@
 											</button>
 										</form>
 										break;
+
+									case MatchStatus.FullTime:
+
+										if (!ev.HasResult)
+										{
+											<button class="btn btn-sm btn-success open-score-modal"
+											        data-match-id="@ev.Id"
+											        data-home="@ev.HomeTeam"
+											        data-away="@ev.AwayTeam"
+											        data-time="@(ev.KickoffTime?.ToLocalTime().ToString("g"))"
+											        data-bs-toggle="modal"
+											        data-bs-target="#scoreMatchModal">
+												<i class="bi bi-pencil-square"></i>
+											</button>
+										}
+										else
+										{
+											<span class="badge bg-success">
+												<i class="bi bi-check-circle-fill"></i> Scored
+											</span>
+										}
+
+										break;
 								}
 
 								@if (ev.ApiFixtureId != null && ev.MatchStatus != MatchStatus.Live && ev.KickoffTime.HasValue)
@@ -663,6 +686,107 @@
 					No, go back
 				</button>
 			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="scoreMatchModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content match-result-container">
+
+			<form asp-controller="Result"
+				  asp-action="SubmitResult"
+				  method="post">
+
+				@Html.AntiForgeryToken()
+
+				<input type="hidden" name="MatchId" id="scoreMatchId" />
+
+				<div class="modal-header">
+					<h5 class="modal-title fw-bold" id="scoreMatchTitle">
+						Match Result
+					</h5>
+
+					<button type="button"
+							class="btn-close"
+							data-bs-dismiss="modal">
+					</button>
+				</div>
+
+				<div class="modal-body text-center">
+
+					<div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+
+						<span class="badge bg-secondary"
+						      id="scoreMatchTime">
+						</span>
+
+						<button type="button"
+						        id="googleScoreSearch"
+						        class="btn btn-sm btn-outline-light"
+						        title="Search score on Google">
+
+							<i class="bi bi-google"></i>
+						</button>
+
+					</div>
+
+					<div class="d-flex justify-content-center gap-4 mb-4">
+
+						<div style="width:110px;">
+							<label class="form-label fw-bold">
+								Home
+							</label>
+
+							<input type="number"
+								   name="HomeScore"
+								   class="form-control text-center"
+								   min="0"
+								   max="20"
+								   required>
+						</div>
+
+						<div style="width:110px;">
+							<label class="form-label fw-bold">
+								Away
+							</label>
+
+							<input type="number"
+								   name="AwayScore"
+								   class="form-control text-center"
+								   min="0"
+								   max="20"
+								   required>
+						</div>
+
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">
+							Notes
+						</label>
+
+						<textarea name="Notes"
+								  class="form-control"
+								  rows="3"
+								  placeholder="Optional notes...">
+                        </textarea>
+					</div>
+
+				</div>
+
+				<div class="modal-footer justify-content-center">
+
+					<button type="submit"
+							class="btn btn-success px-4">
+						<i class="bi bi-check-circle-fill me-1"></i>
+						Submit Result
+					</button>
+
+				</div>
+
+			</form>
+
 		</div>
 	</div>
 </div>
@@ -1306,6 +1430,66 @@
 
 				document.getElementById("fullTimeMatchId").value = matchId;
 			});
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const scoreModal = document.getElementById("scoreMatchModal");
+
+			scoreModal.addEventListener("show.bs.modal", function (event) {
+
+				const button = event.relatedTarget;
+
+				const matchId = button.getAttribute("data-match-id");
+				const home = button.getAttribute("data-home");
+				const away = button.getAttribute("data-away");
+				const time = button.getAttribute("data-time");
+
+				document.getElementById("scoreMatchId").value = matchId;
+
+				document.getElementById("scoreMatchTitle").innerText =
+					`${home} vs ${away}`;
+
+				document.getElementById("scoreMatchTime").innerText =
+					time;
+			});
+
+		});
+
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const scoreModal = document.getElementById("scoreMatchModal");
+
+			scoreModal.addEventListener("show.bs.modal", function (event) {
+
+				const button = event.relatedTarget;
+
+				const matchId = button.getAttribute("data-match-id");
+				const home = button.getAttribute("data-home");
+				const away = button.getAttribute("data-away");
+				const time = button.getAttribute("data-time");
+
+				document.getElementById("scoreMatchId").value = matchId;
+
+				document.getElementById("scoreMatchTitle").innerText =
+					`${home} vs ${away}`;
+
+				document.getElementById("scoreMatchTime").innerText =
+					time;
+
+				const googleBtn = document.getElementById("googleScoreSearch");
+
+				googleBtn.onclick = () => {
+
+					const query = `${home} vs ${away} score`;
+					const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+
+					window.open(url, "_blank");
+				};
+
+			});
+
 		});
 
 
