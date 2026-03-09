@@ -17,7 +17,7 @@
 
 	inactivePct = Math.Clamp(inactivePct, 0, 100);
 
-	var first = true;
+	var firstBetRow = true;
 }
 
 <div class="border-0 rounded-4 p-4 flex-fill">
@@ -39,9 +39,7 @@
 
 <div class="background-profile"></div>
 
-<h1>Admin Dashboard</h1>
-
-<div class="table-section d-flex flex-column" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
+<div class="table-section d-flex flex-column" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em; margin-top: 3em;">
 
 	<div class="admin-metrics-grid">
 
@@ -233,18 +231,20 @@
 
 		    @foreach (var avg in Model.AverageBetSizes)
 		    {
-			    <div class="admin-mini-row @(first ? "mt-5" : "")">
+			    <div class="admin-mini-row @(firstBetRow ? "mt-5" : "")">
 				    <span>@avg.Period</span>
 				    <span>€@avg.AverageAmount.ToString("N2")</span>
 			    </div>
 
-			    first = false;
+			    firstBetRow = false;
 		    }
 	    </div>
 
 	    <!-- TOP WINNERS -->
 	    @{
-		    var winnersMargin = Model.TopWinners.Count <= 3 ? "mt-5" : "";
+		    var fewWinnersResults = Model.TopWinners.Count <= 3;
+		    var firstWinner = true;
+
 	    }
 
 	    <div class="admin-mini-card">
@@ -255,7 +255,7 @@
 
 		    @foreach (var w in Model.TopWinners)
 		    {
-				<div class="admin-mini-row @winnersMargin @(first ? "mt-5" : "")">
+				<div class="admin-mini-row @(fewWinnersResults && firstWinner ? "mt-5" : "")">
 
 				    <a asp-area="Admin"
 				       asp-controller="Users"
@@ -272,14 +272,15 @@
 
 			    </div>
 
-			    first = false;
+				firstWinner = false;
 		    }
 	    </div>
 
 
 	    <!-- TOP LOSERS -->
 	    @{
-		    var losersMargin = Model.TopLosers.Count <= 3 ? "mt-5" : "";
+		    var fewResults = Model.TopLosers.Count <= 3;
+		    var firstLoser = true;
 	    }
 
 	    <div class="admin-mini-card">
@@ -290,7 +291,7 @@
 
 		    @foreach (var l in Model.TopLosers)
 		    {
-			    <div class="admin-mini-row @losersMargin @(first ? "mt-5" : "")">
+				<div class="admin-mini-row @(fewResults && firstLoser ? "mt-5" : "")">
 
 				    <a asp-area="Admin"
 				       asp-controller="Users"
@@ -306,7 +307,8 @@
 				    </span>
 
 			    </div>
-			    first = false;
+
+			    firstLoser = false;
 
 		    }
 	    </div>
