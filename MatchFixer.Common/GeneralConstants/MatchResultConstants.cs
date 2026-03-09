@@ -4,5 +4,6 @@
 	{
 		public const string MatchResultSavedSuccessfully = "Match result saved successfully and winnings awarded.";
 		public const string MatchResultSaveFailed = "Could not save result. It might already be recorded.";
+		public const string InvalidResultSubmitted = "Invalid result submission.";
 	}
 }
