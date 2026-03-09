@@ -156,15 +156,7 @@
 							<i class="bi bi-caret-down-fill dropdown-icon rotate-icon"></i>
 						</a>
 						<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
-							
-							@if (User.IsInRole(Roles.Admin))
-							{
-								<li class="nav-item">
-									<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="LiveMatchResults">
-										<span class="add-match-results-text text-center">Add Match Results</span>
-									</a>
-								</li>
-							}
+
 							<li class="nav-item">
 								<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="EventsResults">
 									<span class="add-match-results-text text-center">Latest Results</span>
