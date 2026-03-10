@@ -664,6 +664,15 @@ table.responsive-stack td {
     font-size: 0.85em;
 }
 
+#scoreMatchModal .btn-close {
+    font-size: 0.85em;
+    margin: 0.35em;
+    position: absolute !important;
+    top: 0.7em !important;
+    right: 0.7em !important;
+    font-size: 0.85em;
+}
+
 .pill-brand-red {
     display: inline-block;
     padding: 0.35em 0.65em;
