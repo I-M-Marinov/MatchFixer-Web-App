@@ -624,6 +624,11 @@ table.responsive-stack td {
     opacity: 0;
 }
 
+.text-bg-purple {
+    color: ghostwhite !important;
+    background-color: #8400d4 !important; 
+}
+
 
 /* ===== Responsive Team Cell ===== */
 
