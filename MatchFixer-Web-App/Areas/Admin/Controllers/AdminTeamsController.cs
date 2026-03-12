@@ -31,16 +31,21 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			[FromQuery] int[]? leagueIds = null,
 			CancellationToken ct = default)
 		{
-			var selected = leagueIds ?? Array.Empty<int>();
+			var selected = leagueIds;
 
 			var leagues = await _teamService.GetAllLeaguesAsync(ct);
-			var existing = await _teamService.GetTeamsPageAsync(page, DefaultPageSize, selected, ct);
+
+			var existing = await _teamService.GetTeamsPageAsync(
+				page,
+				DefaultPageSize,
+				selected,
+				ct);
 
 			var searchVm = new TeamSearchVm
 			{
-				Leagues = leagues,                 
-				SelectedLeagueIds = selected,      
-				Results = Array.Empty<TeamSearchResult>(), 
+				Leagues = leagues,
+				SelectedLeagueIds = selected,
+				Results = Array.Empty<TeamSearchResult>(),
 				Query = string.Empty
 			};
 
