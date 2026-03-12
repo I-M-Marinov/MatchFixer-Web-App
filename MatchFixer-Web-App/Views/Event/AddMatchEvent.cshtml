@@ -90,8 +90,8 @@
 
 					<!-- Start Time -->
 					<div class="mb-3 d-flex flex-column align-items-center">
-						<label class="form-label">Start Time (UTC)</label>
-						<input type="datetime-local" class="form-control" name="StartUtc" />
+						<label class="form-label">Start Time (local)</label>
+						<input type="datetime-local" class="form-control" name="StartTimeLocal" />
 						<small class="form-text text-muted">Leave empty to start immediately.</small>
 					</div>
 
@@ -894,10 +894,10 @@
 				const formData = new FormData(form);
 
 				// Convert local datetime-local to UTC
-				const startInput = form.querySelector("input[name='StartUtc']");
+				const startInput = form.querySelector("input[name='StartTimeLocal']");
 				if (startInput && startInput.value) {
 					const localDate = new Date(startInput.value);
-					formData.set("StartUtc", localDate.toISOString());
+					formData.set("StartTimeLocal", localDate.toISOString());
 				}
 
 				// Get anti-forgery token
