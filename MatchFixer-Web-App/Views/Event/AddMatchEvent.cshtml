@@ -357,10 +357,15 @@
 								{
 									<span class="badge bg-info ms-1">auto</span>
 								}
+								else if (ev.MatchStatus == MatchStatus.FullTime && ev.KickoffTime.HasValue)
+								{
+									<span class="badge bg-success mt-2">finished</span>
+								}
 								else if (ev.ApiFixtureId == null && ev.MatchStatus != MatchStatus.Live && ev.KickoffTime.HasValue)
 								{
 									<span class="badge bg-manual ms-1">manual</span>
 								}
+								
 							</td>
 
 							<td>
