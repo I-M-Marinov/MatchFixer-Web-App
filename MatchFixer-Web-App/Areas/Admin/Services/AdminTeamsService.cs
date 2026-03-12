@@ -89,25 +89,21 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			page = Math.Max(1, page);
 			pageSize = Math.Clamp(pageSize, 5, 200);
 
-			HashSet<string>? leagueNamesFilter = null;
-			if (leagueIds is { Length: > 0 })
+			if (leagueIds == null || leagueIds.Length == 0)
 			{
-				leagueNamesFilter = new HashSet<string>(
-					leagueIds.Where(id => _leagueMap.ContainsKey(id))
-							 .Select(id => _leagueMap[id]),
-					StringComparer.OrdinalIgnoreCase);
-
-				if (leagueNamesFilter.Count == 0)
+				return new PaginatedTeamsList<TeamListRow>
 				{
-					return new PaginatedTeamsList<TeamListRow>
-					{
-						Items = new List<TeamListRow>(),
-						Page = 1,
-						PageSize = pageSize,
-						TotalCount = 0
-					};
-				}
+					Items = new List<TeamListRow>(),
+					Page = page,
+					PageSize = pageSize,
+					TotalCount = 0
+				};
 			}
+
+			var leagueNamesFilter = new HashSet<string>(
+				leagueIds.Where(id => _leagueMap.ContainsKey(id))
+					.Select(id => _leagueMap[id]),
+				StringComparer.OrdinalIgnoreCase);
 
 			IQueryable<Team> q = _db.Teams.AsNoTracking();
 
