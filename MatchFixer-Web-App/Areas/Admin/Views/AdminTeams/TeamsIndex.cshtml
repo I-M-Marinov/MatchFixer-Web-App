@@ -31,7 +31,6 @@
     };
 
     var selectedIds = new HashSet<int>(vm.SelectedLeagueIds ?? Array.Empty<int>());
-
 }
 
 <div class="background-profile"></div>
@@ -129,15 +128,25 @@
 						</tr>
 						</thead>
 						<tbody>
-						@foreach (var t in existing.Items)
+						@if (!existing.Items.Any())
 						{
-							<tr class="team-row"
-							    data-team-id="@t.Id"
-							    data-league-slug="@Slug(t.LeagueName)"
-							    role="button"
-							    tabindex="0">
+							<tr>
+								<td colspan="4" class="text-center text-muted">
+									Select a league above to view teams.
+								</td>
+							</tr>
+						}
+						else
+						{
+							@foreach (var t in existing.Items)
+							{
+								<tr class="team-row"
+								    data-team-id="@t.Id"
+								    data-league-slug="@Slug(t.LeagueName)"
+								    role="button"
+								    tabindex="0">
 
-									<td class="text-center"><img src="@t.EffectiveLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name" /></td>
+									<td class="text-center"><img src="@t.EffectiveLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name"/></td>
 									<td class="text-center">@t.Name</td>
 									<td class="text-center align-middle">
 										<span class="badge api-id d-inline-flex align-items-center justify-content-center"
@@ -163,12 +172,13 @@
 											<img src="@flag"
 											     alt="@t.LeagueName flag"
 											     title="@t.LeagueName"
-											     style="width:18px;height:16px;object-fit:contain;margin-right:3px;margin-bottom:2px;" />
+											     style="width:18px;height:16px;object-fit:contain;margin-right:3px;margin-bottom:2px;"/>
 										}
 
 										@t.LeagueName
 									</td>
-							</tr>
+								</tr>
+							}
 						}
 
 						</tbody>
@@ -376,15 +386,15 @@
 		goToFiltered(currentSelection());
 	  }));
 
-	  btnClear?.addEventListener('click', () => {
-		pills.forEach(p => p.checked = false);
-		goToFiltered([]);
-	  });
+		btnClear?.addEventListener('click', () => {
+			pills.forEach(p => p.checked = false);
+			window.location.href = `${baseUrl}?page=1`;
+		});
 
-	  btnAll?.addEventListener('click', () => {
-		pills.forEach(p => p.checked = true);
-		goToFiltered(currentSelection());
-	  });
+		 btnAll?.addEventListener('click', () => {
+			pills.forEach(p => p.checked = true);
+			goToFiltered(currentSelection());
+		});
 	})();
 
 	(function () {
