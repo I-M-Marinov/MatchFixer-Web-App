@@ -3,6 +3,7 @@
 	public class LogoQuizQuestionViewModel
 	{
 		public string LogoUrl { get; set; } = null!;
+		public string LocalLogoUrl { get; set; } = null!;
 		public string CorrectAnswer { get; set; } = null!;
 		public List<string> OriginalOptions { get; set; } = new();
 		public List<string> Options { get; set; } = new();
