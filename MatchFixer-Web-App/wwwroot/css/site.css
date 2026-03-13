@@ -38,6 +38,7 @@
 html {
     font-size: 14px;
     scroll-behavior: smooth;
+    overflow-y: scroll;
 }
 
 html, body {
