@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.LogoQuiz;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 using static MatchFixer.Common.GeneralConstants.LogoQuizConstants;
@@ -66,12 +67,20 @@ namespace MatchFixer.Core.Services
 
 			return new LogoQuizQuestionViewModel
 			{
-				LogoUrl = correctTeam.LogoUrl,
+				LogoUrl = ResolveLogoUrl(correctTeam),
 				CorrectAnswer = correctTeam.Name,
 				Options = allOptions,
 				OriginalOptions = allOptions,
 				CurrentScore = currentScore
 			};
+		}
+
+		private string ResolveLogoUrl(Team team)
+		{
+			if (!string.IsNullOrWhiteSpace(team.LocalLogoUrl))
+				return team.LocalLogoUrl;
+
+			return team.LogoUrl;
 		}
 
 		public LogoQuizQuestionViewModel BuildAnsweredModel(
