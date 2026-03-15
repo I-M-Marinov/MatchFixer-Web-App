@@ -26,6 +26,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var todayStart = now.Date;
 				var yesterdayStart = todayStart.AddDays(-1);
 				var weekStart = todayStart.AddDays(-7);
+				var last7 = DateTime.UtcNow.AddDays(-7);
 
 				/* -----------------------------
 				   USERS
@@ -166,6 +167,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				----------------------------- */
 
 				var hotMatches = await _dbContext.Bets
+					.Where(b => b.MatchEvent.MatchDate >= last7)
 					.GroupBy(b => b.MatchEventId)
 					.Select(g => new
 					{
@@ -309,8 +311,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						AwayTeamLogo = m.AwayTeam.LogoUrl,
 						MatchUtc = m.MatchDate,
 						Status = m.IsCancelled
-										? "Cancelled"
-										: (m.LiveResult != null ? $"{m.LiveResult.HomeScore} : {m.LiveResult.AwayScore}" : (m.MatchDate <= now ? "Live" : "Upcoming")),
+										? nameof(MatchStatus.Cancelled)
+										: (m.LiveResult != null ? $"{m.LiveResult.HomeScore} : {m.LiveResult.AwayScore}" : (m.MatchDate <= now ? nameof(MatchStatus.Live) : nameof(MatchStatus.Scheduled))),
 						UpdatedUtc = null
 					})
 					.ToListAsync();
