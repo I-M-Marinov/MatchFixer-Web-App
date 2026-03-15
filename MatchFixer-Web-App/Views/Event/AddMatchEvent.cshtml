@@ -262,98 +262,99 @@
 							               : "tba")"
 						    data-postponed="@ev.IsPostponed">
 							<td>
-								@switch (ev.MatchStatus)
-								{
-									case MatchStatus.Postponed:
-										<span class="badge bg-secondary ms-1">
-											<i class="bi bi-pause-circle-fill me-1"></i>
-											Postponed
-										</span>
-										break;
+								<div class="d-flex flex-column justify-content-center align-items-center">
+									@switch (ev.MatchStatus)
+									{
+										case MatchStatus.Postponed:
+											<span class="badge bg-secondary ms-1">
+												<i class="bi bi-pause-circle-fill me-1"></i>
+												Postponed
+											</span>
+											break;
 
-									case MatchStatus.Live:
+										case MatchStatus.Live:
 
-										<div class="d-flex flex-column justify-content-center align-items-center">
-											<form asp-action="MarkEventAsFullTime"
+											<div class="d-flex flex-column justify-content-center align-items-center">
+												<form asp-action="MarkEventAsFullTime"
+												      asp-controller="Event"
+												      method="post"
+												      class="d-inline ms-2">
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="id" value="@ev.Id"/>
+
+
+													<span class="custom-tooltip-wrapper">
+														<button type="button"
+														        class="btn btn-sm btn-dark mark-ft-btn mb-1"
+														        data-match-id="@ev.Id"
+														        data-bs-toggle="modal"
+														        data-bs-target="#confirmFullTimeModal">
+															<i class="bi bi-flag-fill"></i>
+														</button>
+														<span class="custom-tooltip text-bg-purple">
+															Mark this match as full time.
+														</span>
+													</span>
+												</form>
+												<span class="badge bg-danger ms-1">
+													<i class="bi bi-play-circle-fill me-1"></i>
+													Live
+												</span>
+											</div>
+											break;
+
+										case MatchStatus.Scheduled:
+										{
+											<form asp-action="PostponeMatchEvent"
 											      asp-controller="Event"
 											      method="post"
-											      class="d-inline ms-2">
+											      class="d-inline">
 												@Html.AntiForgeryToken()
-												<input type="hidden" name="id" value="@ev.Id" />
-
-												
+												<input type="hidden" name="id" value="@ev.Id"/>
 												<span class="custom-tooltip-wrapper">
-													<button type="button"
-													        class="btn btn-sm btn-dark mark-ft-btn mb-1"
-													        data-match-id="@ev.Id"
-													        data-bs-toggle="modal"
-													        data-bs-target="#confirmFullTimeModal">
-														<i class="bi bi-flag-fill"></i>
+													<button type="submit"
+													        class="btn btn-sm btn-secondary"
+													        onclick="return confirm('Are you sure you want to postpone this match?')">
+														<i class="bi bi-pause-circle"></i>
 													</button>
-													<span class="custom-tooltip text-bg-purple">
-														Mark this match as full time.
+													<span class="custom-tooltip text-bg-secondary text-black">
+														Mark this match as postponed.
 													</span>
 												</span>
 											</form>
-											<span class="badge bg-danger ms-1">
-												<i class="bi bi-play-circle-fill me-1"></i>
-												Live
-											</span>
-										</div>
-										break;
+											break;
+										}
 
-									case MatchStatus.Scheduled:
-									{
-										<form asp-action="PostponeMatchEvent"
-										      asp-controller="Event"
-										      method="post"
-										      class="d-inline">
-											@Html.AntiForgeryToken()
-											<input type="hidden" name="id" value="@ev.Id" />
-											<span class="custom-tooltip-wrapper">
-												<button type="submit"
-												        class="btn btn-sm btn-secondary"
-												        onclick="return confirm('Are you sure you want to postpone this match?')">
-													<i class="bi bi-pause-circle"></i>
-												</button>
-												<span class="custom-tooltip text-bg-secondary text-black">
-													Mark this match as postponed.
+										case MatchStatus.FullTime:
+
+											if (!ev.HasResult)
+											{
+												<span class="custom-tooltip-wrapper">
+													<button class="btn btn-sm btn-success open-score-modal"
+													        data-match-id="@ev.Id"
+													        data-home="@ev.HomeTeam"
+													        data-away="@ev.AwayTeam"
+													        data-time="@(ev.KickoffTime?.ToLocalTime().ToString("g"))"
+													        data-bs-toggle="modal"
+													        data-bs-target="#scoreMatchModal">
+														<i class="bi bi-pencil-square"></i>
+													</button>
+													<span class="custom-tooltip text-bg-success">
+														Submit the official score.
+													</span>
 												</span>
-											</span>
-										</form>
-										break;
+											}
+											else
+											{
+												<span class="badge bg-success">
+													<i class="bi bi-check-circle-fill"></i>
+												</span>
+											}
+
+											break;
 									}
 
-									case MatchStatus.FullTime:
-
-										if (!ev.HasResult)
-										{
-											<span class="custom-tooltip-wrapper">
-												<button class="btn btn-sm btn-success open-score-modal"
-												        data-match-id="@ev.Id"
-												        data-home="@ev.HomeTeam"
-												        data-away="@ev.AwayTeam"
-												        data-time="@(ev.KickoffTime?.ToLocalTime().ToString("g"))"
-												        data-bs-toggle="modal"
-												        data-bs-target="#scoreMatchModal">
-													<i class="bi bi-pencil-square"></i>
-												</button>
-												<span class="custom-tooltip text-bg-success">
-													Submit the official score.
-												</span>
-											</span>
-										}
-										else
-										{
-											<span class="badge bg-success">
-												<i class="bi bi-check-circle-fill"></i>
-											</span>
-										}
-
-										break;
-								}
-
-								@if (ev.ApiFixtureId != null && ev.MatchStatus != MatchStatus.Live && ev.KickoffTime.HasValue)
+								@if (ev.ApiFixtureId != null && ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime && ev.KickoffTime.HasValue)
 								{
 									<span class="badge bg-info ms-1">auto</span>
 								}
@@ -365,7 +366,8 @@
 								{
 									<span class="badge bg-manual ms-1">manual</span>
 								}
-								
+
+								</div>
 							</td>
 
 							<td>
