@@ -1,5 +1,6 @@
-﻿@using System.Globalization
-@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminDashboardViewModel
+﻿@using MatchFixer.Common.EnumExtensions
+@using MatchFixer_Web_App.Areas.Admin.ViewModels
+@model AdminDashboardViewModel
 
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -232,7 +233,7 @@
 		    @foreach (var avg in Model.AverageBetSizes)
 		    {
 			    <div class="admin-mini-row @(firstBetRow ? "mt-5" : "")">
-				    <span>@avg.Period</span>
+				    @avg.Period.ToDisplayName()
 				    <span>€@avg.AverageAmount.ToString("N2")</span>
 			    </div>
 
