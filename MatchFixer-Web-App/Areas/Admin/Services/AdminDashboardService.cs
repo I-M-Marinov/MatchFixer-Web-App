@@ -235,19 +235,19 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					HotMatches = hotMatches,
 					AverageBetSizes = new List<AverageBetSizeViewModel>
 					{
-						new AverageBetSizeViewModel
+						new()
 						{
-							Period = "Today",
+							Period = AverageBetSizeCycle.Today,
 							AverageAmount = avgBetToday
 						},
-						new AverageBetSizeViewModel
+						new()
 						{
-							Period = "Yesterday",
+							Period = AverageBetSizeCycle.Yesterday,
 							AverageAmount = avgBetYesterday
 						},
-						new AverageBetSizeViewModel
+						new()
 						{
-							Period = "This week",
+							Period = AverageBetSizeCycle.ThisWeek,
 							AverageAmount = avgBetWeek
 						}
 					}
