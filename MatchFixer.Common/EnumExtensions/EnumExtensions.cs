@@ -1,6 +1,4 @@
-﻿
-
-namespace MatchFixer.Common.EnumExtensions
+﻿namespace MatchFixer.Common.EnumExtensions
 {
 	public static class EnumExtensions
 	{
