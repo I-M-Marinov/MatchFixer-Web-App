@@ -150,19 +150,21 @@
 			    Platform Exposure
 		    </div>
 
-	        <div>Total stakes today</div>
-	        <div class="admin-mini-value">
-	            €@Model.Exposure.TotalStakesToday.ToString("N2")
-	        </div>
+		    <div class="d-flex flex-column justify-content-center align-items-center">
+			    <div>Total stakes today</div>
+			    <div class="admin-mini-value">
+				    €@Model.Exposure.TotalStakesToday.ToString("N2")
+			    </div>
 
-	        <div>Potential payout</div>
-	        <div class="admin-mini-value text-danger">
-	            €@Model.Exposure.PotentialPayout.ToString("N2")
-	        </div>
+			    <div>Potential payout</div>
+			    <div class="admin-mini-value text-danger">
+				    €@Model.Exposure.PotentialPayout.ToString("N2")
+			    </div>
 
-	        <div class="admin-mini-footer">
-	            Exposure: €@Model.Exposure.Exposure.ToString("N2")
-	        </div>
+			    <div class="admin-mini-footer">
+				    Exposure: €@Model.Exposure.Exposure.ToString("N2")
+			    </div>
+		    </div>
 	    </div>
 
 
