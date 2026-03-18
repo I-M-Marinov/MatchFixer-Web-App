@@ -58,13 +58,30 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				   PLATFORM EXPOSURE
 				----------------------------- */
 
-				var stakesToday = await _dbContext.Bets
-					.Where(b => b.BetTime >= todayStart)
-					.SumAsync(b => (decimal?)b.BetSlip.Amount) ?? 0m;
+				var slips = await _dbContext.BetSlips
+					.Where(s =>
+						!s.IsSettled &&
+						s.Bets.Any(b =>
+							b.MatchEvent.MatchDate >= todayStart &&
+							b.MatchEvent.MatchDate < todayStart.AddDays(1)))
+					.Select(s => new
+					{
+						s.Amount,
+						Odds = s.Bets.Select(b => b.Odds)
+					})
+					.ToListAsync();
 
-				var potentialPayout = await _dbContext.Bets
-					.Where(b => b.Status == BetStatus.Pending)
-					.SumAsync(b => (decimal?)(b.BetSlip.Amount * b.Odds)) ?? 0m;
+				var stakesToday = await _dbContext.BetSlips
+					.Where(s => s.Bets.Any(b =>
+						b.MatchEvent.MatchDate >= todayStart &&
+						b.MatchEvent.MatchDate < todayStart.AddDays(1)))
+					.SumAsync(s => (decimal?)s.Amount) ?? 0m;
+			
+				var potentialPayout = slips.Sum(s =>
+				{
+					var totalOdds = s.Odds.Aggregate(1m, (acc, o) => acc * o);
+					return s.Amount * totalOdds;
+				});
 
 				var exposureVm = new PlatformExposureViewModel
 				{
