@@ -318,26 +318,51 @@
 
 
 	    <!-- HOT MATCHES -->
-	    <div class="admin-mini-card">
+		<div class="admin-mini-card hot-matches-wide hot-matches-card">
 	        <div class="admin-mini-title">
 		        <span class="boost-fire-icon">
 			        <i class="bi bi-fire "></i>
 		        </span>
 	            Hot Matches ( 7 days )
 	        </div>
+			
+	        <div class="hot-matches-body">
 
-	        @foreach (var m in Model.HotMatches)
-	        {
-	            <div class="admin-mini-row">
-	                <span>
-	                    @m.HomeTeam vs @m.AwayTeam
-	                </span>
+		        @foreach (var m in Model.HotMatches)
+		        {
+		            <div class="hot-match-row">
 
-	                <span class="badge bg-dark">
-	                    @m.BetsCount bets
-	                </span>
-	            </div>
-	        }
+			            <!-- HOME -->
+			            <div class="team-col home">
+				            <img src="@m.EffectiveHomeTeamLogo"
+				                 alt="@m.HomeTeam Logo"
+				                 class="team-logo" />
+				            <span class="admin-dashboard-team-name">@m.HomeTeam</span>
+			            </div>
+
+			            <!-- VS -->
+			            <div class="vs-col">
+				            vs
+			            </div>
+
+			            <!-- AWAY -->
+			            <div class="team-col away">
+				            <img src="@m.EffectiveAwayTeamLogo"
+				                 alt="@m.AwayTeam Logo"
+				                 class="team-logo" />
+				            <span class="admin-dashboard-team-name">@m.AwayTeam</span>
+			            </div>
+
+			            <!-- BADGE -->
+			            <div class="bets-col">
+				            <span class="badge bg-dark">
+					            @m.BetsCount bets
+				            </span>
+			            </div>
+
+		            </div>
+		        }
+	        </div>
 	    </div>
 
 	</div>
