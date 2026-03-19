@@ -5,15 +5,83 @@
 
 .admin-dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    align-items: stretch;
+}
+
+/* ============================================================
+   HOT MATCHES CARD
+   ============================================================ */
+
+.hot-matches-wide {
+    grid-column: span 2;
+    min-width: 100%;
+}
+
+.hot-matches-card {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    align-items: center;
+}
+
+.hot-matches-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+
+
+.hot-match-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.team-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.vs-col {
+    text-align: center;
+    font-weight: 600;
+    color: #38bdf8;
+    padding: 0 4px;
+}
+
+.bets-col {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.team-col span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.team-col.home {
+    justify-content: flex-end;
+}
+
+.team-col.away {
+    justify-content: flex-start;
+}
+.admin-dashboard-team-name {
+    font-size: 0.60em;
 }
 
 
 /* ============================================================
-   METRICS GRID (TOP CARDS)
-   ============================================================ */
-
+METRICS GRID (TOP CARDS)
+============================================================ */
 .admin-metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -150,6 +218,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    height: 100%;
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
