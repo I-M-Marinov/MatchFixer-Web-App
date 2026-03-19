@@ -203,6 +203,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							AwayTeam = m.AwayTeam.Name,
 							HomeLogo = m.HomeTeam.LogoUrl,
 							AwayLogo = m.AwayTeam.LogoUrl,
+							HomeTeamLocalLogoUrl = m.HomeTeam.LocalLogoUrl,
+							AwayTeamLocalLogoUrl = m.AwayTeam.LocalLogoUrl,
 							BetsCount = g.BetsCount
 						})
 					.ToListAsync();
