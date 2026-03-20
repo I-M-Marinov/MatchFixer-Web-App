@@ -215,17 +215,22 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var avgBetToday = await _dbContext.BetSlips
 					.AsNoTracking()
-					.Where(s => s.BetTime >= todayStart)
+					.Where(s => s.Bets.Any(b =>
+						b.MatchEvent.MatchDate >= todayStart &&
+						b.MatchEvent.MatchDate < todayStart.AddDays(1)))
 					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
 
 				var avgBetYesterday = await _dbContext.BetSlips
 					.AsNoTracking()
-					.Where(s => s.BetTime >= yesterdayStart && s.BetTime < todayStart)
+					.Where(s => s.Bets.Any(b =>
+						b.MatchEvent.MatchDate >= yesterdayStart &&
+						b.MatchEvent.MatchDate < todayStart))
 					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
 
 				var avgBetWeek = await _dbContext.BetSlips
 					.AsNoTracking()
-					.Where(s => s.BetTime >= weekStart)
+					.Where(s => s.Bets.Any(b =>
+						b.MatchEvent.MatchDate >= weekStart))
 					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
 
 
