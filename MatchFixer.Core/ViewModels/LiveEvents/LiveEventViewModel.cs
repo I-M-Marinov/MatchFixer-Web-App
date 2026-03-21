@@ -38,6 +38,9 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 			!string.IsNullOrWhiteSpace(AwayTeamLocalLogoUrl)
 				? AwayTeamLocalLogoUrl
 				: AwayTeamLogoUrl;
+
+		public bool IsInternational { get; set; }
+		public bool IsEuropeanCompetition { get; set; }
 		public bool IsDerby { get; set; }
 		public string? CompetitionName { get; set; }
 		public bool IsCompetitionMatch =>
