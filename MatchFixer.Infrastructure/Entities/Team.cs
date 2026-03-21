@@ -28,6 +28,7 @@ namespace MatchFixer.Infrastructure.Entities
 		[Required]
 		[StringLength(LeagueNameMaxLength, ErrorMessage = LeagueNameCannotExceed100Characters)]
 		public string LeagueName { get; set; } = null!;
+		public bool IsNationalTeam { get; set; } = false;
 
 		// Navigation properties for matches
 		public ICollection<MatchResult> HomeMatches { get; set; } = new List<MatchResult>();
