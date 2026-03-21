@@ -196,7 +196,11 @@ namespace MatchFixer.Core.Services
 				throw new Exception(TeamDoesNotExist);
 			}
 
-			var utcMatchDate = DateTime.SpecifyKind(model.MatchDate, DateTimeKind.Utc);
+			var utcMatchDate = TimeZoneInfo.ConvertTimeToUtc(
+				model.MatchDate,
+				TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time")
+			); 
+			
 			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
 
 
