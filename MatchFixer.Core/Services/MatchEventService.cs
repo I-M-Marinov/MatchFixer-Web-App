@@ -1,5 +1,7 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.FootballCompetitions;
 using MatchFixer.Common.FootballLeagues;
+using MatchFixer.Common.VirtualLeagues;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.ViewModels.LiveEvents;
@@ -68,10 +70,22 @@ namespace MatchFixer.Core.Services
 
 			var result = new List<LiveEventViewModel>();
 
+
+
 			foreach (var e in events)
 			{
 				var (effHome, effDraw, effAway, boost) = await _oddsBoostService
 					.GetEffectiveOddsAsync(e.Id, e.HomeOdds, e.DrawOdds, e.AwayOdds);
+
+				bool isInternational = false;
+				bool isEuropean = false;
+
+				if (e.CompetitionName != null &&
+				    CompetitionMappings.NameToId.TryGetValue(e.CompetitionName, out int compId))
+				{
+					isInternational = compId < 0;
+					isEuropean = compId >= 1000;
+				}
 
 				result.Add(new LiveEventViewModel
 				{
@@ -93,6 +107,8 @@ namespace MatchFixer.Core.Services
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					HomeTeamLocalLogoUrl = e.HomeTeam.LocalLogoUrl,
 					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
+					IsInternational = isInternational,
+					IsEuropeanCompetition = isEuropean,
 					IsDerby = e.IsDerby,
 					IsPostponed = e.IsPostponed,
 					HasResult = e.LiveResult != null,
@@ -203,6 +219,22 @@ namespace MatchFixer.Core.Services
 			
 			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
 
+			string? competitionName = null;
+
+			if (!string.IsNullOrWhiteSpace(model.CompetitionName))
+			{
+				if (CompetitionMappings.NameToId.TryGetValue(model.CompetitionName, out int compId))
+				{
+					competitionName = model.CompetitionName;
+
+					// compId reserved for future (analytics / filtering)
+					// matchEvent.LeagueId = compId; ????????????? 
+				}
+				else
+				{
+					throw new Exception("Invalid competition selected.");
+				}
+			}
 
 			var matchEvent = new MatchEvent
 			{
@@ -215,10 +247,15 @@ namespace MatchFixer.Core.Services
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby,
 				Status = MatchStatus.Scheduled, // on creation mark events as scheduled
-				CompetitionName = string.IsNullOrWhiteSpace(model.CompetitionName)
-					? null
-					: model.CompetitionName
+				CompetitionName = competitionName
 			};
+
+			bool isInternational = homeTeam.IsNationalTeam && awayTeam.IsNationalTeam;
+
+			if (isInternational && string.IsNullOrWhiteSpace(matchEvent.CompetitionName))
+			{
+				matchEvent.CompetitionName = VirtualLeagues.InternationalName;
+			}
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
 			await _dbContext.SaveChangesAsync();
