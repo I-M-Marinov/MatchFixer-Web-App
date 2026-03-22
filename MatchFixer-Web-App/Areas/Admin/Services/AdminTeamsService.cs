@@ -33,7 +33,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{ BulgarianLeagueId, BulgarianLeagueName },
 
 				// Competition-only virtual league 
-				{ VirtualLeagues.RestOfWorldId, VirtualLeagues.RestOfWorldName }
+				{ VirtualLeagues.RestOfWorldId, VirtualLeagues.RestOfWorldName },
+				{ VirtualLeagues.InternationalId, VirtualLeagues.InternationalName },
 			});
 
 		public AdminTeamsService(HttpClient http, MatchFixerDbContext db, IConfiguration config)
@@ -150,7 +151,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				TeamId = apiTeamId,
 				Name = name,
 				LogoUrl = logoUrl,
-				LeagueName = leagueName
+				LeagueName = leagueName,
+				IsNationalTeam = leagueId == VirtualLeagues.InternationalId
 			};
 
 			await _db.Teams.AddAsync(team, ct);
