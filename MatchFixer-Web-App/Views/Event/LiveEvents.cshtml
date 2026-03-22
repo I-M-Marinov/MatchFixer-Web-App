@@ -1,4 +1,5 @@
 ﻿@using MatchFixer.Common.FootballCompetitions
+@using MatchFixer.Common.VirtualLeagues
 @using MatchFixer.Core.ViewModels.LiveEvents
 @model IEnumerable<LiveEventViewModel>
 
@@ -89,6 +90,9 @@
 													FootballCompetitions.ChampionsLeague => "champions-match-container-effects",
 													FootballCompetitions.EuropaLeague => "europa-match-container-effects",
 													FootballCompetitions.ConferenceLeague => "conference-match-container-effects",
+													VirtualLeagues.InternationalName => "international-match-container-effects",
+													VirtualLeagues.WorldCupName => "worldcup-match-container-effects",
+													VirtualLeagues.EuroName => "euro-match-container-effects",
 													_ => ""
 												}
 												: (match.IsDerby ? "derby-match-container-effects" : "")
@@ -137,6 +141,9 @@
 														"UEFA Champions League" => "/images/live-events/champions-league.png",
 														"UEFA Europa League" => "/images/live-events/europa-league.png",
 														"UEFA Europa Conference League" => "/images/live-events/conference-league.png",
+														"FIFA World Cup" => "/images/live-events/fifa_world_cup.png",
+														"International" => "/images/live-events/international_match.png",
+														"UEFA Euro" => "/images/live-events/uefa_euro.png",
 														_ => "/images/live-events/competition.png"
 													};
 												}
@@ -146,18 +153,26 @@
 									<div class="d-flex justify-content-around align-items-center mb-2 mt-2 @( !string.IsNullOrWhiteSpace(match.CompetitionName) ? "competition-negative-margin" : (match.IsDerby ? "derby-negative-margin" : "") )">
 										<div class="tw-flex tw-justify-around tw-items-center mb-2 gap-4">
 											<div class="text-center">
-												<div class="tw-flex  tw-flex-col  tw-items-center  tw-justify-center">
-													<img src="@match.EffectiveHomeTeamLogo" alt="@match.HomeTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.HomeTeam" data-team-side="home" />
+												<div class="tw-flex tw-flex-col tw-items-center tw-justify-center">
+													<img src="@match.EffectiveHomeTeamLogo"
+													      alt="@match.HomeTeam"
+														  class="live-events-team-logo hoverable-logo mb-2 @(match.IsInternational ? "team-logo-international" : "")"
+													      data-team-name="@match.HomeTeam"
+													      data-team-side="home" />
 													<div class="event-team-name">@match.HomeTeam</div>
 												</div>
 											</div>
 
 
-											<img src="/images/live-events/versus.png" alt="@match.HomeTeam" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
+											<img src="/images/live-events/versus.png" alt="@match.HomeTeam vs @match.AwayTeam" style="width: auto; height: 40px;" class="img-fluid mb-2"/>
 
 											<div class="text-center">
 												<div class="flex flex-col items-center justify-center object-fit-contain">
-													<img src="@match.EffectiveAwayTeamLogo" alt="@match.AwayTeam" style="width: auto; height: 60px;" class="mb-2 team-logo hoverable-logo" data-team-name="@match.AwayTeam" data-team-side="away" />
+													<img src="@match.EffectiveAwayTeamLogo"
+													     alt="@match.AwayTeam"
+														 class="live-events-team-logo hoverable-logo mb-2 @(match.IsInternational ? "team-logo-international" : "")"
+													     data-team-name="@match.AwayTeam"
+													     data-team-side="away" />
 												<div class="event-team-name">@match.AwayTeam</div>
 												</div>
 											</div>
@@ -1023,11 +1038,25 @@
 				case "UEFA Champions League":
 					cardBody.classList.add("champions-match-container-effects");
 					break;
+
 				case "UEFA Europa League":
 					cardBody.classList.add("europa-match-container-effects");
 					break;
+
 				case "UEFA Europa Conference League":
 					cardBody.classList.add("conference-match-container-effects");
+					break;
+
+				case "FIFA World Cup":
+					cardBody.classList.add("worldcup-match-container-effects");
+					break;
+
+				case "UEFA Euro":
+					cardBody.classList.add("euro-match-container-effects");
+					break;
+
+				case "International":
+					cardBody.classList.add("international-match-container-effects");
 					break;
 			}
 		}
@@ -1303,12 +1332,25 @@
 
 	function getCompetitionIcon(name) {
 		switch (name) {
+
 			case "UEFA Champions League":
 				return "/images/live-events/champions-league.png";
+
 			case "UEFA Europa League":
 				return "/images/live-events/europa-league.png";
+
 			case "UEFA Europa Conference League":
 				return "/images/live-events/conference-league.png";
+
+			case "FIFA World Cup":
+			return "/images/live-events/fifa_world_cup.png";
+
+			case "UEFA Euro":
+				return "/images/live-events/uefa_euro.png";
+
+			case "International":
+				return "/images/live-events/international_match.png";
+
 			default:
 				return "/images/live-events/competition.png";
 		}
@@ -1322,6 +1364,12 @@
 				return "bubble-europa";
 			case "UEFA Europa Conference League":
 				return "bubble-conference";
+			case "FIFA World Cup":
+			return "bubble-worldcup";
+			case "UEFA Euro":
+				return "bubble-euro";
+			case "International":
+				return "bubble-international";
 			default:
 				return "bubble-generic";
 		}
@@ -1337,11 +1385,15 @@
 
 		const competitions = new Map();
 
-		const competitionPriority = [
-			"UEFA Champions League",
-			"UEFA Europa League",
-			"UEFA Europa Conference League"
-		];
+			const competitionPriority = [
+				"FIFA World Cup",
+				"UEFA Euro",
+				"International",
+
+				"UEFA Champions League",
+				"UEFA Europa League",
+				"UEFA Europa Conference League"
+			];
 
 		competitionPriority.forEach(name => {
 			document.querySelectorAll(`.event-card[data-competition="${name}"]`)
@@ -1429,18 +1481,25 @@
 </script>
 
 @functions {
-	string GetCompetitionCssClass(string competition)
+	string GetCompetitionCssClass(string? competition)
 	{
 		return competition switch
 		{
-			"UEFA Champions League" => "competition-ucl",
-			"UEFA Europa League" => "competition-uel",
-			"UEFA Europa Conference League" => "competition-uecl",
+			// UEFA
+			FootballCompetitions.ChampionsLeague => "competition-ucl",
+			FootballCompetitions.EuropaLeague => "competition-uel",
+			FootballCompetitions.ConferenceLeague => "competition-uecl",
+
+			// 🌍 INTERNATIONAL
+			VirtualLeagues.InternationalName => "competition-international",
+			VirtualLeagues.WorldCupName => "competition-worldcup",
+			VirtualLeagues.EuroName => "competition-euro",
+
+			// fallback
 			_ => "competition-generic"
 		};
 	}
 }
-
 <style>
 	.odds-up {
 		color: #28a745;
