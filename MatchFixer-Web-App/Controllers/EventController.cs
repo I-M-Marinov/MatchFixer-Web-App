@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.FootballCompetitions;
+using MatchFixer.Common.VirtualLeagues;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.DTO;
 using MatchFixer.Core.ViewModels.LiveEvents;
@@ -23,9 +24,9 @@ namespace MatchFixer_Web_App.Controllers
 
 
 		public EventController(
-			IMatchEventService matchEventService, 
-			IUpcomingMatchService upcomingMatchService, 
-			IUserContextService userContextService, 
+			IMatchEventService matchEventService,
+			IUpcomingMatchService upcomingMatchService,
+			IUserContextService userContextService,
 			IOddsBoostService oddsBoostService,
 			ILiveMatchResultService liveMatchResultService)
 		{
@@ -147,7 +148,7 @@ namespace MatchFixer_Web_App.Controllers
 
 		[Authorize]
 		[HttpPost]
-		[ValidateAntiForgeryToken] 
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> GetLatestOdds([FromBody] Guid[] matchIds)
 		{
 			var odds = await _matchEventService.GetOddsForMatchesAsync(matchIds);
@@ -178,7 +179,7 @@ namespace MatchFixer_Web_App.Controllers
 					boostValue: model.BoostValue,
 					duration: TimeSpan.FromMinutes(model.DurationMinutes),
 					createdByUserId: user.Id,
-					startUtc: startUtc, 
+					startUtc: startUtc,
 					maxStakePerBet: model.MaxStakePerBet,
 					maxUsesPerUser: model.MaxUsesPerUser,
 					note: model.Note);
@@ -333,6 +334,25 @@ namespace MatchFixer_Web_App.Controllers
 				{
 					Text = FootballCompetitions.ConferenceLeague,
 					Value = FootballCompetitions.ConferenceLeague
+				},
+				// =========================
+				// INTERNATIONAL (NEW)
+				// =========================
+
+				new SelectListItem
+				{
+					Text = VirtualLeagues.InternationalName,
+					Value = VirtualLeagues.InternationalName
+				},
+				new SelectListItem
+				{
+					Text = VirtualLeagues.WorldCupName,
+					Value = VirtualLeagues.WorldCupName
+				},
+				new SelectListItem
+				{
+					Text = VirtualLeagues.EuroName,
+					Value = VirtualLeagues.EuroName
 				}
 			};
 		}
