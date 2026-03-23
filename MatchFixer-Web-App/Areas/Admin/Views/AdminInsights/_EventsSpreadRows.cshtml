@@ -42,13 +42,32 @@
 			if (isCompetition)
 			{
 				label = r.CompetitionName!;
-				icon = r.CompetitionName switch
+
+				var isInternational =
+					r.CompetitionName == "FIFA World Cup" ||
+					r.CompetitionName == "UEFA Euro" ||
+					r.CompetitionName == "International";
+
+				if (isInternational)
 				{
-					"UEFA Champions League" => "/images/live-events/champions-league.png",
-					"UEFA Europa League" => "/images/live-events/europa-league.png",
-					"UEFA Europa Conference League" => "/images/live-events/conference-league.png",
-					_ => "/images/live-events/competition.png"
-				};
+					icon = r.CompetitionName switch
+					{
+						"FIFA World Cup" => "/images/live-events/fifa_world_cup.png",
+						"UEFA Euro" => "/images/live-events/uefa_euro.png",
+						"International" => "/images/live-events/international_match.png",
+						_ => "/images/live-events/world.png"
+					};
+				}
+				else
+				{
+					icon = r.CompetitionName switch
+					{
+						"UEFA Champions League" => "/images/live-events/champions-league.png",
+						"UEFA Europa League" => "/images/live-events/europa-league.png",
+						"UEFA Europa Conference League" => "/images/live-events/conference-league.png",
+						_ => "/images/live-events/competition.png"
+					};
+				}
 			}
 			else
 			{
