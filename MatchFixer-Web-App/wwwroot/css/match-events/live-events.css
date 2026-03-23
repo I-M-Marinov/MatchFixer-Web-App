@@ -144,6 +144,7 @@
 .competition-tooltip-wrapper {
     position: relative;
     display: inline-block;
+    z-index: 9999;
 }
 
 .derby-match-tooltip-wrapper,
@@ -178,7 +179,7 @@
     padding: 0.3rem 0.3rem;
     border-radius: 9px;
     position: absolute;
-    z-index: 999;
+    z-index: 99999;
     bottom: 100%;
     right: -90%;
     opacity: 0;
@@ -827,8 +828,29 @@
 .international-match-container-effects {
     position: relative;
     z-index: 1;
+    border-radius: 5% 10%;
+    overflow: visible;
 }
 
+/* TEXTURE */
+.international-match-container-effects::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 5% 10%;
+    background-color: rgba(109, 40, 217, 0.35);
+    -webkit-mask-image: url('/images/textures/fabric.png');
+    -webkit-mask-repeat: repeat;
+    -webkit-mask-size: 200px;
+    mask-image: url('/images/textures/fabric.png');
+    mask-repeat: repeat;
+    mask-size: 200px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* GLOW */
 .international-match-container-effects::after {
     content: '';
     position: absolute;
@@ -836,7 +858,7 @@
     pointer-events: none;
     z-index: -2;
     border-radius: 5% 10%;
-    background: radial-gradient(circle at bottom, rgba(139, 92, 246, 0.5), transparent 55%), linear-gradient(360deg, #6d28d9 0%, rgba(109, 40, 217, 0.8) 6%, transparent 52%);
+    background: radial-gradient(circle at bottom, rgba(168, 85, 247, 0.55), transparent 60%), linear-gradient(360deg, #6d28d9 0%, rgba(109, 40, 217, 0.9) 8%, transparent 60%);
 }
 
 /* --------------------------------------------------------------
@@ -845,9 +867,31 @@
 
 .worldcup-match-container-effects {
     position: relative;
-    z-index: 1;
+    z-index: 0;
+    border-radius: 5% 10%;
+    overflow: visible;
 }
 
+/* TEXTURE */
+.worldcup-match-container-effects::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 5% 10%;
+    background-color: rgba(0, 0, 0, 0.40);
+    opacity: 0.8;
+    -webkit-mask-image: url('/images/textures/weave.png');
+    -webkit-mask-repeat: repeat;
+    -webkit-mask-size: 120px;
+    mask-image: url('/images/textures/weave.png');
+    mask-repeat: repeat;
+    mask-size: 120px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* GLOW */
 .worldcup-match-container-effects::after {
     content: '';
     position: absolute;
@@ -855,8 +899,9 @@
     pointer-events: none;
     z-index: -2;
     border-radius: 5% 10%;
-    background: radial-gradient(circle at bottom, rgba(255, 215, 0, 0.6), transparent 55%), linear-gradient(360deg, #d4af37 0%, rgba(212, 175, 55, 0.85) 6%, transparent 52%);
+    background: radial-gradient(circle at bottom, rgba(255, 223, 0, 0.75), transparent 55%), linear-gradient(360deg, #d4af37 0%, rgba(255, 215, 0, 0.9) 10%, transparent 60%);
 }
+
 
 /* --------------------------------------------------------------
 |                      EURO MATCH CARD EFFECTS                  |
@@ -865,8 +910,29 @@
 .euro-match-container-effects {
     position: relative;
     z-index: 1;
+    border-radius: 5% 10%;
+    overflow: visible;
 }
 
+/* TEXTURE */
+.euro-match-container-effects::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 5% 10%;
+    background-color: rgba(0, 51, 153, 0.4);
+    -webkit-mask-image: url('/images/textures/weave.png');
+    -webkit-mask-repeat: repeat;
+    -webkit-mask-size: 130px;
+    mask-image: url('/images/textures/weave.png');
+    mask-repeat: repeat;
+    mask-size: 130px;
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* GLOW */
 .euro-match-container-effects::after {
     content: '';
     position: absolute;
@@ -874,8 +940,9 @@
     pointer-events: none;
     z-index: -2;
     border-radius: 5% 10%;
-    background: radial-gradient(circle at bottom, rgba(0, 87, 183, 0.55), transparent 55%), linear-gradient(360deg, #003399 0%, rgba(0, 51, 153, 0.85) 6%, transparent 52%);
+    background: radial-gradient(circle at bottom, rgba(0, 123, 255, 0.65), transparent 60%), linear-gradient(360deg, #003399 0%, rgba(0, 102, 255, 0.9) 10%, transparent 60%);
 }
+
 
 .international-match-container-effects::after {
     filter: blur(0.5px);
