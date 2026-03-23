@@ -377,6 +377,12 @@ const leagueLogoMap = @Html.Raw(
 				return "/images/live-events/europa-league.png";
 			case "UEFA Europa Conference League":
 				return "/images/live-events/conference-league.png";
+			case "FIFA World Cup":
+				return "/images/live-events/fifa_world_cup.png";
+			case "UEFA Euro":
+				return "/images/live-events/uefa_euro.png";
+			case "International":
+				return "/images/live-events/international_match.png";
 			default:
 				return "/images/live-events/competition.png";
 		}
@@ -390,6 +396,12 @@ const leagueLogoMap = @Html.Raw(
 				return "bubble-europa";
 			case "UEFA Europa Conference League":
 				return "bubble-conference";
+			case "FIFA World Cup":
+				return "bubble-worldcup";
+			case "UEFA Euro":
+				return "bubble-euro";
+			case "International":
+				return "bubble-international";
 			default:
 				return "bubble-generic";
 		}
@@ -411,7 +423,10 @@ const leagueLogoMap = @Html.Raw(
 		const competitionPriority = [
 			"UEFA Champions League",
 			"UEFA Europa League",
-			"UEFA Europa Conference League"
+			"UEFA Europa Conference League",
+			"FIFA World Cup",
+			"UEFA Euro",
+			"International"
 		];
 
 		competitionPriority.forEach(name => {
