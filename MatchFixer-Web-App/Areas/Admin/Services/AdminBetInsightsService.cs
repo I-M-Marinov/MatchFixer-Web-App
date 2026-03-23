@@ -63,8 +63,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			// Competition Counts 
 			var competitionCounts = await allEventsQ
-				.Where(e => e.CompetitionName != null)
-				.GroupBy(e => e.CompetitionName!)
+				.Where(e => !string.IsNullOrWhiteSpace(e.CompetitionName))
+				.Select(e => e.CompetitionName!.Trim())
+				.GroupBy(name => name)
 				.Select(g => new
 				{
 					Competition = g.Key,
