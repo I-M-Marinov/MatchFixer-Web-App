@@ -26,8 +26,24 @@
 	    { "Parva Liga", "https://media.api-sports.io/flags/bg.svg" },
 		{ "Polish League Ekstraklasa", "https://media.api-sports.io/flags/pl.svg" },
 		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" },
-		{ "Rest of World", "https://res.cloudinary.com/doorb7d6i/image/upload/v1771689175/rest-of-world2_tczptr.png" } // virtual league for competitions only
+		{ "Rest of World", "https://res.cloudinary.com/doorb7d6i/image/upload/v1771689175/rest-of-world2_tczptr.png" }, // virtual league for competitions only
+		{ "International", "/images/live-events/international_friendly_match.png" } // international teams only
+    };
 
+    var leagueOrder = new[]
+    {
+	    "Premier League",
+	    "La Liga",
+	    "Bundesliga",
+	    "Serie A",
+	    "Ligue 1",
+	    "Eredivisie",
+	    "Liga Portugal",
+	    "Parva Liga",
+	    "Polish League Ekstraklasa",
+	    "Swiss League",
+	    "International",
+	    "Rest of World"
     };
 
     var selectedIds = new HashSet<int>(vm.SelectedLeagueIds ?? Array.Empty<int>());
@@ -63,7 +79,9 @@
 
 				<div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-2">
 					<div class="league-btn-group d-flex flex-wrap gap-3 align-items-center justify-content-center" role="group" aria-label="League filters">
-						@foreach (var kv in leagues.OrderBy(x => x.Value))
+						
+
+						@foreach (var kv in leagues.OrderBy(x => Array.IndexOf(leagueOrder, x.Value)))
 						{
 							var id = kv.Key;
 							var name = kv.Value;
@@ -73,7 +91,7 @@
 								: "https://media.api-sports.io/flags/eu.svg";
 
 							<input class="league-pill" id="@inputId" type="checkbox"
-							       value="@id" @(selectedIds.Contains(id) ? "checked" : null) />
+							       value="@id" @(selectedIds.Contains(id) ? "checked" : null)/>
 							<label class="flag-pill" for="@inputId"
 							       title="@name" style="--flag:url('@flagUrl')">
 
