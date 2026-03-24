@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Infrastructure;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Events;
@@ -49,6 +50,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var result = events.Select(e =>
 			{
 				var slips = e.Bets.Select(b => b.BetSlip).Distinct().ToList();
+
+				var slipLegs = slips.ToDictionary(
+					s => s.Id,
+					s => s.Bets.Count
+				);
 
 				decimal totalStake = slips.Sum(s => s.Amount);
 
@@ -111,6 +117,26 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							computedStatus = BetStatus.Pending.ToString();
 						}
 
+						BetSlipStatus slipStatus;
+
+						if (b.BetSlip.IsSettled)
+						{
+							if (b.BetSlip.WinAmount.HasValue && b.BetSlip.WinAmount > 0)
+								slipStatus = BetSlipStatus.Won;
+							else
+								slipStatus = BetSlipStatus.Lost;
+						}
+						else if (e.IsCancelled)
+						{
+							slipStatus = BetSlipStatus.Voided;
+						}
+						else
+						{
+							slipStatus = BetSlipStatus.Pending;
+						}
+
+						var legs = slipLegs[b.BetSlipId];
+
 						return new AdminBetSummaryDto
 						{
 							BetId = b.Id,
@@ -118,9 +144,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							FullName = b.BetSlip.User.FullName,
 							Pick = b.Pick.ToString(),
 							Odds = b.Odds,
-							Status = computedStatus,
+							BetStatus = computedStatus,
+							BetSlipStatus = slipStatus.ToString(),
 							Stake = b.BetSlip.Amount,
-							Payout = computedStatus == BetStatus.Won.ToString() ? b.BetSlip.Amount * b.Odds : null
+							Payout = computedStatus == BetStatus.Won.ToString() ? b.BetSlip.Amount * b.Odds : null,
+							Legs = legs
 						};
 					}).ToList(),
 
