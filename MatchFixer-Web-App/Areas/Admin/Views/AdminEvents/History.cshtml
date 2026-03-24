@@ -123,8 +123,6 @@
 		</div>
 
 	</div>
-
-
 	<!-- PROFIT BY LEAGUE -->
 	<div class="accordion-item">
 		<h2 class="accordion-header" id="headingLeague">
@@ -199,6 +197,7 @@
 			</div>
 		</div>
 	</div>
+	<!-- TEAM BETTING INSIGHTS -->
 	<div class="accordion-item">
 		<h2 class="accordion-header">
 			<button class="accordion-button collapsed" data-bs-toggle="collapse"
@@ -329,9 +328,15 @@
              : (e.HomeScore.HasValue && e.AwayScore.HasValue ? "concluded" : "pending")
          )">
 
-			<td>@e.MatchName</td>
-			<td>@(e.MatchDate?.ToString("g") ?? "TBA")</td>
-			<td>
+			<td class="text-center">@e.MatchName</td>
+			<td class="text-center">
+				@(e.MatchDate.HasValue 
+					? TimeZoneInfo.ConvertTimeFromUtc(
+						e.MatchDate.Value, 
+						TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time")
+					).ToString("g") 
+					: "TBA")
+			</td>			<td class="text-center">
 				@if (e.IsCancelled)
 				{
 					<span class="badge bg-secondary">Cancelled</span>
@@ -341,8 +346,8 @@
 					<span>@e.HomeScore - @e.AwayScore</span>
 				}
 			</td>
-			<td>@e.TotalBets</td>
-			<td class="fw-bold @(
+			<td class="text-center">@e.TotalBets</td>
+			<td class="fw-bold text-center @(
                e.TotalStake > 0 
                    ? "text-success" 
                    : e.TotalStake == 0 
@@ -351,10 +356,10 @@
                )">				
 				€@e.TotalStake.ToString("F2")
 			</td>
-			<td class="fw-bold @(e.TotalPayout >= 0 ? "text-success" : "text-danger")">
+			<td class="fw-bold text-center @(e.TotalPayout >= 0 ? "text-success" : "text-danger")">
 				€@e.TotalPayout.ToString("F2")
 			</td>
-			<td class="fw-bold @(e.Profit >= 0 ? "text-success" : "text-danger")">
+			<td class="fw-bold text-center @(e.Profit >= 0 ? "text-success" : "text-danger")">
 				€@e.Profit.ToString("F2")
 			</td>
 			<td>
