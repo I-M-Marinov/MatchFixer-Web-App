@@ -4,12 +4,14 @@
 <table class="table table-sm admin-user-bets-table">
 	<thead>
 	<tr>
-		<th>User</th>
-		<th>Pick</th>
-		<th>Odds</th>
-		<th>Stake</th>
-		<th>Status</th>
-		<th>Payout</th>
+		<th class="text-center">User</th>
+		<th class="text-center">Pick</th>
+		<th class="text-center">Odds</th>
+		<th class="text-center">Stake</th>
+		<th class="text-center">Legs</th>
+		<th class="text-center">Bet Status</th>
+		<th class="text-center">BetSlip Status</th>
+		<th class="text-center">Payout</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -23,7 +25,14 @@
 			_ => ""
 		};
 
-		string statusClass = b.Status switch
+		string statusClass = b.BetStatus switch
+		{
+			"Won" => "badge bg-success",
+			"Lost" => "badge bg-danger",
+			_ => ""
+		};
+
+		string betslipStatusClass = b.BetSlipStatus switch
 		{
 			"Won" => "badge bg-success",
 			"Lost" => "badge bg-danger",
@@ -31,20 +40,26 @@
 		};
 
 		<tr>
-			<td>@b.FullName (@b.Username)</td>
-			<td>
+			<td class="text-center">@b.FullName (@b.Username)</td>
+			<td class="text-center">
 				<span class="@pickClass fw-semibold px-2 py-1 rounded">
 					@b.Pick
 				</span>
 			</td>
-			<td>@b.Odds</td>
-			<td>€@b.Stake</td>
-			<td>
+			<td class="text-center">@b.Odds</td>
+			<td class="text-center">€@b.Stake</td>
+			<td class="text-center">@b.Legs</td>
+			<td class="text-center">
 				<span class="@statusClass">
-					@b.Status
+					@b.BetStatus
 				</span>
 			</td>
-			<td>@(b.Payout.HasValue ? $"€{b.Payout.Value:F2}" : "-")</td>
+			<td class="text-center">
+				<span class="@betslipStatusClass">
+					@b.BetSlipStatus
+				</span>
+			</td>
+			<td class="text-center">@(b.Payout.HasValue ? $"€{b.Payout.Value:F2}" : "-")</td>
 		</tr>
 	}
 	</tbody>
