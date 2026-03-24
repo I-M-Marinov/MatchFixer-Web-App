@@ -10,8 +10,11 @@
 		public decimal Odds { get; set; }
 		public decimal Stake { get; set; }
 
-		public string Status { get; set; }
-		public decimal? Payout { get; set; }
+		public string BetStatus { get; set; } = null!;      //  leg status
+		public string BetSlipStatus { get; set; } = null!;  // bet slip status
+
+        public decimal? Payout { get; set; }
+		public int Legs { get; set; }
 	}
 
 }
