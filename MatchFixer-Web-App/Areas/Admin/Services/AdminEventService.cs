@@ -147,7 +147,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							BetStatus = computedStatus,
 							BetSlipStatus = slipStatus.ToString(),
 							Stake = b.BetSlip.Amount,
-							Payout = computedStatus == BetStatus.Won.ToString() ? b.BetSlip.Amount * b.Odds : null,
+							Payout = slipStatus.ToString() == BetSlipStatus.Won.ToString() ? b.BetSlip.Amount * b.Odds : null,
 							Legs = legs
 						};
 					}).ToList(),
