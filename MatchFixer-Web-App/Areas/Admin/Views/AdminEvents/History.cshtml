@@ -305,7 +305,7 @@
 </ul>
 
 
-<table class="table table-bordered table-hover" style="font-size: 0.85em;">
+<table class="table table-bordered table-hover admin-events-historical-table" style="font-size: 0.85em;">
 	<thead class="table-light">
 	<tr>
 		<th class="text-center">Match</th>
@@ -322,7 +322,7 @@
 	<tbody>
 	@foreach (var e in Model)
 	{
-		<tr class="event-row"
+		<tr class="event-row event-row-main"
 		    data-status="@(e.IsCancelled 
              ? "cancelled" 
              : (e.HomeScore.HasValue && e.AwayScore.HasValue ? "concluded" : "pending")
@@ -373,27 +373,35 @@
 
 		<tr class="collapse" id="event-@e.EventId">
 			<td colspan="8">
-				<div class="p-3">
+				<div class="p-3 admin-event-information">
 
-					@if (e.Bets.Any())
-					{
-						@await Html.PartialAsync("_EventBetsPartial", e.Bets)
-					}
-					else
-					{
-						<p class="text-muted fst-italic">No bets were placed on this event.</p>
-					}
+					<!-- BETS -->
+					<div class="event-section">
+						@if (e.Bets.Any())
+						{
+							@await Html.PartialAsync("_EventBetsPartial", e.Bets)
+						}
+						else
+						{
+							<p class="text-muted fst-italic text-center">
+								No bets were placed on this event.
+							</p>
+						}
+					</div>
 
-					<hr />
-
-					@if (e.Logs.Any())
-					{
-						@await Html.PartialAsync("_EventLogsPartial", e.Logs)
-					}
-					else
-					{
-						<p class="text-muted fst-italic">No changes were recorded for this event.</p>
-					}
+					<!-- LOGS -->
+					<div class="event-section">
+						@if (e.Logs.Any())
+						{
+							@await Html.PartialAsync("_EventLogsPartial", e.Logs)
+						}
+						else
+						{
+							<p class="text-muted fst-italic text-center">
+								No changes were recorded for this event.
+							</p>
+						}
+					</div>
 
 				</div>
 			</td>
