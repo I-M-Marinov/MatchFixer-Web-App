@@ -362,47 +362,72 @@
 			<td class="fw-bold text-center @(e.Profit >= 0 ? "text-success" : "text-danger")">
 				€@e.Profit.ToString("F2")
 			</td>
-			<td>
-				<button class="btn btn-sm btn-outline-primary"
-				        data-bs-toggle="collapse"
-				        data-bs-target="#event-@e.EventId">
-					Details
-				</button>
+			<td class="text-center">
+
+				<div class="d-flex justify-content-center align-items-center gap-2">
+
+					<!-- LOGS -->
+					@if (e.Logs.Any())
+					{
+						<span class="badge bg-warning text-dark"
+						      title="@($"{e.Logs.Count} changes recorded")">
+							<i class="bi bi-clipboard-data"></i> @e.Logs.Count
+						</span>
+					}
+					else
+					{
+						<span class="text-muted" title="No changes recorded">
+							<i class="bi bi-clipboard-data"></i>
+						</span>
+					}
+
+					<!-- DETAILS BUTTON -->
+					<button class="btn-pill"
+					        onclick="toggleEvent(this)">
+						Details
+					</button>
+
+				</div>
+
 			</td>
 		</tr>
 
-		<tr class="collapse" id="event-@e.EventId">
-			<td colspan="8">
-				<div class="p-3 admin-event-information">
+		<tr class="event-details-row">
 
-					<!-- BETS -->
-					<div class="event-section">
-						@if (e.Bets.Any())
-						{
-							@await Html.PartialAsync("_EventBetsPartial", e.Bets)
-						}
-						else
-						{
-							<p class="text-muted fst-italic text-center">
-								No bets were placed on this event.
-							</p>
-						}
+			<td colspan="8" style="background-color: rgba(0, 0, 0, 0.3); padding: 1em 0.75em; border-radius: 14px; margin-top: 3em;">
+				<div id="details_@e.EventId" class="event-details-wrapper">
+
+					<div class="p-3 admin-event-information">
+
+						<!-- BETS -->
+						<div class="event-section">
+							@if (e.Bets.Any())
+							{
+								@await Html.PartialAsync("_EventBetsPartial", e.Bets)
+							}
+							else
+							{
+								<p class="text-muted fst-italic text-center">
+									No bets were placed on this event.
+								</p>
+							}
+						</div>
+
+						<!-- LOGS -->
+						<div class="event-section">
+							@if (e.Logs.Any())
+							{
+								@await Html.PartialAsync("_EventLogsPartial", e.Logs)
+							}
+							else
+							{
+								<p class="text-muted fst-italic text-center">
+									No changes were recorded for this event.
+								</p>
+							}
+						</div>
+
 					</div>
-
-					<!-- LOGS -->
-					<div class="event-section">
-						@if (e.Logs.Any())
-						{
-							@await Html.PartialAsync("_EventLogsPartial", e.Logs)
-						}
-						else
-						{
-							<p class="text-muted fst-italic text-center">
-								No changes were recorded for this event.
-							</p>
-						}
-					</div>
-
 				</div>
 			</td>
 		</tr>
@@ -463,4 +488,18 @@
 		});
 
 	});
+
+	function toggleEvent(btn) {
+		const row = btn.closest('tr');
+		const detailsRow = row.nextElementSibling;
+		const wrapper = detailsRow.querySelector('.event-details-wrapper');
+
+		if (!wrapper) return;
+
+		const isOpen = detailsRow.classList.toggle('open');
+
+		// toggle button state
+		btn.classList.toggle('active', isOpen);
+	}
+
 </script>
