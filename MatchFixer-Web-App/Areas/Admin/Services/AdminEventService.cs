@@ -51,10 +51,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			{
 				var slips = e.Bets.Select(b => b.BetSlip).Distinct().ToList();
 
-				var slipLegs = slips.ToDictionary(
-					s => s.Id,
-					s => s.Bets.Count
-				);
+				var slipLegs = _db.Bets
+					.Where(b => slips.Select(s => s.Id).Contains(b.BetSlipId))
+					.GroupBy(b => b.BetSlipId)
+					.ToDictionary(
+						g => g.Key,
+						g => g.Count()
+					);
 
 				decimal totalStake = slips.Sum(s => s.Amount);
 
@@ -98,10 +101,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						if (e.IsCancelled)
 						{
 							computedStatus = BetStatus.Voided.ToString();
-						}
-						else if (!b.BetSlip.IsSettled)
-						{
-							computedStatus = BetStatus.Pending.ToString();
 						}
 						else if (matchResult != null)
 						{
