@@ -19,6 +19,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		public async Task<List<AdminEventOverviewDto>> GetFinishedEventsAsync(AdminEventHistoryFilters filters)
 		{
 			var query = _db.MatchEvents
+				.AsNoTracking()
 				.Where(m => m.LiveResult != null || m.IsCancelled)
 				.Include(m => m.HomeTeam)
 				.Include(m => m.AwayTeam)
@@ -43,6 +44,17 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			if (filters.TeamId.HasValue)
 				query = query.Where(m => m.HomeTeamId == filters.TeamId || m.AwayTeamId == filters.TeamId);
 
+			var allSlipIds = await query
+				.SelectMany(e => e.Bets.Select(b => b.BetSlipId))
+				.Distinct()
+				.ToListAsync();
+
+			var slipLegs = await _db.Bets
+				.Where(b => allSlipIds.Contains(b.BetSlipId))
+				.GroupBy(b => b.BetSlipId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionaryAsync(x => x.Key, x => x.Count);
+
 			var events = await query
 				.OrderByDescending(m => m.MatchDate)
 				.ToListAsync();
@@ -50,14 +62,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var result = events.Select(e =>
 			{
 				var slips = e.Bets.Select(b => b.BetSlip).Distinct().ToList();
-
-				var slipLegs = _db.Bets
-					.Where(b => slips.Select(s => s.Id).Contains(b.BetSlipId))
-					.GroupBy(b => b.BetSlipId)
-					.ToDictionary(
-						g => g.Key,
-						g => g.Count()
-					);
 
 				decimal totalStake = slips.Sum(s => s.Amount);
 
@@ -77,8 +81,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var matchResult = e.LiveResult;
 
 				string leagueName = string.IsNullOrWhiteSpace(e.CompetitionName)
-										? e.HomeTeam.LeagueName
-										: "Rest of World";
+					? e.HomeTeam.LeagueName
+					: "Rest of World";
 
 				return new AdminEventOverviewDto
 				{
@@ -134,7 +138,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							slipStatus = BetSlipStatus.Pending;
 						}
 
-						var legs = slipLegs[b.BetSlipId];
+						var legs = slipLegs.TryGetValue(b.BetSlipId, out var l) ? l : 1;
 
 						return new AdminBetSummaryDto
 						{
@@ -146,7 +150,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							BetStatus = computedStatus,
 							BetSlipStatus = slipStatus.ToString(),
 							Stake = b.BetSlip.Amount,
-							Payout = slipStatus.ToString() == BetSlipStatus.Won.ToString() ? b.BetSlip.Amount * b.Odds : null,
+							Payout = slipStatus == BetSlipStatus.Won ? b.BetSlip.Amount * b.Odds : null,
 							Legs = legs
 						};
 					}).ToList(),
