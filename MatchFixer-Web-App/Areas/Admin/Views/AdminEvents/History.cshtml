@@ -304,138 +304,144 @@
 	</li>
 </ul>
 
+<div class="table-scroll-container">
+	
+	<div class="table-scroll-container-inner">
+		<table class="table table-bordered table-hover admin-events-historical-table" style="font-size: 0.85em;">
+			<thead class="table-light">
+				<tr>
+					<th class="text-center">Match</th>
+					<th class="text-center">Date</th>
+					<th class="text-center">Result</th>
+					<th class="text-center">Bets</th>
+					<th class="text-center">Stake</th>
+					<th class="text-center">Payout</th>
+					<th class="text-center">Profit</th>
+					<th class="text-center"></th>
+				</tr>
+			</thead>
 
-<table class="table table-bordered table-hover admin-events-historical-table" style="font-size: 0.85em;">
-	<thead class="table-light">
-	<tr>
-		<th class="text-center">Match</th>
-		<th class="text-center">Date</th>
-		<th class="text-center">Result</th>
-		<th class="text-center">Bets</th>
-		<th class="text-center">Stake</th>
-		<th class="text-center">Payout</th>
-		<th class="text-center">Profit</th>
-		<th class="text-center"></th>
-	</tr>
-	</thead>
-
-	<tbody>
-	@foreach (var e in Model)
-	{
-		<tr class="event-row event-row-main"
-		    data-status="@(e.IsCancelled 
-             ? "cancelled" 
-             : (e.HomeScore.HasValue && e.AwayScore.HasValue ? "concluded" : "pending")
-         )">
-
-			<td class="text-center">@e.MatchName</td>
-			<td class="text-center">
-				@(e.MatchDate.HasValue 
-					? TimeZoneInfo.ConvertTimeFromUtc(
-						e.MatchDate.Value, 
-						TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time")
-					).ToString("g") 
-					: "TBA")
-			</td>			<td class="text-center">
-				@if (e.IsCancelled)
+			<tbody>
+				@foreach (var e in Model)
 				{
-					<span class="badge bg-secondary">Cancelled</span>
-				}
-				else
-				{
-					<span>@e.HomeScore - @e.AwayScore</span>
-				}
-			</td>
-			<td class="text-center">@e.TotalBets</td>
-			<td class="fw-bold text-center @(
-               e.TotalStake > 0 
-                   ? "text-success" 
-                   : e.TotalStake == 0 
-	                   ? "text-warning" 
-	                   : "text-danger"
-               )">				
-				€@e.TotalStake.ToString("F2")
-			</td>
-			<td class="fw-bold text-center @(e.TotalPayout >= 0 ? "text-success" : "text-danger")">
-				€@e.TotalPayout.ToString("F2")
-			</td>
-			<td class="fw-bold text-center @(e.Profit >= 0 ? "text-success" : "text-danger")">
-				€@e.Profit.ToString("F2")
-			</td>
-			<td class="text-center">
+					<tr class="event-row event-row-main"
+						data-status="@(e.IsCancelled
+					 	 ? "cancelled"
+					 	 : (e.HomeScore.HasValue && e.AwayScore.HasValue ? "concluded" : "pending")
+	         	         )">
 
-				<div class="d-flex justify-content-center align-items-center gap-2">
-
-					<!-- LOGS -->
-					@if (e.Logs.Any())
-					{
-						<span class="badge bg-warning text-dark"
-						      title="@($"{e.Logs.Count} changes recorded")">
-							<i class="bi bi-clipboard-data"></i> @e.Logs.Count
-						</span>
-					}
-					else
-					{
-						<span class="text-muted" title="No changes recorded">
-							<i class="bi bi-clipboard-data"></i>
-						</span>
-					}
-
-					<!-- DETAILS BUTTON -->
-					<button class="btn-pill"
-					        onclick="toggleEvent(this)">
-						Details
-					</button>
-
-				</div>
-
-			</td>
-		</tr>
-
-		<tr class="event-details-row">
-
-			<td colspan="8" style="background-color: rgba(0, 0, 0, 0.3); padding: 1em 0.75em; border-radius: 14px; margin-top: 3em;">
-				<div id="details_@e.EventId" class="event-details-wrapper">
-
-					<div class="p-3 admin-event-information">
-
-						<!-- BETS -->
-						<div class="event-section">
-							@if (e.Bets.Any())
+					<td class="text-center">@e.MatchName</td>
+					<td class="text-center">
+						@(e.MatchDate.HasValue
+												? TimeZoneInfo.ConvertTimeFromUtc(
+												e.MatchDate.Value,
+												TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time")
+												).ToString("g")
+												: "TBA")
+					</td>
+					<td class="text-center">
+						@if (e.IsCancelled)
 							{
-								@await Html.PartialAsync("_EventBetsPartial", e.Bets)
+								<span class="badge bg-secondary">Cancelled</span>
 							}
 							else
 							{
-								<p class="text-muted fst-italic text-center">
-									No bets were placed on this event.
-								</p>
+								<span>@e.HomeScore - @e.AwayScore</span>
 							}
-						</div>
+						</td>
+						<td class="text-center">@e.TotalBets</td>
+						<td class="fw-bold text-center @(
+			 e.TotalStake > 0
+				 ? "text-success"
+				 : e.TotalStake == 0
+					 ? "text-warning"
+					 : "text-danger"
+	               	               )">
+						€@e.TotalStake.ToString("F2")
+					</td>
+					<td class="fw-bold text-center @(e.TotalPayout >= 0 ? "text-success" : "text-danger")">
+						€@e.TotalPayout.ToString("F2")
+					</td>
+					<td class="fw-bold text-center @(e.Profit >= 0 ? "text-success" : "text-danger")">
+						€@e.Profit.ToString("F2")
+					</td>
+					<td class="text-center">
 
-						<!-- LOGS -->
-						<div class="event-section">
+							<div class="d-flex justify-content-center align-items-center gap-2">
+
+								<!-- LOGS -->
 							@if (e.Logs.Any())
-							{
-								@await Html.PartialAsync("_EventLogsPartial", e.Logs)
-							}
-							else
-							{
-								<p class="text-muted fst-italic text-center">
-									No changes were recorded for this event.
-								</p>
-							}
-						</div>
+								{
+									<span class="badge bg-warning text-dark"
+										  title="@($"{e.Logs.Count} changes recorded")">
+										<i class="bi bi-clipboard-data"></i> @e.Logs.Count
+									</span>
+								}
+								else
+								{
+									<span class="text-muted" title="No changes recorded">
+										<i class="bi bi-clipboard-data"></i>
+									</span>
+								}
 
-					</div>
-				</div>
-			</td>
-		</tr>
-	}
-	</tbody>
-</table>
+								<!-- DETAILS BUTTON -->
+								<button class="btn-pill"
+										onclick="toggleEvent(this)">
+									Details
+								</button>
 
-			
+							</div>
+
+						</td>
+					</tr>
+
+					<tr class="event-details-row">
+
+						<td colspan="8" style="background-color: rgba(0, 0, 0, 0.3); padding: 1em 0.75em; border-radius: 14px; margin-top: 3em;">
+							<div id="details_@e.EventId" class="event-details-wrapper">
+
+								<div class="p-3 admin-event-information">
+
+									<!-- BETS -->
+									<div class="event-section">
+										@if (e.Bets.Any())
+										{
+											@await Html.PartialAsync("_EventBetsPartial", e.Bets)
+										}
+										else
+										{
+											<p class="text-muted fst-italic text-center">
+												No bets were placed on this event.
+											</p>
+										}
+									</div>
+
+									<!-- LOGS -->
+									<div class="event-section">
+										@if (e.Logs.Any())
+										{
+											@await Html.PartialAsync("_EventLogsPartial", e.Logs)
+										}
+										else
+										{
+											<p class="text-muted fst-italic text-center">
+												No changes were recorded for this event.
+											</p>
+										}
+									</div>
+
+								</div>
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+
+	
+
+</div>			
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 
@@ -492,13 +498,12 @@
 	function toggleEvent(btn) {
 		const row = btn.closest('tr');
 		const detailsRow = row.nextElementSibling;
-		const wrapper = detailsRow.querySelector('.event-details-wrapper');
-
-		if (!wrapper) return;
 
 		const isOpen = detailsRow.classList.toggle('open');
 
-		// toggle button state
+		// 🔥 THIS is the key
+		row.classList.toggle('details-open', isOpen);
+
 		btn.classList.toggle('active', isOpen);
 	}
 
