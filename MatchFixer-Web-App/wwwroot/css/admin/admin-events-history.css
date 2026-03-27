@@ -132,6 +132,32 @@
     margin-bottom: 0;
 }
 
+.event-section:last-child::before {
+    background: linear-gradient(180deg, #0dab76, #0dab76);
+}
+
+.event-row-main.details-open td {
+    background: linear-gradient(125deg, #0d6efd, #3b82f6);
+    box-shadow: 0 0 0 1px rgba(13,110,253,0.15);
+    color: ghostwhite; 
+    text-shadow: 1px 1px 0.5px #000;
+}
+
+.event-row-main.details-open td.text-success {
+    color: #00ff44 !important;
+    text-shadow: 1px 1px 0.5px black;
+}
+
+.event-row-main.details-open td.text-danger {
+    color: tomato !important;
+    text-shadow: 1px 1px 0.5px black;
+}
+
+.event-row-main.details-open .badge {
+    color: black !important;
+    text-shadow: 1px 1px 0.5px white !important;
+}
+
 .admin-event-information {
     color: #495057;
     background: linear-gradient(145deg, #ffffff, #f3f6fb);
@@ -297,7 +323,7 @@ tr.collapse.show .admin-event-information {
 }
 
 .btn-pill.active {
-    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    background: linear-gradient(135deg, #00cf7d, #0dab76);
     color: #fff;
     box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35), inset 0 -2px 0 rgba(255,255,255,0.2);
 }
@@ -324,4 +350,39 @@ tr.collapse.show .admin-event-information {
     width: 160%;
     height: 160%;
     opacity: 0;
+}
+
+
+.admin-events-historical-table thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    background: #f8f9fa !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+}
+
+.table-scroll-container {
+    max-height: 750px;
+    overflow-y: auto;
+    border-radius: 12px !important;
+    padding-right: 6px; 
+    margin-right: -6px;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+    width: 12px;
+    border-radius: 10px; 
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 2px solid transparent; 
+    background-clip: content-box;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+    margin-top: 50px;
+    margin-right: -12px;
+    border-radius: 10px;
 }
