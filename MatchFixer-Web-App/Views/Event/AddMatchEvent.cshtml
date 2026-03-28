@@ -257,8 +257,9 @@
 					@foreach (var ev in Model.CurrentEvents)
 					{
 						<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "manually-added-match") @(ev.MatchStatus == MatchStatus.Live ? "event-started-match" : "")"
+						    data-kickoff="@(ev.KickoffTime?.ToString("o"))"
 						    data-date="@(ev.KickoffTime.HasValue 
-							               ? ev.KickoffTime.Value.ToString("yyyy-MM-dd") 
+							               ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-dd") 
 							               : "tba")"
 						    data-postponed="@ev.IsPostponed">
 							<td>
@@ -1090,6 +1091,23 @@
 
 		document.addEventListener("DOMContentLoaded", () => {
 			const rows = [...document.querySelectorAll("#live-events-table tbody tr")];
+
+			rows.forEach(r => {
+
+				const kickoffStr = r.dataset.kickoff;
+				if (!kickoffStr) return;
+
+				const kickoff = new Date(kickoffStr);
+
+				if (isNaN(kickoff)) return;
+
+				// Convert to LOCAL date 
+				const localDate = kickoff.toLocaleDateString('sv-SE');
+
+				// Overwrite dataset.date
+				r.dataset.date = localDate;
+			});
+
 			const tabs = document.getElementById("eventDateTabs");
 
 			if (!rows.length) return;
