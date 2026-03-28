@@ -150,12 +150,14 @@ namespace MatchFixer.Infrastructure.Services
 						var imageName = image.GetProperty("title").GetString()?.ToLower();
 						if (imageName != null)
 						{
-							// Priority order: crest > logo > badge > emblem
+							// Priority order: crest > logo > badge > emblem > flag
 							if (imageName.Contains("crest"))
 								logoImages.Insert(0, image.GetProperty("title").GetString());
 							else if (imageName.Contains("logo"))
 								logoImages.Add(image.GetProperty("title").GetString());
 							else if (imageName.Contains("badge") || imageName.Contains("emblem"))
+								logoImages.Add(image.GetProperty("title").GetString());
+							else if (imageName.Contains("flag"))
 								logoImages.Add(image.GetProperty("title").GetString());
 						}
 					}
