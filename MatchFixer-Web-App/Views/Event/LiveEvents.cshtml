@@ -600,8 +600,9 @@
 			const kickoff = new Date(card.dataset.kickoff);
 			if (isNaN(kickoff)) return;
 
-			const dateStr = kickoff.toISOString().split('T')[0];
-			dateSet.add(dateStr);
+			const localDateStr = kickoff.toLocaleDateString('sv-SE'); 
+			// const dateStr = kickoff.toISOString().split('T')[0];
+			dateSet.add(localDateStr);
 		});
 
 		return Array.from(dateSet).sort();
@@ -727,7 +728,8 @@
 						if (isPostponed || !card.dataset.kickoff) {
 							matches = false;
 						} else {
-							const kickoffDate = card.dataset.kickoff.split('T')[0];
+							// const kickoffDate = card.dataset.kickoff.split('T')[0];
+							const kickoffDate = new Date(card.dataset.kickoff).toLocaleDateString('sv-SE');
 							matches = kickoffDate === selected;
 						}
 					}
