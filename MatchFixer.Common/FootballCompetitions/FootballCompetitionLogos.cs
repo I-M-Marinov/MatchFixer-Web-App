@@ -1,4 +1,6 @@
-﻿namespace MatchFixer.Common.FootballCompetitions
+﻿using static MatchFixer.Common.VirtualLeagues.VirtualLeagues;
+
+namespace MatchFixer.Common.FootballCompetitions
 {
 		public static class FootballCompetitionLogos
 		{
@@ -18,14 +20,22 @@
 					["Polish League Ekstraklasa"] = 106
 				};
 
-			// Competitions
-			public static readonly Dictionary<string, int> CompetitionIds =
-				new(StringComparer.OrdinalIgnoreCase)
-				{
-					["UEFA Champions League"] = 2,
-					["UEFA Europa League"] = 3,
-					["UEFA Europa Conference League"] = 848
-				};
+		// Competitions
+		public static readonly Dictionary<string, int> CompetitionIds =
+			new(StringComparer.OrdinalIgnoreCase)
+			{
+				// UEFA club competitions
+				["UEFA Champions League"] = 2,
+				["UEFA Europa League"] = 3,
+				["UEFA Europa Conference League"] = 848,
+
+				// INTERNATIONAL COMPETITIONS
+				["FIFA World Cup"] = 1,
+				["UEFA Euro"] = 4,
+
+				// "International" 
+				["International"] = -1
+			};
 
 			public static string? GetLeagueLogo(string leagueName)
 			{
@@ -35,14 +45,25 @@
 				return null;
 			}
 
-			public static string? GetCompetitionLogo(string competitionName)
+			public static string GetCompetitionLogo(string? competitionName)
 			{
-				if (CompetitionIds.TryGetValue(competitionName, out var id))
-					return $"https://media.api-sports.io/football/leagues/{id}.png";
+				if (string.IsNullOrWhiteSpace(competitionName))
+					return "/images/live-events/competition.png";
 
-				return null;
+				return competitionName switch
+				{
+					FootballCompetitions.ChampionsLeague => "/images/live-events/champions-league.png",
+					FootballCompetitions.EuropaLeague => "/images/live-events/europa-league.png",
+					FootballCompetitions.ConferenceLeague => "/images/live-events/conference-league.png",
+
+					WorldCupName => "/images/live-events/fifa_world_cup.png",
+					EuroName => "/images/live-events/uefa_euro.png",
+					InternationalName => "/images/live-events/international_match.png",
+
+					_ => "/images/live-events/competition.png"
+				};
 			}
-		}
+	}
 }
 
 
