@@ -107,5 +107,5 @@
 <h4 align="center">Admin Dashboard View</h4>
 
 <p align="center">
-  <img src="./admin-dashboard-view.png" align="center" border="10" width="600px"/>
+  <img src="./updated-admin-dashboard-view.png" align="center" border="10" width="600px"/>
 </p>
