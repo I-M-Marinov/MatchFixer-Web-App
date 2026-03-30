@@ -970,6 +970,7 @@
     border-radius: 50%;
     border: 2px black groove;
     background: black;
+    cursor: pointer;
 }
 
 .boosted-match-container-effects {
