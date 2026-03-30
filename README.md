@@ -69,6 +69,18 @@
   <img src="./updated-uecl-event-cards.png" align="center" border="10" width="600px"/>
 </p>
 
+<h4 align="center">FIFA World Cup</h4>
+
+<p align="center">
+  <img src="./world-cup-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">International Friendlies</h4>
+
+<p align="center">
+  <img src="./international-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
 <h3 align="center">Style of events that already started</h3>
 
 <p align="center">
