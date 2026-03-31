@@ -21,7 +21,8 @@ namespace MatchFixer.Core.Services
 		public async Task<LogoQuizQuestionViewModel> GenerateQuestionAsync(int currentScore)
 		{
 
-			var teams = await _dbContext.Teams.ToListAsync();
+			var teams = await _dbContext.Teams
+				.Where(t => !t.IsNationalTeam).ToListAsync();
 
 			// correct answer
 			var correctTeam = teams[_random.Next(teams.Count)];
