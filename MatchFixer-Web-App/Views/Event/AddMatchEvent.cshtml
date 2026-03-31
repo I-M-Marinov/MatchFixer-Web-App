@@ -25,7 +25,7 @@
 
 </div>
 
-<ul class="nav nav-tabs mb-3 justify-content-center add-event-navigation-tabs" id="eventTabs" role="tablist">
+<ul class="nav nav-tabs justify-content-start add-event-navigation-tabs" id="eventTabs" role="tablist">
 	<li class="nav-item" role="presentation">
 		<button class="nav-link active"
 		        data-bs-toggle="tab"
@@ -232,8 +232,7 @@
 </div>
 
 
-<div class="live-events-section mt-3 mx-auto" style="max-width: 1400px;">
-	<h3 class="text-center mb-2">Current Live Events</h3>
+<div class="live-events-section mx-auto" style="max-width: 1400px;">
 	<ul class="nav nav-pills justify-content-center mb-3" id="eventDateTabs"></ul>
 
 	@if (Model.CurrentEvents.Any())
@@ -1118,7 +1117,7 @@
 				  .map(r => r.dataset.date)
 				  .filter(d => d && d !== "tba")
 			  )
-			].slice(0, 5);
+			];
 
 			const today = new Date();
 			today.setHours(0,0,0,0);
