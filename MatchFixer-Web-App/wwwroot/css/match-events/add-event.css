@@ -94,11 +94,12 @@
     flex: 1 1 0; 
     gap: 2em;
     min-width: 0; 
-    max-width: 1200px;
+    max-width: 1275px;
+    margin-top: -2.5em;
 }
 
 .live-events-table-wrapper {
-    height: 31em; 
+    height: 34em; 
     overflow-y: auto;
     scrollbar-gutter: stable;
 }
@@ -473,6 +474,7 @@ table.responsive-stack td {
 
 .add-event-navigation-tabs {
     font-size: 0.80em;
+    margin-left: 20rem !important;
 }
 
 .add-match-auto-card{
@@ -554,12 +556,6 @@ table.responsive-stack td {
     flex: 0 0 720px;
     max-width: 750px;
     margin-top: 3rem;
-}
-
-.live-events-section {
-    flex: 1 1 auto;
-    min-width: 0; 
-    max-width: 1500px;
 }
 
 .add-event-navigation-tabs {
