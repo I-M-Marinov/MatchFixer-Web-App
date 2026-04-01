@@ -961,6 +961,7 @@
     height: 60px;
     object-fit: contain;
     transition: transform 0.2s ease;
+    cursor: pointer;
 }
 
 .team-logo-international {
