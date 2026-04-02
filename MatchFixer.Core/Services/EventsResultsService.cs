@@ -17,14 +17,18 @@ namespace MatchFixer.Core.Services
 			if (offset < 0)
 				offset = 0;
 
-			// Get all distinct result days (latest first)
-			var days = await _dbContext.MatchEvents
-				.AsNoTracking()
-				.Where(e => !e.IsCancelled && e.LiveResult != null)
-				.Select(e => DateOnly.FromDateTime(e.MatchDate.Value))
+			var tz = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time");
+
+			var days = (await _dbContext.MatchEvents
+					.AsNoTracking()
+					.Where(e => !e.IsCancelled && e.LiveResult != null)
+					.Select(e => e.MatchDate.Value)
+					.ToListAsync()) 
+				.Select(d => DateOnly.FromDateTime(
+					TimeZoneInfo.ConvertTimeFromUtc(d, tz)))
 				.Distinct()
 				.OrderByDescending(d => d)
-				.ToListAsync();
+				.ToList();
 
 			if (days.Count == 0)
 			{
@@ -40,31 +44,31 @@ namespace MatchFixer.Core.Services
 			offset = Math.Clamp(offset, 0, days.Count - 1);
 			var day = days[offset];
 
-			// Load all results for that day
-			var items = await _dbContext.MatchEvents
+			var allEvents = await _dbContext.MatchEvents
 				.AsNoTracking()
+				.Where(e => !e.IsCancelled && e.LiveResult != null)
+				.Include(e => e.HomeTeam)
+				.Include(e => e.AwayTeam)
+				.Include(e => e.LiveResult)
+				.ToListAsync(); // 🔥 LOAD FIRST
+
+			var items = allEvents
 				.Where(e =>
-					!e.IsCancelled &&
-					e.LiveResult != null &&
-					DateOnly.FromDateTime(e.MatchDate.Value) == day)
+					DateOnly.FromDateTime(
+						TimeZoneInfo.ConvertTimeFromUtc(e.MatchDate.Value, tz)) == day)
 				.OrderByDescending(e => e.MatchDate)
 				.Select(e => new EventsResults
 				{
 					MatchEventId = e.Id,
-
 					HomeTeam = e.HomeTeam!.Name,
 					AwayTeam = e.AwayTeam!.Name,
-
 					HomeScore = e.LiveResult!.HomeScore,
 					AwayScore = e.LiveResult!.AwayScore,
-
 					HomeLogoUrl = e.HomeTeam!.LogoUrl,
 					AwayLogoUrl = e.AwayTeam!.LogoUrl,
-
 					CompetitionName = string.IsNullOrWhiteSpace(e.CompetitionName)
 						? null
 						: e.CompetitionName,
-
 					LeagueName =
 						!string.IsNullOrEmpty(e.HomeTeam.LeagueName)
 							? e.HomeTeam.LeagueName
@@ -72,7 +76,7 @@ namespace MatchFixer.Core.Services
 								? e.AwayTeam.LeagueName
 								: "Unknown"
 				})
-				.ToListAsync();
+				.ToList();
 
 			return new PagedDayEventResult<EventsResults>
 			{
