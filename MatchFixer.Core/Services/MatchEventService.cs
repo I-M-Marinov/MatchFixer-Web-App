@@ -471,7 +471,8 @@ namespace MatchFixer.Core.Services
 				.Select(l => new ApiLeagueSelectViewModel
 				{
 					ApiLeagueId = l.Key,
-					Name = l.Value
+					Name = l.Value,
+					LeagueLogoUrl = $"https://media.api-sports.io/football/leagues/{l.Key}.png"
 				})
 				.ToList();
 
