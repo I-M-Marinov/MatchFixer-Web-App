@@ -478,12 +478,39 @@ table.responsive-stack td {
 }
 
 .add-match-auto-card{
-    width: 75%;
+    width: 80%;
     margin: 0 auto;
 }
 
 .api-upcoming-matches-table {
     font-size: 0.80em;
+}
+
+.api-upcoming-matches-table th:nth-child(6),
+.api-upcoming-matches-table th:nth-child(7),
+.api-upcoming-matches-table th:nth-child(8),
+.api-upcoming-matches-table td:nth-child(6),
+.api-upcoming-matches-table td:nth-child(7),
+.api-upcoming-matches-table td:nth-child(8) {
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+}
+
+.api-upcoming-matches-table th:nth-child(3),
+.api-upcoming-matches-table td:nth-child(3) {
+    width: 175px;
+    min-width: 175px;
+    max-width: 175px;
+}
+
+.api-upcoming-matches-table th:nth-child(1),
+.api-upcoming-matches-table td:nth-child(1),
+.api-upcoming-matches-table th:nth-child(2),
+.api-upcoming-matches-table td:nth-child(2) {
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
 }
 
 #eventDateTabs{
@@ -708,7 +735,7 @@ table.responsive-stack td {
 }
 
 /* ===============================
-   STARTED / LIVE MATCH
+        STARTED / LIVE MATCH      |
    =============================== */
 
 .event-started-match {
@@ -721,7 +748,144 @@ table.responsive-stack td {
     border-left: 4px solid #8400d4 !important;
 }
 
+#apiTab {
+    margin-top: 0.75em;
+}
 
+
+/* ===============================================
+   SELECT2 DROPDOWN in the UPCOMING MACHES TAB   |
+   ============================================ */
+
+.select2-selection__rendered {
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 800 !important;
+    font-style: normal !important;
+    transform-origin: center;
+}
+
+.select2-container--default .select2-selection--single {
+    height: 40px;
+    border-radius: 0.5rem;
+    border: 1px solid #2c2f36;
+    background: #3370a8;
+    color: #1af0b3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    transition: all 0.2s ease;
+    font-size: 0.80em;
+   
+}
+
+.select2-selection__rendered {
+    color: white !important;
+    font-weight: 500;
+}
+
+.select2-selection__arrow {
+    height: 100% !important;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single,
+.select2-container--default .select2-selection--single:focus {
+    border-color: #32c390;
+    box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.25);
+}
+
+.select2-dropdown {
+    background: #3370a8;
+    border-radius: 0.5rem;
+    border: 2px solid #2c2f36;
+    overflow: hidden;
+    font-size: 0.75em;
+}
+
+.select2-results__option {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    padding: 10px 14px;
+    color: #000000;
+    transition: all 0.15s ease;
+}
+
+.select2-results__option--highlighted {
+    background: linear-gradient(90deg, #4dabf7, #339af0);
+    color: #32d18c;
+}
+
+.select2-results__option[aria-selected=true] {
+    background: #0ef391;
+}
+
+.select2-results__option img {
+    border-radius: 0.375rem;
+}
+
+.select2-search__field {
+    background: #121417;
+    color: #fff;
+    border: 1px solid #2c2f36;
+    border-radius: 0.375rem;
+    padding: 6px 10px;
+}
+
+
+/* ===============================================
+   FLOATING BUTTON FOR THE UPCOMING MTCHES TABLE |
+   ============================================ */
+
+
+.upcoming-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0.5em;
+    align-items: start;
+}
+
+.upcoming-actions {
+    position: sticky;
+    top: 400px;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.review-btn {
+    width: 100%;
+    padding: 14px;
+    font-weight: 600;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    /* 👇 key part */
+    transform: translateY(0);
+    box-shadow: 0 8px 0 #0f5132, 0 10px 20px rgba(0,0,0,0.25);
+    transition: all 0.12s ease;
+}
+
+/* hover (slight lift) */
+.review-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 0 #0f5132, 0 14px 28px rgba(0,0,0,0.35);
+}
+
+/* 🔥 PRESS EFFECT */
+.review-btn:focus {
+    transform: translateY(0);
+    box-shadow: 0 8px 0 #0f5132, 0 10px 20px rgba(0,0,0,0.25);
+}
+
+.review-btn:active,
+.review-btn.active {
+    transform: translateY(6px);
+}
+
+.review-btn:not(:active) {
+    transform: translateY(0);
+}
 
 /* Mobile stacking */
 @media (max-width: 1600.98px) {
