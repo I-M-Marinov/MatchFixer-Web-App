@@ -583,7 +583,6 @@
 
 				<div class="row mb-3 d-flex justify-content-center align-items-end">
 					<div class="col-md-4 text-center">
-						<label class="form-label">League</label>
 						<select id="apiLeagueSelect" class="form-select">
 							<option value="">Select league</option>
 							@foreach (var league in Model.ApiLeagues)
@@ -623,6 +622,7 @@
 									<th>Status</th>
 									<th>Date</th>
 									<th>Home</th>
+									<th>  </th>
 									<th>Away</th>
 									<th>H</th>
 									<th>D</th>
@@ -670,6 +670,7 @@
 						<th>Status</th>
 						<th>Date</th>
 						<th>Home</th>
+						<th>  </th>
 						<th>Away</th>
 						<th>H</th>
 						<th>D</th>
@@ -1245,6 +1246,7 @@
 				}
 
 				body.innerHTML = "";
+				let hasAnyDefault = false;
 
 				selectedRows.forEach(row => {
 
@@ -1259,24 +1261,26 @@
 						if (!td) return;
 
 						const value = parseFloat(input.value);
-						const colIndex = [...td.parentElement.children].indexOf(td);
 
-						let pillClass = "pill-brand-blue";
+						function isEqual(a, b) {
+							return Math.abs(a - b) < 0.001;
+						}
+
 						let isDefault = false;
+						let pillClass = "pill-brand-blue";
 
-
-						if (colIndex === 4) {
-							isDefault = value === DEFAULT_ODDS.home;
+						if (input.classList.contains("home-odds")) {
+							isDefault = isEqual(value, DEFAULT_ODDS.home);
 							pillClass = isDefault ? "pill-brand-red" : "pill-brand-blue";
 						}
 
-						if (colIndex === 5) {
-							isDefault = value === DEFAULT_ODDS.draw;
+						if (input.classList.contains("draw-odds")) {
+							isDefault = isEqual(value, DEFAULT_ODDS.draw);
 							pillClass = isDefault ? "pill-brand-red" : "pill-brand-yellow";
 						}
 
-						if (colIndex === 6) {
-							isDefault = value === DEFAULT_ODDS.away;
+						if (input.classList.contains("away-odds")) {
+							isDefault = isEqual(value, DEFAULT_ODDS.away);
 							pillClass = isDefault ? "pill-brand-red" : "pill-brand-green";
 						}
 
@@ -1288,30 +1292,29 @@
 						`;
 
 						if (isDefault) {
+							hasAnyDefault = true;
 							td.closest("tr")?.classList.add("has-default-odds");
 						}
 
-						const hasDefaults =
-							body.querySelectorAll("tr.has-default-odds").length > 0;
-
-						if (hasDefaults) {
-							confirmBtn.disabled = true;
-							confirmBtn.innerHTML = `
-								<i class="bi bi-exclamation-triangle-fill me-1"></i>
-								Default odds detected
-							`;
-							confirmBtn.classList.remove("btn-success");
-							confirmBtn.classList.add("btn-danger");
-							confirmBtn.title = "Please adjust default odds (1.11 / 2.22 / 3.33) before importing.";
-						} else {
-							confirmBtn.disabled = false;
-							confirmBtn.innerHTML = "Confirm & Add Matches";
-							confirmBtn.classList.remove("btn-danger");
-							confirmBtn.classList.add("btn-success");
-							confirmBtn.removeAttribute("title");
-						}
 
 					});
+
+					if (hasAnyDefault) {
+						confirmBtn.disabled = true;
+						confirmBtn.innerHTML = `
+							<i class="bi bi-exclamation-triangle-fill me-1"></i>
+							Default odds detected
+						`;
+						confirmBtn.classList.remove("btn-success");
+						confirmBtn.classList.add("btn-danger");
+						confirmBtn.title = "Please adjust default odds (1.11 / 2.22 / 3.33) before importing.";
+					} else {
+						confirmBtn.disabled = false;
+						confirmBtn.innerHTML = "Confirm & Add Matches";
+						confirmBtn.classList.remove("btn-danger");
+						confirmBtn.classList.add("btn-success");
+						confirmBtn.removeAttribute("title");
+					}
 
 					clone.querySelectorAll("input[type='hidden']").forEach(i => i.remove());
 
