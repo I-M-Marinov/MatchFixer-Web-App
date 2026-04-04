@@ -60,41 +60,43 @@
 		           @(Model.Selected[i].IsAlreadyImported ? "disabled" : "") />
 
 	    </td>
-        <td>
-            <img src="@Model.Selected[i].HomeLogo" height="24" />
-            @Model.Selected[i].HomeName
-        </td>
-
+	    <td>
+		    <img src="@Model.Selected[i].HomeLogo" height="24" />
+		    @Model.Selected[i].HomeName
+	    </td>
+	    <td>
+		    <img src="/images/live-events/versus.png" height="18" />
+	    </td>
         <td>
             <img src="@Model.Selected[i].AwayLogo" height="24" />
             @Model.Selected[i].AwayName
         </td>
 
-        <td>
-            <input type="number"
-                   name="Selected[@i].HomeOdds"
-                   value="@Model.Selected[i].HomeOdds"
-                   step="0.01"
-                   class="form-control form-control-sm"
-                   disabled="@Model.Selected[i].IsAlreadyImported"/>
-        </td>
+	    <td>
+		    <input type="number"
+		           name="Selected[@i].HomeOdds"
+		           value="@Model.Selected[i].HomeOdds"
+		           step="0.01"
+		           class="form-control form-control-sm home-odds"
+		           disabled="@Model.Selected[i].IsAlreadyImported"/>
+	    </td>
 
-        <td>
-            <input type="number"
-                   name="Selected[@i].DrawOdds"
-                   value="@Model.Selected[i].DrawOdds"
-                   step="0.01"
-                   class="form-control form-control-sm"
-                   disabled="@Model.Selected[i].IsAlreadyImported"/>
-        </td>
+	    <td>
+		    <input type="number"
+		           name="Selected[@i].DrawOdds"
+		           value="@Model.Selected[i].DrawOdds"
+		           step="0.01"
+		           class="form-control form-control-sm draw-odds"
+		           disabled="@Model.Selected[i].IsAlreadyImported"/>
+	    </td>
 
-        <td>
-            <input type="number"
-                   name="Selected[@i].AwayOdds"
-                   value="@Model.Selected[i].AwayOdds"
-                   step="0.01"
-                   class="form-control form-control-sm"
-                   disabled="@Model.Selected[i].IsAlreadyImported"ss/>
-        </td>
+	    <td>
+		    <input type="number"
+		           name="Selected[@i].AwayOdds"
+		           value="@Model.Selected[i].AwayOdds"
+		           step="0.01"
+		           class="form-control form-control-sm away-odds"
+		           disabled="@Model.Selected[i].IsAlreadyImported"/>
+	    </td>
     </tr>
 }
