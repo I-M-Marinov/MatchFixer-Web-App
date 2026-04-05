@@ -24,6 +24,24 @@
   <img src="./match-events.png" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">Admin Add Match Event View</h3>
+
+<p align="center">
+  <img src="./add-match-event-view.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Add Match Event View - Api Upcoming Matches Tab</h3>
+
+<p align="center">
+  <img src="./upcoming-api-matches-tab.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Admin Events History View </h3>
+
+<p align="center">
+  <img src="./events-history-table-single-event.png" align="center" border="10" width="800px"/>
+</p>
+
 <h3 align="center">Boosted events showcasing on the Home Page</h3>
 <p align="center">
   <img src="./odds-boosts-home-screen-new.png" align="center" border="10" width="600px"/>
