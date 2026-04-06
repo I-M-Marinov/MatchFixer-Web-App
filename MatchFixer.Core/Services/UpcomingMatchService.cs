@@ -10,17 +10,22 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IFootballApiService _footballApiService;
+		private readonly IUserContextService _userContextService;
+		private readonly ITimezoneService _timezoneService;
 
-		public UpcomingMatchService(MatchFixerDbContext dbContext, IFootballApiService footballApiService){
+		public UpcomingMatchService(MatchFixerDbContext dbContext, IFootballApiService footballApiService, IUserContextService userContextService, ITimezoneService timezoneService){
 			_dbContext = dbContext;
 			_footballApiService = footballApiService;
+			_userContextService = userContextService;
+			_timezoneService = timezoneService;
 		}
 
 
-		public async Task<List<UpcomingMatchDto>> GetUpcomingMatchesAsync(
+		public async Task<List<UpcomingMatchRowViewModel>> GetUpcomingMatchesAsync(
 			int leagueId,
 			int take = 20)
 		{
+			var user = await _userContextService.GetCurrentUserAsync();
 
 			var teams = await _dbContext.Teams
 				.AsNoTracking()
@@ -56,12 +61,13 @@ namespace MatchFixer.Core.Services
 
 			bool IsManualDuplicate(Guid homeId, Guid awayId, DateTimeOffset kickoff)
 			{
-				var kickoffUtc = kickoff.UtcDateTime.Date;
+				var kickoffDate = kickoff.UtcDateTime.Date;
 
 				return existingManualMatches.Any(m =>
 					m.HomeTeamId == homeId &&
 					m.AwayTeamId == awayId &&
-					m.MatchDate == kickoffUtc
+					m.MatchDate.HasValue &&
+					m.MatchDate.Value == kickoffDate
 				);
 			}
 
@@ -116,7 +122,33 @@ namespace MatchFixer.Core.Services
 
 
 			if (fromDb.Any())
-				return fromDb;
+			{
+				return fromDb.Select(m => new UpcomingMatchRowViewModel
+				{
+					ApiFixtureId = m.ApiFixtureId,
+
+					HomeTeamId = m.HomeTeamId,
+					AwayTeamId = m.AwayTeamId,
+
+					HomeName = m.HomeName,
+					AwayName = m.AwayName,
+					HomeLogo = m.HomeLogo,
+					AwayLogo = m.AwayLogo,
+
+					KickoffInput = _timezoneService.FormatForUserExact(
+						m.KickoffUtc.UtcDateTime,
+						user.TimeZone,
+						"yyyy-MM-ddTHH:mm"
+					),
+
+					HomeOdds = m.HomeOdds,
+					DrawOdds = m.DrawOdds,
+					AwayOdds = m.AwayOdds,
+
+					IsAlreadyImported = m.IsAlreadyImported,
+					IsManualDuplicate = m.IsManualDuplicate
+				}).ToList();
+			}
 
 			// API fallback — MARK imported here
 			var apiUpcoming = await _footballApiService
@@ -143,6 +175,31 @@ namespace MatchFixer.Core.Services
 
 			return apiUpcoming
 				.OrderBy(x => x.KickoffUtc)
+				.Select(m => new UpcomingMatchRowViewModel
+				{
+					ApiFixtureId = m.ApiFixtureId,
+
+					HomeTeamId = m.HomeTeamId,
+					AwayTeamId = m.AwayTeamId,
+
+					HomeName = m.HomeName,
+					AwayName = m.AwayName,
+					HomeLogo = m.HomeLogo,
+					AwayLogo = m.AwayLogo,
+
+					KickoffInput = _timezoneService.FormatForUserExact(
+						m.KickoffUtc.UtcDateTime,
+						user.TimeZone,
+						"yyyy-MM-ddTHH:mm"
+					),
+
+					HomeOdds = m.HomeOdds,
+					DrawOdds = m.DrawOdds,
+					AwayOdds = m.AwayOdds,
+
+					IsAlreadyImported = m.IsAlreadyImported,
+					IsManualDuplicate = m.IsManualDuplicate
+				})
 				.ToList();
 		}
 
