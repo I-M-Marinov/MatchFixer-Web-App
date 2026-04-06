@@ -1,4 +1,5 @@
-﻿using MatchFixer.Common.Enums;
+﻿using System.Globalization;
+using MatchFixer.Common.Enums;
 using MatchFixer.Common.FootballCompetitions;
 using MatchFixer.Common.FootballLeagues;
 using MatchFixer.Common.VirtualLeagues;
@@ -28,6 +29,7 @@ namespace MatchFixer.Core.Services
 		private readonly IMatchEventNotifier _notifier;
 		private readonly IOddsBoostService _oddsBoostService;
 		private readonly IFootballApiService _footballApiService;
+		private readonly ITimezoneService _timezoneService;
 
 
 
@@ -37,7 +39,8 @@ namespace MatchFixer.Core.Services
 			 IBettingService bettingService,
 			 IMatchEventNotifier notifier,
 			 IOddsBoostService oddsBoostService,
-			IFootballApiService footballApiService)
+			IFootballApiService footballApiService,
+			ITimezoneService timezoneService)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
@@ -45,7 +48,7 @@ namespace MatchFixer.Core.Services
 			_notifier = notifier;
 			_oddsBoostService = oddsBoostService;
 			_footballApiService = footballApiService;
-
+			_timezoneService = timezoneService;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -206,16 +209,18 @@ namespace MatchFixer.Core.Services
 		{
 			var homeTeam = await _dbContext.Teams.FindAsync(model.HomeTeamId);
 			var awayTeam = await _dbContext.Teams.FindAsync(model.AwayTeamId);
+			var user = await _userContextService.GetCurrentUserAsync();
+
+			var utcMatchDate = _timezoneService.ConvertFromUserTimeToUtc(
+				model.MatchDate,
+				user.TimeZone
+			);
 
 			if (homeTeam == null || awayTeam == null)
 			{
 				throw new Exception(TeamDoesNotExist);
 			}
 
-			var utcMatchDate = TimeZoneInfo.ConvertTimeToUtc(
-				model.MatchDate,
-				TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time")
-			); 
 			
 			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
 
@@ -332,7 +337,8 @@ namespace MatchFixer.Core.Services
 
 		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime)
 		{
-			var userId = _userContextService.GetUserId();
+			var user = await _userContextService.GetCurrentUserAsync();
+			var userId = user.Id;
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
 
 			if (match == null || match.IsCancelled || match.Status == MatchStatus.Cancelled || match.Status == MatchStatus.FullTime)
@@ -362,11 +368,15 @@ namespace MatchFixer.Core.Services
 				anyChange = true;
 			}
 
+			var utcKickoff = kickoffTime.HasValue
+				? _timezoneService.ConvertFromUserTimeToUtc(kickoffTime.Value, user.TimeZone)
+				: (DateTime?)null;
+
 			// ---- MATCH DATE / POSTPONED LOGIC ----
 			if (match.MatchDate != kickoffTime)
 			{
-				LogChange(match.Id, nameof(match.MatchDate), match.MatchDate, kickoffTime, userId);
-				match.MatchDate = kickoffTime;
+				LogChange(match.Id, nameof(match.MatchDate), match.MatchDate, utcKickoff, userId);
+				match.MatchDate = utcKickoff;
 				anyChange = true;
 
 				// ---- UNPOSTPONE THE MATCH IF A NEW DATE IS PRESENT ----
@@ -485,17 +495,28 @@ namespace MatchFixer.Core.Services
 				.AnyAsync(e => e.ApiFixtureId == apiFixtureId && !e.IsCancelled);
 		}
 
-		public async Task AddEventFromUpcomingAsync(UpcomingMatchDto m)
+		public async Task AddEventFromUpcomingAsync(UpcomingMatchRowViewModel m)
 		{
 			if (await MatchExistsByApiFixtureAsync(m.ApiFixtureId))
 				return;
 
 			var homeId = await ResolveTeamIdAsync(m.HomeName);
 			var awayId = await ResolveTeamIdAsync(m.AwayName);
+			var user = await _userContextService.GetCurrentUserAsync();
 
-			var utc = DateTime.SpecifyKind(
-				m.KickoffUtc.DateTime,
-				DateTimeKind.Utc
+			if (!DateTime.TryParseExact(
+				    m.KickoffInput,
+				    "yyyy-MM-ddTHH:mm",
+				    CultureInfo.InvariantCulture,
+				    DateTimeStyles.None,
+				    out var parsed))
+			{
+				throw new Exception("Invalid kickoff time.");
+			}
+
+			var utc = _timezoneService.ConvertFromUserTimeToUtc(
+				parsed,
+				user.TimeZone
 			);
 
 			var model = new MatchEventFormModel
