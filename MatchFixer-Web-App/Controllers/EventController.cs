@@ -221,11 +221,13 @@ namespace MatchFixer_Web_App.Controllers
 				TempData["ErrorMessage"] = string.Join(", ", errors);
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
+
 			if (!model.Selected.Any(x => x.Selected))
 			{
 				TempData["ErrorMessage"] = NoMatchesWereSelected;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
+
 			foreach (var match in model.Selected.Where(x => x.Selected))
 				await _matchEventService.AddEventFromUpcomingAsync(match);
 
