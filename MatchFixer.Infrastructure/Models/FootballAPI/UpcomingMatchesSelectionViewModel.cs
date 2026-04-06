@@ -2,7 +2,7 @@
 {
 	public class UpcomingMatchesSelectionViewModel
 	{
-		public List<UpcomingMatchDto> Selected { get; set; } = new();
+		public List<UpcomingMatchRowViewModel> Selected { get; set; } = new();
 	}
 
 }
