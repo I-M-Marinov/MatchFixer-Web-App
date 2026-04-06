@@ -18,7 +18,7 @@ namespace MatchFixer.Core.Contracts
 		Task<Dictionary<Guid, OddsDTO>> GetOddsForMatchesAsync(Guid[] matchIds);
 		Task<List<ApiLeagueSelectViewModel>> GetApiLeaguesAsync();
 		Task<bool> MatchExistsByApiFixtureAsync(int apiFixtureId);
-		Task AddEventFromUpcomingAsync(UpcomingMatchDto dto);
+		Task AddEventFromUpcomingAsync(UpcomingMatchRowViewModel dto);
 		Task<bool> PostponeMatchAsync(Guid matchEventId, Guid userId);
 	}
 }
