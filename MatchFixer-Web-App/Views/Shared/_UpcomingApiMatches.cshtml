@@ -54,10 +54,10 @@
 	    <td>
 
 		    <input type="datetime-local"
-		           name="Selected[@i].KickoffUtc"
-		           value="@Model.Selected[i].KickoffUtc.UtcDateTime.ToString("yyyy-MM-ddTHH:mm")"
+		           name="Selected[@i].KickoffInput"
+		           value="@Model.Selected[i].KickoffInput"
 		           class="form-control form-control-sm"
-		           @(Model.Selected[i].IsAlreadyImported ? "disabled" : "") />
+		           @(Model.Selected[i].IsAlreadyImported ? "readonly" : "") />
 
 	    </td>
 	    <td>
