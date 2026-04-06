@@ -85,6 +85,11 @@ namespace MatchFixer.Infrastructure.Services
 			);
 		}
 
+		public string FormatForUser(DateTime? utcTime, string timeZoneId)
+		{
+			return FormatForUser(utcTime, timeZoneId, "en-US");
+		}
+
 
 		public string FormatForUserBets(DateTime? utcTime, string timeZoneId, string culture = "en-US")
 		{
@@ -119,6 +124,24 @@ namespace MatchFixer.Infrastructure.Services
 			catch (TimeZoneNotFoundException)
 			{
 				return utcTime.Value.ToString(format, provider ?? CultureInfo.InvariantCulture);
+			}
+		}
+
+		public DateTime ConvertFromUserTimeToUtc(DateTime localTime, string timeZoneId)
+		{
+			try
+			{
+				var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+
+				return TimeZoneInfo.ConvertTimeToUtc(
+					DateTime.SpecifyKind(localTime, DateTimeKind.Unspecified),
+					tz
+				);
+			}
+			catch (TimeZoneNotFoundException)
+			{
+				// fallback: assume already UTC (safe fallback)
+				return DateTime.SpecifyKind(localTime, DateTimeKind.Utc);
 			}
 		}
 
