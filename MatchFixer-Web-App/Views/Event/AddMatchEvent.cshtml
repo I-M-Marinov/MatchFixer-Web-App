@@ -472,7 +472,7 @@
 										       id="MatchDateInput-@ev.Id"
 										       data-id="@ev.Id"
 										       value="@(ev.KickoffTime.HasValue 
-											              ? ev.KickoffTime.Value.ToString("yyyy-MM-ddTHH:mm") 
+											              ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm") 
 											              : "")"
 										       class="form-control form-control-sm matchdate-style"
 										       style="min-width: 240px;"
@@ -1251,6 +1251,24 @@
 				selectedRows.forEach(row => {
 
 					const clone = row.cloneNode(true);
+
+					clone.querySelectorAll("input[type='datetime-local']").forEach(input => {
+						const td = input.closest("td");
+						if (!td) return;
+
+						const value = input.value;
+
+						const date = new Date(value);
+						const formatted = isNaN(date)
+							? value
+							: date.toLocaleString();
+
+						td.innerHTML = `
+							<span class="badge bg-dark px-3 py-2">
+								${formatted}
+							</span>
+						`;					
+					});
 
 					const firstTd = clone.querySelector("td");
 					if (firstTd) {
