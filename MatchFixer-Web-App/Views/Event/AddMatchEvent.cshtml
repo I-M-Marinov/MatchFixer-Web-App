@@ -1259,9 +1259,7 @@
 						const value = input.value;
 
 						const date = new Date(value);
-						const formatted = isNaN(date)
-							? value
-							: date.toLocaleString();
+						const formatted = formatDateTime(value);
 
 						td.innerHTML = `
 							<span class="badge bg-dark px-3 py-2">
@@ -1348,6 +1346,20 @@
 					form.submit();
 			});
 		});
+
+		function formatDateTime(value) {
+			const date = new Date(value);
+			if (isNaN(date)) return value;
+
+			const day = String(date.getDate()).padStart(2, '0');
+			const month = date.toLocaleString('en-GB', { month: 'short' });
+			const year = date.getFullYear();
+
+			const hours = String(date.getHours()).padStart(2, '0');
+			const minutes = String(date.getMinutes()).padStart(2, '0');
+
+			return `${day} ${month} ${year}, ${hours}:${minutes}`;
+		}
 
 
 		document.addEventListener("click", async function (e) {
