@@ -426,7 +426,7 @@
 								else
 								{
 									<span class="custom-tooltip-wrapper">
-										@if (ev.MatchStatus == MatchStatus.Live || ev.IsPostponed || !ev.KickoffTime.HasValue)
+										@if (ev.MatchStatus == MatchStatus.Live || ev.IsPostponed || !ev.KickoffTime.HasValue || ev.MatchStatus == MatchStatus.FullTime)
 										{
 											<button type="button" class="btn btn-sm btn-outline-danger create-boost-btn text-muted"
 											        data-match-id="@ev.Id" disabled>
