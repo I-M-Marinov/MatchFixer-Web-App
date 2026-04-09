@@ -61,22 +61,26 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			var result = events.Select(e =>
 			{
-				var slips = e.Bets.Select(b => b.BetSlip).Distinct().ToList();
+				decimal totalStake = e.Bets.Sum(b =>
+				{
+					var legs = slipLegs.TryGetValue(b.BetSlipId, out var l) ? l : 1;
+					return b.BetSlip.Amount / legs;
+				});
 
-				decimal totalStake = slips.Sum(s => s.Amount);
-
-				var winningSlips = slips
-					.Where(s =>
-						s.IsSettled &&
-						s.WinAmount.HasValue &&
-						s.WinAmount.Value > 0 &&
-						s.Bets
-							.Where(b => b.MatchEventId == e.Id)
-							.All(b => b.Status == BetStatus.Won || b.Status == BetStatus.Voided)
+				decimal totalPayout = e.Bets
+					.Where(b =>
+						b.BetSlip.IsSettled &&
+						b.BetSlip.WinAmount.HasValue &&
+						b.BetSlip.WinAmount > 0 &&
+						b.BetSlip.Bets.All(x =>
+							x.Status == BetStatus.Won || x.Status == BetStatus.Voided)
 					)
-					.ToList();
-
-				decimal totalPayout = winningSlips.Sum(s => s.WinAmount!.Value);
+					.Sum(b =>
+					{
+						var legs = slipLegs.TryGetValue(b.BetSlipId, out var l) ? l : 1;
+						var stakePerLeg = b.BetSlip.Amount / legs;
+						return stakePerLeg * b.Odds;
+					});
 
 				var matchResult = e.LiveResult;
 
@@ -139,6 +143,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						}
 
 						var legs = slipLegs.TryGetValue(b.BetSlipId, out var l) ? l : 1;
+						var stakePerLeg = b.BetSlip.Amount / legs;
+
 
 						return new AdminBetSummaryDto
 						{
@@ -150,7 +156,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							BetStatus = computedStatus,
 							BetSlipStatus = slipStatus.ToString(),
 							Stake = b.BetSlip.Amount,
-							Payout = slipStatus == BetSlipStatus.Won ? b.BetSlip.Amount * b.Odds : null,
+							StakePerLeg = Math.Round(stakePerLeg, 2),
+							Payout = slipStatus == BetSlipStatus.Won
+								? stakePerLeg * b.Odds
+								: null,
 							Legs = legs
 						};
 					}).ToList(),
