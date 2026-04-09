@@ -351,12 +351,12 @@
 						</td>
 						<td class="text-center">@e.TotalBets</td>
 						<td class="fw-bold text-center @(
-			 e.TotalStake > 0
-				 ? "text-success"
-				 : e.TotalStake == 0
-					 ? "text-warning"
-					 : "text-danger"
-	               	               )">
+							 e.TotalStake > 0
+								 ? "text-success"
+								 : e.TotalStake == 0
+									 ? "text-warning"
+									 : "text-danger"
+	               								   )">
 						€@e.TotalStake.ToString("F2")
 					</td>
 					<td class="fw-bold text-center @(e.TotalPayout >= 0 ? "text-success" : "text-danger")">
