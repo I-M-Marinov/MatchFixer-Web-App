@@ -9,7 +9,8 @@
 		<th class="text-center">User</th>
 		<th class="text-center">Pick</th>
 		<th class="text-center">Odds</th>
-		<th class="text-center">Stake</th>
+		<th class="text-center">Total Stake</th>
+		<th class="text-center">Stake (Event)</th>
 		<th class="text-center">Legs</th>
 		<th class="text-center">Bet Status</th>
 		<th class="text-center">BetSlip Status</th>
@@ -50,6 +51,7 @@
 			</td>
 			<td class="text-center">@b.Odds</td>
 			<td class="text-center">€@b.Stake</td>
+			<td class="text-center">€@b.StakePerLeg.ToString("F2")</td>
 			<td class="text-center">@b.Legs</td>
 			<td class="text-center">
 				<span class="@statusClass">
