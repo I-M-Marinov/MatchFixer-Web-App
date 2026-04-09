@@ -9,6 +9,7 @@
 		public string Pick { get; set; }
 		public decimal Odds { get; set; }
 		public decimal Stake { get; set; }
+		public decimal StakePerLeg { get; set; }
 
 		public string BetStatus { get; set; } = null!;      //  leg status
 		public string BetSlipStatus { get; set; } = null!;  // bet slip status
