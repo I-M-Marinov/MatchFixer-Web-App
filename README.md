@@ -2,8 +2,10 @@
 
 <h1 align="center" style="inline-block">:construction: :construction: UNDER CONSTRUCTION :construction: :construction:</h1>
 
+<h3 align="center">MatchFixer Home Page</h3>
+
 <p align="center">
-  <img src="./screen.jpg" align="center" border="10" width="500px"/>
+  <img src="./matchfixer-home-page.png" align="center" border="10" width="600px"/>
 </p>
 
 <h3 align="center">MatchFixer Confirmation Email</h3>
