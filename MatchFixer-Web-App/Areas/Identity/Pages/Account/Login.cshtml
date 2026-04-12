@@ -51,9 +51,9 @@
 			<span asp-validation-for="Input.Password" class="badge bg-info text-dark pt-2 mt-1 centered-validation"></span>
 
 
-		    <div class="form-check mb-3">
+		    <div class="form-check mb-3 d-flex justify-content-center align-items-end gap-2">
 			    <input class="form-check-input" asp-for="Input.RememberMe"/>
-			    <label class="form-check-label" asp-for="Input.RememberMe">
+			    <label class="form-check-label" asp-for="Input.RememberMe" style="font-size: 0.875rem;">
 				    @Html.DisplayNameFor(m => m.Input.RememberMe)
 			    </label>
 		    </div>
