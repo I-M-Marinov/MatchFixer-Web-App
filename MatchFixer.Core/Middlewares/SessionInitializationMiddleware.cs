@@ -42,7 +42,6 @@ namespace MatchFixer.Core.Middlewares
 				{
 					var currentSessionUserId = context.Session.GetString("UserId");
 
-					// reset the currently set currentSessionUserId if it is different from the user id of the user logged in now 
 					if (string.IsNullOrEmpty(currentSessionUserId) || currentSessionUserId != user.Id.ToString())
 					{
 						context.Session.SetString("UserId", user.Id.ToString());
@@ -50,16 +49,12 @@ namespace MatchFixer.Core.Middlewares
 
 					if (string.IsNullOrEmpty(context.Session.GetString(UserTimezoneKey)))
 					{
-						// session expired
-						await context.SignOutAsync(IdentityConstants.ApplicationScheme);
-						context.Response.Redirect("/Identity/Account/Login?sessionExpired=true");
-						return;
+						context.Session.SetString(UserTimezoneKey, user.TimeZone ?? "UTC");
 					}
 				}
 			}
 			else
 			{
-				// clear on logout
 				context.Session.Clear();
 			}
 
