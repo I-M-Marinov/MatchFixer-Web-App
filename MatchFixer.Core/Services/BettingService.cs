@@ -159,7 +159,7 @@ public class BettingService : IBettingService
 
 		await PublishBetMixForEventsAsync(affectedEventIds, ct);
 
-		// await _trophyService.EvaluateTrophiesAsync(userId, profileUrl);
+		// await _trophyService.EvaluateTrophiesAsync(userId);
 
 		return (BetSlipSubmittedSuccessfully, true);
 	}
@@ -314,6 +314,9 @@ public class BettingService : IBettingService
 		if (betSlip == null)
 			return false;
 
+		if (betSlip.IsSettled)
+			return true;
+
 		bool anyLost = false;
 		bool anyPending = false;
 		bool anyVoided = false;
@@ -380,6 +383,8 @@ public class BettingService : IBettingService
 			}
 
 			await _dbContext.SaveChangesAsync();
+			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+
 			return true;
 		}
 
@@ -390,6 +395,8 @@ public class BettingService : IBettingService
 			betSlip.WinAmount = 0;
 
 			await _dbContext.SaveChangesAsync();
+			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+
 			return true;
 		}
 
@@ -416,10 +423,11 @@ public class BettingService : IBettingService
 					$"BetSlip # {betSlip.Id}"
 				);
 
-				await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
 			}
 
 			await _dbContext.SaveChangesAsync();
+			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+
 			return true;
 
 		}
