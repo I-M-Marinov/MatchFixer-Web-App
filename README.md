@@ -26,6 +26,20 @@
   <img src="./match-events.png" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">Profile Page</h3>
+
+<p align="center">
+  <img src="./profile-page.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Trophies</h3>
+
+<p align="center">
+  <img src="./rigged-to-win-trophy.png" align="center" border="10" width="800px"/>
+</p>
+
+
+
 <h3 align="center">Admin Add Match Event View</h3>
 
 <p align="center">
