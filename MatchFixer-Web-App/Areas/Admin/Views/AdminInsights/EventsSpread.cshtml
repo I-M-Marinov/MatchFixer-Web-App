@@ -132,7 +132,7 @@
 
 const leagueLogoMap = @Html.Raw(
 	                      System.Text.Json.JsonSerializer.Serialize(leagueLogos ?? new Dictionary<string,int>())
-                      );
+	                      );
     (function(){
       const hubUrl = "/hubs/admin-insights";
 	 
@@ -175,17 +175,21 @@ const leagueLogoMap = @Html.Raw(
           cell.classList.toggle("text-dark",   total != 0);
         }
 
-      connection.on("BetMixUpdated", function (m) {
-        const row = rowFor(m.eventId);
-        if (!row) return;
+		connection.on("BetMixUpdated", function (m) {
+			const row = rowFor(m.eventId);
+			if (!row) return;
 
-        setPctBar(row.querySelector(".progress-home"), m.homePct);
-        setPctBar(row.querySelector(".progress-draw"), m.drawPct);
-        setPctBar(row.querySelector(".progress-away"), m.awayPct);
-        setTotalCell(row, m.totalBets);
-        setTotalStake(row, m.totalStake);
+			if (m.totalStake > 0) {
+				switchToRealSpread(row);
+			}
 
-      });
+			setPctBar(row.querySelector(".progress-home"), m.homePct);
+			setPctBar(row.querySelector(".progress-draw"), m.drawPct);
+			setPctBar(row.querySelector(".progress-away"), m.awayPct);
+
+			setTotalCell(row, m.totalBets);
+			setTotalStake(row, m.totalStake);
+		});
 
       connection.start().then(function(){
 
@@ -497,6 +501,25 @@ const leagueLogoMap = @Html.Raw(
 		const competitionTotal = Object.values(competitions).reduce((a, b) => a + b, 0);
 
 		return leagueTotal + competitionTotal;
+	}
+
+	function switchToRealSpread(row) {
+		const bars = row.querySelectorAll(".progress-bar");
+
+		bars.forEach(bar => {
+			if (bar.classList.contains("projected-home")) {
+				bar.classList.remove("projected-home");
+				bar.classList.add("progress-home");
+			}
+			if (bar.classList.contains("projected-draw")) {
+				bar.classList.remove("projected-draw");
+				bar.classList.add("progress-draw");
+			}
+			if (bar.classList.contains("projected-away")) {
+				bar.classList.remove("projected-away");
+				bar.classList.add("progress-away");
+			}
+		});
 	}
 
 </script>
