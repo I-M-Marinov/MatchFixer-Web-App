@@ -273,24 +273,28 @@ table.responsive-stack td {
     color: aqua !important;
 }
 
-#createBoostModal {
+#createBoostModal,
+#editCompetitionModal {
     margin-top: 5em;
     font-size: 0.85rem;
 }
 
-#createBoostModal .modal-dialog .row{
+#createBoostModal .modal-dialog .row,
+#editCompetitionModal .modal-dialog .row {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
 }
 
-#createBoostModal .modal-body .row {
+#createBoostModal .modal-body .row,
+#editCompetitionModal .modal-body .row {
     display: flex !important;
     flex-wrap: wrap !important;
 }
 
-#createBoostModal .modal-body {
+#createBoostModal .modal-body,
+#editCompetitionModal .modal-body {
     box-shadow: 0px -25px 20px -20px rgba(0, 0, 0, 0.45), 25px 0 20px -20px rgba(0, 0, 0, 0.45), 0px 25px 20px -20px rgba(0, 0, 0, 0.45), -25px 0 20px -20px rgba(0, 0, 0, 0.45);
     padding: 4em;
     background: #2A7B9B;
@@ -298,22 +302,26 @@ table.responsive-stack td {
 }
 
 #createBoostModal .modal-header,
-#createBoostModal .modal-footer{
+#createBoostModal .modal-footer,
+#editCompetitionModal .modal-header,
+#editCompetitionModal .modal-footer {
     background-color: #2A7B9B;
     color: white;
-    text-align: center; 
+    text-align: center;
 }
 
-#createBoostModal .form-control {
-    text-align: center; 
-    height: 2.5rem; 
-    padding: 0; 
+#createBoostModal .form-control,
+#editCompetitionModal .form-control {
+    text-align: center;
+    height: 2.5rem;
+    padding: 0;
     display: flex;
-    align-items: center; 
+    align-items: center;
     justify-content: center;
 }
 
-#createBoostModal .form-label {
+#createBoostModal .form-label,
+#editCompetitionModal .form-label {
     color: white;
     text-shadow: 0 1px 2px black;
 }
@@ -323,19 +331,22 @@ table.responsive-stack td {
     width: 50% !important;
 }
 
-#createBoostModal .modal-footer {
+    #createBoostModal .modal-footer,
+        #editCompetitionModal .modal-footer {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-#createBoostModal .btn-close{
+#createBoostModal .btn-close,
+    #editCompetitionModal .btn-close{
     font-size: 0.85em;
     margin: 0.35em;
 }
 
-#createBoostModal .btn-primary {
+#createBoostModal .btn-primary,
+#editCompetitionModal .btn-primary {
     align-self: center;
     margin: 0.35em;
 }
@@ -347,7 +358,8 @@ table.responsive-stack td {
     font-size: 1.2em !important;
 }
 
-#createBoostModal .form-control {
+#createBoostModal .form-control,
+#editCompetitionModal .form-control {
     height: 38px;
     padding: 0.375rem 0.75rem;
     display: flex;
@@ -856,7 +868,6 @@ table.responsive-stack td {
     padding: 6px 10px;
 }
 
-
 /* ===============================================
    FLOATING BUTTON FOR THE UPCOMING MTCHES TABLE |
    ============================================ */
@@ -883,19 +894,17 @@ table.responsive-stack td {
     border-radius: 14px;
     background: linear-gradient(135deg, #28a745, #20c997);
     border: none;
-    /* 👇 key part */
     transform: translateY(0);
     box-shadow: 0 8px 0 #0f5132, 0 10px 20px rgba(0,0,0,0.25);
     transition: all 0.12s ease;
 }
 
-/* hover (slight lift) */
 .review-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 0 #0f5132, 0 14px 28px rgba(0,0,0,0.35);
 }
 
-/* 🔥 PRESS EFFECT */
+/*  PRESS EFFECT */
 .review-btn:focus {
     transform: translateY(0);
     box-shadow: 0 8px 0 #0f5132, 0 10px 20px rgba(0,0,0,0.25);
