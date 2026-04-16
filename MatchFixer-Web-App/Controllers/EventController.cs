@@ -128,6 +128,26 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateCompetition(UpdateCompetitionDto model)
+		{
+			var result = await _matchEventService.UpdateCompetitionAsync(model.EventId, model.Competition);
+
+			if (!result)
+			{
+				TempData["ErrorMessage"] = "Failed to update competition.";
+			}
+			else
+			{
+				TempData["SuccessMessage"] = "Competition updated successfully.";
+			}
+
+			return RedirectToAction("AddMatchEvent");
+		}
+
 		[Authorize]
 		[AdminOnly]
 		[HttpPost]
