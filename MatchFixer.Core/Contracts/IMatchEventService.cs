@@ -12,6 +12,7 @@ namespace MatchFixer.Core.Contracts
 		Task AddEventAsync(MatchEventFormModel model);
 		Task AddEventAsync(MatchEventFormModel model, int apiFixtureId);
 		Task<string> GetTeamLogo(string name);
+		Task<bool> UpdateCompetitionAsync(Guid eventId, string? competition);
 		Task<Dictionary<string, List<SelectListItem>>> GetTeamsGroupedByLeagueAsync();
 		Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime);
 		Task<bool> CancelMatchEventAsync(Guid matchEventId);
