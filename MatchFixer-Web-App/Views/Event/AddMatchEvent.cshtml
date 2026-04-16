@@ -303,28 +303,6 @@
 											</div>
 											break;
 
-										case MatchStatus.Scheduled:
-										{
-											<form asp-action="PostponeMatchEvent"
-											      asp-controller="Event"
-											      method="post"
-											      class="d-inline">
-												@Html.AntiForgeryToken()
-												<input type="hidden" name="id" value="@ev.Id"/>
-												<span class="custom-tooltip-wrapper">
-													<button type="submit"
-													        class="btn btn-sm btn-secondary"
-													        onclick="return confirm('Are you sure you want to postpone this match?')">
-														<i class="bi bi-pause-circle"></i>
-													</button>
-													<span class="custom-tooltip text-bg-secondary text-black">
-														Mark this match as postponed.
-													</span>
-												</span>
-											</form>
-											break;
-										}
-
 										case MatchStatus.FullTime:
 
 											if (!ev.HasResult)
@@ -449,7 +427,7 @@
 								}
 							</td>
 							<td style="max-width: 350px;">
-								<div class="d-flex justify-content-center align-items-center">
+								<div class="d-flex justify-content-center align-items-center gap-1">
 
 									<div class="d-flex flex-column gap-1">
 
@@ -525,6 +503,50 @@
 											</form>
 										}
 									</div>
+									<div class="d-flex flex-column gap-1 align-items-end">
+
+										@if (ev.MatchStatus != MatchStatus.Live)
+										{
+											<span class="custom-save-remove-tooltip-wrapper">
+												<button type="button"
+												        class="btn btn-outline-primary btn-sm open-competition-modal"
+												        data-bs-toggle="modal"
+												        data-bs-target="#editCompetitionModal"
+												        data-event-id="@ev.Id"
+												        data-competition="@ev.CompetitionName">
+													<i class="bi bi-pencil-square"></i>
+												</button>
+												<span class="custom-save-remove-tooltip">
+													Edit competition
+												</span>
+											</span>
+										}
+										
+										@if (ev.MatchStatus == MatchStatus.Scheduled)
+										{
+											<form asp-action="PostponeMatchEvent"
+											      asp-controller="Event"
+											      method="post"
+											      class="d-inline">
+												@Html.AntiForgeryToken()
+												<input type="hidden" name="id" value="@ev.Id" />
+
+												<span class="custom-save-remove-tooltip-wrapper">
+													<button type="submit"
+													        class="btn btn-outline-secondary btn-sm"
+													        onclick="return confirm('Are you sure you want to postpone this match?')">
+														<i class="bi bi-pause-circle"></i>
+													</button>
+													<span class="custom-save-remove-tooltip">
+														Mark as postponed
+													</span>
+												</span>
+											</form>
+										}
+
+									</div>
+									
+									
 
 								</div>
 							</td>
@@ -570,6 +592,51 @@
 				</form>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
 			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="editCompetitionModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+
+			<form asp-action="UpdateCompetition"
+			      asp-controller="Event"
+			      method="post">
+				
+
+				@Html.AntiForgeryToken()
+
+				<div class="modal-header">
+					<h5 class="modal-title">
+						<i class="bi bi-trophy me-2"></i>
+						Edit Competition
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body text-center">
+					
+					<input type="hidden" name="EventId" id="editCompetitionEventId" />
+
+					<label class="form-label">Competition</label>
+					<select name="Competition"
+					        id="editCompetitionSelect"
+					        asp-items="Model.AvailableCompetitions"
+					        class="form-select text-center">
+					</select>
+
+				</div>
+
+				<div class="modal-footer justify-content-center">
+							<button type="submit" class="btn btn btn-primary">
+						<i class="bi bi-check-circle me-1"></i>
+						Save
+					</button>
+				</div>
+
+			</form>
+
 		</div>
 	</div>
 </div>
@@ -1626,6 +1693,33 @@
 		document.getElementById("reviewUpcomingBtn")
 		.addEventListener("click", function () {
 			this.blur(); 
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const modal = document.getElementById("editCompetitionModal");
+			if (!modal) return;
+
+			modal.addEventListener("show.bs.modal", function (event) {
+
+				const button = event.relatedTarget;
+				if (!button) return; 
+
+				if (!button.classList.contains("open-competition-modal")) return;
+
+				const eventId = button.getAttribute("data-event-id");
+				const competition = button.getAttribute("data-competition");
+
+				const eventIdInput = document.getElementById("editCompetitionEventId");
+				const select = document.getElementById("editCompetitionSelect");
+
+				if (!eventIdInput || !select) return; 
+
+				eventIdInput.value = eventId ?? "";
+				select.value = competition || "";
+
+			});
+
 		});
 
 	</script>
