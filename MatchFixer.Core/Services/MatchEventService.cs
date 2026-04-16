@@ -406,7 +406,27 @@ namespace MatchFixer.Core.Services
 			return true;
 		}
 
+		public async Task<bool> UpdateCompetitionAsync(Guid eventId, string? competition)
+		{
+			var match = await _dbContext.MatchEvents
+				.FirstOrDefaultAsync(m => m.Id == eventId);
 
+			if (match == null)
+				return false;
+
+			var normalized = string.IsNullOrWhiteSpace(competition)
+				? null
+				: competition.Trim();
+
+			if (match.CompetitionName == normalized)
+				return true;
+
+			match.CompetitionName = normalized;
+
+			await _dbContext.SaveChangesAsync();
+
+			return true;
+		}
 		public async Task<bool> CancelMatchEventAsync(Guid matchEventId)
 		{
 			var match = await _dbContext.MatchEvents.FindAsync(matchEventId);
