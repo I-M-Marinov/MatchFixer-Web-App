@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
 using static MatchFixer.Common.GeneralConstants.OddsBoostConstants;
 using static MatchFixer.Common.GeneralConstants.MatchEventsApiConstants;
+using static MatchFixer.Common.GeneralConstants.CompetitionConstants;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -138,11 +139,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["ErrorMessage"] = "Failed to update competition.";
+				TempData["ErrorMessage"] = FailedToUpdateCompetition;
 			}
 			else
 			{
-				TempData["SuccessMessage"] = "Competition updated successfully.";
+				TempData["SuccessMessage"] = CompetitonUpdatedSuccessfully;
 			}
 
 			return RedirectToAction("AddMatchEvent");
