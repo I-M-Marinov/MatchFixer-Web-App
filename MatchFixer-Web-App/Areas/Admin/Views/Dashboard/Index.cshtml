@@ -71,7 +71,8 @@
 				<div class="bar-fill bg-secondary" style="width:@inactivePct%">
 					<span>@inactivePct%</span>
 				</div>
-				<div class="bar-fill bg-warning text-dark" style="width:@lockedPct%">
+				<div class="bar-fill bg-warning text-dark"
+					style="width:@lockedPct%; min-width:@(pendingPct > 0 ? "25px" : "0")">
 					<span>@lockedPct%</span>
 				</div>
 				<div class="bar-fill bg-danger" style="width:@bannedPct%">
@@ -123,7 +124,8 @@
 			</div>
 
 			<div class="metric-bar segmented">
-				<div class="bar-fill bg-warning text-dark" style="width:@pendingPct%">
+				<div class="bar-fill bg-warning text-dark"
+				     style="width:@pendingPct%; min-width:@(pendingPct > 0 ? "25px" : "0")">
 					<span>@pendingPct%</span>
 				</div>
 				<div class="bar-fill bg-success" style="width:@wonPct%">
