@@ -71,6 +71,7 @@ namespace MatchFixer.Core.Services
 				);
 			}
 
+			
 			// Try DB-backed upcoming matches first
 			var fromDb = await _dbContext.UpcomingMatchEvents
 					.AsNoTracking()
@@ -79,7 +80,8 @@ namespace MatchFixer.Core.Services
 					.Where(x =>
 						x.ApiLeagueId == leagueId &&
 						!x.IsImported &&
-						x.MatchDateUtc > DateTime.UtcNow)
+						x.MatchDateUtc > DateTime.UtcNow.AddHours(-3))
+
 					.OrderBy(x => x.MatchDateUtc)
 					.Select(x => new UpcomingMatchDto
 					{
