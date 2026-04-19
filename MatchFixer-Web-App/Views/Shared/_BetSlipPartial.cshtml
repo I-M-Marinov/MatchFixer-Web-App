@@ -66,7 +66,10 @@
 				</div>
 			</div>
 
-			<button type="submit" class="btn btn-success w-100">Submit slip</button>
+			<button type="submit" id="placeBetBtn" class="btn btn-success w-100 d-flex justify-content-center align-items-center gap-2">
+				<span id="btnText">Submit slip</span>
+				<i id="btnIcon" class="bi bi-lightning-charge-fill d-none"></i>
+			</button>
 		</div>
 	</div>
 </form>
@@ -186,6 +189,33 @@
 		document.getElementById('totalOdds').innerText = totalOdds.toFixed(2);
 		updatePotentialReturn();
 	}
+
+		let isSubmitting = false;
+
+	document.addEventListener("DOMContentLoaded", () => {
+		const form = document.getElementById("betSlipForm");
+		const submitBtn = document.getElementById("placeBetBtn");
+		const btnText = document.getElementById("btnText");
+		const btnIcon = document.getElementById("btnIcon");
+
+		if (!form || !submitBtn) return;
+
+		form.addEventListener("submit", (e) => {
+			if (isSubmitting) {
+				e.preventDefault();
+				return;
+			}
+
+			isSubmitting = true;
+
+			submitBtn.disabled = true;
+
+			btnText.textContent = "Fixing";
+			btnIcon.classList.remove("d-none");
+			btnIcon.classList.add("animate__animated", "animate__flash", "animate__infinite");
+
+		});
+	});
 	
 
 </script>
