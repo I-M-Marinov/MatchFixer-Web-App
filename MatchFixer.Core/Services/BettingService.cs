@@ -64,7 +64,7 @@ public class BettingService : IBettingService
 
 			if (isSame)
 			{
-				return ("Duplicate bet detected.", false);
+				return (DuplicateBetDetected, false);
 			}
 		}
 
