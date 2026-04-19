@@ -5,6 +5,7 @@
 		public const string NoBetsProvided = "No bets provided.";
 		public const string BetAmountMustBeGreaterThanZero = "Bet amount must be greater than zero.";
 		public const string EventOrEventsCancelledInSlip = "An event or events in your slip was cancelled ! Choose other events to bet on.";
+		public const string DuplicateBetDetected = "Duplicate bet detected.";
 
 		public const string EventCancelledInSlip = "One or more events in your slip were cancelled.";
 		public const string EventPostponedInSlip = "One or more events in your slip were postponed.";
