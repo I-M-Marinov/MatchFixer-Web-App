@@ -42,6 +42,32 @@ public class BettingService : IBettingService
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default)
 	{
+		var now = DateTime.UtcNow;
+
+		var recent = await _dbContext.BetSlips
+			.Include(x => x.Bets)
+			.Where(x => x.UserId == userId)
+			.Where(x => x.BetTime > now.AddSeconds(-3))
+			.OrderByDescending(x => x.BetTime)
+			.FirstOrDefaultAsync();
+
+		if (recent != null)
+		{
+			bool isSame =
+				recent.Amount == betSlipDto.Amount &&
+				recent.Bets.Count == betSlipDto.Bets.Count &&
+				!recent.Bets.Any(b =>
+					!betSlipDto.Bets.Any(dto =>
+						dto.MatchId == b.MatchEventId &&
+						dto.SelectedOption.Equals(b.Pick.ToString(), StringComparison.OrdinalIgnoreCase)
+					));
+
+			if (isSame)
+			{
+				return ("Duplicate bet detected.", false);
+			}
+		}
+
 		if (betSlipDto == null || betSlipDto.Bets == null || !betSlipDto.Bets.Any())
 			return (NoBetsProvided, false);
 
