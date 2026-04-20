@@ -234,7 +234,26 @@ const leagueLogoMap = @Html.Raw(
 		/* -----------------------------
 		   CREATE LEAGUE PILLS
 		-------------------------------- */
-		Object.entries(leagueLogoMap).forEach(([league, leagueId]) => {
+		const priority = [
+			"Premier League",
+			"La Liga",
+			"Bundesliga",
+			"Serie A",
+			"Ligue 1"
+		];
+
+		const sortedLeagues = Object.entries(leagueLogoMap).sort(([a], [b]) => {
+			const pa = priority.indexOf(a);
+			const pb = priority.indexOf(b);
+
+			if (pa !== -1 || pb !== -1) {
+				return (pa === -1 ? 999 : pa) - (pb === -1 ? 999 : pb);
+			}
+
+			return a.localeCompare(b);
+		});
+
+		sortedLeagues.forEach(([league, leagueId]) => {
 
 			const btn = document.createElement("button");
 			btn.className = "league-filter-pill";
