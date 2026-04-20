@@ -1038,7 +1038,7 @@
 }
 
 
-odds-up {
+.odds-up {
     color: #007c30;
     transition: color 0.4s ease;
 }
@@ -1403,4 +1403,48 @@ odds-up {
     opacity: 1;
     pointer-events: none;
     z-index: -1;
+}
+
+#backToTopBtn {
+    position: fixed;
+    bottom: 50px;
+    left: 30px; 
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+#backToTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#backToTopBtn.glow {
+    box-shadow: 0 0 12px rgba(66,135,245,0.8), 0 0 24px rgba(66,135,245,0.4);
+}
+
+#backToTopBtn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+.events-scroll-container {
+    max-height: 95vh;
+    overflow-y: auto;
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+}
+
+.events-scroll-container::-webkit-scrollbar {
+    display: none; 
 }
