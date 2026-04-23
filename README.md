@@ -17,7 +17,7 @@
 <h3 align="center">The MatchFixer Game</h3>
 
 <p align="center">
-  <img src="./matfixer-game.jpg" align="center" border="10" width="500px"/>
+  <img src="./matfixer-game.jpg" align="center" border="10" width="500px" />
 </p>
 
 <h3 align="center">The Logo Quiz Game</h3>
@@ -34,9 +34,9 @@
 
 <h3 align="center">Submitting a betslip</h3>
 
-<p align="center">
-  <img src="./submit-betslip.gif" align="center" border="10" width="500px"/>
-</p>
+<div align="center">
+  <img src="./submit-betslip.gif" width="325" alt="Submitting a betslip" />
+</div>
 
 <h3 align="center">Profile Page</h3>
 
