@@ -30,8 +30,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
 				.AsNoTracking()
-				.Where(e => e.MatchDate > now && !e.IsCancelled);
-
+				.Where(e =>
+					!e.IsCancelled &&
+					!e.IsPostponed &&
+					e.Status != MatchStatus.FullTime
+				);
 			var leagueCounts = await allEventsQ
 				.Where(e => e.CompetitionName == null)
 				.Select(e =>
@@ -84,6 +87,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					e.Id,
 					HomeTeam = e.HomeTeam.Name,
 					AwayTeam = e.AwayTeam.Name,
+					IsLive =
+						e.MatchDate <= now &&
+						e.Status != MatchStatus.FullTime &&
+						!e.IsCancelled &&
+						!e.IsPostponed,
 					HomeTeamLogoUrl = e.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = e.AwayTeam.LogoUrl,
 					HomeTeamLocalLogoUrl = e.HomeTeam.LocalLogoUrl,
@@ -118,6 +126,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					EventId = x.Id,
 					HomeTeam = x.HomeTeam,
 					AwayTeam = x.AwayTeam,
+					IsLive = x.IsLive,
 					HomeTeamLogoUrl = x.HomeTeamLogoUrl,
 					AwayTeamLogoUrl = x.AwayTeamLogoUrl,
 					HomeTeamLocalLogoUrl = x.HomeTeamLocalLogoUrl,
