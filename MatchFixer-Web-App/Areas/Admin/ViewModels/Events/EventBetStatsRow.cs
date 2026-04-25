@@ -5,6 +5,7 @@
 		public Guid EventId { get; set; }
 		public string HomeTeam { get; set; } = "";
 		public string AwayTeam { get; set; } = "";
+		public bool IsLive { get; set; }
 		public string? HomeTeamLogoUrl { get; set; } = ""; // API
 		public string? AwayTeamLogoUrl { get; set; } = ""; // API
 		public string? HomeTeamLocalLogoUrl { get; set; } // LOCAL
