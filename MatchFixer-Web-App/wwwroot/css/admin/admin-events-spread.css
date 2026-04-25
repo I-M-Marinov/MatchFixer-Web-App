@@ -147,6 +147,46 @@
     pointer-events: none;
 }
 
+:root {
+    /* RGB version for shadows */
+    --secondary-color-rgb: 0, 194, 168 !important;
+}
+
+.live-indicator {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--secondary-color) !important;
+    box-shadow: 0 0 4px rgba(var(--secondary-color-rgb), 0.8), 0 0 8px rgba(var(--secondary-color-rgb), 0.6);
+    animation: livePulse 1.2s infinite ease-in-out;
+}
+
+.live-dot {
+    top: 22px;
+    left: 10px;
+}
+
+@keyframes livePulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.9;
+        box-shadow: 0 0 4px rgba(var(--secondary-color), 0.8), 0 0 8px rgba(var(--secondary-color-rgb), 0.6);
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(var(--secondary-color-rgb), 1), 0 0 18px rgba(var(--secondary-color-rgb), 0.8);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.9;
+        box-shadow: 0 0 4px rgba(var(--secondary-color-rgb), 0.8), 0 0 8px rgba(var(--secondary-color-rgb), 0.6);
+    }
+}
+
 @media (max-width: 989px) {
 
     .odds-color-map {
