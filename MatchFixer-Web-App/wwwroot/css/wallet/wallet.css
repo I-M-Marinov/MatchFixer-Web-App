@@ -139,8 +139,33 @@
     font-size: 0.75rem;
 }
 
+.hide-show-amount-tooltip {
+    visibility: hidden;
+    background-color: #d4b700;
+    color: black;
+    text-align: center;
+    padding: 0.3rem 0.4rem;
+    border-radius: 9px;
+    position: absolute;
+    z-index: 999;
+    bottom: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
+
+
 /* Tooltip visibility on hover */
 .wallet-clear-history-wrapper:hover .wallet-clear-history-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.hide-show-amount-wrapper:hover .hide-show-amount-tooltip {
     visibility: visible;
     opacity: 1;
 }
@@ -289,3 +314,35 @@
     display: inline-block;
 }
 
+.amount-value{
+    margin-left: -12px;
+}
+
+.balance-hidden {
+    filter: blur(7px);
+    user-select: none;
+    transition: filter 0.25s ease;
+}
+
+.balance-amount i {
+    line-height: 1;
+    transform: translateY(-1px);
+}
+
+/* Active (visible) */
+.hide-amount-icon-active {
+    color: #d4b700 !important;
+}
+
+/* Inactive (hidden) */
+.hide-amount-icon-inactive {
+    color: #6c757d !important;
+}
+
+#toggle-balance-icon.icon-active:hover {
+    text-shadow: 0 0 6px rgba(212, 183, 0, 0.7);
+}
+
+#toggle-balance-icon {
+    transition: color 0.2s ease;
+}
