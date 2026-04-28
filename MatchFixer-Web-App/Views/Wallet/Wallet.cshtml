@@ -42,11 +42,15 @@
             <div class="card-body text-center position-relative">
 
                 <div class="d-flex justify-content-center gap-4 mb-3">
-                    <span id="deposit-icon" class="wallet-icons-tooltip-wrapper toggle-wallet-form-icon" data-target="#deposit-form">
-                        <img src="/images/wallet/deposit.png" alt="Deposit"
-                             style="width: 30px; height: 30px;" class="img-fluid clickable-icon" />
-                        <span class="wallet-deposit-tooltip">Deposit</span>
-                    </span>
+	                <span id="deposit-icon" class="wallet-icons-tooltip-wrapper toggle-wallet-form-icon" data-target="#deposit-form">
+		                <img src="/images/wallet/deposit.png" alt="Deposit"
+		                     style="width: 30px; height: 30px;" class="img-fluid clickable-icon" />
+		                <span class="wallet-deposit-tooltip">Deposit</span>
+	                </span>
+	                <span id="toggle-balance" class="hide-show-amount-wrapper">
+		                <i class="bi bi-eye clickable-icon fs-5" id="toggle-balance-icon"></i>
+		                <span class="hide-show-amount-tooltip">Hide Amount</span>
+	                </span>
 
                     <span id="withdraw-icon" class="wallet-icons-tooltip-wrapper toggle-wallet-form-icon" data-target="#withdraw-form">
                         <img src="/images/wallet/withdraw.png" alt="Withdraw"
@@ -56,9 +60,16 @@
                 </div>
 
                 <h4 class="card-title mb-2">Balance</h4>
-	            <h2 class="text-success d-flex align-items-center justify-content-center">
-		            <i class="bx bx-euro c fs-1"></i>@Model.Balance.ToString("0.00")
-	            </h2>
+                <h2 id="wallet-balance"
+                    class="text-success d-flex align-items-center justify-content-center"
+                    data-real="@Model.Balance.ToString("0.00")">
+
+	                <span class="balance-amount d-flex align-items-center gap-2">
+		                <i class="bx bx-euro fs-1"></i>
+		                <span class="amount-value">@Model.Balance.ToString("0.00")</span>
+	                </span>
+
+                </h2>
                 <!-- Deposit Form -->
                 <div id="deposit-form" class="mt-3 d-none">
                     <form asp-action="Deposit" method="post" class="d-flex flex-column gap-2 justify-content-center align-items-center">
@@ -298,5 +309,54 @@
             isExpanded = !isExpanded;
         });
     });
+
+		document.addEventListener('DOMContentLoaded', function () {
+			const toggleBtn = document.getElementById('toggle-balance');
+			const icon = document.getElementById('toggle-balance-icon');
+			const amountEl = document.querySelector('.balance-amount');
+			const tooltip = toggleBtn.querySelector('.wallet-deposit-tooltip');
+
+			let isHidden = localStorage.getItem("walletHidden") === "true";
+
+			function updateUI() {
+				if (isHidden) {
+					amountEl.classList.add("balance-hidden");
+
+					icon.classList.remove("bi-eye", "hide-amount-icon-active");
+					icon.classList.add("bi-eye-slash", "icon-inactive");
+
+					if (tooltip) {
+						tooltip.textContent = "Show Amount";
+					}
+				} else {
+					amountEl.classList.remove("balance-hidden");
+
+					icon.classList.remove("bi-eye-slash", "hide-amount-icon-inactive");
+					icon.classList.add("bi-eye", "icon-active");
+
+					if (tooltip) {
+						tooltip.textContent = "Hide Amount";
+					}
+				}
+			}
+
+			updateUI();
+
+			toggleBtn.addEventListener('click', () => {
+				isHidden = !isHidden;
+				localStorage.setItem("walletHidden", isHidden);
+				updateUI();
+			});
+
+			toggleBtn.addEventListener('mouseenter', () => {
+				tooltip.style.visibility = 'visible';
+				tooltip.style.opacity = 1;
+			});
+
+			toggleBtn.addEventListener('mouseleave', () => {
+				tooltip.style.visibility = 'hidden';
+				tooltip.style.opacity = 0;
+			});
+		});
 
     </script>
