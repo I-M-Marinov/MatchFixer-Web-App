@@ -783,6 +783,12 @@ table.responsive-stack td {
     border-left: 4px solid #8400d4 !important;
 }
 
+.btn-purple {
+    background-color: #8400d4 !important;
+    border-left: 4px solid #8400d4 !important;
+    color: white !important;
+}
+
 #apiTab {
     margin-top: 0.75em;
 }
