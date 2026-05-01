@@ -139,6 +139,12 @@
   <img src="./league-table-view.png" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">Admin Events Bets Distribution View</h3>
+
+<p align="center">
+  <img src="./admin-area-events-bets.gif" align="center" border="10" width="700px"/>
+</p>
+
 <h3 align="center">Admin Teams View</h3>
 
 <p align="center">
