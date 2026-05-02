@@ -460,7 +460,7 @@
 
 									<div class="d-flex flex-column gap-1 align-items-end">
 
-										@if (ev.MatchStatus != MatchStatus.Live)
+										@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
 										{
 											<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
 												@Html.AntiForgeryToken()
@@ -505,7 +505,7 @@
 									</div>
 									<div class="d-flex flex-column gap-1 align-items-end">
 
-										@if (ev.MatchStatus != MatchStatus.Live)
+										@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
 										{
 											<span class="custom-save-remove-tooltip-wrapper">
 												<button type="button"
