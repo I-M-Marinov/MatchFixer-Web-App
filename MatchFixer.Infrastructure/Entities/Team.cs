@@ -34,6 +34,7 @@ namespace MatchFixer.Infrastructure.Entities
 		public ICollection<MatchResult> HomeMatches { get; set; } = new List<MatchResult>();
 		public ICollection<MatchResult> AwayMatches { get; set; } = new List<MatchResult>();
 		public ICollection<TeamAlias> Aliases { get; set; } = new List<TeamAlias>();
+		public ICollection<UserFavoriteTeam> FavoritedByUsers { get; set; } = new List<UserFavoriteTeam>();
 
 	}
 }
