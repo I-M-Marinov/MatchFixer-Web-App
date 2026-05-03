@@ -30,6 +30,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<MatchEventLog> MatchEventLogs { get; set; }
 		public virtual DbSet<OddsBoost> OddsBoosts { get; set; }
 		public virtual DbSet<UpcomingMatchEvent> UpcomingMatchEvents { get; set; }
+		public virtual DbSet<UserFavoriteTeam> UserFavoriteTeams { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -131,19 +132,28 @@ namespace MatchFixer.Infrastructure
 				.HasIndex(a => a.Alias)
 				.IsUnique();
 
-			builder.Entity<Team>()
-				.HasIndex(t => t.Name)
-				.IsUnique();
-
 			builder.Entity<TeamAlias>()
 				.HasOne(a => a.Team)
 				.WithMany(t => t.Aliases)
 				.HasForeignKey(a => a.TeamId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			builder.Entity<TeamAlias>()
-				.HasIndex(a => a.Alias)
-				.IsUnique();
+			builder.Entity<UserFavoriteTeam>(entity =>
+			{
+				entity.HasKey(x => new { x.UserId, x.TeamId });
+
+				entity.HasOne(x => x.User)
+					.WithMany(u => u.FavoriteTeams)
+					.HasForeignKey(x => x.UserId)
+					.OnDelete(DeleteBehavior.Cascade);
+
+				entity.HasOne(x => x.Team)
+					.WithMany(t => t.FavoritedByUsers)
+					.HasForeignKey(x => x.TeamId)
+					.OnDelete(DeleteBehavior.Cascade);
+
+				entity.HasIndex(x => x.TeamId);
+			});
 		}
 	}
 }
