@@ -85,16 +85,14 @@ namespace MatchFixer.Core.Services
 
 		public async Task<ProfileViewModel?> GetProfileAsync(string userId)
 		{
-			var user = await _userManager.FindByIdAsync(userId);
+			var user = await _dbContext.Users
+				.Include(u => u.ProfilePicture)
+				.FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+
 			if (user == null)
 			{
 				return null;
 			}
-
-			// Reload with profile picture
-			user = await _dbContext.Users
-				.Include(u => u.ProfilePicture)
-				.FirstOrDefaultAsync(u => u.Id == user.Id);
 
 			var countryOptions = Country.List
 				.OrderBy(c => c.Name)
@@ -104,6 +102,32 @@ namespace MatchFixer.Core.Services
 					Text = c.Name
 				})
 				.ToList();
+
+			var favoriteTeams = await _dbContext.UserFavoriteTeams
+				.Where(uf => uf.UserId == user.Id)
+				.Include(uf => uf.Team)
+				.Select(uf => new TeamDto
+				{
+					Id = uf.Team.Id,
+					Name = uf.Team.Name,
+					LogoUrl = !string.IsNullOrEmpty(uf.Team.LocalLogoUrl)
+						? uf.Team.LocalLogoUrl
+						: uf.Team.LogoUrl
+				})
+				.ToListAsync();
+
+			var favoriteTeamIds = favoriteTeams.Select(t => t.Id).ToHashSet();
+
+			var allTeams = await _dbContext.Teams
+				.AsNoTracking()
+				.Where(t => !favoriteTeamIds.Contains(t.Id))
+				.OrderBy(t => t.Name)
+				.Select(t => new SelectListItem
+				{
+					Value = t.Id.ToString(),
+					Text = $"{t.Name}|{(string.IsNullOrEmpty(t.LocalLogoUrl) ? t.LogoUrl : t.LocalLogoUrl)}"
+				})
+				.ToListAsync();
 
 			// Load all trophies and user's earned trophies
 			var allTrophies = await _dbContext.Trophies.AsNoTracking().ToListAsync();
@@ -161,7 +185,9 @@ namespace MatchFixer.Core.Services
 				UserRank = await GetUserRankAsync(user.Id.ToString()) ?? 0,
 				ProfileImageUrl = user.ProfilePicture?.ImageUrl,
 				CountryOptions = countryOptions,
-				Trophies = trophyViewModels
+				Trophies = trophyViewModels,
+				FavoriteTeams = favoriteTeams,
+				AllTeams = allTeams
 			};
 		}
 
@@ -604,6 +630,44 @@ namespace MatchFixer.Core.Services
 
 			var validator = new PasswordValidator<ApplicationUser>();
 			return await validator.ValidateAsync(_userManager, null, password);
+		}
+
+		public async Task<bool> AddFavoriteTeamAsync(string userId, Guid teamId)
+		{
+			var userGuid = Guid.Parse(userId);
+
+			var exists = await _dbContext.UserFavoriteTeams
+				.AnyAsync(x => x.UserId == userGuid && x.TeamId == teamId);
+
+			if (exists)
+				return false;
+
+			var favorite = new UserFavoriteTeam
+			{
+				UserId = userGuid,
+				TeamId = teamId
+			};
+
+			await _dbContext.UserFavoriteTeams.AddAsync(favorite);
+			await _dbContext.SaveChangesAsync();
+
+			return true;
+		}
+
+		public async Task<bool> RemoveFavoriteTeamAsync(string userId, Guid teamId)
+		{
+			var userGuid = Guid.Parse(userId);
+
+			var favorite = await _dbContext.UserFavoriteTeams
+				.FirstOrDefaultAsync(x => x.UserId == userGuid && x.TeamId == teamId);
+
+			if (favorite == null)
+				return false;
+
+			_dbContext.UserFavoriteTeams.Remove(favorite);
+			await _dbContext.SaveChangesAsync();
+
+			return true;
 		}
 
 
