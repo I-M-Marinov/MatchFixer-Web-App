@@ -279,7 +279,82 @@
 	
 
 </section>
-<section class="cabinet-wrapper d-flex justify-content-start mx-auto">
+
+<section class="cabinet-wrapper d-flex flex-column justify-content-start mx-auto gap-3">
+
+	<div class="card shadow border-0 rounded-2 p-4 favorite-teams-container" style="min-width:200px;">
+		<div class="favorite-header d-flex justify-content-center gap-2">
+			<div class="favorite-title">
+				<span class="star">⭐</span>
+				<span>My Favorite Teams</span>
+			</div>
+
+			<button class="favorite-add-btn" id="toggleAddTeam">
+				<span class="custom-tooltip-wrapper">
+					<i class="bi bi-plus-lg"></i>
+					<span class="custom-tooltip">Add a favorite team</span>
+				</span>
+			</button>
+		</div>
+		
+		<!-- ADD FORM -->
+		<form id="favoriteAddForm"
+		       asp-action="AddFavoriteTeam"
+		       asp-controller="Profile"
+		       method="post"
+		       class="favorite-add-row d-none mt-2">
+
+			@Html.AntiForgeryToken()
+
+			<select id="favoriteTeamsSelect" name="teamId" class="form-control">
+				<option value="">Select a team...</option>
+				@foreach (var team in Model.AllTeams)
+				{
+					<option value="@team.Value">
+						@team.Text.Split('|').First()
+					</option>
+				}
+			</select>
+
+			<button type="submit" class="favorite-add-btn">
+				<i class="bi bi-check-lg"></i>
+			</button>
+		</form>
+
+		<!-- SELECTED TEAMS -->
+		<div id="favoriteTeamsContainer" class="d-flex flex-wrap gap-2 justify-content-center">
+
+			@if (Model.FavoriteTeams != null && Model.FavoriteTeams.Any())
+			{
+				foreach (var team in Model.FavoriteTeams)
+				{
+					<div class="favorite-team-pill d-flex align-items-center gap-2">
+
+						<img src="@team.LogoUrl" />
+						<span>@team.Name</span>
+
+						<!-- REMOVE FORM -->
+						<form asp-action="RemoveFavoriteTeam" asp-controller="Profile" method="post">
+							@Html.AntiForgeryToken()
+							<input type="hidden" name="teamId" value="@team.Id" />
+
+							<button type="submit" class="remove-team-btn">
+								<i class="bi bi-x"></i>
+							</button>
+						</form>
+
+					</div>
+				}
+			}
+			else
+			{
+				<div class="favorite-empty">
+					No favorite teams yet ⚽
+				</div>
+			}
+
+		</div>
+	</div>
 
 	<div class="card shadow border-0 rounded-2 p-4 d-flex trophy-cabinet-container" style="min-width:300px;">
 		<h5 class="fw-bold mb-3">Trophy Cabinet</h5>
@@ -289,7 +364,7 @@
 			{
 				foreach (var trophy in Model.Trophies)
 				{
-					<div class="trophy-card text-center rounded-3 position-relative" style="width: 166px;" 
+					<div class="trophy-card text-center rounded-3 position-relative" style="width: 166px;"
 					     data-bs-toggle="modal"
 					     data-bs-target="#trophyModal"
 					     data-name="@trophy.Name"
@@ -300,7 +375,7 @@
 					     data-earned="@trophy.IsEarned"
 					     data-awardedon="@trophy.AwardedOn?.ToString("dd MMM yyyy")"
 					     data-notes="@trophy.Notes"
-						 data-trophy-id="@trophy.TrophyId">
+					     data-trophy-id="@trophy.TrophyId">
 						<img src="@trophy.IconUrl" alt="@trophy.Name" class="img-fluid"/>
 
 						<form id="antiForgeryForm" style="display:none;">
@@ -309,10 +384,11 @@
 
 						@if (trophy.IsEarned && trophy.IsNew)
 						{
-							<span id="trophy-badge-@trophy.TrophyId" class="badge trophy-badge-new">New</span>						}
+							<span id="trophy-badge-@trophy.TrophyId" class="badge trophy-badge-new">New</span>
+						}
 					</div>
 
-					
+
 				}
 			}
 			else
@@ -321,7 +397,7 @@
 			}
 		</div>
 	</div>
-		
+
 	<div class="modal fade" id="trophyModal" tabindex="-1" aria-labelledby="trophyModalLabel"
 	     aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
 		<div class="modal-dialog modal-lg modal-dialog-centered">
@@ -343,7 +419,7 @@
 
 							<span id="modalTrophyLevel">
 								<img id="modalTrophyLevelIcon" src="" alt="Level" title="" class="img-fluid rounded border p-2"
-								     style="max-height: 50px; object-fit: contain;" />
+								     style="max-height: 50px; object-fit: contain;"/>
 							</span>
 
 							<div id="modalNotes" class="text-muted small"></div>
@@ -666,6 +742,13 @@
 				onTrophyModalOpen(trophyId);
 			}
 		});
+	});
+
+	const toggleBtn = document.getElementById("toggleAddTeam");
+	const form = document.getElementById("favoriteAddForm");
+
+	toggleBtn.addEventListener("click", () => {
+		form.classList.toggle("d-none");
 	});
 
 
