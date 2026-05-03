@@ -24,7 +24,7 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public int UserRank { get; set; }
 		public List<SelectListItem> CountryOptions { get; set; } = new();
 		public List<TrophyViewModel> Trophies { get; set; } = new();
-
-
+		public List<TeamDto> FavoriteTeams { get; set; } = new();
+		public List<SelectListItem> AllTeams { get; set; } = new();
 	}
 }
