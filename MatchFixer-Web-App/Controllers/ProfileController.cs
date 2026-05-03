@@ -43,6 +43,40 @@ namespace MatchFixer_Web_App.Controllers
 			return View(viewModel);
 		}
 
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddFavoriteTeam(Guid teamId)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (teamId == Guid.Empty)
+			{
+				TempData["ErrorMessage"] = "Please select a team.";
+				return RedirectToAction(nameof(Profile)); // or Profile
+			}
+
+			var success = await _profileService.AddFavoriteTeamAsync(userId, teamId);
+
+			TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+				success ? "Team added to favorites ⚽" : "Team is already in favorites.";
+
+			return RedirectToAction(nameof(Profile));
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RemoveFavoriteTeam(Guid teamId)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			var success = await _profileService.RemoveFavoriteTeamAsync(userId, teamId);
+
+			TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+				success ? "Team removed from favorites." : "Something went wrong.";
+
+			return RedirectToAction(nameof(Profile));
+		}
+
 		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
