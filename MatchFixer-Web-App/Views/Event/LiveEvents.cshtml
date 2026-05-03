@@ -73,12 +73,18 @@ else
 	{
 		<div class="col">
 		<div class="event-card position-relative"
+		     data-favorite="@(match.IsFavoriteMatch ? "true" : "false")"
+		     data-favorite-teams="@string.Join(",", match.FavoriteTeams)"
 		     data-match-id="@match.Id"
 		     data-competition="@match.CompetitionName"
 		     data-kickoff="@(match.KickoffTime?.ToString("o") ?? "")"
 		     data-user-tz="@match.UserTimeZone"
 		     data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
-		     data-postponed="@(match.IsPostponed ? "true" : "false")">
+		     data-postponed="@(match.IsPostponed ? "true" : "false")" 
+		     data-home-team="@match.HomeTeam"
+		     data-away-team="@match.AwayTeam"
+		     data-home-logo="@match.EffectiveHomeTeamLogo"
+		     data-away-logo="@match.EffectiveAwayTeamLogo">
 
 
 		<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
@@ -715,6 +721,10 @@ else
 			document.querySelectorAll(".competition-bubble-wrapper")
 				.forEach(b => b.classList.remove("active"));
 
+			// Clear favorite bubbles
+			document.querySelectorAll(".favorite-bubble-wrapper")
+				.forEach(b => b.classList.remove("active"));
+
 			// Apply date filter
 			document.querySelectorAll('.event-card').forEach(card => {
 				const isPostponed = card.dataset.postponed === "true";
@@ -755,6 +765,7 @@ else
 	document.addEventListener('DOMContentLoaded', () => {
 		renderDatePills();
 		renderCompetitionBubbles();
+		renderFavoriteBubbles();
 		syncBoostedDatePill();
 
 	});
@@ -1386,6 +1397,67 @@ else
 		}
 	}
 
+		function renderFavoriteBubbles() {
+		const container = document.getElementById("datePillContainer");
+		if (!container) return;
+
+		container.querySelectorAll(".favorite-bubble-wrapper")
+			.forEach(e => e.remove());
+
+		const favorites = new Map();
+
+		document.querySelectorAll(".event-card").forEach(card => {
+
+			const favTeamsRaw = card.dataset.favoriteTeams;
+			if (!favTeamsRaw) return;
+
+			const favTeams = favTeamsRaw.split(',');
+
+			const home = card.dataset.homeTeam;
+			const away = card.dataset.awayTeam;
+			const homeLogo = card.dataset.homeLogo;
+			const awayLogo = card.dataset.awayLogo;
+
+			favTeams.forEach(team => {
+
+				if (team === home && homeLogo) {
+					favorites.set(team, { name: team, logo: homeLogo });
+				}
+
+				if (team === away && awayLogo) {
+					favorites.set(team, { name: team, logo: awayLogo });
+				}
+			});
+		});
+
+		if (favorites.size === 0) return;
+
+		const allTab = document.getElementById("allTab");
+		if (!allTab) return;
+
+		let insertAfter = allTab;
+
+		favorites.forEach(f => {
+
+			const wrapper = document.createElement("div");
+			wrapper.className = "favorite-bubble-wrapper";
+			wrapper.dataset.team = f.name;
+
+			const bubble = document.createElement("div");
+			bubble.className = "favorite-bubble logo-bubble";
+
+			const img = document.createElement("img");
+			img.src = f.logo;
+			img.alt = f.name;
+
+			bubble.appendChild(img);
+			wrapper.appendChild(bubble);
+
+			insertAfter.after(wrapper);
+			insertAfter = wrapper;
+		});
+	}
+
 	function renderCompetitionBubbles() {
 		const container = document.getElementById("datePillContainer");
 		if (!container) return;
@@ -1420,44 +1492,44 @@ else
 		});
 
 		document.querySelectorAll(".event-card").forEach(card => {
-			const comp = card.dataset.competition;
-			if (!comp || competitions.has(comp)) return;
+				const comp = card.dataset.competition;
+				if (!comp || competitions.has(comp)) return;
 
-			competitions.set(comp, {
-				name: comp,
-				icon: getCompetitionIcon(comp),
-				cssClass: getCompetitionClass(comp)
+				competitions.set(comp, {
+					name: comp,
+					icon: getCompetitionIcon(comp),
+					cssClass: getCompetitionClass(comp)
+				});
 			});
-		});
 
-		if (competitions.size === 0) return;
+			if (competitions.size === 0) return;
 
-		const allTab = document.getElementById("allTab");
-		if (!allTab) return;
+			const allTab = document.getElementById("allTab");
+			if (!allTab) return;
 
-		let insertAfter = allTab;
+			let insertAfter = allTab;
 
-		competitions.forEach(c => {
-			const wrapper = document.createElement("div");
-			wrapper.className = "competition-bubble-wrapper";
-			wrapper.dataset.competition = c.name;
+			competitions.forEach(c => {
+				const wrapper = document.createElement("div");
+				wrapper.className = "competition-bubble-wrapper";
+				wrapper.dataset.competition = c.name;
 
-			const bubble = document.createElement("div");
-			bubble.className = `competition-bubble ${c.cssClass}`;
+				const bubble = document.createElement("div");
+				bubble.className = `competition-bubble ${c.cssClass}`;
 
-			const img = document.createElement("img");
-			img.src = c.icon;
-			img.alt = c.name;
+				const img = document.createElement("img");
+				img.src = c.icon;
+				img.alt = c.name;
 
-			bubble.appendChild(img);
-			wrapper.appendChild(bubble);
+				bubble.appendChild(img);
+				wrapper.appendChild(bubble);
 
-			insertAfter.after(wrapper);
-			insertAfter = wrapper; // 👈 move the pointer forward
-		});
-	}
+				insertAfter.after(wrapper);
+				insertAfter = wrapper; // 👈 move the pointer forward
+			});
+		}
 
-
+	
 
 	document.addEventListener("click", e => {
 		
@@ -1480,6 +1552,41 @@ else
 							card.dataset.competition &&
 							card.dataset.competition === selectedCompetition &&
 							card.dataset.postponed !== "true";
+
+			card.closest(".col").style.display = matches ? "" : "none";
+		});
+
+		updateMatchCount();
+	});
+
+	document.addEventListener("click", e => {
+
+		if (!(e.target instanceof Element)) return;
+
+		const bubble = e.target.closest(".favorite-bubble-wrapper");
+		if (!bubble) return;
+
+		const selectedTeam = bubble.dataset.team;
+
+		document.querySelectorAll(".favorite-bubble-wrapper")
+			.forEach(b => b.classList.remove("active"));
+
+		bubble.classList.add("active");
+
+		document.querySelectorAll("#datePillContainer button")
+			.forEach(btn => btn.classList.remove("active"));
+
+		document.querySelectorAll(".competition-bubble-wrapper")
+			.forEach(b => b.classList.remove("active"));
+
+		document.querySelectorAll(".event-card").forEach(card => {
+
+			const home = card.dataset.homeTeam;
+			const away = card.dataset.awayTeam;
+
+			const matches =
+				(home === selectedTeam || away === selectedTeam) &&
+				card.dataset.postponed !== "true";
 
 			card.closest(".col").style.display = matches ? "" : "none";
 		});
