@@ -59,6 +59,6 @@ namespace MatchFixer.Infrastructure.Entities
 		public bool WasDeactivatedByAdmin { get; set; } = false;
 		public ICollection<BetSlip> BetSlips { get; set; } = new List<BetSlip>();
 		public ICollection<UserTrophy> UserTrophies { get; set; } = new List<UserTrophy>(); // user trophies 
-
+		public ICollection<UserFavoriteTeam> FavoriteTeams { get; set; } = new List<UserFavoriteTeam>(); // user favorite teams
 	}
 }
