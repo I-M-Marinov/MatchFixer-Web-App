@@ -20,5 +20,7 @@ namespace MatchFixer.Core.Contracts
 		Task<bool> DeactivateUserAsync(string userId);
 		Task<bool> AnonymizeUserAsync(string userId);
 		Task ChangePasswordAsync(ClaimsPrincipal userPrincipal, string currentPassword, string newPassword);
+		Task<bool> AddFavoriteTeamAsync(string userId, Guid teamId);
+		Task<bool> RemoveFavoriteTeamAsync(string userId, Guid teamId);
 	}
 }
