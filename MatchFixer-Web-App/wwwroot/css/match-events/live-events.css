@@ -958,7 +958,7 @@
 
 .live-events-team-logo {
     width: auto;
-    height: 60px;
+    height: 55px;
     object-fit: contain;
     transition: transform 0.2s ease;
     cursor: pointer;
@@ -1447,4 +1447,33 @@
 
 .events-scroll-container::-webkit-scrollbar {
     display: none; 
+}
+
+.logo-bubble {
+    width: 42px;
+    height: 42px;
+    margin-top: 0.30em;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.logo-bubble img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+.logo-bubble:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+.favorite-bubble-wrapper.active .logo-bubble {
+    border: 2px solid #d4b700;
+    box-shadow: 0 0 12px rgba(212, 183, 0, 0.6);
 }
