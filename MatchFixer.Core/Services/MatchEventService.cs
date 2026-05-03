@@ -73,6 +73,13 @@ namespace MatchFixer.Core.Services
 
 			var result = new List<LiveEventViewModel>();
 
+			var favoriteTeamIds = (await _dbContext.UserFavoriteTeams
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.TeamId)
+					.ToListAsync())
+				.ToHashSet();
+
+
 
 
 			foreach (var e in events)
@@ -88,6 +95,18 @@ namespace MatchFixer.Core.Services
 				{
 					isInternational = compId < 0;
 					isEuropean = compId >= 1000;
+				}
+
+				var favoriteTeams = new List<string>();
+
+				if (favoriteTeamIds.Contains(e.HomeTeamId))
+				{
+					favoriteTeams.Add(e.HomeTeam.Name);
+				}
+
+				if (favoriteTeamIds.Contains(e.AwayTeamId))
+				{
+					favoriteTeams.Add(e.AwayTeam.Name);
 				}
 
 				result.Add(new LiveEventViewModel
@@ -114,6 +133,8 @@ namespace MatchFixer.Core.Services
 					IsEuropeanCompetition = isEuropean,
 					IsDerby = e.IsDerby,
 					IsPostponed = e.IsPostponed,
+					FavoriteTeams = favoriteTeams,
+					IsFavoriteMatch = favoriteTeams.Any(),
 					HasResult = e.LiveResult != null,
 					UserTimeZone = user.TimeZone,
 					ApiFixtureId = e.ApiFixtureId,
@@ -144,6 +165,13 @@ namespace MatchFixer.Core.Services
 				.AsNoTracking()
 				.ToListAsync();
 
+			var favoriteTeamIds = (await _dbContext.UserFavoriteTeams
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.TeamId)
+					.ToListAsync())
+				.ToHashSet();
+
+
 			var viewModels = events.Select(e =>
 			{
 				var now = DateTime.UtcNow;
@@ -152,6 +180,15 @@ namespace MatchFixer.Core.Services
 				var activeBoostEntity = e.OddsBoosts
 					.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
 					.FirstOrDefault();
+
+				var favoriteTeams = new List<string>();
+
+				if (favoriteTeamIds.Contains(e.HomeTeamId))
+					favoriteTeams.Add(e.HomeTeam.Name);
+
+				if (favoriteTeamIds.Contains(e.AwayTeamId))
+					favoriteTeams.Add(e.AwayTeam.Name);
+
 
 				return new LiveEventViewModel
 				{
@@ -192,6 +229,8 @@ namespace MatchFixer.Core.Services
 					IsDerby = e.IsDerby,
 					UserTimeZone = user.TimeZone,
 					IsCancelled = e.IsCancelled,
+					FavoriteTeams = favoriteTeams,
+					IsFavoriteMatch = favoriteTeams.Any(),
 					HasResult = e.LiveResult != null,
 					MatchStatus = e.Status == MatchStatus.Scheduled &&
 					              e.MatchDate.HasValue &&
