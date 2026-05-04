@@ -1,6 +1,19 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
 
 
+.live-events-page {
+    height: calc(100vh - 4.5em); 
+}
+
+.live-events-page .events-scroll-container {
+    height: calc(100vh - 4em) !important; 
+    overflow-y: auto !important;
+}
+
+body.live-events-no-scroll {
+    overflow: hidden;
+}
+
 .team-logo.hoverable-logo {
     transition: transform 0.2s;
     cursor: pointer;
@@ -17,6 +30,11 @@
     background-color: #CAE9FF;
     border-radius: 5% 10%;
     min-height: 23em;
+}
+
+
+.events-scroll-container .row > .col:last-child .live-event-card {
+    margin-bottom: 3em;
 }
 
 .event-team-name {
@@ -1460,20 +1478,46 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.25s ease;
+    border: 3px solid #ccccdb;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .logo-bubble img {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
 }
 
 .logo-bubble:hover {
-    transform: translateY(-2px) scale(1.05);
+    border: 3px solid var(--primary-color);
+    transform: translateY(-2px) scale(1.12);
+}
+
+.favorite-bubble-wrapper.active:hover::before {
+    animation: none;
 }
 
 .favorite-bubble-wrapper.active .logo-bubble {
-    border: 2px solid #d4b700;
-    box-shadow: 0 0 12px rgba(212, 183, 0, 0.6);
+    border: 3px solid var(--primary-color);
+    transform: scale(1.12);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.9);
+}
+
+
+.tw-h-100 {
+    position: relative; 
+}
+
+.live-events-messages {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    width: auto;
+    max-width: 320px;
+    pointer-events: none;
+}
+
+.live-events-messages .alert {
+    pointer-events: auto;
 }
