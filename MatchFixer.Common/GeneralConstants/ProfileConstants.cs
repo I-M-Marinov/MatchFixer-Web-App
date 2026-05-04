@@ -18,5 +18,13 @@
 		public const string EmailConfirmedSuccessfully = "Your email has been confirmed.";
 		public const string EmailConfirmationFailed = "Email confirmation failed.";
 
+		// FAVORITE TEAM
+
+		public const string TeamAddedToFavoritesSuccessfully = "⚽ The team was added to favorites successfully !";
+		public const string TeamIsAlreadyInFavorites = "This team is already in favorites.";
+		public const string TeamRemovedFromFavoritesSuccessfully = "The team was removed from favorites successfully !";
+		public const string TeamCouldNotBeRemovedFromFavorites = "Something went wrong. This team was not removed successfully.";
+		
+
 	}
 }
