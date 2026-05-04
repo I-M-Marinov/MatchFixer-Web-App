@@ -544,6 +544,16 @@
 
                 // Revert the input or select to the original value
                 input.value = input.dataset.originalValue;  // Revert the value
+
+				// Revert the country flag to the original value
+				if (input.id === "Input_Country") {
+					const flagIcon = document.getElementById('country-flag-icon');
+					const originalCountry = input.dataset.originalValue?.toLowerCase();
+
+					if (flagIcon && originalCountry) {
+						flagIcon.className = `fi fi-${originalCountry}`;
+					}
+				}
             } else {
 				button.innerHTML = '<i class="ri-arrow-go-back-fill"></i>';
 				button.classList.remove('edit-toggle-btn');
