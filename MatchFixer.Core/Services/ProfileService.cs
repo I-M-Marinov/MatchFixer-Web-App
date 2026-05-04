@@ -171,6 +171,8 @@ namespace MatchFixer.Core.Services
 				IsNew = ut?.IsNew ?? false
 			}).ToList();
 
+			var userRank = await GetUserRankAsync(user.Id.ToString()) ?? 0;
+
 			return new ProfileViewModel
 			{
 				Id = user.Id.ToString(),
@@ -182,7 +184,7 @@ namespace MatchFixer.Core.Services
 				TimeZone = user.TimeZone,
 				CreatedOn = user.CreatedOn,
 				MatchFixScore = user.MatchFixScore,
-				UserRank = await GetUserRankAsync(user.Id.ToString()) ?? 0,
+				UserRank = userRank,
 				ProfileImageUrl = user.ProfilePicture?.ImageUrl,
 				CountryOptions = countryOptions,
 				Trophies = trophyViewModels,
@@ -636,22 +638,22 @@ namespace MatchFixer.Core.Services
 		{
 			var userGuid = Guid.Parse(userId);
 
-			var exists = await _dbContext.UserFavoriteTeams
-				.AnyAsync(x => x.UserId == userGuid && x.TeamId == teamId);
-
-			if (exists)
-				return false;
-
 			var favorite = new UserFavoriteTeam
 			{
 				UserId = userGuid,
 				TeamId = teamId
 			};
 
-			await _dbContext.UserFavoriteTeams.AddAsync(favorite);
-			await _dbContext.SaveChangesAsync();
-
-			return true;
+			try
+			{
+				_dbContext.UserFavoriteTeams.Add(favorite);
+				await _dbContext.SaveChangesAsync();
+				return true;
+			}
+			catch (DbUpdateException)
+			{
+				return false;
+			}
 		}
 
 		public async Task<bool> RemoveFavoriteTeamAsync(string userId, Guid teamId)
