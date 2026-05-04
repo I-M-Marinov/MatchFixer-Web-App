@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using MatchFixer.Infrastructure.Entities;
 
+using static MatchFixer.Common.GeneralConstants.ProfileConstants;
+
 namespace MatchFixer_Web_App.Controllers
 {
 	public class ProfileController : Controller
@@ -58,7 +60,7 @@ namespace MatchFixer_Web_App.Controllers
 			var success = await _profileService.AddFavoriteTeamAsync(userId, teamId);
 
 			TempData[success ? "SuccessMessage" : "ErrorMessage"] =
-				success ? "Team added to favorites ⚽" : "Team is already in favorites.";
+				success ? TeamAddedToFavoritesSuccessfully : TeamIsAlreadyInFavorites;
 
 			return RedirectToAction(nameof(Profile));
 		}
@@ -72,7 +74,7 @@ namespace MatchFixer_Web_App.Controllers
 			var success = await _profileService.RemoveFavoriteTeamAsync(userId, teamId);
 
 			TempData[success ? "SuccessMessage" : "ErrorMessage"] =
-				success ? "Team removed from favorites." : "Something went wrong.";
+				success ? TeamRemovedFromFavoritesSuccessfully : TeamCouldNotBeRemovedFromFavorites;
 
 			return RedirectToAction(nameof(Profile));
 		}
@@ -178,15 +180,8 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			var (success, message) = await _profileService.ConfirmEmailAsync(userId, code);
 
-			if (success)
-			{
-				TempData["SuccessMessage"] = message;
-			}
-			else
-			{
-				TempData["ErrorMessage"] = message;
-			}
-			
+			TempData[success ? "SuccessMessage" : "ErrorMessage"] = message;
+
 			return RedirectToAction("Profile", "Profile");
 		}
 
@@ -203,14 +198,7 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				var result = await _profileService.UploadProfilePictureAsync(userId, imageFileUploadModel);
 
-				if (result.IsSuccess)
-				{
-					TempData["SuccessMessage"] = result.Message;
-				}
-				else
-				{
-					TempData["ErrorMessage"] = result.Message;
-				}
+				TempData[result.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = result.Message;
 			}
 			else
 			{
@@ -218,7 +206,6 @@ namespace MatchFixer_Web_App.Controllers
 					.SelectMany(v => v.Errors)
 					.FirstOrDefault()?.ErrorMessage;
 
-				// If we find any error message, save it to TempData
 				TempData["ErrorMessage"] = firstErrorMessage;
 			}
 
@@ -235,14 +222,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			var result = await _profileService.RemoveProfilePictureAsync(userId);
 
-			if (result.IsSuccess)
-			{
-				TempData["SuccessMessage"] = result.Message;
-			}
-			else
-			{
-				TempData["ErrorMessage"] = result.Message;
-			}
+			TempData[result.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = result.Message;
 
 			return RedirectToAction("Profile");
 		}
@@ -251,12 +231,10 @@ namespace MatchFixer_Web_App.Controllers
 		[Authorize]
 		public async Task<IActionResult> GetUserRank()
 		{
-			var userId = HttpContext.Session.GetString("UserId");
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			if (string.IsNullOrEmpty(userId))
-			{
 				return Unauthorized(new { message = "Session expired or user is not authenticated." });
-			}
 
 			var userRank = await _profileService.GetUserRankAsync(userId);
 
@@ -280,12 +258,10 @@ namespace MatchFixer_Web_App.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeleteAccount()
 		{
-			var userId = HttpContext.Session.GetString("UserId");
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			if (string.IsNullOrEmpty(userId))
-			{
 				return Unauthorized(new { message = "Session expired or user is not authenticated." });
-			}
 
 			var result = await _profileService.AnonymizeUserAsync(userId);
 
@@ -307,12 +283,10 @@ namespace MatchFixer_Web_App.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeactivateAccount()
 		{
-			var userId = HttpContext.Session.GetString("UserId");
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			if (string.IsNullOrEmpty(userId))
-			{
 				return Unauthorized(new { message = "Session expired or user is not authenticated." });
-			}
 
 			var result = await _profileService.DeactivateUserAsync(userId);
 
@@ -380,9 +354,9 @@ namespace MatchFixer_Web_App.Controllers
 			}
 		}
 
-		private void LogoutUser()
+		private async Task LogoutUser()
 		{
-			_signInManager.SignOutAsync();
+			await _signInManager.SignOutAsync();
 			_sessionService.ClearSession();
 			_logger.LogInformation("User logged out.");
 		}
