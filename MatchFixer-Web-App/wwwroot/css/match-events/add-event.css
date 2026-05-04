@@ -98,8 +98,9 @@
 }
 
 .live-events-table-wrapper {
-    height: 34em; 
-    overflow-y: auto;
+    height: 34em;
+    overflow-x: auto;
+    overflow-y: visible;
     scrollbar-gutter: stable;
 }
 
@@ -367,29 +368,44 @@ table.responsive-stack td {
 }
 
 .custom-save-remove-tooltip-wrapper {
-    position: relative;
+    position: static;
     display: inline-block;
 }
 
 .custom-save-remove-tooltip {
+    position: fixed;
     visibility: hidden;
     background-color: var(--secondary-color);
     color: black;
     text-align: center;
     padding: 0.3rem 0.3rem;
     border-radius: 4px;
-    position: absolute;
     z-index: 999;
-    bottom: 100%;
-    left: -1.8rem;
-    transform: translateX(-50%);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.15s;
     white-space: nowrap;
     font-size: 0.75rem;
 }
 
-.custom-save-remove-tooltip-wrapper:hover .custom-save-remove-tooltip {
+.custom-postponed-remove-tooltip,
+.custom-edit-competition-remove-tooltip {
+    position: fixed;
+    z-index: 999;
+    visibility: hidden;
+    opacity: 0;
+    background-color: var(--secondary-color);
+    color: black;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.custom-save-remove-tooltip-wrapper:hover .custom-save-remove-tooltip,
+.custom-save-remove-tooltip-wrapper:hover .custom-postponed-remove-tooltip,
+.custom-save-remove-tooltip-wrapper:hover .custom-edit-competition-remove-tooltip {
     visibility: visible;
     opacity: 1;
 }
