@@ -671,7 +671,9 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 .favorite-header {
     display: flex;
     justify-content: space-between;
-    align-items: center; 
+    align-items: center;
+    padding-bottom: 0.15em;
+    border-bottom: 1px solid var(--secondary-color);
 }
 
 .favorite-title {
@@ -759,7 +761,7 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     display: block;
     line-height: 1;
     font-size: 1.7em;
-    transform: translateY(0px) translateX(1px) !important;
+    transform: translateY(0.85px) translateX(0.1px) !important;
 }
 
 .favorite-team-pill:hover .remove-team-btn {
