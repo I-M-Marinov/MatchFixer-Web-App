@@ -24,7 +24,32 @@
 		public const string TeamIsAlreadyInFavorites = "This team is already in favorites.";
 		public const string TeamRemovedFromFavoritesSuccessfully = "The team was removed from favorites successfully !";
 		public const string TeamCouldNotBeRemovedFromFavorites = "Something went wrong. This team was not removed successfully.";
-		
 
+		// VALIDATION 
+		public const string SelectATeamFirst = "You have to select a team to add first.";
+		public const string TimezoneMissingOrIncorrect = "Time Zone is missing or incorrect!";
+		public const string AnUnidentifiedErrorOccured = "An unidentified error occurred!";
+		public const string SessionExpiredOrUserIsNotAuthenticated = "Session expired or user is not authenticated.";
+		public const string UserNotRankedInTheTopThree = "User not ranked in the top 3.";
+
+		// ACCOUNT 
+
+		public const string AccountHasBeenDeleted = "Your account has been successfully deleted. Sorry to see you go !";
+		public const string AccountHasBeenDeactivated = "Your account has been deactivated successfully. Log in again to reactivate it !";
+		public const string AccountDeletionWasUnsuccessful = "There was an error deleting your account. Try again later !";
+		public const string AccountDeactivationWasUnsuccessful = "There was an error deactivating your account. Try again later !";
+		public const string UserLoggedOut = "User logged out.";
+
+		// PASSWORD
+
+
+		public const string CorrectTheFormErrors = "Please correct the form errors.";
+		public const string PasswordChangedSuccessfully = "Password was changed successfully!";
+
+
+		// ERROR 
+
+		public const string PasswordChangeErrorHeading = "Password change error";
+		public const string AnUnexpectedErrorOccured = "An unexpected error occurred.";
 	}
 }
