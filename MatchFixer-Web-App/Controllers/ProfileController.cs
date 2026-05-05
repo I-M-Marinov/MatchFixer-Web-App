@@ -45,6 +45,7 @@ namespace MatchFixer_Web_App.Controllers
 			return View(viewModel);
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddFavoriteTeam(Guid teamId)
@@ -53,7 +54,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (teamId == Guid.Empty)
 			{
-				TempData["ErrorMessage"] = "Please select a team.";
+				TempData["ErrorMessage"] = SelectATeamFirst;
 				return RedirectToAction(nameof(Profile)); // or Profile
 			}
 
@@ -65,6 +66,7 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction(nameof(Profile));
 		}
 
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> RemoveFavoriteTeam(Guid teamId)
@@ -91,7 +93,7 @@ namespace MatchFixer_Web_App.Controllers
 				{
 					// Retrieve the first error message for TimeZone and save it to TempData
 					var timeZoneErrorMessage = ModelState[nameof(model.TimeZone)].Errors.FirstOrDefault()?.ErrorMessage;
-					TempData["ErrorMessage"] = timeZoneErrorMessage ?? "Time Zone is missing or incorrect!";
+					TempData["ErrorMessage"] = timeZoneErrorMessage ?? TimezoneMissingOrIncorrect;
 				}
 				else
 				{
@@ -100,7 +102,7 @@ namespace MatchFixer_Web_App.Controllers
 						.FirstOrDefault()?.ErrorMessage;
 
 					// If we find any error message, save it to TempData
-					TempData["ErrorMessage"] = firstErrorMessage ?? "Some other error occurred!";
+					TempData["ErrorMessage"] = firstErrorMessage ?? AnUnidentifiedErrorOccured;
 				}
 
 				return RedirectToAction("Profile"); // Redirect back to the Profile view
@@ -110,14 +112,7 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				var (success, message) = await _profileService.UpdateProfileAsync(model);
 
-				if (success)
-				{
-					TempData["SuccessMessage"] = message; // Store success message
-				}
-				else
-				{
-					TempData["ErrorMessage"] = message; // Store error or no-change
-				}
+				TempData[success ? "SuccessMessage" : "ErrorMessage"] = message;
 
 				return RedirectToAction("Profile", "Profile");
 			}
@@ -134,9 +129,19 @@ namespace MatchFixer_Web_App.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> UpdateNames(ProfileViewModel model)
 		{
-			// Retrieve the current profile data using the service
-			var currentProfile = await _profileService.GetProfileAsync(model.Id);
 
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+			// Retrieve the current profile data using the service
+			var currentProfile = await _profileService.GetProfileAsync(userId);
+
+			if (currentProfile == null)
+			{
+				return NotFound();
+			}
+
+			model.Id = userId;
 			model.Email = currentProfile.Email;
 			model.DateOfBirth = currentProfile.DateOfBirth;
 			model.Country = currentProfile.Country;
@@ -175,6 +180,7 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("Profile");
 		}
 
+		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> ConfirmEmail(string userId, string code)
 		{
@@ -234,7 +240,7 @@ namespace MatchFixer_Web_App.Controllers
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			if (string.IsNullOrEmpty(userId))
-				return Unauthorized(new { message = "Session expired or user is not authenticated." });
+				return Unauthorized(new { message = SessionExpiredOrUserIsNotAuthenticated });
 
 			var userRank = await _profileService.GetUserRankAsync(userId);
 
@@ -243,7 +249,7 @@ namespace MatchFixer_Web_App.Controllers
 				return Ok(new { rank = userRank });
 			}
 
-			return NotFound(new { message = "User not ranked in the top 3." });
+			return NotFound(new { message = UserNotRankedInTheTopThree });
 		}
 
 		[HttpGet]
@@ -261,18 +267,18 @@ namespace MatchFixer_Web_App.Controllers
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			if (string.IsNullOrEmpty(userId))
-				return Unauthorized(new { message = "Session expired or user is not authenticated." });
+				return Unauthorized(new { message = SessionExpiredOrUserIsNotAuthenticated });
 
 			var result = await _profileService.AnonymizeUserAsync(userId);
 
 			if (result)
 			{
 				LogoutUser();
-				TempData["SuccessMessage"] = "Your account has been successfully deleted. Sorry to see you go !";
+				TempData["SuccessMessage"] = AccountHasBeenDeleted;
 			}
 			else
 			{
-				TempData["ErrorMessage"] = "There was an error deleting your account. Try again later !";
+				TempData["ErrorMessage"] = AccountDeletionWasUnsuccessful;
 			}
 
 			return RedirectToAction("Index", "Home");
@@ -286,18 +292,18 @@ namespace MatchFixer_Web_App.Controllers
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			if (string.IsNullOrEmpty(userId))
-				return Unauthorized(new { message = "Session expired or user is not authenticated." });
+				return Unauthorized(new { message = SessionExpiredOrUserIsNotAuthenticated });
 
 			var result = await _profileService.DeactivateUserAsync(userId);
 
 			if (result)
 			{
 				LogoutUser();
-				TempData["SuccessMessage"] = "Your account has been deactivated successfully. Log in again to reactivate it !";
+				TempData["SuccessMessage"] = AccountHasBeenDeactivated;
 			}
 			else
 			{
-				TempData["ErrorMessage"] = "There was an error deactivating your account. Try again later !";
+				TempData["ErrorMessage"] = AccountDeactivationWasUnsuccessful;
 			}
 
 			return RedirectToAction("Index", "Home");
@@ -310,14 +316,14 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				TempData["ErrorMessage"] = $"Please correct the form errors.";
+				TempData["ErrorMessage"] = CorrectTheFormErrors;
 				return RedirectToAction("DangerZone");
 			}
 
 			try
 			{
 				await _profileService.ChangePasswordAsync(User, model.CurrentPassword, model.NewPassword);
-				TempData["SuccessMessage"] = "Password was changed successfully!";
+				TempData["SuccessMessage"] = PasswordChangedSuccessfully;
 			}
 			catch (ArgumentException ex)
 			{
@@ -329,8 +335,8 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Password change error");
-				TempData["ErrorMessage"] = "An unexpected error occurred.";
+				_logger.LogError(ex, PasswordChangeErrorHeading);
+				TempData["ErrorMessage"] = AnUnexpectedErrorOccured;
 			}
 
 			return RedirectToAction("Profile"); // redirect to Profile when the password change is successful
@@ -358,7 +364,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			await _signInManager.SignOutAsync();
 			_sessionService.ClearSession();
-			_logger.LogInformation("User logged out.");
+			_logger.LogInformation(UserLoggedOut);
 		}
 
 	}
