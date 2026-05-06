@@ -33,8 +33,8 @@ body.live-events-no-scroll {
 }
 
 
-.events-scroll-container .row > .col:last-child .live-event-card {
-    margin-bottom: 3em;
+.live-events-page .row {
+    padding-bottom: 2.5em;
 }
 
 .event-team-name {
