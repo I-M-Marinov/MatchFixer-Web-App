@@ -41,7 +41,19 @@
 <h3 align="center">Profile Page</h3>
 
 <p align="center">
-  <img src="./profile-page.png" align="center" border="10" width="800px"/>
+  <img src="./profile-page-final.png" align="center" border="10" width="800px"/>
+</p>
+
+<h4 align="center">Favorite Teams</h4>
+
+<p align="center">
+  <img src="./favorite-teams-profile-page.png" align="center" border="10" width="800px"/>
+</p>
+
+<h4 align="center">Favorite Teams on the Events Board</h4>
+
+<p align="center">
+  <img src="./favorite-teams-events-board.png" align="center" border="10" width="800px"/>
 </p>
 
 <h3 align="center">Trophies</h3>
