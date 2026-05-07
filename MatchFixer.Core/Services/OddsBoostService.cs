@@ -2,6 +2,7 @@
 using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer.Core.Contracts.IMatchEventNotifier;
@@ -13,12 +14,16 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IMatchEventNotifier _notifier;
+		private readonly IUserContextService _userContextService;
+		private readonly ITimezoneService _timezoneService;
 
 
-		public OddsBoostService(MatchFixerDbContext dbContext, IMatchEventNotifier notifier)
+		public OddsBoostService(MatchFixerDbContext dbContext, IMatchEventNotifier notifier, IUserContextService userContextService, ITimezoneService timezoneService)
 		{
 			_dbContext = dbContext;
 			_notifier = notifier;
+			_userContextService = userContextService;
+			_timezoneService = timezoneService;
 		}
 
 		public async Task<(decimal? home, decimal? draw, decimal? away, OddsBoost? boost)>
@@ -48,13 +53,22 @@ namespace MatchFixer.Core.Services
 			decimal boostValue,
 			TimeSpan duration,
 			Guid createdByUserId,
-			DateTime? startUtc = null,
+			DateTime? startLocal = null,
 			decimal? maxStakePerBet = null,
 			int? maxUsesPerUser = null,
 			string? note = null,
 			CancellationToken ct = default)
 		{
-			var start = (startUtc?.ToUniversalTime()) ?? DateTime.UtcNow;
+
+			var user = await _userContextService.GetCurrentUserAsync();
+
+			var start = startLocal.HasValue
+				? _timezoneService.ConvertFromUserTimeToUtc(
+					startLocal.Value,
+					user.TimeZone
+				)
+				: DateTime.UtcNow;
+
 			var end = start.Add(duration);
 
 			// Validate input
@@ -127,17 +141,20 @@ namespace MatchFixer.Core.Services
 			}
 
 
-			await _notifier.NotifyBoostStartedAsync(
-				matchEventId,
-				effHome,
-				effDraw,
-				effAway,
-				boostValue,
-				startUtc: start,          
-				boostEndUtc: end,           
-				maxStake: maxStakePerBet ?? 0m,
-				maxUses: maxUsesPerUser ?? 0
-			);
+			if (start <= now && end > now)
+			{
+				await _notifier.NotifyBoostStartedAsync(
+					matchEventId,
+					effHome,
+					effDraw,
+					effAway,
+					boostValue,
+					startUtc: start,
+					boostEndUtc: end,
+					maxStake: maxStakePerBet ?? 0m,
+					maxUses: maxUsesPerUser ?? 0
+				);
+			}
 
 			await LogBoostLifecycleAsync(
 				matchEventId,
