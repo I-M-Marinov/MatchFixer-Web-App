@@ -4,7 +4,7 @@
 	{
 		public Guid MatchEventId { get; set; }
 		public decimal BoostValue { get; set; }
-		public DateTime? StartUtc { get; set; } // optional: if null, starts immediately
+		public DateTime? StartTimeLocal { get; set; } // optional: if null, starts immediately
 
 		public int DurationMinutes { get; set; } = 30; // default 30 min rush
 		public decimal? MaxStakePerBet { get; set; }
