@@ -979,11 +979,9 @@
 
 				const formData = new FormData(form);
 
-				// Convert local datetime-local to UTC
 				const startInput = form.querySelector("input[name='StartTimeLocal']");
 				if (startInput && startInput.value) {
-					const localDate = new Date(startInput.value);
-					formData.set("StartTimeLocal", localDate.toISOString());
+					formData.set("StartTimeLocal", startInput.value);
 				}
 
 				// Get anti-forgery token
