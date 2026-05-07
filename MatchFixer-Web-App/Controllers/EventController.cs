@@ -188,19 +188,12 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				var user = await _userContextService.GetCurrentUserAsync();
 
-				DateTime? startUtc = null;
-
-				if (model.StartUtc.HasValue)
-				{
-					startUtc = model.StartUtc.Value.ToUniversalTime();
-				}
-
 				var boost = await _oddsBoostService.CreateOddsBoostAsync(
 					matchEventId: model.MatchEventId,
 					boostValue: model.BoostValue,
 					duration: TimeSpan.FromMinutes(model.DurationMinutes),
 					createdByUserId: user.Id,
-					startUtc: startUtc,
+					startUtc: model.StartTimeLocal,
 					maxStakePerBet: model.MaxStakePerBet,
 					maxUsesPerUser: model.MaxUsesPerUser,
 					note: model.Note);
