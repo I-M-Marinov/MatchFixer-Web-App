@@ -45,6 +45,7 @@ namespace MatchFixer.Infrastructure.Services
 					?? resolvedTeam?.Name
 					?? teamName;
 
+
 				// Wikipedia-specific cleanup only
 				var pageTitle = NormalizeTeamName(canonicalName);
 
