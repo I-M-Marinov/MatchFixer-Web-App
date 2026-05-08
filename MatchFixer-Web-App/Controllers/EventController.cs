@@ -82,6 +82,7 @@ namespace MatchFixer_Web_App.Controllers
 				return View(model);
 			}
 
+			TempData["SuccessMessage"] = MatchEventWasSuccessfullyAdded;
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
