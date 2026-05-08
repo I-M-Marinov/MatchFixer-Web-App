@@ -53,7 +53,7 @@
 <h4 align="center">Favorite Teams on the Events Board</h4>
 
 <p align="center">
-  <img src="./favorite-teams-events-board.png" align="center" border="10" width="800px"/>
+  <img src="./favorite-teams.gif" align="center" border="10" width="800px"/>
 </p>
 
 <h3 align="center">Trophies</h3>
