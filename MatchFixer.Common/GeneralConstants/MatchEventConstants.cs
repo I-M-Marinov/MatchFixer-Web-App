@@ -8,6 +8,8 @@
 		public const string MatchUpdateFailed = "Failed to edit the match. It might not exist or is already cancelled.";
 		public const string MatchUpdateSuccessful = "Match updated successfully.";
 
+		public const string MatchEventWasSuccessfullyAdded = "Match was successfully added to the events board!";
+
 		public const string EventCancellationUnsuccessful = "There was an error cancelling this event";
 		public const string EventCancellationSuccessful = "Event cancelled successfully.";
 
