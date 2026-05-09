@@ -260,7 +260,8 @@ table.responsive-stack td {
 
 #confirmCancelModal .btn-close,
 #confirmStopBoostModal .btn-close,
-#confirmFullTimeModal .btn-close{
+#confirmPostponeModal .btn-close,
+#confirmFullTimeModal .btn-close {
     font-size: 0.85em;
     margin: 0.35em;
 }
