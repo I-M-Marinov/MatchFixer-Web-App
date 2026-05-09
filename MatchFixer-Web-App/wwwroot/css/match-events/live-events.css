@@ -30,6 +30,7 @@ body.live-events-no-scroll {
     background-color: #CAE9FF;
     border-radius: 5% 10%;
     min-height: 23em;
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
 }
 
 
@@ -1459,7 +1460,8 @@ body.live-events-no-scroll {
 .events-scroll-container {
     max-height: 95vh;
     overflow-y: auto;
-    scrollbar-width: none; 
+    overflow-x: visible;
+    scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
