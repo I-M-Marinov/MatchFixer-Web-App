@@ -26,7 +26,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			// Header info
 			var user = await _dbContext.Users.AsNoTracking()
 				.Where(u => u.Id == userId)
-				.Select(u => new { u.UserName, u.Email })
+				.Select(u => new { u.UserName, u.Email, u.FullName })
 				.FirstOrDefaultAsync();
 
 			if (user is null) return null;
@@ -79,6 +79,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			{
 				UserId = userId,
 				UserName = user.UserName,
+				FullName = user.FullName,
 				Email = user.Email,
 				Pending = pending,
 				Won = won,
