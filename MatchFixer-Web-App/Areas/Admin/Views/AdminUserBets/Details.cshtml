@@ -3,7 +3,7 @@
 
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
-    ViewData["Title"] = $"Bets · {Model.UserName ?? Model.Email}";
+    ViewData["Title"] = $"Bets · {Model.FullName ?? Model.Email}";
 
     string Money(decimal amount) => $"€{amount:0.00}";
     string MoneyOpt(decimal? amount) => amount.HasValue ? $"€{amount.Value:0.00}" : "-";
@@ -47,11 +47,15 @@
 	<div class="card shadow-sm border-0 rounded-4 admin-user-bets-card">
 
 		<div class="card-body">
-
-			<h5 class="card-title mb-3 text-center">
-				Bets for @Model.UserName
-			</h5>
-
+			
+			<div class="d-flex flex-column justify-content-center align-items-center">
+				<h5 class="card-title mb-1 text-center">
+					@Model.FullName's Bets
+				</h5>
+				<p class="mb-3 text-center badge bg-primary">
+					@Model.UserName
+				</p>
+			</div>
 			<!-- Quick totals -->
 			<div class="row g-2 mb-3">
 				<div class="col-6 col-md-3">
