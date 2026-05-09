@@ -259,6 +259,7 @@ table.responsive-stack td {
 }
 
 #confirmCancelModal .btn-close,
+#confirmStopBoostModal .btn-close,
 #confirmFullTimeModal .btn-close{
     font-size: 0.85em;
     margin: 0.35em;
@@ -953,4 +954,50 @@ table.responsive-stack td {
         padding-top: 6px;
         border-top: 1px dashed rgba(0, 0, 0, 0.15);
     }
+}
+
+/* =================================================
+   DYNAMIC MODAL THAT SHOWS MESSAGES FOR THE BOOST  |
+   =============================================== */
+
+.promo-toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    width: 340px;
+    background: rgba(18,18,18,0.95);
+    border-radius: 18px;
+    padding: 1rem 1.2rem;
+    backdrop-filter: blur(12px);
+    z-index: 999999;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.35s ease;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+}
+
+.promo-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.promo-toast.success {
+    border-left: 5px solid #d4b700;
+}
+
+.promo-toast.error {
+    border-left: 5px solid #dc3545;
+}
+
+.promo-toast h5 {
+    margin-bottom: 0.4rem;
+    color: white;
+    font-weight: 700;
+}
+
+.promo-toast p {
+    margin: 0;
+    color: #cfcfcf;
+    font-size: 0.95rem;
 }
