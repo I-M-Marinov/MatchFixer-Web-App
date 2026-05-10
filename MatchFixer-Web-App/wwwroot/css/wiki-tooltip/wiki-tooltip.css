@@ -195,12 +195,18 @@
     border: 5px solid #ffdf00 !important;
     position: relative;
     background: url('/images/wiki-tooltip/manutd-devil.png') center bottom / 75px no-repeat, linear-gradient( 135deg, #9b0000 0%, #c40000 28%, #111111 55%, #000000 100% ) !important;
-    width: 150% !important;
+    width: 100% !important;
+    max-width: 99vw;
     height: 13.3em !important;
 }
 
+.wiki-tooltip.sponsor-manutd {
+    width: 100% !important;
+    max-width: clamp(375px, 32vw, 480px);
+}
+
 .wiki-tooltip.sponsor-manutd .wiki-tooltip-content p {
-   color: #ffeeee;
+    color: #ffeeee;
 }
 
 
