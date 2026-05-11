@@ -364,7 +364,47 @@ body.live-events-no-scroll {
 
 @media (max-width: 780px) {
     .event-team-name {
-        font-size: 1.25em;
+        font-size: 1.15em;
+    }
+
+    #event-date-time {
+        font-size: 1rem;
+    }
+
+    .odds-table thead tr th {
+        font-size: 1em !important;
+    }
+
+    .odds-table tbody tr .bet-trigger .badge {
+        font-size: 1.1em !important;
+    }
+}
+
+@media (max-width: 580px) {
+    .event-team-name {
+        font-size: 1.15em;
+    }
+
+    .hoverable-logo {
+        height: 38px !important;
+        width: auto !important;
+    }
+
+    #event-date-time {
+        font-size: 1rem;
+    }
+
+    #live-events-versus {
+        height: 28px !important;
+        width: auto !important;
+    }
+
+    .odds-table thead tr th {
+        font-size: 1em !important;
+    }
+
+    .odds-table tbody tr .bet-trigger .badge {
+        font-size: 1.1em !important;
     }
 }
 
