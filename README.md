@@ -70,6 +70,12 @@
   <img src="./add-match-event-view.png" align="center" border="10" width="800px"/>
 </p>
 
+<h3 align="center">Boost notifications</h3>
+
+<p align="center">
+  <img src="./boost-notifications.png" align="center" border="10" width="800px"/>
+</p>
+
 <h3 align="center">Add Match Event View - Api Upcoming Matches Tab</h3>
 
 <p align="center">
