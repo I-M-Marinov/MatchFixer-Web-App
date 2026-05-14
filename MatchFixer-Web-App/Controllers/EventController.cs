@@ -314,16 +314,9 @@ namespace MatchFixer_Web_App.Controllers
 			var success = await _liveMatchResultService
 				.MarkMatchAsFullTimeAsync(id);
 
-			if (!success)
-			{
-				TempData["ErrorMessage"] =
-					"Unable to mark match as Full Time.";
-			}
-			else
-			{
-				TempData["SuccessMessage"] =
-					"Match successfully marked as Full Time.";
-			}
+			TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+					? MatchMarkedAsFullTime
+					: UnableToMarkMatchAsFullTime;
 
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
