@@ -162,7 +162,7 @@ namespace MatchFixer_Web_App.Controllers
 
 				TempData["ErrorMessage"] = allErrors.Any()
 					? string.Join("<br/>", allErrors)
-					: "An error occurred while updating your name.";
+					: ErrorUpdatingYourName;
 
 				return RedirectToAction("Profile");
 			}
