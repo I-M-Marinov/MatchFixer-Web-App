@@ -11,6 +11,7 @@
 		public const string FailedToUpdateProfile = "Failed to update profile.";
 		public const string ProfileUpdatedSuccessfully = "Your profile was updated successfully. You have made changes to:";
 		public const string NameUpdatedSuccessfully = "Your name was updated successfully !";
+		public const string ErrorUpdatingYourName = "An error occurred while updating your name.";
 		public const string UserNotFound = "User not found.";
 		public const string FailedToUpdateUsersEmail = "Failed to update user email.";
 		public const string EmailUpdatedSuccessfully = "Email updated and confirmation sent.";
