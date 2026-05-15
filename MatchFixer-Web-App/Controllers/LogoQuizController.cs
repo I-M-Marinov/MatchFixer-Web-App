@@ -34,14 +34,9 @@ namespace MatchFixer_Web_App.Controllers
 			var (pointsMessage, updatedScore) = await _logoQuizService.UpdateLogoQuizScoreAsync(userId, model.IsCorrect == true);
 			model.CurrentScore = updatedScore;
 
-			if (model.IsCorrect == true)
-			{
-				TempData["SuccessMessage"] = pointsMessage; // Store success message
-			}
-			else
-			{
-				TempData["ErrorMessage"] = pointsMessage; // Store error or no-change
-			}
+			TempData[model.IsCorrect == true
+				? "SuccessMessage"
+				: "ErrorMessage"] = pointsMessage;
 
 			return View(model);
 		}
