@@ -62,6 +62,11 @@
   <img src="./rigged-to-win-trophy.png" align="center" border="10" width="800px"/>
 </p>
 
+<h3 align="center">Admin viewing of a user's bets</h3>
+
+<p align="center">
+  <img src="./admin-users-bets.png" align="center" border="10" width="800px"/>
+</p>
 
 
 <h3 align="center">Admin Add Match Event View</h3>
@@ -155,6 +160,12 @@
 
 <p align="center">
   <img src="./league-table-view.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Latest Results</h3>
+
+<p align="center">
+  <img src="./latest-results.png" align="center" border="10" width="600px"/>
 </p>
 
 <h3 align="center">Admin Events Bets Distribution View</h3>
