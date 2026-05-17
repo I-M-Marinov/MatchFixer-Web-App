@@ -68,6 +68,18 @@
   <img src="./admin-users-bets.png" align="center" border="10" width="800px"/>
 </p>
 
+<h3 align="center">Email Blast</h3>
+
+<p align="center">
+  <img src="./email-blast.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Test-Email Sent Via the Email Blast</h3>
+
+<p align="center">
+  <img src="./test-email.png" align="center" border="10" width="800px"/>
+</p>
+
 
 <h3 align="center">Admin Add Match Event View</h3>
 
