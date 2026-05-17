@@ -75,14 +75,14 @@ namespace MatchFixer.Infrastructure.Services
 				if (page.Name == "-1") return null;
 
 				var imageUrl = await GetTeamLogoAsync(page.Value, pageTitle);
-				var players = await GetTeamPlayersAsync(pageTitle);
+				// var players = await GetTeamPlayersAsync(pageTitle);
 
 				return new WikiTeamInfo
 				{
 					Name = pageTitle,
 					Summary = summary,
 					ImageUrl = imageUrl,
-					Players = players,
+					// Players = players,
 					WikipediaUrl = $"https://en.wikipedia.org/wiki/{pageTitle.Replace(" ", "_")}"
 				};
 			}
@@ -157,8 +157,6 @@ namespace MatchFixer.Infrastructure.Services
 							else if (imageName.Contains("logo"))
 								logoImages.Add(image.GetProperty("title").GetString());
 							else if (imageName.Contains("badge") || imageName.Contains("emblem"))
-								logoImages.Add(image.GetProperty("title").GetString());
-							else if (imageName.Contains("flag"))
 								logoImages.Add(image.GetProperty("title").GetString());
 						}
 					}
@@ -338,119 +336,119 @@ namespace MatchFixer.Infrastructure.Services
 			}
 		}
 
-		private async Task<List<string>> GetTeamPlayersAsync(string teamName)
-		{
-			try
-			{
-				var encodedTeamName = HttpUtility.UrlEncode(teamName);
+		//private async Task<List<string>> GetTeamPlayersAsync(string teamName)
+		//{
+		//	try
+		//	{
+		//		var encodedTeamName = HttpUtility.UrlEncode(teamName);
 
-				// Get page sections to find squad/players section
-				var sectionsUrl = $"api.php?action=parse&page={encodedTeamName}&prop=sections&format=json";
-				var sectionsResponse = await _httpClient.GetAsync(sectionsUrl);
-				sectionsResponse.EnsureSuccessStatusCode();
-				var sectionsContent = await sectionsResponse.Content.ReadAsStringAsync();
-				var sectionsDoc = JsonDocument.Parse(sectionsContent);
+		//		// Get page sections to find squad/players section
+		//		var sectionsUrl = $"api.php?action=parse&page={encodedTeamName}&prop=sections&format=json";
+		//		var sectionsResponse = await _httpClient.GetAsync(sectionsUrl);
+		//		sectionsResponse.EnsureSuccessStatusCode();
+		//		var sectionsContent = await sectionsResponse.Content.ReadAsStringAsync();
+		//		var sectionsDoc = JsonDocument.Parse(sectionsContent);
 
-				// Find squad/players section with safer JSON parsing
-				int? squadSectionIndex = null;
-				if (sectionsDoc.RootElement.TryGetProperty("parse", out var parse) &&
-					parse.TryGetProperty("sections", out var sections) &&
-					sections.ValueKind == JsonValueKind.Array)
-				{
-					foreach (var section in sections.EnumerateArray())
-					{
-						// Get section name
-						var sectionName = section.TryGetProperty("line", out var lineProp)
-							? lineProp.GetString()?.ToLower()
-							: null;
+		//		// Find squad/players section with safer JSON parsing
+		//		int? squadSectionIndex = null;
+		//		if (sectionsDoc.RootElement.TryGetProperty("parse", out var parse) &&
+		//			parse.TryGetProperty("sections", out var sections) &&
+		//			sections.ValueKind == JsonValueKind.Array)
+		//		{
+		//			foreach (var section in sections.EnumerateArray())
+		//			{
+		//				// Get section name
+		//				var sectionName = section.TryGetProperty("line", out var lineProp)
+		//					? lineProp.GetString()?.ToLower()
+		//					: null;
 
-						if (sectionName != null && (sectionName.Contains("squad") ||
-												  sectionName.Contains("players") ||
-												  sectionName.Contains("current") ||
-												  sectionName.Contains("roster")))
-						{
-							// Get section index
-							if (section.TryGetProperty("index", out var indexProp))
-							{
-								if (indexProp.ValueKind == JsonValueKind.Number)
-								{
-									squadSectionIndex = indexProp.GetInt32();
-								}
-								else if (indexProp.ValueKind == JsonValueKind.String &&
-										 int.TryParse(indexProp.GetString(), out var stringIndex))
-								{
-									squadSectionIndex = stringIndex;
-								}
-							}
-							break;
-						}
-					}
-				}
+		//				if (sectionName != null && (sectionName.Contains("squad") ||
+		//										  sectionName.Contains("players") ||
+		//										  sectionName.Contains("current") ||
+		//										  sectionName.Contains("roster")))
+		//				{
+		//					// Get section index
+		//					if (section.TryGetProperty("index", out var indexProp))
+		//					{
+		//						if (indexProp.ValueKind == JsonValueKind.Number)
+		//						{
+		//							squadSectionIndex = indexProp.GetInt32();
+		//						}
+		//						else if (indexProp.ValueKind == JsonValueKind.String &&
+		//								 int.TryParse(indexProp.GetString(), out var stringIndex))
+		//						{
+		//							squadSectionIndex = stringIndex;
+		//						}
+		//					}
+		//					break;
+		//				}
+		//			}
+		//		}
 
-				if (!squadSectionIndex.HasValue)
-				{
-					_logger.LogInformation($"No squad section found for {teamName}");
-					return new List<string>();
-				}
+		//		if (!squadSectionIndex.HasValue)
+		//		{
+		//			_logger.LogInformation($"No squad section found for {teamName}");
+		//			return new List<string>();
+		//		}
 
-				// Get the squad section content
-				var squadUrl = $"api.php?action=parse&page={encodedTeamName}&section={squadSectionIndex}" +
-							  $"&prop=wikitext&format=json";
-				var squadResponse = await _httpClient.GetAsync(squadUrl);
-				squadResponse.EnsureSuccessStatusCode();
-				var squadContent = await squadResponse.Content.ReadAsStringAsync();
-				var squadDoc = JsonDocument.Parse(squadContent);
+		//		// Get the squad section content
+		//		var squadUrl = $"api.php?action=parse&page={encodedTeamName}&section={squadSectionIndex}" +
+		//					  $"&prop=wikitext&format=json";
+		//		var squadResponse = await _httpClient.GetAsync(squadUrl);
+		//		squadResponse.EnsureSuccessStatusCode();
+		//		var squadContent = await squadResponse.Content.ReadAsStringAsync();
+		//		var squadDoc = JsonDocument.Parse(squadContent);
 
-				if (squadDoc.RootElement.TryGetProperty("parse", out var squadParse) &&
-					squadParse.TryGetProperty("wikitext", out var wikitext) &&
-					wikitext.TryGetProperty("*", out var wikitextContent))
-				{
-					var content = wikitextContent.GetString();
-					return !string.IsNullOrEmpty(content)
-						? ParsePlayersFromWikitext(content)
-						: new List<string>();
-				}
+		//		if (squadDoc.RootElement.TryGetProperty("parse", out var squadParse) &&
+		//			squadParse.TryGetProperty("wikitext", out var wikitext) &&
+		//			wikitext.TryGetProperty("*", out var wikitextContent))
+		//		{
+		//			var content = wikitextContent.GetString();
+		//			return !string.IsNullOrEmpty(content)
+		//				? ParsePlayersFromWikitext(content)
+		//				: new List<string>();
+		//		}
 
-				return new List<string>();
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting players for {TeamName}", teamName);
-				return new List<string>();
-			}
-		}
+		//		return new List<string>();
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		_logger.LogError(ex, "Error getting players for {TeamName}", teamName);
+		//		return new List<string>();
+		//	}
+		//}
 
-		private List<string> ParsePlayersFromWikitext(string wikitext)
-		{
-			var players = new List<string>();
+		//private List<string> ParsePlayersFromWikitext(string wikitext)
+		//{
+		//	var players = new List<string>();
 
-			if (string.IsNullOrEmpty(wikitext))
-				return players;
+		//	if (string.IsNullOrEmpty(wikitext))
+		//		return players;
 
-			// Look for player links in the format [[Player Name]]
+		//	// Look for player links in the format [[Player Name]]
 
-			var playerPattern = @"\[\[([^|\]]+)(?:\|[^\]]+)?\]\]";
-			var matches = System.Text.RegularExpressions.Regex.Matches(wikitext, playerPattern);
+		//	var playerPattern = @"\[\[([^|\]]+)(?:\|[^\]]+)?\]\]";
+		//	var matches = System.Text.RegularExpressions.Regex.Matches(wikitext, playerPattern);
 
-			foreach (System.Text.RegularExpressions.Match match in matches)
-			{
-				var playerName = match.Groups[1].Value.Trim();
+		//	foreach (System.Text.RegularExpressions.Match match in matches)
+		//	{
+		//		var playerName = match.Groups[1].Value.Trim();
 
-				// Filter out obvious non-player entries
-				if (!string.IsNullOrEmpty(playerName) &&
-					!playerName.ToLower().Contains("category:") &&
-					!playerName.ToLower().Contains("file:") &&
-					!playerName.ToLower().Contains("image:") &&
-					!playerName.Contains("flag") &&
-					playerName.Length > 2 &&
-					playerName.Length < 50) // Name max length
-				{
-					players.Add(playerName);
-				}
-			}
+		//		// Filter out obvious non-player entries
+		//		if (!string.IsNullOrEmpty(playerName) &&
+		//			!playerName.ToLower().Contains("category:") &&
+		//			!playerName.ToLower().Contains("file:") &&
+		//			!playerName.ToLower().Contains("image:") &&
+		//			!playerName.Contains("flag") &&
+		//			playerName.Length > 2 &&
+		//			playerName.Length < 50) // Name max length
+		//		{
+		//			players.Add(playerName);
+		//		}
+		//	}
 
-			// Remove duplicates and return
-			return players.Distinct().ToList();
-		}
+		//	// Remove duplicates and return
+		//	return players.Distinct().ToList();
+		//}
 	}
 }
