@@ -1,7 +1,5 @@
 ﻿<script>
-    var wikiCache = window.wikiCache || {};
-
-    var wikiCache = window.wikiCache || {};
+    // var wikiCache = window.wikiCache || {};
 
      document.addEventListener('DOMContentLoaded', function () {
          const debounce = (func, delay) => {
@@ -93,10 +91,21 @@
              try {
                  let dataToUse;
 
-                 if (wikiCache[teamName]) {
-                     dataToUse = wikiCache[teamName];
-                 } else {
-                     const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
+                 // if (wikiCache[teamName]) {
+                 //     dataToUse = wikiCache[teamName];
+                 // } else {
+                 //     const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
+
+                 //     if (!response.ok) {
+                 //         const error = await response.json();
+                 //         throw new Error(error.error || 'Failed to load team info');
+                 //     }
+
+                 //     dataToUse = await response.json();
+                 //     wikiCache[teamName] = dataToUse;
+                 // }
+
+                 const response = await fetch(`/api/wiki/${encodeURIComponent(teamName)}`);
 
                      if (!response.ok) {
                          const error = await response.json();
@@ -104,8 +113,6 @@
                      }
 
                      dataToUse = await response.json();
-                     wikiCache[teamName] = dataToUse;
-                 }
 
                  // Wait for minimum delay regardless of cache status
                  await minDelay;
