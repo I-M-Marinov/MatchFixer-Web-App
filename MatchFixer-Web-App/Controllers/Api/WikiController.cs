@@ -20,7 +20,7 @@ namespace MatchFixer_Web_App.Controllers.Api
 			_logger = logger;
 		}
 
-		[ResponseCache(Duration = 3600, VaryByQueryKeys = new[] { "teamName" })]
+		[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 		[HttpGet("{teamName}")]
 		public async Task<IActionResult> GetTeamInfo(string teamName)
 		{
@@ -32,8 +32,7 @@ namespace MatchFixer_Web_App.Controllers.Api
 					return BadRequest("Team name cannot be empty");
 				}
 
-				var officialName = GetOfficialName(teamName);
-				var info = await _wikipediaService.GetTeamInfoAsync(officialName);
+				var info = await _wikipediaService.GetTeamInfoAsync(teamName);
 
 				if (info == null || string.IsNullOrEmpty(info.Name))
 				{
