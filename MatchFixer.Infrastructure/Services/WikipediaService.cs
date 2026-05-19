@@ -1,5 +1,7 @@
 ﻿using MatchFixer.Infrastructure.Contracts;
+using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.Wikipedia;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
@@ -13,13 +15,16 @@ namespace MatchFixer.Infrastructure.Services
 		private readonly HttpClient _httpClient;
 		private readonly ILogger<WikipediaService> _logger;
 		private readonly ITeamNameResolver _teamNameResolver;
+		private readonly MatchFixerDbContext _dbContext;
+		private static readonly SemaphoreSlim _wikiSemaphore = new(3, 3);
 
 
-		public WikipediaService(HttpClient httpClient, ILogger<WikipediaService> logger, ITeamNameResolver teamNameResolver)
+		public WikipediaService(HttpClient httpClient, ILogger<WikipediaService> logger, ITeamNameResolver teamNameResolver, MatchFixerDbContext dbContext)
 		{
 			_httpClient = httpClient;
 			_logger = logger;
 			_teamNameResolver = teamNameResolver;
+			_dbContext = dbContext;
 
 			_httpClient.BaseAddress = new Uri("https://en.wikipedia.org/w/");
 			_httpClient.DefaultRequestHeaders.Add("User-Agent", "MatchFixer/1.0");
@@ -36,24 +41,120 @@ namespace MatchFixer.Infrastructure.Services
 		{
 			try
 			{
-				teamName = Uri.UnescapeDataString(teamName);
 
-				var resolvedTeam = await _teamNameResolver.ResolveTeamAsync(teamName);
+				var requestedTeamName =
+					Uri.UnescapeDataString(teamName);
 
-				var canonicalName =
-					resolvedTeam?.Aliases?.FirstOrDefault()?.Alias
-					?? resolvedTeam?.Name
-					?? teamName;
+				if (string.IsNullOrWhiteSpace(requestedTeamName))
+					return null;
+
+				var team = await _dbContext.Teams
+					.AsNoTracking()
+					.Include(t => t.Aliases)
+					.SingleOrDefaultAsync(t =>
+						t.Name == requestedTeamName);
+
+				if (team == null)
+				{
+					_logger.LogWarning(
+						"Team not found in database: {TeamName}",
+						requestedTeamName);
+
+					return null;
+				}
 
 
-				// Wikipedia-specific cleanup only
-				var pageTitle = NormalizeTeamName(canonicalName);
+				var existing = await _dbContext.TeamWikiInfos
+					.AsNoTracking()
+					.SingleOrDefaultAsync(x =>
+						x.TeamId== team.Id);
 
-				// Get summary via REST
-				var summary = await GetSummaryAsync(pageTitle)
-				              ?? "No summary available.";
 
-				// Query API for images
+				if (existing != null)
+				{
+					return new WikiTeamInfo
+					{
+						Name = team.Name,
+
+						Summary = existing!.Summary,
+
+						ImageUrl = existing.ImageUrl,
+
+						WikipediaUrl = existing.WikipediaUrl
+					};
+				}
+
+				var wikipediaAlias =
+					team.Aliases
+						.FirstOrDefault()
+						?.Alias
+						?? team.Name;
+
+				var pageTitle = NormalizeTeamName(wikipediaAlias);
+				var wikiData = await FetchFromWikipediaAsync(pageTitle);
+
+				if (wikiData == null)
+				{
+					_logger.LogWarning(
+						"Wikipedia returned no data for {TeamName}",
+						pageTitle);
+
+					return null;
+				}
+
+				wikiData.Name = team.Name;
+
+				var entity = existing ?? new TeamWikiInfo
+				{
+					Id = Guid.NewGuid(),
+
+					TeamId = team.Id
+				};
+
+				entity.Summary = wikiData.Summary;
+
+				entity.ImageUrl = wikiData.ImageUrl;
+
+				entity.WikipediaUrl = wikiData.WikipediaUrl;
+
+				entity.LastUpdatedUtc = DateTime.UtcNow;
+
+
+				if (existing == null)
+				{
+					_dbContext.TeamWikiInfos.Add(entity);
+				}
+
+				await _dbContext.SaveChangesAsync();
+
+				return wikiData;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(
+					ex,
+					"Error fetching Wikipedia info for {TeamName}",
+					teamName);
+
+				return null;
+			}
+		}
+
+		private async Task<WikiTeamInfo?> FetchFromWikipediaAsync(string pageTitle)
+		{
+			await _wikiSemaphore.WaitAsync();
+
+			try
+			{
+				// Small pacing delay
+				await Task.Delay(250);
+
+				// Get summary via REST API
+				var summary =
+					await GetSummaryAsync(pageTitle)
+					?? "No summary available.";
+
+				// Query Wikipedia API for images
 				var encodedTitle = Uri.EscapeDataString(pageTitle);
 
 				var url =
@@ -65,31 +166,42 @@ namespace MatchFixer.Infrastructure.Services
 					$"&format=json" +
 					$"&titles={encodedTitle}";
 
-				var response = await _httpClient.GetAsync(url);
+				var response = await SendWikiRequestAsync(url);
+
 				response.EnsureSuccessStatusCode();
 
-				var jsonDoc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-				var pages = jsonDoc.RootElement.GetProperty("query").GetProperty("pages");
+				var jsonDoc =
+					JsonDocument.Parse(
+						await response.Content.ReadAsStringAsync());
+
+				var pages =
+					jsonDoc.RootElement
+						.GetProperty("query")
+						.GetProperty("pages");
+
 				var page = pages.EnumerateObject().First();
 
-				if (page.Name == "-1") return null;
+				if (page.Name == "-1")
+					return null;
 
-				var imageUrl = await GetTeamLogoAsync(page.Value, pageTitle);
-				// var players = await GetTeamPlayersAsync(pageTitle);
+				var imageUrl =
+					await GetTeamLogoAsync(page.Value, pageTitle);
 
 				return new WikiTeamInfo
 				{
 					Name = pageTitle,
+
 					Summary = summary,
+
 					ImageUrl = imageUrl,
-					// Players = players,
-					WikipediaUrl = $"https://en.wikipedia.org/wiki/{pageTitle.Replace(" ", "_")}"
+
+					WikipediaUrl =
+						$"https://en.wikipedia.org/wiki/{pageTitle.Replace(" ", "_")}"
 				};
 			}
-			catch (Exception ex)
+			finally
 			{
-				_logger.LogError(ex, "Error fetching Wikipedia info for {TeamName}", teamName);
-				return null;
+				_wikiSemaphore.Release();
 			}
 		}
 
@@ -116,7 +228,7 @@ namespace MatchFixer.Infrastructure.Services
 				var encoded = Uri.EscapeDataString(pageTitle);
 				var url = $"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}";
 
-				var response = await _httpClient.GetAsync(url);
+				var response = await SendWikiRequestAsync(url);
 				if (!response.IsSuccessStatusCode)
 					return null;
 
@@ -187,7 +299,7 @@ namespace MatchFixer.Infrastructure.Services
 				var url = $"api.php?action=query&titles={encodedImageTitle}&prop=imageinfo" +
 						 $"&iiprop=url&iiurlwidth=300&format=json";
 
-				var response = await _httpClient.GetAsync(url);
+				var response = await SendWikiRequestAsync(url);
 				response.EnsureSuccessStatusCode();
 				var content = await response.Content.ReadAsStringAsync();
 				var jsonDoc = JsonDocument.Parse(content);
@@ -219,7 +331,7 @@ namespace MatchFixer.Infrastructure.Services
 				var url = $"api.php?action=query&titles={encodedPageTitle}&prop=revisions" +
 						 $"&rvprop=content&format=json&formatversion=2";
 
-				var response = await _httpClient.GetAsync(url);
+				var response = await SendWikiRequestAsync(url);
 				response.EnsureSuccessStatusCode();
 				var content = await response.Content.ReadAsStringAsync();
 				var jsonDoc = JsonDocument.Parse(content);
@@ -315,7 +427,7 @@ namespace MatchFixer.Infrastructure.Services
 				var url = $"api.php?action=query&list=search&srsearch={encodedSearch}" +
 						 $"&srnamespace=6&srlimit=5&format=json";
 
-				var response = await _httpClient.GetAsync(url);
+				var response = await SendWikiRequestAsync(url);
 				response.EnsureSuccessStatusCode();
 				var content = await response.Content.ReadAsStringAsync();
 				var jsonDoc = JsonDocument.Parse(content);
@@ -336,119 +448,17 @@ namespace MatchFixer.Infrastructure.Services
 			}
 		}
 
-		//private async Task<List<string>> GetTeamPlayersAsync(string teamName)
-		//{
-		//	try
-		//	{
-		//		var encodedTeamName = HttpUtility.UrlEncode(teamName);
+		private async Task<HttpResponseMessage> SendWikiRequestAsync(string url)
+		{
+			// Small pacing between ALL wiki requests
+			await Task.Delay(150);
 
-		//		// Get page sections to find squad/players section
-		//		var sectionsUrl = $"api.php?action=parse&page={encodedTeamName}&prop=sections&format=json";
-		//		var sectionsResponse = await _httpClient.GetAsync(sectionsUrl);
-		//		sectionsResponse.EnsureSuccessStatusCode();
-		//		var sectionsContent = await sectionsResponse.Content.ReadAsStringAsync();
-		//		var sectionsDoc = JsonDocument.Parse(sectionsContent);
+			var response = await _httpClient.GetAsync(url);
 
-		//		// Find squad/players section with safer JSON parsing
-		//		int? squadSectionIndex = null;
-		//		if (sectionsDoc.RootElement.TryGetProperty("parse", out var parse) &&
-		//			parse.TryGetProperty("sections", out var sections) &&
-		//			sections.ValueKind == JsonValueKind.Array)
-		//		{
-		//			foreach (var section in sections.EnumerateArray())
-		//			{
-		//				// Get section name
-		//				var sectionName = section.TryGetProperty("line", out var lineProp)
-		//					? lineProp.GetString()?.ToLower()
-		//					: null;
+			response.EnsureSuccessStatusCode();
 
-		//				if (sectionName != null && (sectionName.Contains("squad") ||
-		//										  sectionName.Contains("players") ||
-		//										  sectionName.Contains("current") ||
-		//										  sectionName.Contains("roster")))
-		//				{
-		//					// Get section index
-		//					if (section.TryGetProperty("index", out var indexProp))
-		//					{
-		//						if (indexProp.ValueKind == JsonValueKind.Number)
-		//						{
-		//							squadSectionIndex = indexProp.GetInt32();
-		//						}
-		//						else if (indexProp.ValueKind == JsonValueKind.String &&
-		//								 int.TryParse(indexProp.GetString(), out var stringIndex))
-		//						{
-		//							squadSectionIndex = stringIndex;
-		//						}
-		//					}
-		//					break;
-		//				}
-		//			}
-		//		}
+			return response;
+		}
 
-		//		if (!squadSectionIndex.HasValue)
-		//		{
-		//			_logger.LogInformation($"No squad section found for {teamName}");
-		//			return new List<string>();
-		//		}
-
-		//		// Get the squad section content
-		//		var squadUrl = $"api.php?action=parse&page={encodedTeamName}&section={squadSectionIndex}" +
-		//					  $"&prop=wikitext&format=json";
-		//		var squadResponse = await _httpClient.GetAsync(squadUrl);
-		//		squadResponse.EnsureSuccessStatusCode();
-		//		var squadContent = await squadResponse.Content.ReadAsStringAsync();
-		//		var squadDoc = JsonDocument.Parse(squadContent);
-
-		//		if (squadDoc.RootElement.TryGetProperty("parse", out var squadParse) &&
-		//			squadParse.TryGetProperty("wikitext", out var wikitext) &&
-		//			wikitext.TryGetProperty("*", out var wikitextContent))
-		//		{
-		//			var content = wikitextContent.GetString();
-		//			return !string.IsNullOrEmpty(content)
-		//				? ParsePlayersFromWikitext(content)
-		//				: new List<string>();
-		//		}
-
-		//		return new List<string>();
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		_logger.LogError(ex, "Error getting players for {TeamName}", teamName);
-		//		return new List<string>();
-		//	}
-		//}
-
-		//private List<string> ParsePlayersFromWikitext(string wikitext)
-		//{
-		//	var players = new List<string>();
-
-		//	if (string.IsNullOrEmpty(wikitext))
-		//		return players;
-
-		//	// Look for player links in the format [[Player Name]]
-
-		//	var playerPattern = @"\[\[([^|\]]+)(?:\|[^\]]+)?\]\]";
-		//	var matches = System.Text.RegularExpressions.Regex.Matches(wikitext, playerPattern);
-
-		//	foreach (System.Text.RegularExpressions.Match match in matches)
-		//	{
-		//		var playerName = match.Groups[1].Value.Trim();
-
-		//		// Filter out obvious non-player entries
-		//		if (!string.IsNullOrEmpty(playerName) &&
-		//			!playerName.ToLower().Contains("category:") &&
-		//			!playerName.ToLower().Contains("file:") &&
-		//			!playerName.ToLower().Contains("image:") &&
-		//			!playerName.Contains("flag") &&
-		//			playerName.Length > 2 &&
-		//			playerName.Length < 50) // Name max length
-		//		{
-		//			players.Add(playerName);
-		//		}
-		//	}
-
-		//	// Remove duplicates and return
-		//	return players.Distinct().ToList();
-		//}
 	}
 }
