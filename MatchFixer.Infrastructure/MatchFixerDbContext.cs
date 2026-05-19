@@ -31,6 +31,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<OddsBoost> OddsBoosts { get; set; }
 		public virtual DbSet<UpcomingMatchEvent> UpcomingMatchEvents { get; set; }
 		public virtual DbSet<UserFavoriteTeam> UserFavoriteTeams { get; set; }
+		public virtual DbSet<TeamWikiInfo> TeamWikiInfos { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -154,6 +155,10 @@ namespace MatchFixer.Infrastructure
 
 				entity.HasIndex(x => x.TeamId);
 			});
+
+			builder.Entity<TeamWikiInfo>()
+				.HasIndex(x => x.TeamId)
+				.IsUnique();
 		}
 	}
 }
