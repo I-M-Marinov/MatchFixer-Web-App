@@ -21,6 +21,7 @@ namespace MatchFixer.Infrastructure.Services
 			inputName = inputName.Trim();
 
 			var team = await _db.Teams
+				.AsNoTracking()
 				.Include(t => t.Aliases)
 				.FirstOrDefaultAsync(t => t.Name == inputName);
 
