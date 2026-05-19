@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519155909_Updated_The_New_TeamWikiInfo_Entity")]
+    partial class Updated_The_New_TeamWikiInfo_Entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

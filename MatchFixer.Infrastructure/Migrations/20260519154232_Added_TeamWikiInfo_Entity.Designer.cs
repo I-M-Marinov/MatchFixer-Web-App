@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519154232_Added_TeamWikiInfo_Entity")]
+    partial class Added_TeamWikiInfo_Entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -538,6 +541,9 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastUpdatedUtc")
                         .HasColumnType("datetime2");
 
@@ -545,16 +551,15 @@ namespace MatchFixer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TeamId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("TeamName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WikipediaUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TeamId");
 
                     b.ToTable("TeamWikiInfos");
                 });
@@ -1029,17 +1034,6 @@ namespace MatchFixer.Infrastructure.Migrations
                 {
                     b.HasOne("MatchFixer.Infrastructure.Entities.Team", "Team")
                         .WithMany("Aliases")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TeamWikiInfo", b =>
-                {
-                    b.HasOne("MatchFixer.Infrastructure.Entities.Team", "Team")
-                        .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
