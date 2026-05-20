@@ -10,7 +10,16 @@
 
         <!-- LEFT -->
         <div class="team-editor-logo">
-            <img src="@Model.EffectiveLogoUrl" alt="@Model.Name" />
+	        <img src="@Model.EffectiveLogoUrl" alt="@Model.Name" />
+			
+			
+	        @if (!string.IsNullOrWhiteSpace(Model.WikiImageUrl))
+	        {
+		        <div class="mt-2 text-center">
+			        <img src="@Model.WikiImageUrl"
+			             style="max-height:150px;object-fit:contain;" />
+		        </div>
+	        }
         </div>
 
         <!-- RIGHT -->
@@ -39,38 +48,74 @@
                     </select>
                 </div>
 
-                <div class="team-editor-aliases">
-	                <h6>Aliases</h6>
+	            <div class="team-editor-aliases">
+					<label class="form-label">Aliases</label>
 
-	                <div id="aliasList">
-		                @if (Model.Aliases.Any())
-		                {
-			                @for (var i = 0; i < Model.Aliases.Count; i++)
-			                {
-				                <div class="team-alias-row">
-					                <input class="form-control"
-					                       name="Aliases[@i].Alias"
-					                       value="@Model.Aliases[i].Alias" />
-				                </div>
-			                }
-		                }
-		                else
-		                {
-			                @if (!Model.Aliases.Any())
-			                {
-				                <div class="team-alias-row">
-					                <input class="form-control"
-					                       name="Aliases[0].Alias"
-					                       placeholder="Add an alias…" />
-				                </div>
-			                }
-		                }
-	                </div>
+		            <div id="aliasList">
+			            @if (Model.Aliases.Any())
+			            {
+				            @for (var i = 0; i < Model.Aliases.Count; i++)
+				            {
+					            <div class="team-alias-row">
+						            <input class="form-control"
+						                   name="Aliases[@i].Alias"
+						                   value="@Model.Aliases[i].Alias" />
+					            </div>
+				            }
+			            }
+			            else
+			            {
+				            @if (!Model.Aliases.Any())
+				            {
+					            <div class="team-alias-row">
+						            <input class="form-control"
+						                   name="Aliases[0].Alias"
+						                   placeholder="Add an alias…" />
+					            </div>
+				            }
+			            }
+		            </div>
 
-                </div>
+	            </div>
+				
+	            <hr />
 
+	            <h5 class="text-warning mb-2 text-center">
+		            Wikipedia Information
+	            </h5>
 
-                <div class="team-editor-save">
+	            <div class="mb-3">
+		            <label class="form-label">Wikipedia Summary</label>
+
+		            <textarea class="form-control "rows="8" name="WikiSummary">@Model.WikiSummary</textarea>
+	            </div>
+
+	            <div class="mb-3">
+		            <label class="form-label">Wikipedia Image</label>
+
+		            <input class="form-control"
+		                   name="WikiImageUrl"
+		                   value="@Model.WikiImageUrl" />
+
+	            </div>
+
+	            <div class="mb-3">
+		            <label class="form-label">Wikipedia URL</label>
+
+		            <input class="form-control"
+		                   name="WikipediaUrl"
+		                   value="@Model.WikipediaUrl" />
+	            </div>
+
+	            @if (Model.WikiLastUpdatedUtc != null)
+	            {
+		            <div class="text-muted small">
+			            Last Updated:
+			            @Model.WikiLastUpdatedUtc
+		            </div>
+	            }
+
+	            <div class="team-editor-save">
                     <button class="btn btn-primary">
                         Save team
                     </button>
