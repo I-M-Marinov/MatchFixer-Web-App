@@ -14,6 +14,14 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Teams
 			!string.IsNullOrWhiteSpace(LocalLogoUrl)
 				? LocalLogoUrl
 				: LogoUrl;
+
+		public string? WikiSummary { get; set; }
+
+		public string? WikiImageUrl { get; set; }
+
+		public string? WikipediaUrl { get; set; }
+
+		public DateTime? WikiLastUpdatedUtc { get; set; }
 		public string LeagueName { get; set; } = "";
 		public int? ApiTeamId { get; set; }
 
