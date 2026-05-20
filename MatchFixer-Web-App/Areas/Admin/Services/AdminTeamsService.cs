@@ -173,6 +173,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				.Include(t => t.Aliases)
 				.FirstOrDefaultAsync(t => t.Id == teamId, ct);
 
+			var wikiInfo = await _db.TeamWikiInfos
+				.AsNoTracking()
+				.FirstOrDefaultAsync(x => x.TeamId == teamId, ct);
+
 			if (team == null)
 				return null;
 
@@ -191,6 +195,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				LeagueName = team.LeagueName, 
 				LeagueId = leagueId, 
 				ApiTeamId = team.TeamId,
+				WikiSummary = wikiInfo?.Summary,
+				WikiImageUrl = wikiInfo?.ImageUrl,
+				WikipediaUrl = wikiInfo?.WikipediaUrl,
+				WikiLastUpdatedUtc = wikiInfo?.LastUpdatedUtc,
 
 				Leagues = _leagueMap
 					.OrderBy(kv => kv.Value)
@@ -229,6 +237,26 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				return false;
 
 			team.LeagueName = leagueName;
+
+			var wikiInfo = await _db.TeamWikiInfos
+				.FirstOrDefaultAsync(x => x.TeamId == team.Id);
+
+			if (wikiInfo == null)
+			{
+				wikiInfo = new TeamWikiInfo
+				{
+					Id = Guid.NewGuid(),
+
+					TeamId = team.Id
+				};
+
+				await _db.TeamWikiInfos.AddAsync(wikiInfo);
+			}
+
+			wikiInfo.Summary = vm.WikiSummary?.Trim() ?? "";
+			wikiInfo.ImageUrl = vm.WikiImageUrl?.Trim();
+			wikiInfo.WikipediaUrl = vm.WikipediaUrl?.Trim() ?? "";
+			wikiInfo.LastUpdatedUtc = DateTime.UtcNow;
 
 			// ---- SINGLE ALIAS RULE ----
 			var newAlias = vm.Aliases
