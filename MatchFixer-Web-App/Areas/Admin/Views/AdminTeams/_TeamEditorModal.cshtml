@@ -9,17 +9,22 @@
     <div class="team-editor-layout">
 
         <!-- LEFT -->
-        <div class="team-editor-logo">
-	        <img src="@Model.EffectiveLogoUrl" alt="@Model.Name" />
-			
-			
+        <div class="team-editor-logo-column">
+
+	        <div class="team-logo-card">
+		        <img src="@Model.EffectiveLogoUrl"
+		             alt="@Model.Name" />
+	        </div>
+
 	        @if (!string.IsNullOrWhiteSpace(Model.WikiImageUrl))
 	        {
-		        <div class="mt-2 text-center">
+		        <div class="wiki-logo-card">
 			        <img src="@Model.WikiImageUrl"
-			             style="max-height:150px;object-fit:contain;" />
+			             alt="Wikipedia Image"
+			             onerror="this.closest('.wiki-logo-card').style.display='none';" />
 		        </div>
 	        }
+
         </div>
 
         <!-- RIGHT -->
@@ -49,7 +54,7 @@
                 </div>
 
 	            <div class="team-editor-aliases">
-					<label class="form-label">Aliases</label>
+		            <label class="form-label">Aliases</label>
 
 		            <div id="aliasList">
 			            @if (Model.Aliases.Any())
@@ -77,7 +82,7 @@
 		            </div>
 
 	            </div>
-				
+
 	            <hr />
 
 	            <h5 class="text-warning mb-2 text-center">
@@ -87,7 +92,7 @@
 	            <div class="mb-3">
 		            <label class="form-label">Wikipedia Summary</label>
 
-		            <textarea class="form-control "rows="8" name="WikiSummary">@Model.WikiSummary</textarea>
+		            <textarea class="form-control "rows="4" name="WikiSummary">@Model.WikiSummary</textarea>
 	            </div>
 
 	            <div class="mb-3">
@@ -109,18 +114,19 @@
 
 	            @if (Model.WikiLastUpdatedUtc != null)
 	            {
-		            <div class="text-muted small">
-			            Last Updated:
-			            @Model.WikiLastUpdatedUtc
+		            <div class="d-flex justify-content-center align-items-center">
+			            <label class="text-info badge justify-content-center">
+				            Last Updated:
+				            @Model.WikiLastUpdatedUtc.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+			            </label>
 		            </div>
 	            }
 
 	            <div class="team-editor-save">
-                    <button class="btn btn-primary">
-                        Save team
-                    </button>
-                </div>
-
+		            <button class="btn btn-primary">
+			            Save team
+		            </button>
+	            </div>
             </form>
         </div>
 
