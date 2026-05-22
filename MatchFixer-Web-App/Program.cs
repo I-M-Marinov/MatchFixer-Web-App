@@ -88,6 +88,7 @@ builder.Services.AddScoped<IOddsBoostService, OddsBoostService>();				// Add the
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
 builder.Services.AddScoped<IUpcomingMatchService, UpcomingMatchService>();		// Add the Upcoming Matches Service 
 builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
+builder.Services.AddScoped<INotificationService, NotificationService>();        // Add the Favorite Teams User Notification Service   	
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
 builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();                // Add the Logo Quiz Service
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
