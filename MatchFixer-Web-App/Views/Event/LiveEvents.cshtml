@@ -772,6 +772,31 @@
 
 	});
 
+	document.addEventListener("DOMContentLoaded", () => {
+
+		const params = new URLSearchParams(window.location.search);
+		const teamFromUrl = params.get("team");
+
+		if (!teamFromUrl) return;
+
+		setTimeout(() => {
+
+			const bubble = document.querySelector(
+				`.favorite-bubble-wrapper[data-team="${teamFromUrl}"]`
+			);
+
+			if (bubble) {
+				bubble.click(); 
+
+				bubble.scrollIntoView({
+					behavior: "smooth",
+					block: "center"
+				});
+			}
+
+		}, 100); 
+	});
+
 	document.addEventListener("DOMContentLoaded", function () {
 		const connection = new signalR.HubConnectionBuilder()
 			.withUrl("/matchEventHub")
