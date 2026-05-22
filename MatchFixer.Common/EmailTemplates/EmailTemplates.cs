@@ -293,6 +293,33 @@ namespace MatchFixer.Common.EmailTemplates
 				  </body>
 				</html>";
 		}
+		public static string MatchAddedEmail(string logoUrl, string homeTeam, string awayTeam, string matchTime, string link)
+		{
+			return $@"
+					    <!DOCTYPE html>
+					    <html>
+					    <body style='font-family: Arial; background:#f4f4f4; padding:20px;'>
+					        <div style='max-width:800px;margin:auto;background:white;border-radius:8px;padding:20px;text-align:center;'>
+					            
+					            <img src='{logoUrl}' style='height:60px;margin-bottom:10px;' />
+
+					            <h2>🔥 Your Favorite Team is Playing!</h2>
+
+					            <h3>{homeTeam} vs {awayTeam}</h3>
+
+					            <p style='font-size:16px; color:#555;'>
+					                Kickoff: {matchTime}
+					            </p>
+
+					            <a href='{link}'
+					               style='display:inline-block;margin-top:15px;padding:10px 20px;background:#27ae60;color:black;border-radius:6px;text-decoration:none;font-weight:bold;'>
+					                Place Your Bet 🎯
+					            </a>
+
+					        </div>
+					    </body>
+					    </html>";
+		}
 
 	}
 
