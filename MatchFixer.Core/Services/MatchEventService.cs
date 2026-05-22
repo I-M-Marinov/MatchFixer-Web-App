@@ -30,6 +30,8 @@ namespace MatchFixer.Core.Services
 		private readonly IOddsBoostService _oddsBoostService;
 		private readonly IFootballApiService _footballApiService;
 		private readonly ITimezoneService _timezoneService;
+		private readonly INotificationService _notificationService;
+
 
 
 
@@ -40,7 +42,8 @@ namespace MatchFixer.Core.Services
 			 IMatchEventNotifier notifier,
 			 IOddsBoostService oddsBoostService,
 			IFootballApiService footballApiService,
-			ITimezoneService timezoneService)
+			ITimezoneService timezoneService,
+			INotificationService notificationService)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
@@ -49,6 +52,7 @@ namespace MatchFixer.Core.Services
 			_oddsBoostService = oddsBoostService;
 			_footballApiService = footballApiService;
 			_timezoneService = timezoneService;
+			_notificationService = notificationService;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -303,6 +307,9 @@ namespace MatchFixer.Core.Services
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
 			await _dbContext.SaveChangesAsync();
+
+			//  Notify users that have either teams in their favorites 
+			_ = Task.Run(() => _notificationService.NotifyUsersForMatchAsync(matchEvent.Id));
 		}
 		public async Task AddEventAsync(MatchEventFormModel model, int apiFixtureId)
 		{
@@ -331,6 +338,9 @@ namespace MatchFixer.Core.Services
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
 			await _dbContext.SaveChangesAsync();
+
+			//  Notify users that have either teams in their favorites 
+			_ = Task.Run(() => _notificationService.NotifyUsersForMatchAsync(matchEvent.Id));
 		}
 
 		public async Task<string> GetTeamLogo(string name)
