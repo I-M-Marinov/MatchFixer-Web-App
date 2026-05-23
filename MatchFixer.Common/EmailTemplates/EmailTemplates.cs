@@ -5,6 +5,7 @@ namespace MatchFixer.Common.EmailTemplates
 {
 	public static class EmailTemplates
 	{
+		private static readonly Random _random = new();
 
 		public const string SubjectPleaseConfirmEmail = "MatchFixer - Please confirm your email"; // Welcome email & Resend email confirmation
 		public const string SubjectEmailAddressChanged = "MatchFixer - Your email address was changed"; // Email subject for the email changed emails
@@ -293,32 +294,110 @@ namespace MatchFixer.Common.EmailTemplates
 				  </body>
 				</html>";
 		}
-		public static string MatchAddedEmail(string logoUrl, string homeTeam, string awayTeam, string matchTime, string link)
+		public static string MatchAddedEmail(string logoUrl, string homeTeam, string awayTeam, string homeLogo, string awayLogo, string matchTime, string link)
 		{
+			var homeLogoHtml = !string.IsNullOrEmpty(homeLogo)
+				? $"<img src='{homeLogo}' style='height:50px; display:block; margin:0 auto 6px auto;' />"
+				: "";
+
+			var awayLogoHtml = !string.IsNullOrEmpty(awayLogo)
+				? $"<img src='{awayLogo}' style='height:50px; display:block; margin:0 auto 6px auto;' />"
+				: "";
+
 			return $@"
-					    <!DOCTYPE html>
-					    <html>
-					    <body style='font-family: Arial; background:#f4f4f4; padding:20px;'>
-					        <div style='max-width:800px;margin:auto;background:white;border-radius:8px;padding:20px;text-align:center;'>
-					            
-					            <img src='{logoUrl}' style='height:60px;margin-bottom:10px;' />
+						<!DOCTYPE html>
+						<html>
+						<body style='font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;'>
 
-					            <h2>🔥 Your Favorite Team is Playing!</h2>
+						<div style='max-width:700px;margin:auto;background:white;border-radius:12px;overflow:hidden;
+						            box-shadow:0 10px 30px rgba(0,0,0,0.1);'>
 
-					            <h3>{homeTeam} vs {awayTeam}</h3>
+						    <!-- HEADER -->
+						    <div style='background:#2c3e50;padding:20px;text-align:center;'>
+						        <img src='{logoUrl}' style='height:50px;' />
+						    </div>
 
-					            <p style='font-size:16px; color:#555;'>
-					                Kickoff: {matchTime}
-					            </p>
+						    <!-- CONTENT -->
+						    <div style='padding:30px;text-align:center;'>
 
-					            <a href='{link}'
-					               style='display:inline-block;margin-top:15px;padding:10px 20px;background:#27ae60;color:black;border-radius:6px;text-decoration:none;font-weight:bold;'>
-					                Place Your Bet 🎯
-					            </a>
+						        <h2 style='margin-bottom:10px;'>⚽ Your Favorite Team is Playing!</h2>
 
-					        </div>
-					    </body>
-					    </html>";
+						        <p style='color:#666;font-size:15px;margin-bottom:25px;'>
+						            Looks like something interesting just got added… 👀
+						        </p>
+
+						        <!-- MATCH ROW -->
+						        <table width='100%' cellpadding='0' cellspacing='0' style='margin:20px 0; text-align:center;'>
+						            <tr>
+
+						                <!-- HOME -->
+						                <td style='width:40%; text-align:center;'>
+						                    {homeLogoHtml}
+						                    <span style='font-size:16px;font-weight:600;color:#2c3e50;'>{homeTeam}</span>
+						                </td>
+
+						                <!-- VS -->
+						                <td style='width:20%; text-align:center; font-weight:bold; color:#666;'>
+						                    VS
+						                </td>
+
+						                <!-- AWAY -->
+						                <td style='width:40%; text-align:center;'>
+						                    {awayLogoHtml}
+						                    <span style='font-size:16px;font-weight:600;color:#2c3e50;'>{awayTeam}</span>
+						                </td>
+
+						            </tr>
+						        </table>
+
+						        <!-- TIME -->
+						        <p style='font-size:15px;color:#555;margin-top:15px;'>
+						            🕒 Kickoff: <strong>{matchTime}</strong>
+						        </p>
+
+						        <!-- CTA -->
+						        <a href='{link}'
+						           style='display:inline-block;margin-top:25px;padding:12px 28px;
+						                  background:linear-gradient(135deg,#27ae60,#2ecc71);
+						                  color:black;border-radius:8px;text-decoration:none;
+						                  font-weight:bold;font-size:15px;
+						                  box-shadow:0 6px 15px rgba(39,174,96,0.4);'>
+						            Place Your Bet 🎯
+						        </a>
+
+						        <!-- EXTRA -->
+						        <p style='margin-top:30px;font-size:13px;color:#777;'>
+						            We’re not saying it’s fixed… but we’re not NOT saying it either 😏
+						        </p>
+
+						    </div>
+
+						    <!-- FOOTER -->
+						    <div style='background:#f1f1f1;padding:15px;text-align:center;font-size:12px;color:#777;'>
+						        MatchFixer © 2025-2026 — Your personal space for fixing bets
+						    </div>
+
+						</div>
+
+						</body>
+						</html>";
+		}
+
+
+		public static string GetMatchNotificationSubject(string favoriteTeam, string opponent)
+		{
+			var subjects = new List<string>
+			{
+				$"⚽ {favoriteTeam} has a new match — don’t miss it!",
+				$"🔥 {favoriteTeam} is playing soon — place your bets!",
+				$"👀 {favoriteTeam} just got scheduled… looks interesting",
+				$"🎯 Your team {favoriteTeam} is back — time to fix your bets",
+				$"⚽ {favoriteTeam} vs {opponent} — bet now",
+				$"⚽ {favoriteTeam} is playing — don’t miss your chance!",
+				$"🔥 {favoriteTeam} vs {opponent} just dropped — get in early!"
+			};
+
+			return subjects[_random.Next(subjects.Count)];
 		}
 
 	}
