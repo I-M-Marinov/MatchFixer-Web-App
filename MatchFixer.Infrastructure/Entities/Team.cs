@@ -29,7 +29,7 @@ namespace MatchFixer.Infrastructure.Entities
 		[StringLength(LeagueNameMaxLength, ErrorMessage = LeagueNameCannotExceed100Characters)]
 		public string LeagueName { get; set; } = null!;
 		public bool IsNationalTeam { get; set; } = false;
-
+		public TeamWikiInfo? WikiInfo { get; set; }
 		// Navigation properties for matches
 		public ICollection<MatchResult> HomeMatches { get; set; } = new List<MatchResult>();
 		public ICollection<MatchResult> AwayMatches { get; set; } = new List<MatchResult>();
