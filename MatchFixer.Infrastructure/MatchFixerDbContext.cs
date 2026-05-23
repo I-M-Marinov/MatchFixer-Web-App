@@ -159,6 +159,11 @@ namespace MatchFixer.Infrastructure
 			builder.Entity<TeamWikiInfo>()
 				.HasIndex(x => x.TeamId)
 				.IsUnique();
+
+			builder.Entity<Team>()
+				.HasOne(t => t.WikiInfo)
+				.WithOne(w => w.Team)
+				.HasForeignKey<TeamWikiInfo>(w => w.TeamId);
 		}
 	}
 }
