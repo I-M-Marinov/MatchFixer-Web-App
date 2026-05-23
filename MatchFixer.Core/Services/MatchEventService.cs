@@ -309,7 +309,7 @@ namespace MatchFixer.Core.Services
 			await _dbContext.SaveChangesAsync();
 
 			//  Notify users that have either teams in their favorites 
-			_ = Task.Run(() => _notificationService.NotifyUsersForMatchAsync(matchEvent.Id));
+			await _notificationService.NotifyUsersForMatchAsync(matchEvent.Id);
 		}
 		public async Task AddEventAsync(MatchEventFormModel model, int apiFixtureId)
 		{
@@ -340,7 +340,7 @@ namespace MatchFixer.Core.Services
 			await _dbContext.SaveChangesAsync();
 
 			//  Notify users that have either teams in their favorites 
-			_ = Task.Run(() => _notificationService.NotifyUsersForMatchAsync(matchEvent.Id));
+			await _notificationService.NotifyUsersForMatchAsync(matchEvent.Id);
 		}
 
 		public async Task<string> GetTeamLogo(string name)
