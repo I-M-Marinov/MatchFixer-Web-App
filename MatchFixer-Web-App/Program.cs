@@ -56,8 +56,9 @@ builder.Services.AddHttpClient();                                               
 
 builder.Services.AddHttpClient<IFootballApiService, FootballApiService>();				// Add the FootballAPI Service ( newly added interface here )
 builder.Services.AddScoped<IUpcomingMatchSeederService, UpcomingMatchSeederService>();  // Upcoming Matches Seeder Service
-builder.Services.AddScoped<ITeamLogoSyncService, TeamLogoSyncService>();				// Team Logo Sync Service
+builder.Services.AddScoped<ITeamLogoSyncService, TeamLogoSyncService>();                // Team Logo Sync Service
 
+builder.Services.AddScoped<IHomePageService, HomePageService>();						// Home Page Service ( new showing last big wins with 3 legs or more ) 
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();			// Add the Admin Dashboard Service
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();						// Add the Admin User Service
 builder.Services.AddScoped<IAdminWalletService, AdminWalletService>();					// Add the Admin Wallet Service
