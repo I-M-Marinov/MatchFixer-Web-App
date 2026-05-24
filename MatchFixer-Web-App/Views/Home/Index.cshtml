@@ -1,4 +1,6 @@
-﻿@using static MatchFixer.Common.ServiceConstants.FootballApiConstants
+﻿@using MatchFixer.Core.ViewModels.Index
+@model HomePageViewModel
+@using static MatchFixer.Common.ServiceConstants.FootballApiConstants
 
 @{
     ViewData["Title"] = "Let's fix some bets";
@@ -32,10 +34,10 @@
 				</span>
 			</div>
 		</h1>
-		<p class="lead pulse-goal">We don’t fix matches…</p>
-		<p class="pulse-goal">We help you predict them suspiciously well!</p>
 	</div>
 </div>
+
+@await Html.PartialAsync("_RecentBigWinsPartial", Model.RecentBigWins)
 
 
 <!-- Left Drawer Trigger -->
