@@ -1,0 +1,252 @@
+﻿@model IEnumerable<MatchFixer.Core.ViewModels.Index.RecentBigWinViewModel>
+
+<div class="recent-big-wins-section">
+
+	<!-- CAROUSEL -->
+	<div class="big-wins-carousel" id="bigWinsCarousel">
+
+		@foreach (var slip in Model)
+		{
+			<div class="big-win-card">
+
+				<div class="big-win-user">
+					@slip.Username 
+					<div>
+						won:
+					</div>
+				</div>
+
+				<div class="big-win-amount">
+					€@slip.WinAmount.ToString("F2")
+				</div>
+
+				<div class="big-win-meta">
+					@slip.LegsCount Bets
+					<i class="bi bi-lightning-charge-fill winning-odds-home-page"></i>
+					@slip.TotalOdds.ToString("F2")
+				</div>
+
+				<button class="view-slip-btn"
+				        data-bs-toggle="modal"
+				        data-bs-target="#betSlipModal-@slip.BetSlipId">
+
+					View Betslip
+				</button>
+
+			</div>
+		}
+
+	</div>
+
+	<!-- MODALS CAROUSEL -->
+	@foreach (var slip in Model)
+	{
+		<div class="modal fade"
+		     id="betSlipModal-@slip.BetSlipId"
+		     tabindex="-1"
+		     aria-hidden="true"
+		     data-bs-backdrop="false">
+
+			<div class="modal-dialog modal-dialog-centered recent-bet-slip-dialog">
+
+				<div class="modal-content bet-slip-modal">
+
+					<div class="modal-header border-0">
+
+						<h5 class="modal-title">
+							Winning Bet Slip
+						</h5>
+
+					</div>
+
+					<div class="modal-body">
+
+						@foreach (var bet in slip.Bets)
+						{
+							<div class="bet-leg">
+
+								
+								<div class="bet-match">
+									@bet.HomeTeam
+									<div class="team-logo-index-card">
+										<img class="team-logo-index-card  home-logo" src="@bet.HomeTeamImageUrl"
+										     alt="@bet.HomeTeam" data-bs-toggle="tooltip"
+										     aria-label="@bet.HomeTeam"
+										     data-bs-original-title="@bet.HomeTeam">
+									</div>
+
+									<div style="color: #f1d302;">
+										VS
+									</div>
+									<div class="team-logo-index-card">
+										<img class="team-logo-index-card  away-logo" src="@bet.AwayTeamImageUrl"
+										     alt="@bet.AwayTeam" data-bs-toggle="tooltip"
+										     aria-label="@bet.AwayTeam"
+										     data-bs-original-title="@bet.AwayTeam">
+									</div>
+
+									@bet.AwayTeam
+								</div>
+
+								<div class="bet-result">
+									@(bet.HomeScore)-@(bet.AwayScore)
+								</div>
+
+								<div class="bet-pick
+								    @(bet.Pick.ToString() == "Home" ? "pill-brand-blue" : "")
+								    @(bet.Pick.ToString() == "Draw" ? "pill-brand-yellow" : "")
+								    @(bet.Pick.ToString() == "Away" ? "pill-brand-green" : "")">
+
+									@bet.Pick
+
+								</div>
+
+								<div class="bet-odd">
+									<i class="bi bi-lightning-charge-fill winning-odds-home-page"></i>
+									@bet.Odds
+								</div>
+
+							</div>
+						}
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	}
+
+</div>
+<style>
+
+	html:has([id^="betSlipModal-"].show),
+	body:has([id^="betSlipModal-"].show) {
+		overflow-y: auto !important;
+		overflow-x: hidden !important;
+	}
+
+	body.modal-open {
+		padding-right: 0 !important;
+	}
+
+	[id^="betSlipModal-"] {
+		pointer-events: none;
+	}
+
+		[id^="betSlipModal-"] .modal-dialog,
+		[id^="betSlipModal-"] .modal-content {
+			pointer-events: auto;
+		}
+
+</style>
+<script>
+
+	document.addEventListener("DOMContentLoaded", () => {
+
+		const carousel =
+			document.getElementById("bigWinsCarousel");
+
+		if (!carousel) return;
+
+		let autoScroll;
+
+		let direction = 1;
+
+		const speed = 1;
+
+		function stopAutoScroll() {
+
+			clearInterval(autoScroll);
+
+		}
+
+		function startAutoScroll() {
+
+			stopAutoScroll();
+
+			autoScroll = setInterval(() => {
+
+				carousel.scrollLeft += speed * direction;
+
+				const maxScroll =
+					carousel.scrollWidth -
+					carousel.clientWidth;
+
+				// HIT RIGHT SIDE
+				if (carousel.scrollLeft >= maxScroll) {
+
+					direction = -1;
+
+				}
+
+				// HIT LEFT SIDE
+				if (carousel.scrollLeft <= 0) {
+
+					direction = 1;
+
+				}
+
+			}, 15);
+
+		}
+
+		startAutoScroll();
+
+		// PAUSE ON HOVER
+		carousel.addEventListener(
+			"mouseenter",
+			stopAutoScroll);
+
+		carousel.addEventListener(
+			"mouseleave",
+			startAutoScroll);
+
+			// STOP WHEN MODAL OPENS
+		document.querySelectorAll('[id^="betSlipModal-"]')
+			.forEach(modalEl => {
+
+				modalEl.addEventListener(
+					'show.bs.modal',
+					() => {
+
+						stopAutoScroll();
+
+					});
+
+				modalEl.addEventListener(
+					'hidden.bs.modal',
+					() => {
+
+						startAutoScroll();
+
+					});	
+
+			});
+
+		});
+
+		document.addEventListener('mousedown', (e) => {
+
+			const openModal =
+				document.querySelector('[id^="betSlipModal-"].show');
+
+			if (!openModal) return;
+
+			const dialog =
+				openModal.querySelector('.modal-dialog');
+
+			// clicked outside modal
+			if (!dialog.contains(e.target)) {
+
+				const modal =
+					bootstrap.Modal.getInstance(openModal);
+
+				modal.hide();
+
+			}
+
+		});
+
+</script>
