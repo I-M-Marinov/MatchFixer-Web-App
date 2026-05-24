@@ -90,7 +90,7 @@
     left: 0;
     width: 100vw;
     height: 7em;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: none;
 }
 
@@ -105,9 +105,10 @@
     z-index: 10;
 }
 
-.soccer-hero{
+.soccer-hero {
+    position: relative;
     margin-top: 1em;
-    z-index: 20;
+    z-index: -1;
 }
 
 @keyframes bounceAndRoll {
@@ -1020,3 +1021,320 @@ border: 2px #0DAB76 solid;
 .boost-header-row .lightning-icon {
     margin-right: 0.25rem;
 }
+
+
+/* =========================================
+   RECENT BIG WINS SECTION
+========================================= */
+
+body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+}
+
+[id^="betSlipModal-"] {
+    z-index: 999999 !important;
+}
+
+.recent-big-wins-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #111;
+    text-shadow: 2px 5px 5px rgba(0, 0, 0, 0.8) !important;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+    color: #FAF3DD;
+}
+
+
+.recent-big-wins-title i {
+    color: #f1d302 !important;
+    font-size: 1.8rem;
+    filter: drop-shadow(0 2px 1px #000786);
+}
+
+
+.recent-bet-slip-dialog {
+    max-width: 750px;
+}
+
+/* =========================================
+   CAROUSEL
+========================================= */
+
+.big-wins-carousel {
+    display: flex;
+    gap: 1.4rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 1.5rem 0 2rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.big-wins-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+/* =========================================
+   CARD
+========================================= */
+
+.big-win-card {
+    position: relative;
+    z-index: 1;
+    min-width: 290px;
+    max-width: 290px;
+    background: linear-gradient( 145deg, rgba(20,20,20,0.88), rgba(10,10,10,0.92) );
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 1.7rem;
+    padding: 1.5rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.big-win-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(13,171,118,0.35);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45), 0 0 18px rgba(13,171,118,0.12);
+    z-index: 2;
+}
+
+.winning-odds-home-page{
+    color: #d7bd0d;
+}
+
+/* =========================================
+   USER
+========================================= */
+.big-win-user {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #f5f5f5;
+    text-align: center;
+    margin-bottom: 0.6rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================
+   WIN AMOUNT
+========================================= */
+
+/* BASE */
+.big-win-amount {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.8rem;
+    transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+/* BLUE CARDS */
+.big-win-card:nth-child(odd) .big-win-amount {
+    color: #4db8ff;
+    text-shadow: 0 0 14px rgba(2,116,179,0.35);
+}
+
+/* GREEN CARDS */
+.big-win-card:nth-child(even) .big-win-amount {
+    color: #18d692;
+    text-shadow: 0 0 14px rgba(13,171,118,0.35);
+}
+
+/* =========================================
+   META
+========================================= */
+
+.big-win-meta {
+    text-align: center;
+    color: #cfcfcf;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+}
+
+/* =========================================
+   BUTTON
+========================================= */
+
+/* DEFAULT BUTTON BASE */
+.view-slip-btn {
+    width: 100%;
+    border: none;
+    outline: none;
+    border-radius: 1rem;
+    border: 1px solid black;
+    padding: 0.85rem 1rem;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, background 0.25s ease;
+}
+
+/* GREEN BUTTONS */
+.big-win-card:nth-child(even) .view-slip-btn {
+    background: linear-gradient( 135deg, #0DAB76, #0a8d61 );
+    box-shadow: 0 8px 18px rgba(13,171,118,0.25);
+}
+
+.big-win-card:nth-child(even) .view-slip-btn:hover {
+    background: linear-gradient( 135deg, #10c488, #0DAB76 );
+    box-shadow: 0 12px 25px rgba(13,171,118,0.4);
+}
+
+/* BLUE BUTTONS */
+.big-win-card:nth-child(odd) .view-slip-btn {
+    background: linear-gradient( 135deg, #0274b3, #015786 );
+    box-shadow: 0 8px 18px rgba(2,116,179,0.25);
+}
+
+.big-win-card:nth-child(odd) .view-slip-btn:hover {
+    background: linear-gradient( 135deg, #1493da, #0274b3 );
+    box-shadow: 0 12px 25px rgba(2,116,179,0.4);
+}
+
+/* SHARED HOVER */
+.view-slip-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal-content.bet-slip-modal {
+    background: linear-gradient( 145deg, rgba(15,15,15,0.98), rgba(22,22,22,0.98) );
+    color: white;
+    border-radius: 1.6rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    padding: 1.2rem 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0DAB76;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* =========================================
+   BET LEG
+========================================= */
+
+.bet-leg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 1rem;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.bet-leg:hover {
+    transform: translateY(-2px);
+    border-color: rgba(13,171,118,0.2);
+    background: rgba(255,255,255,0.06);
+}
+
+/* =========================================
+   MATCH
+========================================= */
+
+.bet-match {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex: 2;
+    gap: 15px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: white;
+}
+
+/* =========================================
+   SCORE
+========================================= */
+
+.bet-result {
+    min-width: 60px;
+    text-align: center;
+    background: rgba(13,171,118,0.15);
+    color: #0274b3;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    text-shadow: 2px 5px 5px rgba(0, 0, 0, 0.8) !important;
+    font-family: "Orbitron", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+}
+
+/* =========================================
+   PICK + ODDS
+========================================= */
+
+.bet-pick {
+    min-width: 80px;
+    text-align: center;
+    color: #d4d4d4;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.bet-odd {
+    min-width: 60px;
+    text-align: right;
+    color: #0DAB76;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .recent-big-wins-title {
+        font-size: 1.5rem;
+    }
+
+    .big-win-card {
+        min-width: 240px;
+        max-width: 240px;
+        padding: 1.2rem;
+    }
+
+    .big-win-amount {
+        font-size: 1.6rem;
+    }
+
+    .view-slip-btn {
+        padding: 0.75rem;
+    }
+}
+
