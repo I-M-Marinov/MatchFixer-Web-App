@@ -203,7 +203,7 @@
   <img src="./admin-edit-team.png" align="center" border="10" width="600px"/>
 </p>
 
-<h4 align="center">Admin Dashboard View</h4>
+<h3 align="center">Admin Dashboard View</h3>
 
 <p align="center">
   <img src="./updated-admin-dashboard-view.png" align="center" border="10" width="600px"/>
