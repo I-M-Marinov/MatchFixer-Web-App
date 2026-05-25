@@ -8,6 +8,12 @@
   <img src="./new-home-page-view.png" align="center" border="10" width="600px"/>
 </p>
 
+<p align="center">Winning Bet Slip</p>
+
+<p align="center">
+  <img src="./winning-betslip.png" align="center" border="10" width="350px"/>
+</p>
+
 <h3 align="center">MatchFixer Confirmation Email</h3>
 
 <p align="center">
