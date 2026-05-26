@@ -5,7 +5,13 @@
 <h3 align="center">MatchFixer Home Page</h3>
 
 <p align="center">
-  <img src="./matchfixer-home-page.png" align="center" border="10" width="600px"/>
+  <img src="./new-home-page-view.png" align="center" border="10" width="600px"/>
+</p>
+
+<p align="center">Winning Bet Slip</p>
+
+<p align="center">
+  <img src="./winning-betslip.png" align="center" border="10" width="350px"/>
 </p>
 
 <h3 align="center">MatchFixer Confirmation Email</h3>
@@ -197,7 +203,7 @@
   <img src="./admin-edit-team.png" align="center" border="10" width="600px"/>
 </p>
 
-<h4 align="center">Admin Dashboard View</h4>
+<h3 align="center">Admin Dashboard View</h3>
 
 <p align="center">
   <img src="./updated-admin-dashboard-view.png" align="center" border="10" width="600px"/>
