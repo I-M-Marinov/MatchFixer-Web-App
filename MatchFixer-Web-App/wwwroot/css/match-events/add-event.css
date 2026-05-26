@@ -1002,3 +1002,24 @@ table.responsive-stack td {
     color: #cfcfcf;
     font-size: 0.95rem;
 }
+
+.fifa-world-cup-class {
+    border-left: 4px solid #d4af37;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.fifa-world-cup-class td {
+    background: linear-gradient( 180deg, rgba(233, 240, 248, 0.96) 0%, rgba(225, 232, 241, 0.94) 52%, rgba(236, 214, 62, 0.38) 100% ) !important;
+    border-top: 1px solid rgba(255,255,255,0.45);
+    border-bottom: 1px solid rgba(196, 170, 42, 0.28);
+    transition: all 0.22s ease;
+}
+
+.fifa-world-cup-class td:first-child {
+    border-left: 4px solid rgba(212, 181, 58, 0.85) !important;
+}
+
+.fifa-world-cup-class:hover td {
+    background: linear-gradient( 180deg, rgba(238, 244, 250, 0.98) 0%, rgba(231, 237, 245, 0.96) 52%, rgba(241, 220, 78, 0.48) 100% ) !important;
+}
