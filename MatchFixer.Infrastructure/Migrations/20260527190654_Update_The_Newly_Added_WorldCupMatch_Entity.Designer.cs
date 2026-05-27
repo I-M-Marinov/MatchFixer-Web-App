@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527190654_Update_The_Newly_Added_WorldCupMatch_Entity")]
+    partial class Update_The_Newly_Added_WorldCupMatch_Entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -779,45 +782,14 @@ namespace MatchFixer.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ApiEventId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AwayLogo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("AwayScore")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AwayTeam")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HomeLogo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HomeScore")
-                        .HasColumnType("int");
-
-                    b.Property<string>("HomeTeam")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsFinished")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsKnockout")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsLive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("MatchDate")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid>("MatchEventId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("RoundPosition")
                         .HasColumnType("int");
@@ -826,6 +798,9 @@ namespace MatchFixer.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MatchEventId")
+                        .IsUnique();
 
                     b.ToTable("WorldCupMatches");
                 });
@@ -1186,6 +1161,17 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Navigation("Wallet");
                 });
 
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.WorldCupMatch", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.MatchEvent", "MatchEvent")
+                        .WithOne("WorldCupMatch")
+                        .HasForeignKey("MatchFixer.Infrastructure.Entities.WorldCupMatch", "MatchEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MatchEvent");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -1260,6 +1246,8 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Navigation("MatchEventLogs");
 
                     b.Navigation("OddsBoosts");
+
+                    b.Navigation("WorldCupMatch");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.ProfilePicture", b =>
