@@ -88,6 +88,7 @@ builder.Services.AddScoped<IWalletService, WalletService>();					// Add the Wall
 builder.Services.AddScoped<IOddsBoostService, OddsBoostService>();				// Add the Odds Boost Service
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();			// Add the Match Event Service 
 builder.Services.AddScoped<IUpcomingMatchService, UpcomingMatchService>();		// Add the Upcoming Matches Service 
+builder.Services.AddScoped<IWorldCupService, WorldCupService>();		// Add the World Cup Service 
 builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
 builder.Services.AddScoped<INotificationService, NotificationService>();        // Add the Favorite Teams User Notification Service   	
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service 
@@ -185,7 +186,9 @@ using (var scope = app.Services.CreateScope())
 	// historical match results
 	await SeedMatchResultsAsync(services);                     // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 	// seed the Admin & Moderator Roles
-	await SeedRolesAndAdminAsync(services);					 // Seed the Roles ( Admin and Moderator ) and the Admin account
+	await SeedRolesAndAdminAsync(services);					 // Seed the Roles ( Admin and Moderator ) and the Admin account	
+    // seed the World Cup Matches 
+	await SeedWorldCupMatchesAsync(services);			   // Seed all the World Cup 2026 matches 
 
 }
 
