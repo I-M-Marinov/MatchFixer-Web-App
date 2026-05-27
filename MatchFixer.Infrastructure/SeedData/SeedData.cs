@@ -625,5 +625,142 @@ namespace MatchFixer.Infrastructure.SeedData
 			}
 		}
 
+
+		public static async Task SeedWorldCupMatchesAsync(
+			IServiceProvider serviceProvider)
+		{
+			var dbContext =
+				serviceProvider.GetRequiredService<MatchFixerDbContext>();
+
+			var sportsDb =
+				serviceProvider.GetRequiredService<ITheSportsDbApiService>();
+
+			if (await dbContext.WorldCupMatches.AnyAsync())
+			{
+				return;
+			}
+
+			var fixtures =
+				await sportsDb.GetWorldCupFixturesAsync();
+
+			if (!fixtures.Any())
+			{
+				return;
+			}
+
+			var worldCupMatches =
+				new List<WorldCupMatch>();
+
+			var roundPosition = 1;
+
+			foreach (var fixture in fixtures)
+			{
+				DateTime kickoff;
+
+				if (!DateTime.TryParse(
+					    $"{fixture.Date} {fixture.Time}",
+					    out kickoff))
+				{
+					kickoff = DateTime.UtcNow;
+				}
+
+				var stage =
+					ParseWorldCupStage(fixture.Round);
+
+				worldCupMatches.Add(new WorldCupMatch
+				{
+					ApiEventId =
+						int.TryParse(
+							fixture.EventId,
+							out var parsedId)
+							? parsedId
+							: null,
+
+					HomeTeam = fixture.HomeTeam,
+
+					AwayTeam = fixture.AwayTeam,
+
+					HomeLogo =
+						fixture.HomeBadge
+						?? string.Empty,
+
+					AwayLogo =
+						fixture.AwayBadge
+						?? string.Empty,
+
+					MatchDate = kickoff,
+
+					HomeScore =
+						int.TryParse(
+							fixture.HomeScore,
+							out var hs)
+							? hs
+							: null,
+
+					AwayScore =
+						int.TryParse(
+							fixture.AwayScore,
+							out var aw)
+							? aw
+							: null,
+
+					Stage = stage,
+
+					GroupName =
+						stage == WorldCupStage.GroupStage
+							? fixture.Round
+							: null,
+
+					IsKnockout =
+						stage != WorldCupStage.GroupStage,
+
+					IsFinished =
+						fixture.Status == "Match Finished",
+
+					IsLive =
+						fixture.Status == "Live",
+
+					RoundPosition = roundPosition++
+				});
+			}
+
+			await dbContext.WorldCupMatches
+				.AddRangeAsync(worldCupMatches);
+
+			await dbContext.SaveChangesAsync();
+		}
+
+		private static WorldCupStage ParseWorldCupStage(
+			string? round)
+		{
+			if (string.IsNullOrWhiteSpace(round))
+			{
+				return WorldCupStage.GroupStage;
+			}
+
+			round = round.ToLower();
+
+			if (round.Contains("round of 16"))
+			{
+				return WorldCupStage.RoundOf16;
+			}
+
+			if (round.Contains("quarter"))
+			{
+				return WorldCupStage.QuarterFinal;
+			}
+
+			if (round.Contains("semi"))
+			{
+				return WorldCupStage.SemiFinal;
+			}
+
+			if (round.Contains("final"))
+			{
+				return WorldCupStage.Final;
+			}
+
+			return WorldCupStage.GroupStage;
+		}
 	}
 }
