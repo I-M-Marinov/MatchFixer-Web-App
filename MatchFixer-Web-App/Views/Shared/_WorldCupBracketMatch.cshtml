@@ -1,0 +1,43 @@
+﻿@model MatchFixer.Core.ViewModels.WordCup.WorldCupMatchCardViewModel
+
+<div class="wc-bracket-match">
+
+	<div class="wc-bracket-team">
+
+		<div class="wc-bracket-team-info">
+
+			<img src="@Model.HomeLogo"
+				 class="wc-bracket-logo" />
+
+			<span>
+				@Model.HomeTeam
+			</span>
+
+		</div>
+
+		<div class="wc-bracket-score">
+			@(Model.HomeScore?.ToString() ?? "-")
+		</div>
+
+	</div>
+
+	<div class="wc-bracket-team">
+
+		<div class="wc-bracket-team-info">
+
+			<img src="@Model.AwayLogo"
+				 class="wc-bracket-logo" />
+
+			<span>
+				@Model.AwayTeam
+			</span>
+
+		</div>
+
+		<div class="wc-bracket-score">
+			@(Model.AwayScore?.ToString() ?? "-")
+		</div>
+
+	</div>
+
+</div>
