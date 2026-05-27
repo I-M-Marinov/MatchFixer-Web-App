@@ -1,0 +1,348 @@
+﻿@using MatchFixer.Core.ViewModels.WordCup
+@model WorldCupPageViewModel
+
+@{
+	ViewData["Title"] = "FIFA World Cup";
+}
+
+<link rel="stylesheet"
+	  href="~/css/world-cup/world-cup.css" />
+
+<div class="world-cup-page">
+
+	<!-- HERO -->
+	<div class="world-cup-hero">
+
+		<div class="world-cup-hero-overlay"></div>
+
+		<div class="world-cup-hero-content">
+
+			<div class="world-cup-title">
+				<i class="bi bi-trophy-fill"></i>
+				FIFA WORLD CUP
+			</div>
+
+			<div class="world-cup-subtitle">
+				Tournament Tracker & Knockout Graph
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- TABS -->
+	<div class="world-cup-tabs">
+
+		<button class="wc-tab active"
+				data-tab="bracketTab">
+
+			<i class="bi bi-diagram-3-fill"></i>
+			Tournament Graph
+		</button>
+
+		<button class="wc-tab"
+				data-tab="trackerTab">
+
+			<i class="bi bi-list-stars"></i>
+			Tournament Tracker
+		</button>
+
+	</div>
+
+	<!-- ========================= -->
+	<!-- BRACKET TAB -->
+	<!-- ========================= -->
+
+	<div id="bracketTab"
+	     class="wc-tab-content active">
+
+		<div class="wc-bracket-container">
+
+			<!-- ROUND OF 16 -->
+			<div class="wc-round">
+
+				<div class="wc-round-title">
+					Round of 16
+				</div>
+
+				@foreach (var match in Model.Bracket.RoundOf16)
+				{
+					<partial name="_WorldCupBracketMatch"
+					         model="match" />
+				}
+
+			</div>
+
+			<!-- QUARTER FINALS -->
+			<div class="wc-round">
+
+				<div class="wc-round-title">
+					Quarter Finals
+				</div>
+
+				@foreach (var match in Model.Bracket.QuarterFinals)
+				{
+					<partial name="_WorldCupBracketMatch"
+					         model="match" />
+				}
+
+			</div>
+
+			<!-- SEMI FINALS -->
+			<div class="wc-round">
+
+				<div class="wc-round-title">
+					Semi Finals
+				</div>
+
+				@foreach (var match in Model.Bracket.SemiFinals)
+				{
+					<partial name="_WorldCupBracketMatch"
+					         model="match" />
+				}
+
+			</div>
+
+			<!-- FINAL -->
+			<div class="wc-round final-round">
+
+				<div class="wc-round-title">
+					Final
+				</div>
+
+				@foreach (var match in Model.Bracket.Final)
+				{
+					<partial name="_WorldCupBracketMatch"
+					         model="match" />
+				}
+
+			</div>
+
+		</div>
+
+	</div>
+	
+	
+	<div class="wc-group-standings-section">
+
+		@foreach (var group in Model.GroupStandings)
+		{
+			<div class="wc-group-card">
+
+				<div class="wc-group-title">
+					@group.GroupName
+				</div>
+
+				<table class="wc-standings-table">
+
+					<thead>
+					<tr>
+						<th>#</th>
+						<th>Team</th>
+						<th>P</th>
+						<th>W</th>
+						<th>D</th>
+						<th>L</th>
+						<th>GD</th>
+						<th>Pts</th>
+					</tr>
+					</thead>
+
+					<tbody>
+
+					@{
+						int rank = 1;
+					}
+
+					@foreach (var team in group.Teams)
+					{
+						<tr class="@(team.IsQualified
+							           ? "qualified-team"
+							           : "")">
+
+							<td>@rank</td>
+
+							<td class="wc-team-cell">
+
+								<img src="@team.TeamLogo"
+								     class="wc-standing-logo" />
+
+								<span>
+									@team.TeamName
+								</span>
+
+							</td>
+
+							<td>@team.Played</td>
+							<td>@team.Wins</td>
+							<td>@team.Draws</td>
+							<td>@team.Losses</td>
+							<td>@team.GoalDifference</td>
+							<td>@team.Points</td>
+
+						</tr>
+
+						rank++;
+					}
+
+					</tbody>
+
+				</table>
+
+			</div>
+		}
+
+	</div>
+
+	<!-- ========================= -->
+	<!-- TRACKER TAB -->
+	<!-- ========================= -->
+
+	<div id="trackerTab"
+		 class="wc-tab-content">
+
+		<div class="wc-stage-tracker">
+
+			@foreach (var stage in Model.Stages)
+			{
+				<div class="wc-stage-section">
+
+					<div class="wc-stage-header">
+						@stage.StageName
+					</div>
+
+					<div class="wc-stage-matches">
+
+						@foreach (var match in stage.Matches)
+						{
+							<div class="wc-match-card">
+
+								<!-- TOP -->
+								<div class="wc-match-card-top">
+
+									<div class="wc-match-status">
+
+										@if (match.IsLive)
+										{
+											<span class="live-badge">
+												LIVE
+											</span>
+										}
+										else if (match.IsFinished)
+										{
+											<span class="finished-badge">
+												FT
+											</span>
+										}
+										else
+										{
+											<span class="scheduled-badge">
+												UPCOMING
+											</span>
+										}
+
+									</div>
+
+									<div class="wc-match-date">
+										@(match.MatchDate?.ToString("dd MMM yyyy HH:mm"))
+									</div>
+
+								</div>
+
+								<!-- BODY -->
+								<div class="wc-match-body">
+
+									<!-- HOME -->
+									<div class="wc-team">
+
+										<img src="@match.HomeLogo"
+											 alt="@match.HomeTeam"
+											 class="wc-team-logo" />
+
+										<div class="wc-team-name">
+											@match.HomeTeam
+										</div>
+
+									</div>
+
+									<!-- SCORE -->
+									<div class="wc-score-section">
+
+										@if (match.HomeScore.HasValue &&
+																		match.AwayScore.HasValue)
+										{
+											<div class="wc-score">
+												@match.HomeScore - @match.AwayScore
+											</div>
+										}
+										else
+										{
+											<div class="wc-vs">
+												VS
+											</div>
+										}
+
+									</div>
+
+									<!-- AWAY -->
+									<div class="wc-team">
+
+										<img src="@match.AwayLogo"
+											 alt="@match.AwayTeam"
+											 class="wc-team-logo" />
+
+										<div class="wc-team-name">
+											@match.AwayTeam
+										</div>
+
+									</div>
+
+								</div>
+
+							</div>
+						}
+
+					</div>
+
+				</div>
+			}
+
+		</div>
+
+	</div>
+
+</div>
+
+@section Scripts
+{
+	<script>
+
+		document.addEventListener("DOMContentLoaded", () => {
+
+			const tabs = document.querySelectorAll(".wc-tab");
+
+			const contents = document.querySelectorAll(".wc-tab-content");
+
+			tabs.forEach(tab => {
+
+				tab.addEventListener("click", () => {
+
+					tabs.forEach(t =>
+						t.classList.remove("active"));
+
+					contents.forEach(c =>
+						c.classList.remove("active"));
+
+					tab.classList.add("active");
+
+					const target =
+						document.getElementById(
+							tab.dataset.tab);
+
+					target.classList.add("active");
+				});
+			});
+		});
+
+	</script>
+}
