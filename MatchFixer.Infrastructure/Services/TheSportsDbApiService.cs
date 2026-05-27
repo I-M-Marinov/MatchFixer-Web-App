@@ -108,6 +108,50 @@ namespace MatchFixer.Infrastructure.Services
 		}
 
 
+		public async Task<List<WorldCupFixtureApiDto>>
+			GetWorldCupFixturesAsync(
+				CancellationToken ct = default)
+		{
+			// FIFA World Cup Soccer
+			// 4956 = FIFA World Cup
+
+			var url =
+				$"{BaseUrl}/{_apiKey}/eventsseason.php?id=4429&s=2026";
+			HttpResponseMessage response;
+
+			try
+			{
+				response = await _http.GetAsync(url, ct);
+			}
+			catch
+			{
+				return new();
+			}
+
+			if (!response.IsSuccessStatusCode)
+			{
+				return new();
+			}
+
+			var content =
+				await response.Content.ReadAsStringAsync(ct);
+
+			if (string.IsNullOrWhiteSpace(content))
+			{
+				return new();
+			}
+
+			var parsed =
+				JsonSerializer.Deserialize<
+					WorldCupFixturesApiResponse>(
+					content,
+					new JsonSerializerOptions
+					{
+						PropertyNameCaseInsensitive = true
+					});
+
+			return parsed?.Events ?? new();
+		}
 
 	}
 }
