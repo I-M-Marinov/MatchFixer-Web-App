@@ -10,23 +10,14 @@
 
 <div class="world-cup-page">
 
-	<!-- HERO -->
-	<div class="world-cup-hero">
+	<!-- HERO BANNER -->
+	<div class="world-cup-banner">
 
-		<div class="world-cup-hero-overlay"></div>
+		<img src="~/images/world-cup/matchfixer-world-cup-2026.png"
+			 alt="MatchFixer World Cup 2026"
+			 class="world-cup-banner-image" />
 
-		<div class="world-cup-hero-content">
-
-			<div class="world-cup-title">
-				<i class="bi bi-trophy-fill"></i>
-				FIFA WORLD CUP
-			</div>
-
-			<div class="world-cup-subtitle">
-				Tournament Tracker & Knockout Graph
-			</div>
-
-		</div>
+		<div class="world-cup-banner-overlay"></div>
 
 	</div>
 
@@ -38,6 +29,7 @@
 
 			<i class="bi bi-diagram-3-fill"></i>
 			Tournament Graph
+
 		</button>
 
 		<button class="wc-tab"
@@ -45,61 +37,95 @@
 
 			<i class="bi bi-list-stars"></i>
 			Tournament Tracker
+
 		</button>
 
 	</div>
 
-	<!-- ========================= -->
+	<!-- ========================================= -->
 	<!-- BRACKET TAB -->
-	<!-- ========================= -->
+	<!-- ========================================= -->
 
 	<div id="bracketTab"
-	     class="wc-tab-content active">
+		 class="wc-tab-content active">
 
 		<div class="wc-bracket-container">
 
 			<!-- ROUND OF 16 -->
-			<div class="wc-round">
+			<div class="wc-round r16-round">
 
 				<div class="wc-round-title">
 					Round of 16
 				</div>
 
-				@foreach (var match in Model.Bracket.RoundOf16)
+				@if (Model.Bracket.RoundOf16.Any())
 				{
-					<partial name="_WorldCupBracketMatch"
-					         model="match" />
+					@foreach (var match in Model.Bracket.RoundOf16)
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="match" />
+					}
 				}
+				else
+				{
+					@for (int i = 0; i < 8; i++)
+					{
+						@await Html.PartialAsync(
+						"_WorldCupPlaceholderMatch")
+								}
+								}
 
 			</div>
 
 			<!-- QUARTER FINALS -->
-			<div class="wc-round">
+			<div class="wc-round qf-round">
 
 				<div class="wc-round-title">
 					Quarter Finals
 				</div>
 
-				@foreach (var match in Model.Bracket.QuarterFinals)
+				@if (Model.Bracket.QuarterFinals.Any())
 				{
-					<partial name="_WorldCupBracketMatch"
-					         model="match" />
+					@foreach (var match in Model.Bracket.QuarterFinals)
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="match" />
+					}
 				}
+				else
+				{
+					@for (int i = 0; i < 4; i++)
+					{
+						@await Html.PartialAsync(
+						"_WorldCupPlaceholderMatch")
+								}
+								}
 
 			</div>
 
 			<!-- SEMI FINALS -->
-			<div class="wc-round">
+			<div class="wc-round sf-round">
 
 				<div class="wc-round-title">
 					Semi Finals
 				</div>
 
-				@foreach (var match in Model.Bracket.SemiFinals)
+				@if (Model.Bracket.SemiFinals.Any())
 				{
-					<partial name="_WorldCupBracketMatch"
-					         model="match" />
+					@foreach (var match in Model.Bracket.SemiFinals)
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="match" />
+					}
 				}
+				else
+				{
+					@for (int i = 0; i < 2; i++)
+					{
+						@await Html.PartialAsync(
+						"_WorldCupPlaceholderMatch")
+								}
+								}
 
 			</div>
 
@@ -110,198 +136,229 @@
 					Final
 				</div>
 
-				@foreach (var match in Model.Bracket.Final)
+				@if (Model.Bracket.Final.Any())
 				{
-					<partial name="_WorldCupBracketMatch"
-					         model="match" />
+					@foreach (var match in Model.Bracket.Final)
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="match" />
+					}
 				}
+				else
+				{
+					<div class="final-placeholder-wrapper">
+
+						@await Html.PartialAsync(
+						"_WorldCupPlaceholderMatch")
+
+				</div>
+								}
 
 			</div>
 
 		</div>
 
 	</div>
-	
-	
-	<div class="wc-group-standings-section">
 
-		@foreach (var group in Model.GroupStandings)
-		{
-			<div class="wc-group-card">
-
-				<div class="wc-group-title">
-					@group.GroupName
-				</div>
-
-				<table class="wc-standings-table">
-
-					<thead>
-					<tr>
-						<th>#</th>
-						<th>Team</th>
-						<th>P</th>
-						<th>W</th>
-						<th>D</th>
-						<th>L</th>
-						<th>GD</th>
-						<th>Pts</th>
-					</tr>
-					</thead>
-
-					<tbody>
-
-					@{
-						int rank = 1;
-					}
-
-					@foreach (var team in group.Teams)
-					{
-						<tr class="@(team.IsQualified
-							           ? "qualified-team"
-							           : "")">
-
-							<td>@rank</td>
-
-							<td class="wc-team-cell">
-
-								<img src="@team.TeamLogo"
-								     class="wc-standing-logo" />
-
-								<span>
-									@team.TeamName
-								</span>
-
-							</td>
-
-							<td>@team.Played</td>
-							<td>@team.Wins</td>
-							<td>@team.Draws</td>
-							<td>@team.Losses</td>
-							<td>@team.GoalDifference</td>
-							<td>@team.Points</td>
-
-						</tr>
-
-						rank++;
-					}
-
-					</tbody>
-
-				</table>
-
-			</div>
-		}
-
-	</div>
-
-	<!-- ========================= -->
+	<!-- ========================================= -->
 	<!-- TRACKER TAB -->
-	<!-- ========================= -->
+	<!-- ========================================= -->
 
 	<div id="trackerTab"
 		 class="wc-tab-content">
 
+		<!-- GROUP STANDINGS -->
+		@if (Model.GroupStandings.Any())
+		{
+			<div class="wc-group-standings-section">
+
+				@foreach (var group in Model.GroupStandings)
+				{
+					<div class="wc-group-card">
+
+						<div class="wc-group-title">
+							@group.GroupName
+						</div>
+
+						<table class="wc-standings-table">
+
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Team</th>
+									<th>P</th>
+									<th>W</th>
+									<th>D</th>
+									<th>L</th>
+									<th>GD</th>
+									<th>Pts</th>
+								</tr>
+							</thead>
+
+							<tbody>
+
+								@{
+									int rank = 1;
+								}
+
+								@foreach (var team in group.Teams)
+								{
+									<tr class="@(team.IsQualified
+														  ? "qualified-team"
+														  : "")">
+
+							<td>@rank</td>
+
+										<td class="wc-team-cell">
+
+											<img src="@team.TeamLogo"
+												 class="wc-standing-logo" />
+
+											<span>
+												@team.TeamName
+											</span>
+
+										</td>
+
+										<td>@team.Played</td>
+										<td>@team.Wins</td>
+										<td>@team.Draws</td>
+										<td>@team.Losses</td>
+										<td>@team.GoalDifference</td>
+										<td>@team.Points</td>
+
+									</tr>
+
+												rank++;
+								}
+
+							</tbody>
+
+						</table>
+
+					</div>
+				}
+
+			</div>
+		}
+
+		<!-- MATCH TRACKER -->
 		<div class="wc-stage-tracker">
 
-			@foreach (var stage in Model.Stages)
+			@if (Model.Stages.Any())
 			{
-				<div class="wc-stage-section">
+				@foreach (var stage in Model.Stages)
+				{
+					<div class="wc-stage-section">
 
-					<div class="wc-stage-header">
-						@stage.StageName
-					</div>
+						<div class="wc-stage-header">
+							@stage.StageName
+						</div>
 
-					<div class="wc-stage-matches">
+						<div class="wc-stage-matches">
 
-						@foreach (var match in stage.Matches)
-						{
-							<div class="wc-match-card">
+							@foreach (var match in stage.Matches)
+							{
+								<div class="wc-match-card">
 
-								<!-- TOP -->
-								<div class="wc-match-card-top">
+									<div class="wc-match-card-top">
 
-									<div class="wc-match-status">
+										<div class="wc-match-status">
 
-										@if (match.IsLive)
-										{
-											<span class="live-badge">
-												LIVE
-											</span>
-										}
-										else if (match.IsFinished)
-										{
-											<span class="finished-badge">
-												FT
-											</span>
-										}
-										else
-										{
-											<span class="scheduled-badge">
-												UPCOMING
-											</span>
-										}
+											@if (match.IsLive)
+											{
+												<span class="live-badge">
+													LIVE
+												</span>
+											}
+											else if (match.IsFinished)
+											{
+												<span class="finished-badge">
+													FT
+												</span>
+											}
+											else
+											{
+												<span class="scheduled-badge">
+													UPCOMING
+												</span>
+											}
 
 									</div>
 
 									<div class="wc-match-date">
-										@(match.MatchDate?.ToString("dd MMM yyyy HH:mm"))
-									</div>
-
-								</div>
-
-								<!-- BODY -->
-								<div class="wc-match-body">
-
-									<!-- HOME -->
-									<div class="wc-team">
-
-										<img src="@match.HomeLogo"
-											 alt="@match.HomeTeam"
-											 class="wc-team-logo" />
-
-										<div class="wc-team-name">
-											@match.HomeTeam
-										</div>
-
-									</div>
-
-									<!-- SCORE -->
-									<div class="wc-score-section">
-
-										@if (match.HomeScore.HasValue &&
-																		match.AwayScore.HasValue)
-										{
-											<div class="wc-score">
-												@match.HomeScore - @match.AwayScore
-											</div>
-										}
-										else
-										{
-											<div class="wc-vs">
-												VS
-											</div>
-										}
-
-									</div>
-
-									<!-- AWAY -->
-									<div class="wc-team">
-
-										<img src="@match.AwayLogo"
-											 alt="@match.AwayTeam"
-											 class="wc-team-logo" />
-
-										<div class="wc-team-name">
-											@match.AwayTeam
-										</div>
-
-									</div>
-
-								</div>
-
+										@(match.MatchDate?.ToString(
+																		"dd MMM yyyy HH:mm"))
 							</div>
-						}
 
+									</div>
+
+									<div class="wc-match-body">
+
+										<div class="wc-team">
+
+											<img src="@match.HomeLogo"
+												 class="wc-team-logo" />
+
+											<div class="wc-team-name">
+												@match.HomeTeam
+											</div>
+
+										</div>
+
+										<div class="wc-score-section">
+
+								@if (match.HomeScore.HasValue
+																&& match.AwayScore.HasValue)
+											{
+												<div class="wc-score">
+													@match.HomeScore
+													-
+													@match.AwayScore
+												</div>
+											}
+											else
+											{
+												<div class="wc-vs">
+													VS
+												</div>
+											}
+
+										</div>
+
+										<div class="wc-team">
+
+											<img src="@match.AwayLogo"
+												 class="wc-team-logo" />
+
+											<div class="wc-team-name">
+												@match.AwayTeam
+											</div>
+
+										</div>
+
+									</div>
+
+								</div>
+							}
+
+						</div>
+
+					</div>
+				}
+			}
+			else
+			{
+				<div class="wc-empty-state">
+
+					<i class="bi bi-hourglass-split"></i>
+
+					<div class="wc-empty-title">
+						World Cup data is loading...
+					</div>
+
+					<div class="wc-empty-subtitle">
+						Fixtures and standings will appear here.
 					</div>
 
 				</div>
@@ -319,9 +376,12 @@
 
 		document.addEventListener("DOMContentLoaded", () => {
 
-			const tabs = document.querySelectorAll(".wc-tab");
+			const tabs =
+				document.querySelectorAll(".wc-tab");
 
-			const contents = document.querySelectorAll(".wc-tab-content");
+			const contents =
+				document.querySelectorAll(
+					".wc-tab-content");
 
 			tabs.forEach(tab => {
 
