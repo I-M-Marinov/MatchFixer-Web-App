@@ -7,6 +7,7 @@
 		<div class="wc-bracket-team-info">
 
 			<img src="@Model.HomeLogo"
+				 alt="@Model.HomeTeam"
 				 class="wc-bracket-logo" />
 
 			<span>
@@ -15,9 +16,18 @@
 
 		</div>
 
-		<div class="wc-bracket-score">
-			@(Model.HomeScore?.ToString() ?? "-")
-		</div>
+		<span class="wc-bracket-score">
+
+			@if (Model.HomeScore.HasValue)
+			{
+				@Model.HomeScore
+			}
+			else
+			{
+				@:-
+			}
+
+		</span>
 
 	</div>
 
@@ -26,6 +36,7 @@
 		<div class="wc-bracket-team-info">
 
 			<img src="@Model.AwayLogo"
+				 alt="@Model.AwayTeam"
 				 class="wc-bracket-logo" />
 
 			<span>
@@ -34,9 +45,18 @@
 
 		</div>
 
-		<div class="wc-bracket-score">
-			@(Model.AwayScore?.ToString() ?? "-")
-		</div>
+		<span class="wc-bracket-score">
+
+			@if (Model.AwayScore.HasValue)
+			{
+				@Model.AwayScore
+			}
+			else
+			{
+				@:-
+			}
+
+		</span>
 
 	</div>
 
