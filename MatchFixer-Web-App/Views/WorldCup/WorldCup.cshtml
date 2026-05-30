@@ -49,88 +49,80 @@
 	<div id="bracketTab"
 		 class="wc-tab-content active">
 
-		<div class="wc-bracket-container">
+		<div class="wc-bracket-grid">
 
 			<!-- ROUND OF 16 -->
-			<div class="wc-round r16-round">
+			<div class="wc-column r16-round">
 
 				<div class="wc-round-title">
 					Round of 16
 				</div>
 
-				@if (Model.Bracket.RoundOf16.Any())
+				@for (int i = 0; i < 8; i++)
 				{
-					@foreach (var match in Model.Bracket.RoundOf16)
+					if (Model.Bracket.RoundOf16.Count > i)
 					{
 						<partial name="_WorldCupBracketMatch"
-								 model="match" />
+								 model="Model.Bracket.RoundOf16[i]" />
+					}
+					else
+					{
+						<partial name="_WorldCupPlaceholderMatch" />
 					}
 				}
-				else
-				{
-					@for (int i = 0; i < 8; i++)
-					{
-						@await Html.PartialAsync(
-						"_WorldCupPlaceholderMatch")
-								}
-								}
 
 			</div>
 
-			<!-- QUARTER FINALS -->
-			<div class="wc-round qf-round">
+
+			<!-- QUARTERS -->
+			
+			<div class="wc-column quarters">
 
 				<div class="wc-round-title">
 					Quarter Finals
 				</div>
 
-				@if (Model.Bracket.QuarterFinals.Any())
+				@for (int i = 0; i < 4; i++)
 				{
-					@foreach (var match in Model.Bracket.QuarterFinals)
+					if (Model.Bracket.QuarterFinals.Count > i)
 					{
 						<partial name="_WorldCupBracketMatch"
-								 model="match" />
+								 model="Model.Bracket.QuarterFinals[i]" />
+					}
+					else
+					{
+						<partial name="_WorldCupPlaceholderMatch" />
 					}
 				}
-				else
-				{
-					@for (int i = 0; i < 4; i++)
-					{
-						@await Html.PartialAsync(
-						"_WorldCupPlaceholderMatch")
-								}
-								}
 
 			</div>
 
-			<!-- SEMI FINALS -->
-			<div class="wc-round sf-round">
+			<!-- SEMIS -->
+
+			<div class="wc-column semis">
 
 				<div class="wc-round-title">
 					Semi Finals
 				</div>
 
-				@if (Model.Bracket.SemiFinals.Any())
+				@for (int i = 0; i < 2; i++)
 				{
-					@foreach (var match in Model.Bracket.SemiFinals)
+					if (Model.Bracket.SemiFinals.Count > i)
 					{
 						<partial name="_WorldCupBracketMatch"
-								 model="match" />
+								 model="Model.Bracket.SemiFinals[i]" />
+					}
+					else
+					{
+						<partial name="_WorldCupPlaceholderMatch" />
 					}
 				}
-				else
-				{
-					@for (int i = 0; i < 2; i++)
-					{
-						@await Html.PartialAsync(
-						"_WorldCupPlaceholderMatch")
-								}
-								}
 
 			</div>
 
 			<!-- FINAL -->
-			<div class="wc-round final-round">
+
+			<div class="wc-column finals">
 
 				<div class="wc-round-title">
 					Final
@@ -138,21 +130,31 @@
 
 				@if (Model.Bracket.Final.Any())
 				{
-					@foreach (var match in Model.Bracket.Final)
-					{
-						<partial name="_WorldCupBracketMatch"
-								 model="match" />
-					}
+					<partial name="_WorldCupBracketMatch"
+							 model="Model.Bracket.Final.First()" />
 				}
 				else
 				{
-					<div class="final-placeholder-wrapper">
+					<partial name="_WorldCupPlaceholderMatch" />
+				}
 
-						@await Html.PartialAsync(
-						"_WorldCupPlaceholderMatch")
+			</div>
+
+			<!-- CHAMPION -->
+
+			<div class="wc-column champion">
+
+				<div class="wc-round-title">
+					Champion
+				</div>
+
+				<div class="wc-champion-slot">
+
+					<i class="bi bi-trophy-fill"></i>
+
+					<span>TBD</span>
 
 				</div>
-								}
 
 			</div>
 
