@@ -1,63 +1,63 @@
 ﻿@model MatchFixer.Core.ViewModels.WordCup.WorldCupMatchCardViewModel
 
-<div class="wc-bracket-match">
+	<div class="wc-bracket-match">
 
-	<div class="wc-bracket-team">
+		<div class="wc-bracket-team">
 
-		<div class="wc-bracket-team-info">
+			<div class="wc-bracket-team-info">
 
-			<img src="@Model.HomeLogo"
-				 alt="@Model.HomeTeam"
-				 class="wc-bracket-logo" />
+				<img src="@Model.HomeLogo"
+					 alt="@Model.HomeTeam"
+					 class="wc-bracket-logo" />
 
-			<span>
-				@Model.HomeTeam
+				<span>
+					@Model.HomeTeam
+				</span>
+
+			</div>
+
+			<span class="wc-bracket-score">
+
+				@if (Model.HomeScore.HasValue)
+				{
+					@Model.HomeScore
+				}
+				else
+				{
+					@:-
+				}
+
 			</span>
 
 		</div>
 
-		<span class="wc-bracket-score">
+		<div class="wc-bracket-team">
 
-			@if (Model.HomeScore.HasValue)
-			{
-				@Model.HomeScore
-			}
-			else
-			{
-				@:-
-			}
+			<div class="wc-bracket-team-info">
 
-		</span>
+				<img src="@Model.AwayLogo"
+					 alt="@Model.AwayTeam"
+					 class="wc-bracket-logo" />
 
-	</div>
+				<span>
+					@Model.AwayTeam
+				</span>
 
-	<div class="wc-bracket-team">
+			</div>
 
-		<div class="wc-bracket-team-info">
+			<span class="wc-bracket-score">
 
-			<img src="@Model.AwayLogo"
-				 alt="@Model.AwayTeam"
-				 class="wc-bracket-logo" />
+				@if (Model.AwayScore.HasValue)
+				{
+					@Model.AwayScore
+				}
+				else
+				{
+					@:-
+				}
 
-			<span>
-				@Model.AwayTeam
 			</span>
 
 		</div>
 
-		<span class="wc-bracket-score">
-
-			@if (Model.AwayScore.HasValue)
-			{
-				@Model.AwayScore
-			}
-			else
-			{
-				@:-
-			}
-
-		</span>
-
 	</div>
-
-</div>
