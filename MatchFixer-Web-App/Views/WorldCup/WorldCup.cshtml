@@ -84,15 +84,19 @@
 
 				@for (int i = 0; i < 4; i++)
 				{
-					if (Model.Bracket.QuarterFinals.Count > i)
-					{
-						<partial name="_WorldCupBracketMatch"
-								 model="Model.Bracket.QuarterFinals[i]" />
-					}
-					else
-					{
-						<partial name="_WorldCupPlaceholderMatch" />
-					}
+					<div class="wc-match-node">
+
+						@if (Model.Bracket.QuarterFinals.Count > i)
+						{
+							<partial name="_WorldCupBracketMatch"
+									 model="Model.Bracket.QuarterFinals[i]" />
+						}
+						else
+						{
+							<partial name="_WorldCupPlaceholderMatch" />
+						}
+
+					</div>
 				}
 
 			</div>
@@ -107,15 +111,19 @@
 
 				@for (int i = 0; i < 2; i++)
 				{
-					if (Model.Bracket.SemiFinals.Count > i)
-					{
-						<partial name="_WorldCupBracketMatch"
-								 model="Model.Bracket.SemiFinals[i]" />
-					}
-					else
-					{
-						<partial name="_WorldCupPlaceholderMatch" />
-					}
+					<div class="wc-match-node">
+
+						@if (Model.Bracket.SemiFinals.Count > i)
+						{
+							<partial name="_WorldCupBracketMatch"
+									 model="Model.Bracket.SemiFinals[i]" />
+						}
+						else
+						{
+							<partial name="_WorldCupPlaceholderMatch" />
+						}
+
+					</div>
 				}
 
 			</div>
@@ -127,17 +135,18 @@
 				<div class="wc-round-title">
 					Final
 				</div>
+				<div class="wc-match-node">
 
-				@if (Model.Bracket.Final.Any())
-				{
-					<partial name="_WorldCupBracketMatch"
-							 model="Model.Bracket.Final.First()" />
-				}
-				else
-				{
-					<partial name="_WorldCupPlaceholderMatch" />
-				}
-
+					@if (Model.Bracket.Final.Any())
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="Model.Bracket.Final.First()" />
+					}
+					else
+					{
+						<partial name="_WorldCupPlaceholderMatch" />
+					}
+				</div>
 			</div>
 
 			<!-- CHAMPION -->
@@ -257,94 +266,117 @@
 							@stage.StageName
 						</div>
 
-						<div class="wc-stage-matches">
+						@foreach (var day in stage.DayGroups)
+						{
+							<div class="wc-day-header">
 
-							@foreach (var match in stage.Matches)
-							{
-								<div class="wc-match-card">
+								<i class="bi bi-calendar-event"></i>
 
-									<div class="wc-match-card-top">
+								@day.Date.ToString("dddd, dd MMMM yyyy")
 
-										<div class="wc-match-status">
-
-											@if (match.IsLive)
-											{
-												<span class="live-badge">
-													LIVE
-												</span>
-											}
-											else if (match.IsFinished)
-											{
-												<span class="finished-badge">
-													FT
-												</span>
-											}
-											else
-											{
-												<span class="scheduled-badge">
-													UPCOMING
-												</span>
-											}
-
-									</div>
-
-									<div class="wc-match-date">
-										@(match.MatchDate?.ToString(
-																		"dd MMM yyyy HH:mm"))
 							</div>
 
-									</div>
+							<div class="wc-day-grid">
 
-									<div class="wc-match-body">
+								@foreach (var match in day.Matches)
+								{
+									<div class="wc-match-card">
 
-										<div class="wc-team">
+										<div class="wc-match-card-top">
 
-											<img src="@match.HomeLogo"
-												 class="wc-team-logo" />
+											<div class="wc-match-status">
 
-											<div class="wc-team-name">
-												@match.HomeTeam
+												@if (match.IsLive)
+												{
+													<span class="live-badge">
+														LIVE
+													</span>
+												}
+												else if (match.IsFinished)
+												{
+													<span class="finished-badge">
+														FT
+													</span>
+												}
+												else
+												{
+													<span class="scheduled-badge">
+														UPCOMING
+													</span>
+												}
+
+											</div>
+
+											<div class="wc-match-date">
+												@match.MatchDate?.ToString("HH:mm")
 											</div>
 
 										</div>
 
-										<div class="wc-score-section">
+										<div class="wc-match-body">
 
-								@if (match.HomeScore.HasValue
-																&& match.AwayScore.HasValue)
-											{
-												<div class="wc-score">
-													@match.HomeScore
-													-
-													@match.AwayScore
+											<div class="wc-team">
+
+												<img src="@match.HomeLogo"
+													 class="wc-team-logo" />
+
+												<div class="wc-team-name">
+													@match.HomeTeam
 												</div>
-											}
-											else
-											{
-												<div class="wc-vs">
-													VS
+
+											</div>
+
+											<div class="wc-score-section">
+
+												@if (match.HomeScore.HasValue &&
+																				match.AwayScore.HasValue)
+												{
+													<div class="wc-score">
+														@match.HomeScore
+														-
+														@match.AwayScore
+													</div>
+												}
+												else
+												{
+													<div class="wc-vs">
+														VS
+													</div>
+												}
+
+											</div>
+
+											<div class="wc-team">
+
+												<img src="@match.AwayLogo"
+													 class="wc-team-logo" />
+
+												<div class="wc-team-name">
+													@match.AwayTeam
 												</div>
-											}
 
-										</div>
-
-										<div class="wc-team">
-
-											<img src="@match.AwayLogo"
-												 class="wc-team-logo" />
-
-											<div class="wc-team-name">
-												@match.AwayTeam
 											</div>
 
 										</div>
 
+										@if (match.IsAvailableForBetting)
+										{
+											<a asp-controller="Event"
+											   asp-action="LiveEvents"
+											   class="wc-bet-link">
+
+												<i class="bi bi-crosshair"></i>
+
+												BET NOW
+
+											</a>
+										}
+
 									</div>
+								}
 
-								</div>
-							}
-
-						</div>
+							</div>
+						}
 
 					</div>
 				}
