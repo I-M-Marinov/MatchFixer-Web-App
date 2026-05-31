@@ -4,6 +4,7 @@
 	{
 		public string StageName { get; set; } = null!;
 
-		public List<WorldCupMatchCardViewModel> Matches { get; set; } = new();
+		public List<WorldCupDayGroupViewModel> DayGroups { get; set; }
+			= new();
 	}
 }
