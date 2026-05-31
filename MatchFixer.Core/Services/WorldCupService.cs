@@ -13,11 +13,15 @@ namespace MatchFixer.Core.Services
 	{
 		private readonly MatchFixerDbContext _context;
 		private readonly ITheSportsDbApiService _sportsDbApiService;
+		private readonly ITimezoneService _timezoneService;
+		private readonly IUserContextService _userContextService;
 
-		public WorldCupService(MatchFixerDbContext context, ITheSportsDbApiService sportsDbApiService)
+		public WorldCupService(MatchFixerDbContext context, ITheSportsDbApiService sportsDbApiService, ITimezoneService timezoneService, IUserContextService userContextService)
 		{
 			_context = context;
 			_sportsDbApiService = sportsDbApiService;
+			_timezoneService = timezoneService;
+			_userContextService = userContextService;
 		}
 
 		public async Task<WorldCupPageViewModel> GetWorldCupPageAsync()
@@ -26,7 +30,15 @@ namespace MatchFixer.Core.Services
 
 				.OrderBy(x => x.Stage)
 				.ThenBy(x => x.RoundPosition)
+				.ToListAsync();
 
+			var user = await _userContextService.GetCurrentUserAsync();
+			var userTimeZone = user.TimeZone;
+
+			var matchEvents = await _context.MatchEvents
+				.Include(x => x.HomeTeam)
+				.Include(x => x.AwayTeam)
+				.Where(x => !x.IsCancelled)
 				.ToListAsync();
 
 			var groupedStages = matches
@@ -34,11 +46,20 @@ namespace MatchFixer.Core.Services
 				.Select(g => new WorldCupStageViewModel
 				{
 					StageName = FormatStageName(g.Key),
+					DayGroups = g.OrderBy(x => x.MatchDate)
+								.GroupBy(x => DateOnly.FromDateTime(x.MatchDate))
+								.Select(day => new WorldCupDayGroupViewModel
+								{
+									Date = day.Key,
 
-					Matches = g
-						.OrderBy(x => x.RoundPosition)
-						.Select(MapMatchCard)
-						.ToList()
+									Matches = day
+										.Select(x => MapMatchCard(
+											x,
+											matchEvents,
+											userTimeZone))
+										.ToList()
+								})
+								.ToList()
 				})
 				.ToList();
 
@@ -46,7 +67,10 @@ namespace MatchFixer.Core.Services
 			{
 				Stages = groupedStages,
 
-				Bracket = BuildBracket(matches),
+				Bracket = BuildBracket(
+					matches,
+					matchEvents,
+					userTimeZone),
 
 				GroupStandings =
 					await GetGroupStandingsAsync()
@@ -54,36 +78,76 @@ namespace MatchFixer.Core.Services
 		}
 
 		private KnockoutBracketViewModel BuildBracket(
-			List<WorldCupMatch> matches)
+			List<WorldCupMatch> matches,
+			List<MatchEvent> matchEvents,
+			string userTimeZone)
 		{
 			return new KnockoutBracketViewModel
 			{
-				RoundOf16 = MapStage(matches, WorldCupStage.RoundOf16),
+				RoundOf16 = MapStage(
+					matches,
+					WorldCupStage.RoundOf16,
+					matchEvents,
+					userTimeZone),
 
-				QuarterFinals = MapStage(matches, WorldCupStage.QuarterFinal),
+				QuarterFinals = MapStage(
+					matches,
+					WorldCupStage.QuarterFinal,
+					matchEvents,
+					userTimeZone),
 
-				SemiFinals = MapStage(matches, WorldCupStage.SemiFinal),
+				SemiFinals = MapStage(
+					matches,
+					WorldCupStage.SemiFinal,
+					matchEvents,
+					userTimeZone),
 
-				ThirdPlace = MapStage(matches, WorldCupStage.ThirdPlace),
+				ThirdPlace = MapStage(
+					matches,
+					WorldCupStage.ThirdPlace,
+					matchEvents,
+					userTimeZone),
 
-				Final = MapStage(matches, WorldCupStage.Final)
+				Final = MapStage(
+					matches,
+					WorldCupStage.Final,
+					matchEvents,
+					userTimeZone)
 			};
 		}
 
 		private List<WorldCupMatchCardViewModel> MapStage(
 			List<WorldCupMatch> matches,
-			WorldCupStage stage)
+			WorldCupStage stage,
+			List<MatchEvent> matchEvents,
+			string userTimeZone)
 		{
 			return matches
 				.Where(x => x.Stage == stage)
 				.OrderBy(x => x.RoundPosition)
-				.Select(MapMatchCard)
+				.Select(x => MapMatchCard(
+					x,
+					matchEvents,
+					userTimeZone))
 				.ToList();
 		}
 
 		private WorldCupMatchCardViewModel MapMatchCard(
-			WorldCupMatch match)
+			WorldCupMatch match,
+			List<MatchEvent> matchEvents,
+			string userTimeZone)
 		{
+			var matchDateLocal =
+				_timezoneService
+					.ConvertToUserTime(
+						match.MatchDate,
+						userTimeZone)
+					;
+
+			var matchEvent = matchEvents.FirstOrDefault(x =>
+				x.HomeTeam.Name == match.HomeTeam &&
+				x.AwayTeam.Name == match.AwayTeam);
+
 			return new WorldCupMatchCardViewModel
 			{
 				MatchId = match.Id,
@@ -94,16 +158,19 @@ namespace MatchFixer.Core.Services
 				HomeLogo = match.HomeLogo,
 				AwayLogo = match.AwayLogo,
 
-				MatchDate = match.MatchDate,
+				MatchDate = matchDateLocal,
 
 				HomeScore = match.HomeScore,
 				AwayScore = match.AwayScore,
 
 				IsFinished = match.IsFinished,
-
 				IsLive = match.IsLive,
 
-				Stage = match.Stage
+				Stage = match.Stage,
+
+				IsAvailableForBetting = matchEvent != null,
+
+				MatchEventId = matchEvent?.Id
 			};
 		}
 
@@ -133,10 +200,6 @@ namespace MatchFixer.Core.Services
 			{
 				return new();
 			}
-
-			// TEMP:
-			// Since API DTO has no group field,
-			// we fake groups based on ranking chunks
 
 			var grouped = standings
 				.Select((team, index) => new
