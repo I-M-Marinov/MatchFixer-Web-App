@@ -27,5 +27,10 @@ namespace MatchFixer.Core.ViewModels.WordCup
 		public string? Winner { get; set; }
 
 		public WorldCupStage Stage { get; set; }
+
+		public bool IsAvailableForBetting { get; set; }
+
+		public Guid? MatchEventId { get; set; }
+
 	}
 }
