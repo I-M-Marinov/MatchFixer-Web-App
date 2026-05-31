@@ -127,19 +127,19 @@
 ========================================================= */
 
 .r16-round {
-    grid-template-rows: auto repeat(8, 100px);
+    grid-template-rows: auto repeat(8, 110px);
 }
 
 .quarters {
-    grid-template-rows: auto repeat(4, 200px);
+    grid-template-rows: auto repeat(4, 350px);
 }
 
 .semis {
-    grid-template-rows: auto repeat(2, 400px);
+    grid-template-rows: auto repeat(2, 480px);
 }
 
 .finals {
-    grid-template-rows: auto 800px;
+    grid-template-rows: auto 960px;
 }
 
 .wc-column {
@@ -156,7 +156,88 @@
 .finals .wc-bracket-match {
     align-self: center;
 }
- 
+
+.wc-match-node .wc-bracket-match,
+.wc-match-node .placeholder-match {
+    width: 100%;
+    height: 100%;
+}
+
+.quarters .wc-match-node,
+.semis .wc-match-node,
+.finals .wc-match-node {
+    position: relative;
+    padding: 24px;
+    border: 2px solid rgba(212,183,0,.18);
+    border-radius: 24px;
+    background: rgba(212,183,0,.025);
+    width: 100%;
+}
+
+.semis .wc-match-node .wc-bracket-match,
+.semis .wc-match-node .placeholder-match {
+    position: relative;
+    padding: 85px;
+}
+
+
+.finals .wc-match-node .wc-bracket-match,
+.finals .wc-match-node .placeholder-match {
+    position: relative;
+    padding: 100px;
+}
+
+.wc-match-node .wc-bracket-match,
+.wc-match-node .placeholder-match {
+    width: 100%;
+    height: 100%;
+}
+
+.quarters .wc-match-node {
+    border-color: rgba(212,183,0,.35);
+    margin-left: -3px;
+}
+
+.semis .wc-match-node {
+    border-color: rgba(212,183,0,.45);
+}
+
+.finals .wc-match-node {
+    border-color: rgba(212,183,0,.60);
+}
+
+.quarters > .wc-match-node:nth-child(2) {
+    transform: translateY(40px);
+}
+
+.quarters > .wc-match-node:nth-child(3) {
+    transform: translateY(-90px);
+}
+
+.quarters > .wc-match-node:nth-child(4) {
+    transform: translateY(-220px);
+}
+
+.quarters > .wc-match-node:nth-child(5) {
+    transform: translateY(-350px);
+}
+
+.semis .wc-match-node:nth-child(2) {
+    transform: translateY(90px);
+    margin-left: 2px;
+}
+
+.semis .wc-match-node:nth-child(3) {
+    transform: translateY(50px);
+    margin-left: 2px;
+}
+
+.finals .wc-match-node {
+    transform: translateY(300px);
+    margin-left: 75px;
+}
+
+
 /* =========================================================
    MATCH CARDS
 ========================================================= */
@@ -187,7 +268,76 @@
     background: rgba(212,183,0,.35);
 }
 
+.semis .wc-bracket-match::after,
+.semis .placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -10rem;
+    width: 10rem;
+    height: 4px;
+    background: rgba(212,183,0,.35);
+}
 
+/*.semis .wc-match-node:first-child::before {
+    content: "";
+    position: absolute;
+    right: -5rem;
+    top: 50%;
+    width: 4px;
+    height: 5rem;
+    background: rgba(212,183,0,.35);
+    z-index: 999;
+}
+
+.semis .wc-match-node:last-child::before {
+    content: "";
+    position: absolute;
+    right: -8.45rem;
+    bottom: 49%;
+    width: 4px;
+    height: 4.15rem;*/ /* same value */
+    /*background: rgba(212,183,0,.35);
+}*/
+
+.semis .wc-match-node:nth-child(2)::before {
+    content: "";
+    position: absolute;
+    right: -8.45rem;
+    top: 50%;
+    width: 4px;
+    height: 4.65rem;
+    background: rgba(212,183,0,.35);
+}
+
+.semis .wc-match-node:nth-child(3)::before {
+    content: "";
+    position: absolute;
+    right: -8.45rem;
+    bottom: 49%;
+    width: 4px;
+    height: 4.15rem;
+    background: rgba(212,183,0,.35);
+}
+
+.quarters .wc-bracket-match::after,
+.quarters .placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -5rem;
+    width: 5rem;
+    height: 4px;
+    background: rgba(212,183,0,.35);
+}
+
+.finals .wc-bracket-match::after,
+.finals .placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -10rem;
+    width: 10rem;
+    height: 4px;
+    background: rgba(212,183,0,.35);
+}
 /* =========================================================
    CHAMPION
 ========================================================= */
@@ -196,12 +346,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 325px; /* move title + circle together */
+}
+
+.champion .wc-round-title {
+    margin-bottom: 1.5rem;
+    margin-left: 550px;
 }
 
 .wc-champion-slot {
-    width: 180px;
-    height: 180px;
-    margin-top: 380px;
+    width: 250px;
+    height: 250px;
+    margin-left: 555px;
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -252,85 +408,144 @@
 }
 
 
-/* =========================================================
-   MATCH GRID
-========================================================= */
+/* ============================================
+   DAY GROUPING
+============================================ */
 
-.wc-stage-matches {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.5rem;
+.wc-day-header {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 4px solid #d4b700;
+    color: #d4b700;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
+.wc-day-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
 
-/* =========================================================
+/* ============================================
    MATCH CARD
-========================================================= */
+============================================ */
 
 .wc-match-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+    padding: 1.25rem;
     border-radius: 20px;
-    padding: 1.2rem;
-    transition: 0.25s ease;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    background: linear-gradient( 135deg, rgba(255,255,255,.04), rgba(255,255,255,.02) );
+    border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(10px);
+    transition: .25s;
 }
 
-    .wc-match-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(212,183,0,0.4);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-    }
+.wc-match-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(212,183,0,.35);
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
 
-
-/* =========================================================
-   CARD TOP
-========================================================= */
+/* ============================================
+   TOP BAR
+============================================ */
 
 .wc-match-card-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 .wc-match-date {
-    font-size: 0.82rem;
-    opacity: 0.75;
+    color: rgba(255,255,255,.7);
+    font-size: .85rem;
+    font-weight: 600;
 }
 
-
-/* =========================================================
+/* ============================================
    MATCH BODY
-========================================================= */
+============================================ */
 
 .wc-match-body {
-    margin-top: 1.2rem;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
 }
 
 .wc-team {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 110px;
+    width: 100px;
     text-align: center;
 }
 
 .wc-team-logo {
-    width: 52px;
-    height: 52px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
-    margin-bottom: 0.5rem;
+    margin-bottom: .75rem;
 }
 
 .wc-team-name {
-    font-size: 0.92rem;
+    font-size: 1rem;
     font-weight: 600;
+    color: white;
 }
 
+.wc-score-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.wc-score {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #d4b700;
+}
+
+.wc-vs {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255,255,255,.6);
+}
+
+/* ============================================
+   BET BUTTON
+============================================ */
+
+.wc-bet-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    margin-top: 1rem;
+    padding: .7rem 1rem;
+    border-radius: 999px;
+    background: linear-gradient( 135deg, #00d084, #00b36f );
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s;
+}
+
+    .wc-bet-link:hover {
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 0 15px rgba(0,208,132,.35);
+    }
 
 /* =========================================================
    SCORE SECTION
@@ -387,6 +602,34 @@
     color: white;
 }
 
+
+/* =========================================================
+  BET LINK
+========================================================= */
+
+.wc-bet-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10em;
+    margin: 0 auto;
+    gap: .4rem;
+    margin-top: .75rem;
+    padding: .35rem .75rem;
+    border-radius: 999px;
+    background: #01c690;
+    color: #000000;
+    font-size: .75rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.wc-bet-link:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
 
 /* =========================================================
    RESPONSIVE
