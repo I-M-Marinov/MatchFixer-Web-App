@@ -66,16 +66,16 @@
     gap: 0.6rem;
 }
 
-    .wc-tab:hover {
-        transform: translateY(-2px);
-        background: rgba(212,183,0,0.14);
-    }
+.wc-tab:hover {
+    transform: translateY(-2px);
+    background: rgba(212,183,0,0.14);
+}
 
-    .wc-tab.active {
-        background: linear-gradient( 135deg, #d4b700, #f6d84a);
-        color: black;
-        box-shadow: 0 0 25px rgba(212,183,0,0.35);
-    }
+.wc-tab.active {
+    background: linear-gradient( 135deg, #d4b700, #f6d84a);
+    color: black;
+    box-shadow: 0 0 25px rgba(212,183,0,0.35);
+}
 
 
 /* =========================================================
@@ -84,7 +84,7 @@
 
 .wc-tab-content {
     display: none;
-    padding: 3rem;
+    padding: 1rem;
 }
 
 .wc-tab-content.active {
@@ -101,7 +101,9 @@
     grid-template-columns: 280px 280px 280px 280px 220px;
     gap: 3rem;
     justify-content: center;
-    padding: 3rem;
+    padding: 1rem;
+    position: relative;
+    left: -155px;
     overflow-x: auto;
 }
 
@@ -415,19 +417,28 @@
 .wc-day-header {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: .75rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    padding-left: 1rem;
-    border-left: 4px solid #d4b700;
+    width: fit-content;
+    margin: 2rem auto 1.5rem auto;
+    padding: 0 1rem;
     color: #d4b700;
     font-size: 1.25rem;
     font-weight: 700;
 }
 
+.wc-day-header::before,
+.wc-day-header::after {
+    content: "";
+    width: 60px;
+    height: 2px;
+    background: rgba(212,183,0,.35);
+}
+
 .wc-day-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, 320px);
+    justify-content: center;
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -734,4 +745,19 @@
 
 .qualified-team {
     background: rgba(31,157,85,0.12);
+}
+
+.wc-bracket-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 auto;
+}
+
+.wc-bracket-scale {
+    transform-origin: top left;
+}
+
+.wc-bracket-scale {
+    zoom: 0.85;
 }
