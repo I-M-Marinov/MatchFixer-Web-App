@@ -280,34 +280,13 @@
     background: rgba(212,183,0,.35);
 }
 
-/*.semis .wc-match-node:first-child::before {
-    content: "";
-    position: absolute;
-    right: -5rem;
-    top: 50%;
-    width: 4px;
-    height: 5rem;
-    background: rgba(212,183,0,.35);
-    z-index: 999;
-}
-
-.semis .wc-match-node:last-child::before {
-    content: "";
-    position: absolute;
-    right: -8.45rem;
-    bottom: 49%;
-    width: 4px;
-    height: 4.15rem;*/ /* same value */
-    /*background: rgba(212,183,0,.35);
-}*/
-
 .semis .wc-match-node:nth-child(2)::before {
     content: "";
     position: absolute;
     right: -8.45rem;
     top: 50%;
     width: 4px;
-    height: 4.65rem;
+    height: 4.30rem;
     background: rgba(212,183,0,.35);
 }
 
@@ -317,7 +296,7 @@
     right: -8.45rem;
     bottom: 49%;
     width: 4px;
-    height: 4.15rem;
+    height: 3.80rem;
     background: rgba(212,183,0,.35);
 }
 
@@ -348,18 +327,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 325px; /* move title + circle together */
+    padding-top: 340px; /* move title + circle together */
 }
 
 .champion .wc-round-title {
     margin-bottom: 1.5rem;
-    margin-left: 550px;
+    margin-left: 612px;
 }
 
 .wc-champion-slot {
     width: 250px;
     height: 250px;
-    margin-left: 555px;
+    margin-left: 622px;
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -760,4 +739,51 @@
 
 .wc-bracket-scale {
     zoom: 0.85;
+}
+
+/* ============================================
+         PLACEHOLDER AND CHAMPION LOGOS
+============================================ */
+
+
+.wc-placeholder-logo-wrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wc-placeholder-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: .85;
+    display: block;
+}
+
+.wc-champion-logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 0 12px rgba(212,183,0,.25));
+}
+
+.wc-champion-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.wc-champion-trophy {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #d4b700;
+    font-size: 1.4rem;
 }
