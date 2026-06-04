@@ -170,7 +170,7 @@
 .finals .wc-match-node {
     position: relative;
     padding: 24px;
-    border: 2px solid rgba(212,183,0,.18);
+    border: 2px solid #0db981 !important;
     border-radius: 24px;
     background: rgba(212,183,0,.025);
     width: 100%;
@@ -249,7 +249,7 @@
     position: relative;
     height: 90px;
     background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid #17a4c6;
     border-radius: 18px;
     padding: 1rem;
     backdrop-filter: blur(10px);
@@ -267,7 +267,7 @@
     top: 50%;
     width: 3rem;
     height: 2px;
-    background: rgba(212,183,0,.35);
+    background: #17a4c6;
 }
 
 .semis .wc-bracket-match::after,
@@ -277,7 +277,7 @@
     right: -10rem;
     width: 10rem;
     height: 4px;
-    background: rgba(212,183,0,.35);
+    background: #17a4c6;
 }
 
 .semis .wc-match-node:nth-child(2)::before {
@@ -287,7 +287,7 @@
     top: 50%;
     width: 4px;
     height: 4.30rem;
-    background: rgba(212,183,0,.35);
+    background: #0db981;
 }
 
 .semis .wc-match-node:nth-child(3)::before {
@@ -297,7 +297,7 @@
     bottom: 49%;
     width: 4px;
     height: 3.80rem;
-    background: rgba(212,183,0,.35);
+    background: #0db981;
 }
 
 .quarters .wc-bracket-match::after,
@@ -307,7 +307,7 @@
     right: -5rem;
     width: 5rem;
     height: 4px;
-    background: rgba(212,183,0,.35);
+    background: #17a4c6;
 }
 
 .finals .wc-bracket-match::after,
@@ -317,7 +317,7 @@
     right: -10rem;
     width: 10rem;
     height: 4px;
-    background: rgba(212,183,0,.35);
+    background: #17a4c6;
 }
 /* =========================================================
    CHAMPION
@@ -345,7 +345,7 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    border: 2px solid rgba(212,183,0,.35);
+    border: 5px solid #0db981;
     box-shadow: 0 0 40px rgba(212,183,0,.15);
 }
 
@@ -433,14 +433,14 @@
     padding: 1.25rem;
     border-radius: 20px;
     background: linear-gradient( 135deg, rgba(255,255,255,.04), rgba(255,255,255,.02) );
-    border: 1px solid rgba(255,255,255,.08);
+    border: 1px solid #0db981;
     backdrop-filter: blur(10px);
     transition: .25s;
 }
 
 .wc-match-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(212,183,0,.35);
+    border-color: #17a4c6;
     box-shadow: 0 10px 30px rgba(0,0,0,.2);
 }
 
@@ -531,11 +531,11 @@
     transition: .2s;
 }
 
-    .wc-bet-link:hover {
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: 0 0 15px rgba(0,208,132,.35);
-    }
+.wc-bet-link:hover {
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(0,208,132,.35);
+}
 
 /* =========================================================
    SCORE SECTION
@@ -700,15 +700,15 @@
     border-collapse: collapse;
 }
 
-    .wc-standings-table th {
-        color: rgba(255,255,255,0.7);
-        font-size: 0.8rem;
-        padding-bottom: 0.7rem;
-    }
+.wc-standings-table th {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    padding-bottom: 0.7rem;
+}
 
-    .wc-standings-table td {
-        padding: 0.7rem 0;
-    }
+.wc-standings-table td {
+    padding: 0.7rem 0;
+}
 
 .wc-team-cell {
     display: flex;
@@ -763,14 +763,6 @@
     display: block;
 }
 
-.wc-champion-logo {
-    width: 72px;
-    height: 72px;
-    object-fit: contain;
-    margin-bottom: 0.75rem;
-    filter: drop-shadow(0 0 12px rgba(212,183,0,.25));
-}
-
 .wc-champion-slot {
     position: relative;
     display: flex;
@@ -786,4 +778,35 @@
     transform: translateX(-50%);
     color: #d4b700;
     font-size: 1.4rem;
+}
+
+.wc-champion-logo {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 0 8px rgba(0,212,255,.8)) drop-shadow(0 0 16px rgba(0,255,204,.5));
+}
+
+@property --champion-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0turn;
+}
+
+.wc-champion-slot {
+    --champion-angle: 0turn;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    background: radial-gradient( circle, rgba(0,22,50,.95), rgba(0,10,25,.98) ) padding-box, conic-gradient( from var(--champion-angle), transparent 65%, #00d4ff 78%, #00ffcc 92%, transparent 100% ) border-box, radial-gradient( circle, rgba(0,22,50,.95), rgba(0,10,25,.98) ) border-box;
+    animation: champion-spin 3.5s linear infinite;
+    box-shadow: 0 0 30px rgba(0,212,255,.15), 0 0 50px rgba(0,255,204,.08);
+}
+
+@keyframes champion-spin {
+    to {
+        --champion-angle: 1turn;
+    }
 }
