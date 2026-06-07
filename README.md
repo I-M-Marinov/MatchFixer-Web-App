@@ -56,6 +56,15 @@
   <img src="./favorite-teams-profile-page.png" align="center" border="10" width="800px"/>
 </p>
 
+<h4 align="center">FYour Favorite Team is playing emails</h4>
+
+<p align="center">
+  <img src="./favorite-team-playing-email.png" align="center" border="10" width="300px"/>
+  <img src="./favorite-team-playing-email3.png" align="center" border="10" width="300px"/>
+  <img src="./favorite-team-playing-email2.png" align="center" border="10" width="300px"/>
+
+</p>
+
 <h4 align="center">Favorite Teams on the Events Board</h4>
 
 <p align="center">
