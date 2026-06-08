@@ -46,20 +46,28 @@ namespace MatchFixer.Core.Services
 				.Select(g => new WorldCupStageViewModel
 				{
 					StageName = FormatStageName(g.Key),
-					DayGroups = g.OrderBy(x => x.MatchDate)
-								.GroupBy(x => DateOnly.FromDateTime(x.MatchDate))
-								.Select(day => new WorldCupDayGroupViewModel
-								{
-									Date = day.Key,
 
-									Matches = day
-										.Select(x => MapMatchCard(
-											x,
-											matchEvents,
-											userTimeZone))
-										.ToList()
-								})
+					DayGroups = g
+						.OrderBy(x => x.MatchDate)
+						.GroupBy(x =>
+							DateOnly.FromDateTime(
+								_timezoneService
+									.ConvertToUserTime(
+										x.MatchDate,
+										userTimeZone)!
+									.Value))
+						.Select(day => new WorldCupDayGroupViewModel
+						{
+							Date = day.Key,
+
+							Matches = day
+								.Select(x => MapMatchCard(
+									x,
+									matchEvents,
+									userTimeZone))
 								.ToList()
+						})
+						.ToList()
 				})
 				.ToList();
 
