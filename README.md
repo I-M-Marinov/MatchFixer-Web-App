@@ -60,9 +60,8 @@
 
 <p align="center">
   <img src="./favorite-team-playing-email.png" align="center" border="10" width="300px"/>
-  <img src="./favorite-team-playing-email3.png" align="center" border="10" width="300px"/>
   <img src="./favorite-team-playing-email2.png" align="center" border="10" width="300px"/>
-
+  <img src="./favorite-team-playing-email3.png" align="center" border="10" width="600px"/>
 </p>
 
 <h4 align="center">Favorite Teams on the Events Board</h4>
