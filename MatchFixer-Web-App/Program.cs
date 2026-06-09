@@ -212,14 +212,13 @@ app.UseStaticFiles();
 app.UseSession();
 
 app.UseRouting();
-
-app.MapHub<MatchEventHub>("/matchEventHub");
-app.MapHub<AdminInsightsHub>("/hubs/admin-insights");
-
 app.UseCors("SignalRCors");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<MatchEventHub>("/matchEventHub");
+app.MapHub<AdminInsightsHub>("/hubs/admin-insights");
 
 // custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
