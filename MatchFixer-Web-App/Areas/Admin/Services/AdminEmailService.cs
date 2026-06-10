@@ -1,5 +1,6 @@
 ﻿using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Infrastructure;
+using static MatchFixer.Common.Admin.AdminUserServiceConstants;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Email;
@@ -48,8 +49,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					skipped++;
 					continue;
 				}
-				// Never email deleted accounts unless status == "deleted"
-				if (r.IsDeleted && !string.Equals(cmd.Status, "deleted", StringComparison.OrdinalIgnoreCase))
+				// Never email deleted accounts unless status == StatusDeleted
+				if (r.IsDeleted && !string.Equals(cmd.Status, StatusDeleted, StringComparison.OrdinalIgnoreCase))
 				{
 					skipped++;
 					continue;
@@ -72,16 +73,16 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			{
 				switch (cmd.Status.ToLowerInvariant())
 				{
-					case "active":
+					case StatusActive:
 						users = users.Where(u => u.IsActive && !u.IsDeleted && u.LockoutEnd == null);
 						break;
-					case "unconfirmed":
+					case StatusUnconfirmed:
 						users = users.Where(u => !u.EmailConfirmed && !u.IsDeleted);
 						break;
-					case "locked":
+					case StatusLocked:
 						users = users.Where(u => u.LockoutEnd != null && !u.IsDeleted);
 						break;
-					case "deleted":
+					case StatusDeleted:
 						users = users.Where(u => u.IsDeleted);
 						break;
 				}

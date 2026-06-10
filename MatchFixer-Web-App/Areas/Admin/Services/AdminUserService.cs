@@ -38,7 +38,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				if (page <= 0) page = 1;
 				if (pageSize <= 0 || pageSize > 200) pageSize = 20;
 
-				status = string.IsNullOrWhiteSpace(status) ? "active" : status.ToLowerInvariant();
+				status = string.IsNullOrWhiteSpace(status) ? StatusActive : status.ToLowerInvariant();
 
 				var usersQ = _db.Users.AsNoTracking();
 
@@ -55,18 +55,18 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var now = DateTimeOffset.UtcNow;
 				usersQ = status switch
 				{
-					"active" => usersQ.Where(u =>
+					StatusActive => usersQ.Where(u =>
 						u.IsActive &&
 						!u.IsDeleted &&
 						(!u.LockoutEnd.HasValue || u.LockoutEnd <= now)),
 
-					"unconfirmed" => usersQ.Where(u => !u.EmailConfirmed && !u.IsDeleted),
+					StatusUnconfirmed => usersQ.Where(u => !u.EmailConfirmed && !u.IsDeleted),
 
-					"locked" => usersQ.Where(u => u.LockoutEnd.HasValue && u.LockoutEnd > now && !u.IsDeleted),
+					StatusLocked => usersQ.Where(u => u.LockoutEnd.HasValue && u.LockoutEnd > now && !u.IsDeleted),
 
-					"deleted" => usersQ.Where(u => u.IsDeleted),
+					StatusDeleted => usersQ.Where(u => u.IsDeleted),
 
-					"all" or _ => usersQ.Where(u => !u.IsDeleted) // fallback
+					StatusAll or _ => usersQ.Where(u => !u.IsDeleted) // fallback
 				};
 
 				var total = await usersQ.CountAsync();
