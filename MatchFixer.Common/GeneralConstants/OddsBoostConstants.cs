@@ -2,6 +2,8 @@
 {
 	public static class OddsBoostConstants
 	{
+		public const string DefaultBoostLabel = "BOOST";
+
 		public const string OddsBoostCreatedSuccessfully = "The odds boost for this event was created successfully!";
 		public const string BoostValueMustBePositive = "Boost value must be greater than zero.";
 		public const string DurationMustBePositive = "Duration must be greater than zero.";
