@@ -225,7 +225,7 @@ app.UseMiddleware<SessionInitializationMiddleware>();
 
 
 app.Use(async (ctx, next) =>
-{
+{         
 	if (ctx.Request.Path.Equals("/Account/Login", StringComparison.OrdinalIgnoreCase))
 		ctx.Response.Redirect("/Identity/Account/Login" + ctx.Request.QueryString);
 	else
