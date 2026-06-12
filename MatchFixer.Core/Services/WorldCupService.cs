@@ -159,6 +159,7 @@ namespace MatchFixer.Core.Services
 
 			var liveResult = matchEvent?.LiveResult;
 			var isFinished = match.IsFinished || liveResult != null;
+			var isOngoing = !isFinished && !match.IsLive && match.MatchDate <= DateTime.UtcNow;
 
 			return new WorldCupMatchCardViewModel
 			{
@@ -177,13 +178,14 @@ namespace MatchFixer.Core.Services
 
 				IsFinished = isFinished,
 				IsLive = match.IsLive,
+				IsOngoing = isOngoing,
 
 				Stage = match.Stage,
 
 				IsAvailableForBetting = matchEvent != null
 					&& !isFinished
 					&& !match.IsLive
-					&& match.MatchDate > DateTime.UtcNow,
+					&& !isOngoing,
 
 				MatchEventId = matchEvent?.Id
 			};
