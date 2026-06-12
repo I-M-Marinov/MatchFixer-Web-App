@@ -24,6 +24,8 @@ namespace MatchFixer.Core.ViewModels.WordCup
 
 		public bool IsLive { get; set; }
 
+		public bool IsOngoing { get; set; }
+
 		public string? Winner { get; set; }
 
 		public WorldCupStage Stage { get; set; }
