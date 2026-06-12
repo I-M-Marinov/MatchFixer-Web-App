@@ -277,11 +277,15 @@
 
 						@foreach (var day in stage.DayGroups)
 						{
-							<div class="wc-day-header">
+							<div class="wc-day-section">
+
+							<div class="wc-day-header wc-day-accordion-toggle">
 
 								<i class="bi bi-calendar-event"></i>
 
 								@day.Date.ToString("dddd, dd MMMM yyyy")
+
+								<i class="bi bi-chevron-up wc-day-chevron"></i>
 
 							</div>
 
@@ -295,7 +299,7 @@
 
 											<div class="wc-match-status">
 
-												@if (match.IsLive)
+												@if (match.IsLive || match.IsOngoing)
 												{
 													<span class="live-badge">
 														LIVE
@@ -385,6 +389,8 @@
 								}
 
 							</div>
+
+							</div> @* end wc-day-section *@
 						}
 
 					</div>
@@ -418,6 +424,21 @@
 	<script>
 
 		document.addEventListener("DOMContentLoaded", () => {
+
+			// Day accordion
+			document.querySelectorAll(".wc-day-accordion-toggle").forEach(header => {
+				header.addEventListener("click", () => {
+					header.closest(".wc-day-section").classList.toggle("collapsed");
+				});
+			});
+
+			// Auto-collapse days where every match is FT
+			document.querySelectorAll(".wc-day-section").forEach(section => {
+				const badges = section.querySelectorAll(".wc-match-status span");
+				const allFinished = badges.length > 0 &&
+					[...badges].every(b => b.classList.contains("finished-badge"));
+				if (allFinished) section.classList.add("collapsed");
+			});
 
 			const tabs =
 				document.querySelectorAll(".wc-tab");
