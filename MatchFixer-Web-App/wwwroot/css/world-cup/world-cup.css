@@ -410,6 +410,28 @@
     font-weight: 700;
 }
 
+.wc-day-accordion-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+
+.wc-day-accordion-toggle:hover {
+    opacity: 0.85;
+}
+
+.wc-day-chevron {
+    font-size: 0.9rem;
+    transition: transform 0.25s ease;
+}
+
+.wc-day-section.collapsed .wc-day-chevron {
+    transform: rotate(180deg);
+}
+
+.wc-day-section.collapsed .wc-day-grid {
+    display: none;
+}
+
 .wc-day-header::before,
 .wc-day-header::after {
     content: "";
