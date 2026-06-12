@@ -38,6 +38,7 @@ namespace MatchFixer.Core.Services
 			var matchEvents = await _context.MatchEvents
 				.Include(x => x.HomeTeam)
 				.Include(x => x.AwayTeam)
+				.Include(x => x.LiveResult)
 				.Where(x => !x.IsCancelled)
 				.ToListAsync();
 
@@ -156,6 +157,9 @@ namespace MatchFixer.Core.Services
 				x.HomeTeam.Name == match.HomeTeam &&
 				x.AwayTeam.Name == match.AwayTeam);
 
+			var liveResult = matchEvent?.LiveResult;
+			var isFinished = match.IsFinished || liveResult != null;
+
 			return new WorldCupMatchCardViewModel
 			{
 				MatchId = match.Id,
@@ -168,15 +172,18 @@ namespace MatchFixer.Core.Services
 
 				MatchDate = matchDateLocal,
 
-				HomeScore = match.HomeScore,
-				AwayScore = match.AwayScore,
+				HomeScore = liveResult?.HomeScore ?? match.HomeScore,
+				AwayScore = liveResult?.AwayScore ?? match.AwayScore,
 
-				IsFinished = match.IsFinished,
+				IsFinished = isFinished,
 				IsLive = match.IsLive,
 
 				Stage = match.Stage,
 
-				IsAvailableForBetting = matchEvent != null,
+				IsAvailableForBetting = matchEvent != null
+					&& !isFinished
+					&& !match.IsLive
+					&& match.MatchDate > DateTime.UtcNow,
 
 				MatchEventId = matchEvent?.Id
 			};
