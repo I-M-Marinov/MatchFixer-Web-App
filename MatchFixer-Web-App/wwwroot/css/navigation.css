@@ -370,6 +370,7 @@
 .navbar-nav .nav-item .dropdown-text,
 .dropdown-item.dropdown-item .events-board-text,
 .dropdown-item.dropdown-item .add-event-text,
+.dropdown-item.dropdown-item .world-cup-text,
 .add-match-results-text {
     position: relative;
     font-family: "Orbitron", sans-serif !important;

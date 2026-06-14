@@ -1,0 +1,472 @@
+﻿@using MatchFixer.Core.ViewModels.WordCup
+@model WorldCupPageViewModel
+
+@{
+	ViewData["Title"] = "FIFA World Cup";
+}
+
+<link rel="stylesheet"
+	  href="~/css/world-cup/world-cup.css" />
+
+<div class="world-cup-page">
+
+	<!-- HERO BANNER -->
+	<div class="world-cup-banner">
+
+		<img src="~/images/world-cup/matchfixer-world-cup-2026.png"
+			 alt="MatchFixer World Cup 2026"
+			 class="world-cup-banner-image" />
+
+		<div class="world-cup-banner-overlay"></div>
+
+	</div>
+
+	<!-- TABS -->
+	<div class="world-cup-tabs">
+
+		<button class="wc-tab active"
+				data-tab="bracketTab">
+
+			<i class="bi bi-diagram-3-fill"></i>
+			Tournament Graph
+
+		</button>
+
+		<button class="wc-tab"
+				data-tab="trackerTab">
+
+			<i class="bi bi-list-stars"></i>
+			Tournament Tracker
+
+		</button>
+
+	</div>
+
+	<!-- ========================================= -->
+	<!-- BRACKET TAB -->
+	<!-- ========================================= -->
+
+	<div id="bracketTab"
+		 class="wc-tab-content active">
+
+		<div class="wc-bracket-wrapper">
+
+			<div class="wc-bracket-scale">
+
+				<div class="wc-bracket-grid">
+
+			<!-- ROUND OF 16 -->
+			<div class="wc-column r16-round">
+
+				<div class="wc-round-title">
+					Round of 16
+				</div>
+
+				@for (int i = 0; i < 8; i++)
+				{
+					if (Model.Bracket.RoundOf16.Count > i)
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="Model.Bracket.RoundOf16[i]" />
+					}
+					else
+					{
+						<partial name="_WorldCupPlaceholderMatch" />
+					}
+				}
+
+			</div>
+
+
+			<!-- QUARTERS -->
+			
+			<div class="wc-column quarters">
+
+				<div class="wc-round-title">
+					Quarter Finals
+				</div>
+
+				@for (int i = 0; i < 4; i++)
+				{
+					<div class="wc-match-node">
+
+						@if (Model.Bracket.QuarterFinals.Count > i)
+						{
+							<partial name="_WorldCupBracketMatch"
+									 model="Model.Bracket.QuarterFinals[i]" />
+						}
+						else
+						{
+							<partial name="_WorldCupPlaceholderMatch" />
+						}
+
+					</div>
+				}
+
+			</div>
+
+			<!-- SEMIS -->
+
+			<div class="wc-column semis">
+
+				<div class="wc-round-title">
+					Semi Finals
+				</div>
+
+				@for (int i = 0; i < 2; i++)
+				{
+					<div class="wc-match-node">
+
+						@if (Model.Bracket.SemiFinals.Count > i)
+						{
+							<partial name="_WorldCupBracketMatch"
+									 model="Model.Bracket.SemiFinals[i]" />
+						}
+						else
+						{
+							<partial name="_WorldCupPlaceholderMatch" />
+						}
+
+					</div>
+				}
+
+			</div>
+
+			<!-- FINAL -->
+
+			<div class="wc-column finals">
+
+				<div class="wc-round-title">
+					Final
+				</div>
+				<div class="wc-match-node">
+
+					@if (Model.Bracket.Final.Any())
+					{
+						<partial name="_WorldCupBracketMatch"
+								 model="Model.Bracket.Final.First()" />
+					}
+					else
+					{
+						<partial name="_WorldCupPlaceholderMatch" />
+					}
+				</div>
+			</div>
+
+			<!-- CHAMPION -->
+
+				<div class="wc-column champion">
+
+					<div class="wc-round-title">
+						Champion
+					</div>
+
+					<div class="wc-champion-slot">
+
+						<img src="~/images/world-cup/generic-team-badge.png"
+								class="wc-champion-logo" />
+
+						<span class="wc-champion-name">
+							TBD
+						</span>
+
+					</div>
+
+				</div>
+
+		</div>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- ========================================= -->
+	<!-- TRACKER TAB -->
+	<!-- ========================================= -->
+
+	<div id="trackerTab"
+		 class="wc-tab-content">
+
+		<!-- GROUP STANDINGS -->
+		@if (Model.GroupStandings.Any())
+		{
+			<div class="wc-group-standings-section">
+
+				@foreach (var group in Model.GroupStandings)
+				{
+					<div class="wc-group-card">
+
+						<div class="wc-group-title">
+							@group.GroupName
+						</div>
+
+						<table class="wc-standings-table">
+
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Team</th>
+									<th>P</th>
+									<th>W</th>
+									<th>D</th>
+									<th>L</th>
+									<th>GD</th>
+									<th>Pts</th>
+								</tr>
+							</thead>
+
+							<tbody>
+
+								@{
+									int rank = 1;
+								}
+
+								@foreach (var team in group.Teams)
+								{
+									<tr class="@(team.IsQualified
+														  ? "qualified-team"
+														  : "")">
+
+							<td>@rank</td>
+
+										<td class="wc-team-cell">
+
+											<img src="@team.TeamLogo"
+												 class="wc-standing-logo" />
+
+											<span>
+												@team.TeamName
+											</span>
+
+										</td>
+
+										<td>@team.Played</td>
+										<td>@team.Wins</td>
+										<td>@team.Draws</td>
+										<td>@team.Losses</td>
+										<td>@team.GoalDifference</td>
+										<td>@team.Points</td>
+
+									</tr>
+
+												rank++;
+								}
+
+							</tbody>
+
+						</table>
+
+					</div>
+				}
+
+			</div>
+		}
+
+		<!-- MATCH TRACKER -->
+		<div class="wc-stage-tracker">
+
+			@if (Model.Stages.Any())
+			{
+				@foreach (var stage in Model.Stages)
+				{
+					<div class="wc-stage-section">
+
+						<div class="wc-stage-header">
+							@stage.StageName
+						</div>
+
+						@foreach (var day in stage.DayGroups)
+						{
+							<div class="wc-day-section">
+
+							<div class="wc-day-header wc-day-accordion-toggle">
+
+								<i class="bi bi-calendar-event"></i>
+
+								@day.Date.ToString("dddd, dd MMMM yyyy")
+
+								<i class="bi bi-chevron-up wc-day-chevron"></i>
+
+							</div>
+
+							<div class="wc-day-grid">
+
+								@foreach (var match in day.Matches)
+								{
+									<div class="wc-match-card">
+
+										<div class="wc-match-card-top">
+
+											<div class="wc-match-status">
+
+												@if (match.IsLive || match.IsOngoing)
+												{
+													<span class="live-badge">
+														LIVE
+													</span>
+												}
+												else if (match.IsFinished)
+												{
+													<span class="finished-badge">
+														FT
+													</span>
+												}
+												else
+												{
+													<span class="scheduled-badge">
+														UPCOMING
+													</span>
+												}
+
+											</div>
+
+											<div class="wc-match-date">
+												@match.MatchDate?.ToString("HH:mm")
+											</div>
+
+										</div>
+
+										<div class="wc-match-body">
+
+											<div class="wc-team">
+
+												<img src="@match.HomeLogo"
+													 class="wc-team-logo" />
+
+												<div class="wc-team-name">
+													@match.HomeTeam
+												</div>
+
+											</div>
+
+											<div class="wc-score-section">
+
+												@if (match.HomeScore.HasValue &&
+																				match.AwayScore.HasValue)
+												{
+													<div class="wc-score">
+														@match.HomeScore
+														-
+														@match.AwayScore
+													</div>
+												}
+												else
+												{
+													<div class="wc-vs">
+														VS
+													</div>
+												}
+
+											</div>
+
+											<div class="wc-team">
+
+												<img src="@match.AwayLogo"
+													 class="wc-team-logo" />
+
+												<div class="wc-team-name">
+													@match.AwayTeam
+												</div>
+
+											</div>
+
+										</div>
+
+										@if (match.IsAvailableForBetting)
+										{
+											<a asp-controller="Event"
+											   asp-action="LiveEvents"
+											   class="wc-bet-link">
+
+												<i class="bi bi-crosshair"></i>
+
+												BET NOW
+
+											</a>
+										}
+
+									</div>
+								}
+
+							</div>
+
+							</div> @* end wc-day-section *@
+						}
+
+					</div>
+				}
+			}
+			else
+			{
+				<div class="wc-empty-state">
+
+					<i class="bi bi-hourglass-split"></i>
+
+					<div class="wc-empty-title">
+						World Cup data is loading...
+					</div>
+
+					<div class="wc-empty-subtitle">
+						Fixtures and standings will appear here.
+					</div>
+
+				</div>
+			}
+
+		</div>
+
+	</div>
+
+</div>
+
+@section Scripts
+{
+	<script>
+
+		document.addEventListener("DOMContentLoaded", () => {
+
+			// Day accordion
+			document.querySelectorAll(".wc-day-accordion-toggle").forEach(header => {
+				header.addEventListener("click", () => {
+					header.closest(".wc-day-section").classList.toggle("collapsed");
+				});
+			});
+
+			// Auto-collapse days where every match is FT
+			document.querySelectorAll(".wc-day-section").forEach(section => {
+				const badges = section.querySelectorAll(".wc-match-status span");
+				const allFinished = badges.length > 0 &&
+					[...badges].every(b => b.classList.contains("finished-badge"));
+				if (allFinished) section.classList.add("collapsed");
+			});
+
+			const tabs =
+				document.querySelectorAll(".wc-tab");
+
+			const contents =
+				document.querySelectorAll(
+					".wc-tab-content");
+
+			tabs.forEach(tab => {
+
+				tab.addEventListener("click", () => {
+
+					tabs.forEach(t =>
+						t.classList.remove("active"));
+
+					contents.forEach(c =>
+						c.classList.remove("active"));
+
+					tab.classList.add("active");
+
+					const target =
+						document.getElementById(
+							tab.dataset.tab);
+
+					target.classList.add("active");
+				});
+			});
+		});
+
+	</script>
+}

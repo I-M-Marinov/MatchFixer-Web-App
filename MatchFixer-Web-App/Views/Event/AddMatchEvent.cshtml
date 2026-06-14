@@ -335,7 +335,7 @@
 						<tbody>
 						@foreach (var ev in Model.CurrentEvents)
 						{
-							<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "manually-added-match") @(ev.MatchStatus == MatchStatus.Live ? "event-started-match" : "")"
+											<tr class="@(ev.ApiFixtureId > 0 ? "api-imported-match" : "manually-added-match") @(ev.MatchStatus == MatchStatus.Live ? "event-started-match" : "") @(ev.CompetitionName == "FIFA World Cup" ? "fifa-world-cup-class" : "")"
 							    data-kickoff="@(ev.KickoffTime?.ToString("o"))"
 							    data-date="@(ev.KickoffTime.HasValue 
 								               ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-dd") 

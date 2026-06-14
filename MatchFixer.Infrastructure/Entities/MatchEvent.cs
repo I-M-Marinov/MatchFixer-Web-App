@@ -41,7 +41,6 @@ namespace MatchFixer.Infrastructure.Entities
 		public string? CompetitionName { get; set; }
 		[NotMapped]
 		public bool IsCompetitionMatch => !string.IsNullOrWhiteSpace(CompetitionName);
-
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 		public ICollection<OddsBoost> OddsBoosts { get; set; } = new List<OddsBoost>();
 		public ICollection<MatchEventLog> MatchEventLogs { get; set; } = new List<MatchEventLog>();

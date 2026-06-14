@@ -12,5 +12,8 @@ namespace MatchFixer.Infrastructure.Contracts
 
 		Task<List<LiveEventApiDto>> GetLiveSoccerEventsAsync(
 			CancellationToken ct = default);
+
+		Task<List<WorldCupFixtureApiDto>> GetWorldCupFixturesAsync(
+				CancellationToken ct = default);
 	}
 }

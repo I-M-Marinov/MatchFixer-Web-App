@@ -1,0 +1,838 @@
+﻿/* =========================================================
+   WORLD CUP PAGE
+========================================================= */
+
+.world-cup-page {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, rgba(212,183,0,0.08), transparent 35%), linear-gradient( 180deg, #07111f 0%, #09182a 100%);
+    color: white;
+    padding-bottom: 5rem;
+}
+
+/* =========================================
+   WORLD CUP HERO BANNER
+========================================= */
+
+.world-cup-banner {
+    position: relative;
+    width: 90%;
+    height: 275px;
+    overflow: hidden;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(212,183,0,0.18);
+    background: linear-gradient( 180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.4));
+}
+
+.world-cup-banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.world-cup-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient( 180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 100%);
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.world-cup-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: -1.6rem;
+    position: relative;
+    z-index: 10;
+}
+
+.wc-tab {
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: white;
+    padding: 0.95rem 1.7rem;
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    font-weight: 700;
+    transition: 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.wc-tab:hover {
+    transform: translateY(-2px);
+    background: rgba(212,183,0,0.14);
+}
+
+.wc-tab.active {
+    background: linear-gradient( 135deg, #d4b700, #f6d84a);
+    color: black;
+    box-shadow: 0 0 25px rgba(212,183,0,0.35);
+}
+
+
+/* =========================================================
+   TAB CONTENT
+========================================================= */
+
+.wc-tab-content {
+    display: none;
+    padding: 1rem;
+}
+
+.wc-tab-content.active {
+    display: block;
+}
+
+
+/* =========================================================
+   BRACKET GRID
+========================================================= */
+
+.wc-bracket-grid {
+    display: grid;
+    grid-template-columns: 280px 280px 280px 280px 220px;
+    gap: 3rem;
+    justify-content: center;
+    padding: 1rem;
+    position: relative;
+    left: -155px;
+    overflow-x: auto;
+}
+
+/* =========================================================
+   COLUMNS
+========================================================= */
+
+.wc-column {
+    display: grid;
+    align-content: start;
+}
+
+.wc-round-title {
+    text-align: center;
+    color: #d4b700;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+/* =========================================================
+   ROUND STRUCTURE
+========================================================= */
+
+.r16-round {
+    grid-template-rows: auto repeat(8, 110px);
+}
+
+.quarters {
+    grid-template-rows: auto repeat(4, 350px);
+}
+
+.semis {
+    grid-template-rows: auto repeat(2, 480px);
+}
+
+.finals {
+    grid-template-rows: auto 960px;
+}
+
+.wc-column {
+    display: grid;
+    align-items: start;
+}
+
+.wc-bracket-match {
+    align-self: center;
+}
+
+.quarters .wc-bracket-match,
+.semis .wc-bracket-match,
+.finals .wc-bracket-match {
+    align-self: center;
+}
+
+.wc-match-node .wc-bracket-match,
+.wc-match-node .placeholder-match {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+.quarters .wc-match-node,
+.semis .wc-match-node,
+.finals .wc-match-node {
+    position: relative;
+    padding: 24px;
+    border: 2px solid #0db981 !important;
+    border-radius: 24px;
+    background: rgba(212,183,0,.025);
+    width: 100%;
+}
+
+.semis .wc-match-node .wc-bracket-match,
+.semis .wc-match-node .placeholder-match {
+    position: relative;
+    padding: 85px;
+}
+
+
+.finals .wc-match-node .wc-bracket-match,
+.finals .wc-match-node .placeholder-match {
+    position: relative;
+    padding: 100px;
+}
+
+.wc-match-node .wc-bracket-match,
+.wc-match-node .placeholder-match {
+    width: 100%;
+    height: 100%;
+}
+
+.quarters .wc-match-node {
+    border-color: rgba(212,183,0,.35);
+    margin-left: -3px;
+}
+
+.semis .wc-match-node {
+    border-color: rgba(212,183,0,.45);
+}
+
+.finals .wc-match-node {
+    border-color: rgba(212,183,0,.60);
+}
+
+.quarters > .wc-match-node:nth-child(2) {
+    transform: translateY(40px);
+}
+
+.quarters > .wc-match-node:nth-child(3) {
+    transform: translateY(-90px);
+}
+
+.quarters > .wc-match-node:nth-child(4) {
+    transform: translateY(-220px);
+}
+
+.quarters > .wc-match-node:nth-child(5) {
+    transform: translateY(-350px);
+}
+
+.semis .wc-match-node:nth-child(2) {
+    transform: translateY(90px);
+    margin-left: 2px;
+}
+
+.semis .wc-match-node:nth-child(3) {
+    transform: translateY(50px);
+    margin-left: 2px;
+}
+
+.finals .wc-match-node {
+    transform: translateY(300px);
+    margin-left: 75px;
+}
+
+
+/* =========================================================
+   MATCH CARDS
+========================================================= */
+
+.wc-bracket-match,
+.placeholder-match {
+    position: relative;
+    height: 90px;
+    border-radius: 18px;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.04) !important;
+    border: 2px solid #17a4c6 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), inset 0 -1px 0 rgba(0,0,0,.25), 0 8px 18px rgba(0,0,0,.35) !important;
+    filter: drop-shadow(0 0 1px rgba(0,212,255,.35)) drop-shadow(0 0 4px rgba(0,255,204,.15));
+}
+
+/* =========================================================
+   CONNECTORS
+========================================================= */
+
+.wc-bracket-match::after,
+.placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -3rem;
+    top: 50%;
+    width: 3rem;
+    height: 2px;
+    background: #17a4c6;
+}
+
+.semis .wc-bracket-match::after,
+.semis .placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -10rem;
+    width: 10rem;
+    height: 4px;
+    background: #17a4c6;
+}
+
+.semis .wc-match-node:nth-child(2)::before {
+    content: "";
+    position: absolute;
+    right: -8.45rem;
+    top: 50%;
+    width: 4px;
+    height: 4.30rem;
+    background: #0db981;
+}
+
+.semis .wc-match-node:nth-child(3)::before {
+    content: "";
+    position: absolute;
+    right: -8.45rem;
+    bottom: 49%;
+    width: 4px;
+    height: 3.80rem;
+    background: #0db981;
+}
+
+.quarters .wc-bracket-match::after,
+.quarters .placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -5rem;
+    width: 5rem;
+    height: 4px;
+    background: #17a4c6;
+}
+
+.finals .wc-bracket-match::after,
+.finals .placeholder-match::after {
+    content: "";
+    position: absolute;
+    right: -10rem;
+    width: 10rem;
+    height: 4px;
+    background: #17a4c6;
+}
+/* =========================================================
+   CHAMPION
+========================================================= */
+
+.champion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 340px; /* move title + circle together */
+}
+
+.champion .wc-round-title {
+    margin-bottom: 1.5rem;
+    margin-left: 612px;
+}
+
+.wc-champion-slot {
+    width: 250px;
+    height: 250px;
+    margin-left: 622px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border: 5px solid #0db981;
+    box-shadow: 0 0 40px rgba(212,183,0,.15);
+}
+
+.wc-bracket-team {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wc-bracket-team-info {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.wc-bracket-score {
+    font-weight: 700;
+    min-width: 20px;
+    text-align: right;
+}
+
+/* =========================================================
+   TRACKER
+========================================================= */
+
+.wc-stage-tracker {
+    margin-top: 1rem;
+}
+
+.wc-stage-section {
+    margin-bottom: 3.5rem;
+}
+
+.wc-stage-header {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #d4b700;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #d4b700;
+    padding-left: 1rem;
+}
+
+
+/* ============================================
+   DAY GROUPING
+============================================ */
+
+.wc-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    width: fit-content;
+    margin: 2rem auto 1.5rem auto;
+    padding: 0 1rem;
+    color: #d4b700;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.wc-day-accordion-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+
+.wc-day-accordion-toggle:hover {
+    opacity: 0.85;
+}
+
+.wc-day-chevron {
+    font-size: 0.9rem;
+    transition: transform 0.25s ease;
+}
+
+.wc-day-section.collapsed .wc-day-chevron {
+    transform: rotate(180deg);
+}
+
+.wc-day-section.collapsed .wc-day-grid {
+    display: none;
+}
+
+.wc-day-header::before,
+.wc-day-header::after {
+    content: "";
+    width: 60px;
+    height: 2px;
+    background: rgba(212,183,0,.35);
+}
+
+.wc-day-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 320px);
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* ============================================
+   MATCH CARD
+============================================ */
+
+.wc-match-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+    padding: 1.25rem;
+    border-radius: 20px;
+    background: linear-gradient( 135deg, rgba(255,255,255,.04), rgba(255,255,255,.02) );
+    border: 1px solid #0db981;
+    backdrop-filter: blur(10px);
+    transition: .25s;
+}
+
+.wc-match-card:hover {
+    transform: translateY(-3px);
+    border-color: #17a4c6;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+
+/* ============================================
+   TOP BAR
+============================================ */
+
+.wc-match-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.wc-match-date {
+    color: rgba(255,255,255,.7);
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+/* ============================================
+   MATCH BODY
+============================================ */
+
+.wc-match-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.wc-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+    text-align: center;
+}
+
+.wc-team-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: .75rem;
+}
+
+.wc-team-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+}
+
+.wc-score-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.wc-score {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #d4b700;
+}
+
+.wc-vs {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255,255,255,.6);
+}
+
+/* ============================================
+   BET BUTTON
+============================================ */
+
+.wc-bet-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    margin-top: 1rem;
+    padding: .7rem 1rem;
+    border-radius: 999px;
+    background: linear-gradient( 135deg, #00d084, #00b36f );
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.wc-bet-link:hover {
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(0,208,132,.35);
+}
+
+/* =========================================================
+   SCORE SECTION
+========================================================= */
+
+.wc-score-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+}
+
+.wc-score {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #d4b700;
+    text-shadow: 0 0 15px rgba(212,183,0,0.25);
+}
+
+.wc-vs {
+    font-size: 1rem;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.live-badge,
+.finished-badge,
+.scheduled-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04rem;
+}
+
+.live-badge {
+    background: #ff3b30;
+    color: white;
+    box-shadow: 0 0 15px rgba(255,59,48,0.4);
+}
+
+.finished-badge {
+    background: #1f9d55;
+    color: white;
+}
+
+.scheduled-badge {
+    background: #2563eb;
+    color: white;
+}
+
+
+/* =========================================================
+  BET LINK
+========================================================= */
+
+.wc-bet-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10em;
+    margin: 0 auto;
+    gap: .4rem;
+    margin-top: .75rem;
+    padding: .35rem .75rem;
+    border-radius: 999px;
+    background: #01c690;
+    color: #000000;
+    font-size: .75rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.wc-bet-link:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 992px) {
+
+    .wc-tab-content {
+        padding: 2rem 1rem;
+    }
+
+    .world-cup-title {
+        font-size: 2.2rem;
+    }
+
+    .wc-stage-matches {
+        grid-template-columns: 1fr;
+    }
+
+    .wc-round {
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .world-cup-tabs {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wc-tab {
+        width: 90%;
+        justify-content: center;
+    }
+
+    .world-cup-title {
+        font-size: 1.8rem;
+    }
+
+    .wc-match-body {
+        gap: 0.7rem;
+    }
+
+    .wc-team {
+        width: 90px;
+    }
+
+    .wc-score {
+        font-size: 1.3rem;
+    }
+}
+
+.wc-group-standings-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.wc-group-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 1.2rem;
+    backdrop-filter: blur(12px);
+}
+
+.wc-group-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #d4b700;
+    margin-bottom: 1rem;
+}
+
+.wc-standings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.wc-standings-table th {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    padding-bottom: 0.7rem;
+}
+
+.wc-standings-table td {
+    padding: 0.7rem 0;
+}
+
+.wc-team-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.wc-standing-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.qualified-team {
+    background: rgba(31,157,85,0.12);
+}
+
+.wc-bracket-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 auto;
+}
+
+.wc-bracket-scale {
+    transform-origin: top left;
+}
+
+.wc-bracket-scale {
+    zoom: 0.85;
+}
+
+/* ============================================
+         PLACEHOLDER AND CHAMPION LOGOS
+============================================ */
+
+
+.wc-placeholder-logo-wrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wc-placeholder-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: .85;
+    display: block;
+}
+
+.wc-champion-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.wc-champion-trophy {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #d4b700;
+    font-size: 1.4rem;
+}
+
+.wc-champion-logo {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 0 8px rgba(0,212,255,.8)) drop-shadow(0 0 16px rgba(0,255,204,.5));
+}
+
+@property --champion-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0turn;
+}
+
+.wc-champion-slot {
+    --champion-angle: 0turn;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    background: radial-gradient( circle, rgba(0,22,50,.95), rgba(0,10,25,.98) ) padding-box, conic-gradient( from var(--champion-angle), transparent 65%, #00d4ff 78%, #00ffcc 92%, transparent 100% ) border-box, radial-gradient( circle, rgba(0,22,50,.95), rgba(0,10,25,.98) ) border-box;
+    animation: champion-spin 3.5s linear infinite;
+    box-shadow: 0 0 30px rgba(0,212,255,.15), 0 0 50px rgba(0,255,204,.08);
+}
+
+@keyframes champion-spin {
+    to {
+        --champion-angle: 1turn;
+    }
+}

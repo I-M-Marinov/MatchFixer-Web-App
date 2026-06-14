@@ -32,6 +32,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<UpcomingMatchEvent> UpcomingMatchEvents { get; set; }
 		public virtual DbSet<UserFavoriteTeam> UserFavoriteTeams { get; set; }
 		public virtual DbSet<TeamWikiInfo> TeamWikiInfos { get; set; }
+		public virtual DbSet<WorldCupMatch> WorldCupMatches { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)

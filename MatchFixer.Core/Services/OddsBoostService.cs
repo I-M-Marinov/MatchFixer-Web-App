@@ -132,7 +132,7 @@ namespace MatchFixer.Core.Services
 					EndUtc = DateTime.SpecifyKind(end, DateTimeKind.Utc),
 					MaxStake = maxStakePerBet,
 					MaxUses = maxUsesPerUser,
-					Label = string.IsNullOrWhiteSpace(note) ? "BOOST" : note,
+					Label = string.IsNullOrWhiteSpace(note) ? DefaultBoostLabel : note,
 					HomeName = match.HomeTeam.Name,
 					AwayName = match.AwayTeam.Name,
 					HomeTeamLogo = match.HomeTeam.LogoUrl,

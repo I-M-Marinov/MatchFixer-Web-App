@@ -2,6 +2,13 @@
 {
 	public static class AdminUserServiceConstants
 	{
+		// User status filter keys
+		public const string StatusActive = "active";
+		public const string StatusUnconfirmed = "unconfirmed";
+		public const string StatusLocked = "locked";
+		public const string StatusDeleted = "deleted";
+		public const string StatusAll = "all";
+
 		public const string CannotLockOwnAccount = "You cannot lock your own account.";
 		public const string UserWasNotFound = "The user was not found.";
 		public const string FailedToEnableLockForUser = "Failed to enable lockout for this user.";

@@ -2,6 +2,7 @@
 using MatchFixer.Core.ViewModels.DTO;
 using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using static MatchFixer.Common.GeneralConstants.OddsBoostConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -153,7 +154,7 @@ namespace MatchFixer.Core.Services
 					EndUtc = b.EndUtc,
 					MaxStake = b.MaxStakePerBet,
 					MaxUses = b.MaxUsesPerUser,
-					Label = string.IsNullOrWhiteSpace(b.Note) ? "BOOSTED" : b.Note,
+					Label = string.IsNullOrWhiteSpace(b.Note) ? DefaultBoostLabel : b.Note,
 					HomeTeamName = m?.HomeTeamName,
 					AwayTeamName = m?.AwayTeamName,
 					HomeTeamLogo = m?.HomeTeamLogo,
