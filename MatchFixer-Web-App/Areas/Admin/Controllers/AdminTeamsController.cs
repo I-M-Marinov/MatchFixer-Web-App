@@ -29,6 +29,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> TeamsIndex(
 			int page = 1,
 			[FromQuery] int[]? leagueIds = null,
+			string? nameFilter = null,
 			CancellationToken ct = default)
 		{
 			var selected = leagueIds;
@@ -39,6 +40,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				page,
 				DefaultPageSize,
 				selected,
+				nameFilter,
 				ct);
 
 			var searchVm = new TeamSearchVm
@@ -46,7 +48,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				Leagues = leagues,
 				SelectedLeagueIds = selected,
 				Results = Array.Empty<TeamSearchResult>(),
-				Query = string.Empty
+				Query = string.Empty,
+				NameFilter = nameFilter
 			};
 
 			return View(Tuple.Create(searchVm, existing));
@@ -63,7 +66,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				? Array.Empty<TeamSearchResult>()
 				: await _teamService.SearchTeamsAsync(searchVm.Query!, ct);
 
-			var existing = await _teamService.GetTeamsPageAsync(1, DefaultPageSize, null, ct);
+			var existing = await _teamService.GetTeamsPageAsync(1, DefaultPageSize, null, null, ct);
 
 			return View("TeamsIndex", Tuple.Create(searchVm, existing));
 		}
