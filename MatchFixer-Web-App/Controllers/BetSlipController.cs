@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
@@ -61,13 +62,16 @@ namespace MatchFixer_Web_App.Controllers
 				);
 
 				// Only update odds if effective odds exist, otherwise keep current session odds
-				bet.Odds = bet.SelectedOption switch
+				if (Enum.TryParse<MatchPick>(bet.SelectedOption, ignoreCase: true, out var pick))
 				{
-					"Home" => home ?? bet.Odds,
-					"Draw" => draw ?? bet.Odds,
-					"Away" => away ?? bet.Odds,
-					_ => bet.Odds
-				};
+					bet.Odds = pick switch
+					{
+						MatchPick.Home => home ?? bet.Odds,
+						MatchPick.Draw => draw ?? bet.Odds,
+						MatchPick.Away => away ?? bet.Odds,
+						_ => bet.Odds
+					};
+				}
 
 
 			}
@@ -179,11 +183,14 @@ namespace MatchFixer_Web_App.Controllers
 				ct
 			);
 
-			decimal? odds = option switch
+			if (!Enum.TryParse<MatchPick>(option, ignoreCase: true, out var pick))
+				return BadRequest("Invalid option or odds unavailable.");
+
+			decimal? odds = pick switch
 			{
-				"Home" => home,
-				"Draw" => draw,
-				"Away" => away,
+				MatchPick.Home => home,
+				MatchPick.Draw => draw,
+				MatchPick.Away => away,
 				_ => null
 			};
 
