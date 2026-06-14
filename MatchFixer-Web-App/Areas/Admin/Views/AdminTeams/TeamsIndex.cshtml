@@ -129,6 +129,31 @@
 					</button>
 				</form>
 				<h3 class="h5 mb-1 mt-1 text-center text-white">Existing Teams</h3>
+
+				<form method="get"
+				      asp-area="Admin"
+				      asp-controller="AdminTeams"
+				      asp-action="TeamsIndex"
+				      class="d-flex gap-2 align-items-center justify-content-center mb-2 mt-1">
+					@foreach (var id in selectedIds)
+					{
+						<input type="hidden" name="leagueIds" value="@id" />
+					}
+					<input type="text"
+					       name="nameFilter"
+					       value="@vm.NameFilter"
+					       class="form-control form-control-sm"
+					       placeholder="Filter by name…"
+					       style="max-width:200px" />
+					<button type="submit" class="btn btn-primary btn-sm">Filter</button>
+					@if (!string.IsNullOrWhiteSpace(vm.NameFilter))
+					{
+						var clearUrl = Url.Action("TeamsIndex", "AdminTeams",
+							new { area = "Admin", page = 1, leagueIds = selectedIds.ToArray() })!;
+						<a href="@clearUrl" class="btn btn-outline-secondary btn-sm">✕ Clear</a>
+					}
+				</form>
+
 				<div class="table-responsive existing-teams-table">
 					<table class="table align-middle table-fixed w-100">
 						<colgroup>
@@ -216,11 +241,12 @@
 											var end = Math.Min(start + window - 1, total);
 
 											var selectedIdsArr = vm.SelectedLeagueIds ?? Array.Empty<int>();
+											var nameFilterParam = vm.NameFilter;
 
 											string Link(int i) => Url.Action(
 												"TeamsIndex",
 												"AdminTeams",
-												new { area = "Admin", page = i, leagueIds = selectedIdsArr } // <- pass the array
+												new { area = "Admin", page = i, leagueIds = selectedIdsArr, nameFilter = nameFilterParam }
 											)!;
 
 											int prevWindowStart = Math.Max(1, start - window);
