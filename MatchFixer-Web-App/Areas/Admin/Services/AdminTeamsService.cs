@@ -85,6 +85,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			int page,
 			int pageSize,
 			int[]? leagueIds = null,
+			string? nameFilter = null,
 			CancellationToken ct = default)
 		{
 			page = Math.Max(1, page);
@@ -110,6 +111,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			if (leagueNamesFilter is not null)
 				q = q.Where(t => leagueNamesFilter.Contains(t.LeagueName));
+
+			if (!string.IsNullOrWhiteSpace(nameFilter))
+				q = q.Where(t => t.Name.Contains(nameFilter));
 
 			q = q.OrderBy(t => t.LeagueName).ThenBy(t => t.Name);
 
