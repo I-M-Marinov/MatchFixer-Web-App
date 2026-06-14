@@ -3,6 +3,7 @@
 	public class TeamSearchVm
 	{
 		public string? Query { get; set; }
+		public string? NameFilter { get; set; }
 		public int LeagueId { get; set; }
 		public int Season { get; set; }
 		public IReadOnlyDictionary<int, string>? Leagues { get; set; }
