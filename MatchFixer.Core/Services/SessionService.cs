@@ -1,4 +1,5 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.Extensions;
 using MatchFixer.Core.ViewModels.GameSessionState;
@@ -90,12 +91,15 @@ namespace MatchFixer.Core.Services
 				ct
 			);
 
-			decimal currentOdds = item.SelectedOption switch
+			if (!Enum.TryParse<MatchPick>(item.SelectedOption, ignoreCase: true, out var pick))
+				throw new ArgumentException($"Invalid SelectedOption: '{item.SelectedOption}'");
+
+			decimal currentOdds = pick switch
 			{
-				"Home" => home ?? throw new InvalidOperationException("Home odds unavailable."),
-				"Draw" => draw ?? throw new InvalidOperationException("Draw odds unavailable."),
-				"Away" => away ?? throw new InvalidOperationException("Away odds unavailable."),
-				_ => throw new ArgumentException("Invalid SelectedOption")
+				MatchPick.Home => home ?? throw new InvalidOperationException("Home odds unavailable."),
+				MatchPick.Draw => draw ?? throw new InvalidOperationException("Draw odds unavailable."),
+				MatchPick.Away => away ?? throw new InvalidOperationException("Away odds unavailable."),
+				_ => throw new ArgumentException($"Unhandled MatchPick value: {pick}")
 			};
 
 			// Update existing bet or add a new one
