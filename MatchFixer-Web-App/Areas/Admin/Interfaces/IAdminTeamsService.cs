@@ -17,6 +17,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 			int page,
 			int pageSize,
 			int[]? leagueIds = null,
+			string? nameFilter = null,
 			CancellationToken ct = default);
 
 		Task<Dictionary<int, string>> GetAllLeaguesAsync(CancellationToken ct = default);
