@@ -41,7 +41,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		{
 			_http = http;
 			_db = db;
-			_apiKey = config["FootballApi:Key"]; 
+			_apiKey = config[ConfigKey];
 		}
 
 		public async Task<IReadOnlyList<TeamSearchResult>> SearchTeamsAsync(
@@ -67,9 +67,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			(string key, string value) mainParam,
 			CancellationToken ct)
 		{
-			var url = $"https://v3.football.api-sports.io/teams?{mainParam.key}={Uri.EscapeDataString(mainParam.value)}";
+			var url = $"{BaseUrl}/teams?{mainParam.key}={Uri.EscapeDataString(mainParam.value)}";
 			using var req = new HttpRequestMessage(HttpMethod.Get, url);
-			req.Headers.Add("x-apisports-key", _apiKey);
+			req.Headers.Add(ApiHeader, _apiKey);
 
 			using var resp = await _http.SendAsync(req, ct);
 			if (!resp.IsSuccessStatusCode) return new List<SearchTeamResponseItem>();
