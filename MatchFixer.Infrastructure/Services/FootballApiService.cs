@@ -20,7 +20,7 @@ namespace MatchFixer.Infrastructure.Services
 		{
 			_httpClient = httpClient;
 			_dbContext = dbContext;
-			_apiKey = config["FootballApi:Key"]; 
+			_apiKey = config[ConfigKey];
 		}
 
 		public async Task FetchAndSaveFixturesAsync()
@@ -39,9 +39,9 @@ namespace MatchFixer.Infrastructure.Services
 				{
 					Console.WriteLine($" ************************** Fetching fixtures for League {leagueId}");
 
-					var url = $"https://v3.football.api-sports.io/fixtures?league={leagueId}&season={Season}";
+					var url = $"{BaseUrl}/fixtures?league={leagueId}&season={Season}";
 					var request = new HttpRequestMessage(HttpMethod.Get, url);
-					request.Headers.Add("x-apisports-key", _apiKey);
+					request.Headers.Add(ApiHeader, _apiKey);
 					var response = await _httpClient.SendAsync(request);
 					response.EnsureSuccessStatusCode();
 
@@ -135,10 +135,10 @@ namespace MatchFixer.Infrastructure.Services
 				int leagueId = kvp.Key;
 				string leagueName = kvp.Value;
 
-				var url = $"https://v3.football.api-sports.io/teams?league={leagueId}&season={Season}";
+				var url = $"{BaseUrl}/teams?league={leagueId}&season={Season}";
 
 				var request = new HttpRequestMessage(HttpMethod.Get, url);
-				request.Headers.Add("x-apisports-key", _apiKey);
+				request.Headers.Add(ApiHeader, _apiKey);
 
 				var response = await _httpClient.SendAsync(request);
 				response.EnsureSuccessStatusCode();
@@ -212,9 +212,7 @@ namespace MatchFixer.Infrastructure.Services
 				? DateTime.UtcNow.Year
 				: DateTime.UtcNow.Year - 1;
 
-			var baseUrl =
-				$"https://v3.football.api-sports.io/fixtures" +
-				$"?league={leagueId}&season={season}";
+			var baseUrl = $"{BaseUrl}/fixtures?league={leagueId}&season={season}";
 
 			string url;
 
@@ -233,7 +231,7 @@ namespace MatchFixer.Infrastructure.Services
 			}
 
 			using var request = new HttpRequestMessage(HttpMethod.Get, url);
-			request.Headers.Add("x-apisports-key", _apiKey);
+			request.Headers.Add(ApiHeader, _apiKey);
 
 			var response = await _httpClient.SendAsync(request);
 			response.EnsureSuccessStatusCode();
