@@ -2,6 +2,10 @@
 {
 	public static class FootballApiConstants
 	{
+		public const string BaseUrl   = "https://v3.football.api-sports.io";
+		public const string ApiHeader = "x-apisports-key";
+		public const string ConfigKey = "FootballApi:Key";
+
 		public const int Season = 2023;
 
 		public const int PremierLeagueId = 39;
