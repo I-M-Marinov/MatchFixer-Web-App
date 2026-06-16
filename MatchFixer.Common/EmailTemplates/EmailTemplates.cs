@@ -13,6 +13,12 @@ namespace MatchFixer.Common.EmailTemplates
 		public const string SubjectPasswordResetRequested = "MatchFixer - Password reset requested"; // Email subject for the password reset requested emails
 		public const string SubjectHappyBirthdayFromMatchFixer = "🎂 Happy Birthday from MatchFixer!"; // Email subject for the birthday emails
 
+		public const string SubjectBetSlipWon    = "🎉 You won! Your MatchFixer bet slip has been settled";
+		public const string SubjectBetSlipLost   = "📋 Your MatchFixer bet slip result is in";
+		public const string SubjectBetSlipVoided = "↩️ Your MatchFixer bet slip has been voided and refunded";
+
+		public record BetRowEmailData(string HomeTeam, string AwayTeam, string Pick, string Status);
+
 		public static string SubjectTrophyWonEmail(string trophyName)
 		{
 			return $@"🏆 You’ve won the '{trophyName}' Trophy!"; 
@@ -383,6 +389,107 @@ namespace MatchFixer.Common.EmailTemplates
 						</html>";
 		}
 
+
+		public static string BetSlipSettledEmail(
+			string logoUrl,
+			string userName,
+			string outcome,
+			decimal stake,
+			decimal totalOdds,
+			decimal? winAmount,
+			IEnumerable<BetRowEmailData> bets)
+		{
+			var outcomeColor = outcome switch
+			{
+				"Won"    => "#27ae60",
+				"Lost"   => "#e74c3c",
+				"Voided" => "#95a5a6",
+				_        => "#555"
+			};
+
+			var outcomeEmoji = outcome switch
+			{
+				"Won"    => "🎉",
+				"Lost"   => "😞",
+				"Voided" => "↩️",
+				_        => "📋"
+			};
+
+			var payoutRow = outcome switch
+			{
+				"Won"    => $"<tr><td style='padding:6px 12px;color:#555;'>Payout</td><td style='padding:6px 12px;font-weight:bold;color:#27ae60;'>€{winAmount:F2}</td></tr>",
+				"Voided" => $"<tr><td style='padding:6px 12px;color:#555;'>Refunded</td><td style='padding:6px 12px;font-weight:bold;color:#95a5a6;'>€{stake:F2}</td></tr>",
+				_        => ""
+			};
+
+			var betRowsHtml = string.Join("", bets.Select(b =>
+			{
+				var statusColor = b.Status switch
+				{
+					"Won"    => "#27ae60",
+					"Lost"   => "#e74c3c",
+					"Voided" => "#95a5a6",
+					_        => "#f39c12"
+				};
+
+				var statusBadge = $"<span style='background:{statusColor};color:white;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;'>{b.Status.ToUpper()}</span>";
+
+				return $@"
+					<tr style='border-bottom:1px solid #eee;'>
+						<td style='padding:10px 12px;color:#333;'>{b.HomeTeam} <span style='color:#aaa;'>vs</span> {b.AwayTeam}</td>
+						<td style='padding:10px 12px;color:#555;text-align:center;'>{b.Pick}</td>
+						<td style='padding:10px 12px;text-align:center;'>{statusBadge}</td>
+					</tr>";
+			}));
+
+			return $@"
+				<!DOCTYPE html>
+				<html>
+				<head><meta charset='UTF-8'><title>Bet Slip Result</title></head>
+				<body style='font-family:Helvetica,sans-serif;background-color:#f4f4f4;padding:30px;'>
+					<div style='max-width:680px;margin:auto;background:white;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
+
+						<div style='text-align:center;background-color:#2c3e50;padding:20px 0;'>
+							<img src='{logoUrl}' alt='MatchFixer Logo' style='height:80px;margin-bottom:10px;'/>
+						</div>
+
+						<div style='padding:30px;text-align:center;'>
+							<h2 style='color:{outcomeColor};margin-bottom:4px;'>{outcomeEmoji} Bet Slip {outcome}</h2>
+							<p style='color:#777;margin-top:0;'>Hi {userName}, here is the result of your bet slip.</p>
+
+							<table style='margin:20px auto;border-collapse:collapse;font-size:15px;'>
+								<tr>
+									<td style='padding:6px 12px;color:#555;'>Stake</td>
+									<td style='padding:6px 12px;font-weight:bold;color:#333;'>€{stake:F2}</td>
+								</tr>
+								<tr>
+									<td style='padding:6px 12px;color:#555;'>Total Odds</td>
+									<td style='padding:6px 12px;font-weight:bold;color:#333;'>{totalOdds:F2}x</td>
+								</tr>
+								{payoutRow}
+							</table>
+
+							<h4 style='color:#333;margin-bottom:8px;text-align:left;'>Selections</h4>
+							<table style='width:100%;border-collapse:collapse;font-size:14px;text-align:left;'>
+								<thead>
+									<tr style='background:#f8f8f8;'>
+										<th style='padding:8px 12px;color:#888;font-weight:600;'>Match</th>
+										<th style='padding:8px 12px;color:#888;font-weight:600;text-align:center;'>Pick</th>
+										<th style='padding:8px 12px;color:#888;font-weight:600;text-align:center;'>Result</th>
+									</tr>
+								</thead>
+								<tbody>
+									{betRowsHtml}
+								</tbody>
+							</table>
+
+							<p style='margin-top:30px;font-size:13px;color:#888;'>Keep betting smart — your next win could be around the corner.</p>
+							<p style='margin-top:10px;font-size:12px;color:#040bcf;'>All Rights Reserved. MatchFixer ® 2025</p>
+						</div>
+					</div>
+				</body>
+				</html>";
+		}
 
 		public static string GetMatchNotificationSubject(string favoriteTeam, string opponent)
 		{
