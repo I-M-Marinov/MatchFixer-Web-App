@@ -1,12 +1,16 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
+using static MatchFixer.Common.EmailTemplates.EmailTemplates;
 using static MatchFixer.Common.GeneralConstants.BettingServiceConstants;
+using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 namespace MatchFixer.Core.Services;
 
@@ -19,15 +23,17 @@ public class BettingService : IBettingService
 	private readonly ITrophyService _trophyService;
 	private readonly IOddsBoostService _oddsBoostService;
 	private readonly IAdminInsightsNotifier _notifier;
+	private readonly IEmailSender _emailSender;
 
 
-	public BettingService(MatchFixerDbContext dbContext, 
-		ISessionService sessionService, 
+	public BettingService(MatchFixerDbContext dbContext,
+		ISessionService sessionService,
 		ITimezoneService timezoneService,
 		IWalletService walletService,
 		ITrophyService trophyService,
 		IOddsBoostService oddsBoostService,
-		IAdminInsightsNotifier notifier
+		IAdminInsightsNotifier notifier,
+		IEmailSender emailSender
 		)
 	{
 		_dbContext = dbContext;
@@ -37,7 +43,7 @@ public class BettingService : IBettingService
 		_trophyService = trophyService;
 		_oddsBoostService = oddsBoostService;
 		_notifier = notifier;
-
+		_emailSender = emailSender;
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default)
@@ -335,6 +341,12 @@ public class BettingService : IBettingService
 			.Include(bs => bs.Bets)
 				.ThenInclude(b => b.MatchEvent)
 					.ThenInclude(me => me.LiveResult)
+			.Include(bs => bs.Bets)
+				.ThenInclude(b => b.MatchEvent)
+					.ThenInclude(me => me.HomeTeam)
+			.Include(bs => bs.Bets)
+				.ThenInclude(b => b.MatchEvent)
+					.ThenInclude(me => me.AwayTeam)
 			.FirstOrDefaultAsync(bs => bs.Id == betSlipId);
 
 		if (betSlip == null)
@@ -410,6 +422,7 @@ public class BettingService : IBettingService
 
 			await _dbContext.SaveChangesAsync();
 			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+			await SendSettlementEmailAsync(betSlip, "Voided", refundAmount: betSlip.Amount);
 
 			return true;
 		}
@@ -422,6 +435,7 @@ public class BettingService : IBettingService
 
 			await _dbContext.SaveChangesAsync();
 			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+			await SendSettlementEmailAsync(betSlip, "Lost", refundAmount: null);
 
 			return true;
 		}
@@ -453,6 +467,7 @@ public class BettingService : IBettingService
 
 			await _dbContext.SaveChangesAsync();
 			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+			await SendSettlementEmailAsync(betSlip, "Won", refundAmount: winnings);
 
 			return true;
 
@@ -488,6 +503,54 @@ public class BettingService : IBettingService
 	}
 
 
+
+	private async Task SendSettlementEmailAsync(BetSlip betSlip, string outcome, decimal? refundAmount)
+	{
+		try
+		{
+			var user = await _dbContext.Users
+				.AsNoTracking()
+				.FirstOrDefaultAsync(u => u.Id == betSlip.UserId);
+
+			if (user?.Email == null)
+				return;
+
+			var totalOdds = betSlip.Bets
+				.Where(b => b.Status != BetStatus.Voided)
+				.Aggregate(1m, (acc, b) => acc * b.Odds);
+
+			var betRows = betSlip.Bets.Select(b => new BetRowEmailData(
+				HomeTeam: b.MatchEvent?.HomeTeam?.Name ?? "Home",
+				AwayTeam: b.MatchEvent?.AwayTeam?.Name ?? "Away",
+				Pick: b.Pick.ToString(),
+				Status: b.Status.ToString()
+			));
+
+			var subject = outcome switch
+			{
+				"Won"    => SubjectBetSlipWon,
+				"Lost"   => SubjectBetSlipLost,
+				"Voided" => SubjectBetSlipVoided,
+				_        => SubjectBetSlipLost
+			};
+
+			var body = BetSlipSettledEmail(
+				logoUrl: LogoUrl,
+				userName: user.FullName,
+				outcome: outcome,
+				stake: betSlip.Amount,
+				totalOdds: totalOdds,
+				winAmount: refundAmount,
+				bets: betRows
+			);
+
+			await _emailSender.SendEmailAsync(user.Email, subject, body);
+		}
+		catch
+		{
+			// Email failure must never break settlement
+		}
+	}
 
 	private async Task PublishBetMixForEventsAsync(IEnumerable<Guid> eventIds, CancellationToken ct)
 	{
