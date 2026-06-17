@@ -14,7 +14,6 @@ namespace MatchFixer.Common.EmailTemplates
 		public const string SubjectHappyBirthdayFromMatchFixer = "🎂 Happy Birthday from MatchFixer!"; // Email subject for the birthday emails
 
 		public const string SubjectBetSlipWon    = "🎉 You won! Your MatchFixer bet slip has been settled";
-		public const string SubjectBetSlipLost   = "📋 Your MatchFixer bet slip result is in";
 		public const string SubjectBetSlipVoided = "↩️ Your MatchFixer bet slip has been voided and refunded";
 
 		public record BetRowEmailData(string HomeTeam, string AwayTeam, string Pick, string Status);
