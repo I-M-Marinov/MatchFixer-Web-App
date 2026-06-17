@@ -435,7 +435,6 @@ public class BettingService : IBettingService
 
 			await _dbContext.SaveChangesAsync();
 			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
-			await SendSettlementEmailAsync(betSlip, "Lost", refundAmount: null);
 
 			return true;
 		}
@@ -529,9 +528,8 @@ public class BettingService : IBettingService
 			var subject = outcome switch
 			{
 				"Won"    => SubjectBetSlipWon,
-				"Lost"   => SubjectBetSlipLost,
 				"Voided" => SubjectBetSlipVoided,
-				_        => SubjectBetSlipLost
+				_        => SubjectBetSlipVoided
 			};
 
 			var body = BetSlipSettledEmail(
