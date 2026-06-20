@@ -1016,7 +1016,7 @@ body.live-events-no-scroll {
 }
 
 .live-events-team-logo {
-    width: auto;
+    width: 55px;
     height: 55px;
     object-fit: contain;
     transition: transform 0.2s ease;
@@ -1024,13 +1024,13 @@ body.live-events-no-scroll {
 }
 
 .team-logo-international {
-    width: 64px;
-    height: 64px;
-    object-fit: fill;
-    border-radius: 50%;
-    border: 2px black groove;
-    background: black;
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
     cursor: pointer;
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8))
+        drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5));
 }
 
 .boosted-match-container-effects {
