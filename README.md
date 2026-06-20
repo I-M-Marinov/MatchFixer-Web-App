@@ -222,3 +222,10 @@
 <p align="center">
   <img src="./world-cup-view.gif" align="center" border="10" width="600px"/>
 </p>
+
+<h3 align="center">Group Stage Matches That already concluded</h3>
+
+<p align="center">
+  <img src="./world-cup-full-time-matches.png" align="center" border="10" width="600px"/>
+</p>
+
