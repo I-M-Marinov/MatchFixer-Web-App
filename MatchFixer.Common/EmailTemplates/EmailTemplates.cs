@@ -59,7 +59,7 @@ namespace MatchFixer.Common.EmailTemplates
 									If you did not sign up for MatchFixer, please ignore this email.
 								</p>
 								<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-								   All Rights Reserved. MatchFixer ® 2025
+								   All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 								</p>
 							</div>
 						</div>
@@ -86,7 +86,7 @@ namespace MatchFixer.Common.EmailTemplates
 							If you did not reset your password, please review your account and ensure it is not compromised.
 						</p>
 						<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-							All Rights Reserved. MatchFixer ® 2025
+							All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 						</p>
 					</div>
 				</div>
@@ -119,7 +119,7 @@ namespace MatchFixer.Common.EmailTemplates
 									If you did not sign up for MatchFixer, please ignore this email.
 								</p>
 								<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-								   All Rights Reserved. MatchFixer ® 2025
+								   All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 								</p>
 							</div>
 						</div>
@@ -152,7 +152,7 @@ namespace MatchFixer.Common.EmailTemplates
 				                If you did not request this password reset, please review your account and ensure it is not compromised.
 				            </p>
 							<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-				               All Rights Reserved. MatchFixer ® 2025
+				               All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 				            </p>
 				        </div>
 				    </div>
@@ -183,7 +183,7 @@ namespace MatchFixer.Common.EmailTemplates
 					                If you did not request this email change, your account might be compromised.
 					            </p>
 					            <p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-					               All Rights Reserved. MatchFixer ® 2025
+					               All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 					            </p>
 					        </div>
 					    </div>
@@ -223,7 +223,7 @@ namespace MatchFixer.Common.EmailTemplates
 						If you received this by mistake, it’s probably because your doppelganger shares your birthday.
 					</p>
 					<p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-						All Rights Reserved. MatchFixer ® 2025
+						All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 					</p>
 				</div>
 			</div>
@@ -265,7 +265,7 @@ namespace MatchFixer.Common.EmailTemplates
 					                    Keep betting smart to earn even more trophies!
 					                </p>
 					                <p style='margin-top: 15px; font-size: 12px; color: #040bcf;'>
-					                   All Rights Reserved. MatchFixer ® 2025
+					                   All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 					                </p>
 					            </div>
 					        </div>
@@ -292,7 +292,7 @@ namespace MatchFixer.Common.EmailTemplates
 				          {contentHtml}
 				        </div>
 				        <p style='margin-top: 15px; font-size: 12px; color: #040bcf; text-align:center;'>
-				           All Rights Reserved. MatchFixer ® 2025
+				           All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
 				        </p>
 				      </div>
 				    </div>
@@ -379,7 +379,7 @@ namespace MatchFixer.Common.EmailTemplates
 
 						    <!-- FOOTER -->
 						    <div style='background:#f1f1f1;padding:15px;text-align:center;font-size:12px;color:#777;'>
-						        MatchFixer © 2025-2026 — Your personal space for fixing bets
+						        MatchFixer © 2025-{DateTime.UtcNow.Year} — Your personal space for fixing bets
 						    </div>
 
 						</div>
@@ -483,7 +483,7 @@ namespace MatchFixer.Common.EmailTemplates
 							</table>
 
 							<p style='margin-top:30px;font-size:13px;color:#888;'>Keep betting smart — your next win could be around the corner.</p>
-							<p style='margin-top:10px;font-size:12px;color:#040bcf;'>All Rights Reserved. MatchFixer ® 2025</p>
+							<p style='margin-top:10px;font-size:12px;color:#040bcf;'>All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}</p>
 						</div>
 					</div>
 				</body>
