@@ -32,9 +32,11 @@ namespace MatchFixer.Common.EmailTemplates
 						<title>Confirm Your Email</title>
 					</head>
 					<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-						<div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+						<div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 							<div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-								<img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+								<div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 							</div>
 							<div style='padding: 30px; text-align: center;'>
 								<h2 style='color: #333;'>🎉 Welcome to MatchFixer (Don’t worry, it’s legal... we checked)</h2>
@@ -76,9 +78,11 @@ namespace MatchFixer.Common.EmailTemplates
 				<title>Password Changed</title>
 			</head>
 			<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-				<div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+				<div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 					<div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-						<img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+						<div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 					</div>
 					<div style='padding: 30px; text-align: center;'>
 						<h2 style='color: #333;'>Your password was changed on {userTimeFormatted}</h2>
@@ -103,9 +107,11 @@ namespace MatchFixer.Common.EmailTemplates
 						<title>Confirm your email</title>
 					</head>
 					<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-						<div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+						<div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 							<div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-								<img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+								<div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 							</div>
 							<div style='padding: 30px; text-align: center;'>
 								<h2 style='color: #333;'>Please follow the link below to confirm your MatchFixer Account</h2>
@@ -136,9 +142,11 @@ namespace MatchFixer.Common.EmailTemplates
 				    <title>Reset Your Password</title>
 				</head>
 				<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-				    <div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+				    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 				        <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-				            <img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+				            <div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 				        </div>
 				        <div style='padding: 30px; text-align: center;'>
 				            <h2 style='color: #333;'>Please follow the link below to reset your MatchFixer password</h2>
@@ -169,9 +177,11 @@ namespace MatchFixer.Common.EmailTemplates
 					    <title>Confirm your email</title>
 					</head>
 					<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-					    <div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+					    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 					        <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-					            <img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+					            <div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 					        </div>
 					        <div style='padding: 30px; text-align: center;'>
 					            <h2 style='color: #333;'>Please follow the link below to confirm your new Email Address</h2>
@@ -200,9 +210,11 @@ namespace MatchFixer.Common.EmailTemplates
 			<title>Happy Birthday!</title>
 		</head>
 		<body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-			<div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+			<div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 				<div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-					<img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+					<div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 				</div>
 				<div style='padding: 30px; text-align: center;'>
 					<h2 style='color: #333;'>🎉 Happy Birthday, {username}! 🎂</h2>
@@ -240,9 +252,11 @@ namespace MatchFixer.Common.EmailTemplates
 					        <title>You've Won a Trophy!</title>
 					    </head>
 					    <body style='font-family: Helvetica, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-					        <div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+					        <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 					            <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-					                <img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+					                <div style='max-width: 320px; margin: 0 auto;'>
+									<img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+								</div>
 					            </div>
 					            <div style='padding: 30px; text-align: center;'>
 					                <h2 style='color: #333;'>🏆 Congratulations!</h2>
@@ -282,9 +296,11 @@ namespace MatchFixer.Common.EmailTemplates
 				    <title>{HtmlEncoder.Default.Encode(subject)}</title>
 				  </head>
 				  <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-				    <div style='max-width: 600px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+				    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
 				      <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-				        <img src='{LogoUrl}' alt='MatchFixer Logo' width='400' style='width: 400px; max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto;' />
+				        <div style='max-width: 320px; margin: 0 auto;'>
+								<img src='{LogoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
+							</div>
 				      </div>
 				      <div style='padding: 30px;'>
 				        <h2 style='color: #333; text-align:center;'>{HtmlEncoder.Default.Encode(subject)}</h2>
@@ -314,12 +330,12 @@ namespace MatchFixer.Common.EmailTemplates
 						<html>
 						<body style='font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;'>
 
-						<div style='max-width:600px;margin:auto;background:white;border-radius:12px;overflow:hidden;
+						<div style='max-width:1000px;margin:auto;background:white;border-radius:12px;overflow:hidden;
 						            box-shadow:0 10px 30px rgba(0,0,0,0.1);'>
 
 						    <!-- HEADER -->
 						    <div style='background:#2c3e50;padding:20px;text-align:center;'>
-						        <img src='{logoUrl}' style='width:160px;max-width:80%;height:auto;display:block;margin:0 auto;' />
+						        <div style='max-width:320px;margin:0 auto;'><img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width:100%;height:auto;display:block;' /></div>
 						    </div>
 
 						    <!-- CONTENT -->
@@ -446,10 +462,10 @@ namespace MatchFixer.Common.EmailTemplates
 				<html>
 				<head><meta charset='UTF-8'><title>Bet Slip Result</title></head>
 				<body style='font-family:Helvetica,sans-serif;background-color:#f4f4f4;padding:30px;'>
-					<div style='max-width:600px;margin:auto;background:white;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
+					<div style='max-width:1000px;margin:auto;background:white;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
 
 						<div style='text-align:center;background-color:#2c3e50;padding:20px 0;'>
-							<img src='{logoUrl}' alt='MatchFixer Logo' width='400' style='width:400px;max-width:100%;height:auto;display:block;margin:0 auto 10px auto;'/>
+							<div style='max-width:320px;margin:0 auto;'><img src='{logoUrl}' alt='MatchFixer Logo' width='320' style='width:100%;height:auto;display:block;' /></div>
 						</div>
 
 						<div style='padding:30px;text-align:center;'>
