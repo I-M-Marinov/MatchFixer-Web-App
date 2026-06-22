@@ -2,11 +2,34 @@
    WORLD CUP PAGE
 ========================================================= */
 
+/* Extend the dark theme to the body + footer when on this page */
+body:has(.world-cup-page) {
+    background: #09182a;
+}
+
+/* Allow layout-container to grow beyond 100vh so content doesn't cover the footer */
+body:has(.world-cup-page) .layout-container {
+    height: auto;
+    min-height: 100vh;
+}
+
+body:has(.world-cup-page) .footer {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    text-align: center;
+    padding: 1rem 0;
+}
+
 .world-cup-page {
     min-height: 100vh;
     background: radial-gradient(circle at top, rgba(212,183,0,0.08), transparent 35%), linear-gradient( 180deg, #07111f 0%, #09182a 100%);
     color: white;
-    padding-bottom: 5rem;
+    padding-bottom: 2rem;
 }
 
 /* =========================================
@@ -15,19 +38,15 @@
 
 .world-cup-banner {
     position: relative;
-    width: 90%;
-    height: 275px;
+    width: 100%;
     overflow: hidden;
-    margin: 0 auto;
     border-bottom: 1px solid rgba(212,183,0,0.18);
     background: linear-gradient( 180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.4));
 }
 
 .world-cup-banner-image {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
     display: block;
 }
 
@@ -701,24 +720,30 @@
 
 .wc-group-standings-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 2rem;
-    margin-bottom: 4rem;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 2rem 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .wc-group-card {
+    width: 100%;
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
-    padding: 1.2rem;
+    padding: 1.4rem 1.6rem;
     backdrop-filter: blur(12px);
 }
 
 .wc-group-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: #d4b700;
     margin-bottom: 1rem;
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .wc-standings-table {
@@ -727,13 +752,33 @@
 }
 
 .wc-standings-table th {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.8rem;
-    padding-bottom: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0 0.4rem 0.7rem;
+    text-align: center;
+}
+
+.wc-standings-table th:nth-child(2) {
+    text-align: left;
+    padding-left: 0;
 }
 
 .wc-standings-table td {
-    padding: 0.7rem 0;
+    padding: 0.55rem 0.4rem;
+    text-align: center;
+    font-size: 0.88rem;
+}
+
+.wc-standings-table td:nth-child(2) {
+    text-align: left;
+    padding-left: 0;
+}
+
+.wc-standings-table tbody tr {
+    border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 .wc-team-cell {
@@ -835,4 +880,160 @@
     to {
         --champion-angle: 1turn;
     }
+}
+/* ============================================
+        ADMIN TOOLBAR
+============================================ */
+
+.wc-admin-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem 0;
+}
+
+.wc-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.wc-refresh-btn:hover {
+    background: rgba(0, 212, 255, 0.18);
+    border-color: rgba(0, 212, 255, 0.7);
+}
+
+.wc-refresh-btn:active {
+    opacity: 0.6;
+}
+
+.wc-refresh-btn.is-loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.wc-refresh-btn.is-loading i {
+    animation: wc-spin 0.7s linear infinite;
+}
+
+@keyframes wc-spin {
+    to { transform: rotate(360deg); }
+}
+
+.wc-refresh-btn i {
+    font-size: 0.9rem;
+}
+
+.wc-refresh-toast {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 1.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    color: #00ffcc;
+    background: rgba(0, 255, 204, 0.08);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    border-radius: 6px;
+}
+
+.wc-sub-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.25rem 1.5rem 0;
+}
+
+.wc-sub-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.wc-sub-tab:hover {
+    color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(0, 212, 255, 0.4);
+}
+
+.wc-sub-tab.active {
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.55);
+}
+
+.wc-sub-content {
+    display: none;
+}
+
+.wc-sub-content.active {
+    display: block;
+}
+
+.wc-r32-wrapper {
+    padding: 2rem 2.5rem;
+    overflow-x: auto;
+}
+
+.wc-r32-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.wc-r32-half {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wc-r32-half .wc-round-title {
+    text-align: center;
+    margin-bottom: 0.75rem;
+}
+
+.wc-r32-half .wc-bracket-match::after,
+.wc-r32-half .placeholder-match::after {
+    display: none;
+}
+
+.wc-r32-half .wc-bracket-match,
+.wc-r32-half .placeholder-match {
+    height: auto;
+    min-height: 72px;
+    padding: 0.85rem 1.2rem;
+}
+
+.wc-refresh-btn--danger {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+    border-color: rgba(255, 107, 107, 0.35);
+}
+
+.wc-refresh-btn--danger:hover {
+    background: rgba(255, 107, 107, 0.18);
+    border-color: rgba(255, 107, 107, 0.7);
 }
