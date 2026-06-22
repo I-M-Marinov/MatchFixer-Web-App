@@ -6,6 +6,7 @@ using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.TheSportsDBAPI;
 using Microsoft.EntityFrameworkCore;
+using static MatchFixer.Common.GeneralConstants.WorldCupApiConstants;
 
 namespace MatchFixer.Core.Services
 {
@@ -93,6 +94,12 @@ namespace MatchFixer.Core.Services
 		{
 			return new KnockoutBracketViewModel
 			{
+				RoundOf32 = MapStage(
+					matches,
+					WorldCupStage.RoundOf32,
+					matchEvents,
+					userTimeZone),
+
 				RoundOf16 = MapStage(
 					matches,
 					WorldCupStage.RoundOf16,
@@ -196,11 +203,12 @@ namespace MatchFixer.Core.Services
 			return stage switch
 			{
 				WorldCupStage.GroupStage => "Group Stage",
-				WorldCupStage.RoundOf16 => "Round of 16",
-				WorldCupStage.QuarterFinal => "Quarter Finals",
-				WorldCupStage.SemiFinal => "Semi Finals",
-				WorldCupStage.ThirdPlace => "Third Place",
-				WorldCupStage.Final => "Final",
+				WorldCupStage.RoundOf32 => StageNameRoundOf32,
+				WorldCupStage.RoundOf16 => StageNameRoundOf16,
+				WorldCupStage.QuarterFinal => StageNameQuarterFinal,
+				WorldCupStage.SemiFinal => StageNameSemiFinal,
+				WorldCupStage.ThirdPlace => StageNameThirdPlace,
+				WorldCupStage.Final => StageNameFinal,
 				_ => stage.ToString()
 			};
 		}
@@ -208,78 +216,287 @@ namespace MatchFixer.Core.Services
 		public async Task<List<WorldCupGroupStandingViewModel>>
 			GetGroupStandingsAsync()
 		{
-			var standings = await _sportsDbApiService
-				.GetLeagueTableAsync(
-					4424,
-					"2026");
+			var rows = await _context.WorldCupGroupStandings
+				.OrderBy(s => s.GroupName)
+				.ThenBy(s => s.Rank)
+				.ToListAsync();
 
-			if (!standings.Any())
+			if (!rows.Any())
 			{
 				return new();
 			}
 
-			var grouped = standings
-				.Select((team, index) => new
-				{
-					Team = team,
-
-					GroupName =
-						$"Group {(char)('A' + (index / 4))}"
-				})
-				.GroupBy(x => x.GroupName)
-				.OrderBy(x => x.Key)
+			return rows
+				.GroupBy(s => s.GroupName)
 				.Select(group => new WorldCupGroupStandingViewModel
 				{
 					GroupName = group.Key,
 
 					Teams = group
-						.OrderByDescending(x =>
-							ParseInt(x.Team.Points))
-
-						.ThenByDescending(x =>
-							ParseInt(x.Team.GoalDifference))
-
-						.Select(x => new WorldCupStandingTeamViewModel
+						.Select(s => new WorldCupStandingTeamViewModel
 						{
-							TeamName = x.Team.Team,
-
-							TeamLogo = string.IsNullOrWhiteSpace(
-								x.Team.Badge)
-								? "/images/default-team.png"
-								: x.Team.Badge,
-
-							Played =
-								ParseInt(x.Team.Played),
-
-							Wins =
-								ParseInt(x.Team.Wins),
-
-							Draws =
-								ParseInt(x.Team.Draws),
-
-							Losses =
-								ParseInt(x.Team.Losses),
-
-							GoalDifference =
-								ParseInt(x.Team.GoalDifference),
-
-							Points =
-								ParseInt(x.Team.Points),
-
-							IsQualified = group
-								.OrderByDescending(t =>
-									ParseInt(t.Team.Points))
-
-								.Take(2)
-
-								.Any(t =>
-									t.Team.Team == x.Team.Team)
+							TeamName       = s.TeamName,
+							TeamLogo       = s.TeamBadge,
+							Played         = s.Played,
+							Wins           = s.Wins,
+							Draws          = s.Draws,
+							Losses         = s.Losses,
+							GoalDifference = s.GoalDifference,
+							Points         = s.Points,
+							IsQualified    = s.IsQualified
 						})
 						.ToList()
 				})
 				.ToList();
+		}
 
-			return grouped;
+		public async Task<int> RefreshGroupStandingsAsync()
+		{
+			var apiRows = await _sportsDbApiService
+				.GetLeagueTableAsync(4429, "2026");
+
+			if (!apiRows.Any())
+			{
+				return 0;
+			}
+
+			var newStandings = apiRows
+				.Where(t => !string.IsNullOrWhiteSpace(t.Group))
+				.Select(t => new WorldCupGroupStanding
+				{
+					GroupName      = t.Group,
+					Rank           = ParseInt(t.Rank),
+					TeamName       = t.Team,
+					TeamBadge      = string.IsNullOrWhiteSpace(t.Badge)
+						? "/images/default-team.png"
+						: t.Badge,
+					Played         = ParseInt(t.Played),
+					Wins           = ParseInt(t.Wins),
+					Draws          = ParseInt(t.Draws),
+					Losses         = ParseInt(t.Losses),
+					GoalDifference = ParseInt(t.GoalDifference),
+					Points         = ParseInt(t.Points),
+					IsQualified    = t.Description
+						.Equals(DescriptionRoundOf32,
+							StringComparison.OrdinalIgnoreCase),
+					LastUpdated    = DateTime.UtcNow
+				})
+				.ToList();
+
+			// Wipe existing standings and replace with fresh data.
+			var existing = await _context.WorldCupGroupStandings.ToListAsync();
+			_context.WorldCupGroupStandings.RemoveRange(existing);
+			await _context.WorldCupGroupStandings.AddRangeAsync(newStandings);
+			await _context.SaveChangesAsync();
+
+			return newStandings.Count;
+		}
+
+		public async Task<int> RefreshKnockoutStageAsync()
+		{
+			var fixtures = await _sportsDbApiService
+				.GetWorldCupFixturesAsync();
+
+			var knockoutFixtures = fixtures
+				.Where(f =>
+				{
+					var round = f.Round?.ToLower() ?? string.Empty;
+					return round.Contains("round of 32")
+						|| round.Contains("round of 16")
+						|| round.Contains("quarter")
+						|| round.Contains("semi")
+						|| round.Contains("third")
+						|| round.Contains("final");
+				})
+				.ToList();
+
+			if (!knockoutFixtures.Any())
+			{
+				return 0;
+			}
+
+			var apiEventIds = knockoutFixtures
+				.Select(f =>
+					int.TryParse(f.EventId, out var id) ? (int?)id : null)
+				.Where(id => id.HasValue)
+				.Select(id => id!.Value)
+				.ToList();
+
+			var existingMatches = await _context.WorldCupMatches
+				.Where(m => m.IsKnockout
+					&& m.ApiEventId.HasValue
+					&& apiEventIds.Contains(m.ApiEventId.Value))
+				.ToListAsync();
+
+			var updatedCount = 0;
+
+			foreach (var fixture in knockoutFixtures)
+			{
+				if (!int.TryParse(fixture.EventId, out var apiId))
+				{
+					continue;
+				}
+
+				var match = existingMatches
+					.FirstOrDefault(m => m.ApiEventId == apiId);
+
+				if (match == null)
+				{
+					continue;
+				}
+
+				match.HomeTeam = fixture.HomeTeam;
+				match.AwayTeam = fixture.AwayTeam;
+				match.HomeLogo = fixture.HomeBadge ?? match.HomeLogo;
+				match.AwayLogo = fixture.AwayBadge ?? match.AwayLogo;
+
+				match.HomeScore =
+					int.TryParse(fixture.HomeScore, out var hs)
+						? hs
+						: null;
+
+				match.AwayScore =
+					int.TryParse(fixture.AwayScore, out var aws)
+						? aws
+						: null;
+
+				match.IsFinished =
+					fixture.Status == StatusMatchFinished;
+
+				match.IsLive =
+					fixture.Status == StatusLive;
+
+				updatedCount++;
+			}
+
+			await _context.SaveChangesAsync();
+
+			return updatedCount;
+		}
+
+		public async Task<int> ReclassifyAndRefreshAsync()
+		{
+			var toRemove = await _context.WorldCupMatches
+				.Where(m => m.IsKnockout
+					|| (m.Stage == WorldCupStage.GroupStage
+						&& m.GroupName != null
+						&& m.GroupName.ToLower().Contains("round of 32")))
+				.ToListAsync();
+
+			_context.WorldCupMatches.RemoveRange(toRemove);
+			await _context.SaveChangesAsync();
+
+			// Re-fetch all fixtures and re-seed knockout + R32 rows.
+			var fixtures = await _sportsDbApiService
+				.GetWorldCupFixturesAsync();
+
+			var knockoutFixtures = fixtures
+				.Where(f =>
+				{
+					var round = f.Round?.ToLower() ?? string.Empty;
+					return round.Contains("round of 32")
+						|| round.Contains("round of 16")
+						|| round.Contains("quarter")
+						|| round.Contains("semi")
+						|| round.Contains("third")
+						|| round.Contains("final");
+				})
+				.ToList();
+
+			if (!knockoutFixtures.Any())
+			{
+				return 0;
+			}
+
+			// Determine the next RoundPosition to avoid collisions with existing group-stage rows.
+			var maxPosition = await _context.WorldCupMatches
+				.MaxAsync(m => (int?)m.RoundPosition) ?? 0;
+
+			var newMatches = new List<WorldCupMatch>();
+
+			foreach (var fixture in knockoutFixtures)
+			{
+				var stage = ParseWorldCupStageFromRound(
+					fixture.Round);
+
+				newMatches.Add(new WorldCupMatch
+				{
+					ApiEventId =
+						int.TryParse(fixture.EventId, out var pid)
+							? pid
+							: null,
+
+					HomeTeam = fixture.HomeTeam,
+					AwayTeam = fixture.AwayTeam,
+					HomeLogo = fixture.HomeBadge ?? string.Empty,
+					AwayLogo = fixture.AwayBadge ?? string.Empty,
+
+					MatchDate =
+						DateTime.TryParse(
+							$"{fixture.Date} {fixture.Time}",
+							out var kickoff)
+							? kickoff
+							: DateTime.UtcNow,
+
+					HomeScore =
+						int.TryParse(fixture.HomeScore, out var hs)
+							? hs
+							: null,
+
+					AwayScore =
+						int.TryParse(fixture.AwayScore, out var aws)
+							? aws
+							: null,
+
+					Stage = stage,
+					GroupName = null,
+					IsKnockout = true,
+					IsFinished = fixture.Status == StatusMatchFinished,
+					IsLive = fixture.Status == StatusLive,
+					RoundPosition = ++maxPosition
+				});
+			}
+
+			await _context.WorldCupMatches.AddRangeAsync(newMatches);
+			await _context.SaveChangesAsync();
+
+			return newMatches.Count;
+		}
+
+		private static WorldCupStage ParseWorldCupStageFromRound(
+			string? round)
+		{
+			// API returns intRound as a numeric string (1-3 = Group Stage,
+			// 4 = R32, 5 = R16, 6 = QF, 7 = SF, 8 = Third Place, 9+ = Final).
+			if (int.TryParse(round, out var intRound))
+			{
+				return intRound switch
+				{
+					<= 3 => WorldCupStage.GroupStage,
+					4    => WorldCupStage.RoundOf32,
+					5    => WorldCupStage.RoundOf16,
+					6    => WorldCupStage.QuarterFinal,
+					7    => WorldCupStage.SemiFinal,
+					8    => WorldCupStage.ThirdPlace,
+					_    => WorldCupStage.Final
+				};
+			}
+
+			if (string.IsNullOrWhiteSpace(round))
+			{
+				return WorldCupStage.GroupStage;
+			}
+
+			var r = round.ToLower();
+
+			if (r.Contains("round of 32")) return WorldCupStage.RoundOf32;
+			if (r.Contains("round of 16")) return WorldCupStage.RoundOf16;
+			if (r.Contains("quarter"))     return WorldCupStage.QuarterFinal;
+			if (r.Contains("semi"))        return WorldCupStage.SemiFinal;
+			if (r.Contains("third"))       return WorldCupStage.ThirdPlace;
+			if (r.Contains("final"))       return WorldCupStage.Final;
+
+			return WorldCupStage.GroupStage;
 		}
 
 		private int ParseInt(string? value)
