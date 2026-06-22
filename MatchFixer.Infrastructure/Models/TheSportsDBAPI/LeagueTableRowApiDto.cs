@@ -11,6 +11,12 @@ public class LeagueTableRowApiDto
 	[JsonPropertyName("strBadge")]
 	public string Badge { get; set; } = string.Empty;
 
+	[JsonPropertyName("strGroup")]
+	public string Group { get; set; } = string.Empty;
+
+	[JsonPropertyName("strDescription")]
+	public string Description { get; set; } = string.Empty;
+
 	[JsonPropertyName("intPlayed")]
 	public string Played { get; set; } = "0";
 
