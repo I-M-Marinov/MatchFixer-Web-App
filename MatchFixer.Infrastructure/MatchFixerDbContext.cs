@@ -33,6 +33,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<UserFavoriteTeam> UserFavoriteTeams { get; set; }
 		public virtual DbSet<TeamWikiInfo> TeamWikiInfos { get; set; }
 		public virtual DbSet<WorldCupMatch> WorldCupMatches { get; set; }
+		public virtual DbSet<WorldCupGroupStanding> WorldCupGroupStandings { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
