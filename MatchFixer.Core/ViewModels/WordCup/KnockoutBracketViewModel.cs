@@ -2,6 +2,8 @@
 {
 	public class KnockoutBracketViewModel
 	{
+		public List<WorldCupMatchCardViewModel> RoundOf32 { get; set; } = new();
+
 		public List<WorldCupMatchCardViewModel> RoundOf16 { get; set; } = new();
 
 		public List<WorldCupMatchCardViewModel> QuarterFinals { get; set; } = new();
