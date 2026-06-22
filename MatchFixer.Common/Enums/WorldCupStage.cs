@@ -7,6 +7,7 @@
 		QuarterFinal = 2,
 		SemiFinal = 3,
 		ThirdPlace = 4,
-		Final = 5
+		Final = 5,
+		RoundOf32 = 6
 	}
 }
