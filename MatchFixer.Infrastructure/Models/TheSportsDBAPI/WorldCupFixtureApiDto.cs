@@ -25,7 +25,9 @@ namespace MatchFixer.Infrastructure.Models.TheSportsDBAPI
 		[JsonPropertyName("strTime")]
 		public string Time { get; set; } = string.Empty;
 
-		[JsonPropertyName("strRound")]
+		// strRound does not exist in the TheSportsDB response — the API
+		// uses intRound (a numeric matchday / knockout-round index).
+		[JsonPropertyName("intRound")]
 		public string Round { get; set; } = string.Empty;
 
 		[JsonPropertyName("intHomeScore")]
