@@ -8,5 +8,8 @@ namespace MatchFixer.Core.Contracts
 		Task<WorldCupPageViewModel> GetWorldCupPageAsync();
 		Task<List<WorldCupGroupStandingViewModel>>
 			GetGroupStandingsAsync();
+		Task<int> RefreshKnockoutStageAsync();
+		Task<int> ReclassifyAndRefreshAsync();
+		Task<int> RefreshGroupStandingsAsync();
 	}
 }
