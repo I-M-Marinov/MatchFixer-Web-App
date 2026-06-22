@@ -1,5 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
+using static MatchFixer.Common.GeneralConstants.WorldCupApiConstants;
 
 namespace MatchFixer_Web_App.Controllers
 {
@@ -17,6 +19,51 @@ namespace MatchFixer_Web_App.Controllers
 			var model = await _worldCupService.GetWorldCupPageAsync();
 
 			return View(model);
+		}
+
+		[HttpPost]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RefreshKnockoutStage()
+		{
+			var updated = await _worldCupService.RefreshKnockoutStageAsync();
+
+			TempData[TempDataRefreshMessage] =
+				updated > 0
+					? string.Format(MsgKnockoutRefreshed, updated)
+					: MsgKnockoutNoData;
+
+			return RedirectToAction(nameof(WorldCup));
+		}
+
+		[HttpPost]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ReclassifyAndRefresh()
+		{
+			var reseeded = await _worldCupService.ReclassifyAndRefreshAsync();
+
+			TempData[TempDataRefreshMessage] =
+				reseeded > 0
+					? string.Format(MsgReclassifyRefreshed, reseeded)
+					: MsgReclassifyNoData;
+
+			return RedirectToAction(nameof(WorldCup));
+		}
+
+		[HttpPost]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RefreshGroupStandings()
+		{
+			var count = await _worldCupService.RefreshGroupStandingsAsync();
+
+			TempData[TempDataRefreshMessage] =
+				count > 0
+					? string.Format(MsgStandingsRefreshed, count)
+					: MsgStandingsNoData;
+
+			return RedirectToAction(nameof(WorldCup));
 		}
 	}
 }
