@@ -1,13 +1,9 @@
 ﻿/* =========================================================
    WORLD CUP PAGE
 ========================================================= */
-
-/* Extend the dark theme to the body + footer when on this page */
 body:has(.world-cup-page) {
     background: #09182a;
 }
-
-/* Allow layout-container to grow beyond 100vh so content doesn't cover the footer */
 body:has(.world-cup-page) .layout-container {
     height: auto;
     min-height: 100vh;
