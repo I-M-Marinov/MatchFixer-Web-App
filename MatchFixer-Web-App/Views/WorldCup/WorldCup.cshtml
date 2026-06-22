@@ -1,8 +1,17 @@
-﻿@using MatchFixer.Core.ViewModels.WordCup
+@using MatchFixer.Core.ViewModels.WordCup
+@using static MatchFixer.Common.GeneralConstants.WorldCupApiConstants
 @model WorldCupPageViewModel
 
 @{
 	ViewData["Title"] = "FIFA World Cup";
+}
+
+@if (TempData[TempDataRefreshMessage] != null)
+{
+	<div class="wc-refresh-toast">
+		<i class="bi bi-check-circle-fill"></i>
+		@TempData[TempDataRefreshMessage]
+	</div>
 }
 
 <link rel="stylesheet"
@@ -21,14 +30,14 @@
 
 	</div>
 
-	<!-- TABS -->
+	<!-- OUTER TABS -->
 	<div class="world-cup-tabs">
 
 		<button class="wc-tab active"
-				data-tab="bracketTab">
+				data-tab="tournamentTab">
 
 			<i class="bi bi-diagram-3-fill"></i>
-			Tournament Graph
+			Tournament
 
 		</button>
 
@@ -43,224 +52,361 @@
 	</div>
 
 	<!-- ========================================= -->
-	<!-- BRACKET TAB -->
+	<!-- TOURNAMENT TAB                            -->
 	<!-- ========================================= -->
 
-	<div id="bracketTab"
+	<div id="tournamentTab"
 		 class="wc-tab-content active">
 
-		<div class="wc-bracket-wrapper">
+		<!-- ADMIN TOOLBAR -->
+		@if (User.IsInRole("Admin"))
+		{
+			<div class="wc-admin-toolbar">
 
-			<div class="wc-bracket-scale">
+				<form asp-controller="WorldCup"
+					  asp-action="RefreshKnockoutStage"
+					  method="post"
+					  style="display:inline;">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="wc-refresh-btn">
+						<i class="bi bi-arrow-clockwise"></i>
+						Refresh Knockout Stage
+					</button>
+				</form>
 
-				<div class="wc-bracket-grid">
+				<form asp-controller="WorldCup"
+					  asp-action="ReclassifyAndRefresh"
+					  method="post"
+					  style="display:inline;">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="wc-refresh-btn wc-refresh-btn--danger">
+						<i class="bi bi-database-fill-gear"></i>
+						Reclassify &amp; Reseed
+					</button>
+				</form>
 
-			<!-- ROUND OF 16 -->
-			<div class="wc-column r16-round">
-
-				<div class="wc-round-title">
-					Round of 16
-				</div>
-
-				@for (int i = 0; i < 8; i++)
-				{
-					if (Model.Bracket.RoundOf16.Count > i)
-					{
-						<partial name="_WorldCupBracketMatch"
-								 model="Model.Bracket.RoundOf16[i]" />
-					}
-					else
-					{
-						<partial name="_WorldCupPlaceholderMatch" />
-					}
-				}
-
-			</div>
-
-
-			<!-- QUARTERS -->
-			
-			<div class="wc-column quarters">
-
-				<div class="wc-round-title">
-					Quarter Finals
-				</div>
-
-				@for (int i = 0; i < 4; i++)
-				{
-					<div class="wc-match-node">
-
-						@if (Model.Bracket.QuarterFinals.Count > i)
-						{
-							<partial name="_WorldCupBracketMatch"
-									 model="Model.Bracket.QuarterFinals[i]" />
-						}
-						else
-						{
-							<partial name="_WorldCupPlaceholderMatch" />
-						}
-
-					</div>
-				}
+				<form asp-controller="WorldCup"
+					  asp-action="RefreshGroupStandings"
+					  method="post"
+					  style="display:inline;">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="wc-refresh-btn">
+						<i class="bi bi-table"></i>
+						Refresh Group Standings
+					</button>
+				</form>
 
 			</div>
+		}
 
-			<!-- SEMIS -->
+		<!-- SUB-TABS -->
+		<div class="wc-sub-tabs">
 
-			<div class="wc-column semis">
+			<button class="wc-sub-tab active"
+					data-subtab="subGroupStage">
 
-				<div class="wc-round-title">
-					Semi Finals
-				</div>
+				<i class="bi bi-grid-3x3-gap-fill"></i>
+				Group Stage
 
-				@for (int i = 0; i < 2; i++)
-				{
-					<div class="wc-match-node">
+			</button>
 
-						@if (Model.Bracket.SemiFinals.Count > i)
-						{
-							<partial name="_WorldCupBracketMatch"
-									 model="Model.Bracket.SemiFinals[i]" />
-						}
-						else
-						{
-							<partial name="_WorldCupPlaceholderMatch" />
-						}
+			<button class="wc-sub-tab"
+					data-subtab="subR32">
 
-					</div>
-				}
+				<i class="bi bi-diagram-2-fill"></i>
+				Round of 32
 
-			</div>
+			</button>
 
-			<!-- FINAL -->
+			<button class="wc-sub-tab"
+					data-subtab="subBracket">
 
-			<div class="wc-column finals">
+				<i class="bi bi-trophy-fill"></i>
+				Round of 16 &rarr; Final
 
-				<div class="wc-round-title">
-					Final
-				</div>
-				<div class="wc-match-node">
-
-					@if (Model.Bracket.Final.Any())
-					{
-						<partial name="_WorldCupBracketMatch"
-								 model="Model.Bracket.Final.First()" />
-					}
-					else
-					{
-						<partial name="_WorldCupPlaceholderMatch" />
-					}
-				</div>
-			</div>
-
-			<!-- CHAMPION -->
-
-				<div class="wc-column champion">
-
-					<div class="wc-round-title">
-						Champion
-					</div>
-
-					<div class="wc-champion-slot">
-
-						<img src="~/images/world-cup/generic-team-badge.png"
-								class="wc-champion-logo" />
-
-						<span class="wc-champion-name">
-							TBD
-						</span>
-
-					</div>
-
-				</div>
+			</button>
 
 		</div>
+
+		<!-- ── GROUP STAGE SUB-TAB ── -->
+		<div id="subGroupStage"
+			 class="wc-sub-content active">
+
+			@if (Model.GroupStandings.Any())
+			{
+				<div class="wc-group-standings-section">
+
+					@foreach (var group in Model.GroupStandings)
+					{
+						<div class="wc-group-card">
+
+							<div class="wc-group-title">
+								@group.GroupName
+							</div>
+
+							<table class="wc-standings-table">
+
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Team</th>
+										<th>P</th>
+										<th>W</th>
+										<th>D</th>
+										<th>L</th>
+										<th>GD</th>
+										<th>Pts</th>
+									</tr>
+								</thead>
+
+								<tbody>
+
+									@{
+										int rank = 1;
+									}
+
+									@foreach (var team in group.Teams)
+									{
+										<tr class="@(team.IsQualified ? "qualified-team" : "")">
+
+											<td>@rank</td>
+
+											<td class="wc-team-cell">
+
+												<img src="@team.TeamLogo"
+													 class="wc-standing-logo" />
+
+												<span>@team.TeamName</span>
+
+											</td>
+
+											<td>@team.Played</td>
+											<td>@team.Wins</td>
+											<td>@team.Draws</td>
+											<td>@team.Losses</td>
+											<td>@team.GoalDifference</td>
+											<td>@team.Points</td>
+
+										</tr>
+
+										rank++;
+									}
+
+								</tbody>
+
+							</table>
+
+						</div>
+					}
+
+				</div>
+			}
+			else
+			{
+				<div class="wc-empty-state">
+					<i class="bi bi-hourglass-split"></i>
+					<div class="wc-empty-title">Group standings are loading…</div>
+					<div class="wc-empty-subtitle">Check back once the group stage is underway.</div>
+				</div>
+			}
+
+		</div>
+
+		<!-- ── ROUND OF 32 SUB-TAB ── -->
+		<div id="subR32"
+			 class="wc-sub-content">
+
+			<div class="wc-r32-wrapper">
+
+				<div class="wc-r32-grid">
+
+					<!-- LEFT HALF (matches 0-7) -->
+					<div class="wc-r32-half">
+
+						<div class="wc-round-title">Round of 32 — Top Half</div>
+
+						@for (int i = 0; i < 8; i++)
+						{
+							if (Model.Bracket.RoundOf32.Count > i)
+							{
+								<partial name="_WorldCupBracketMatch"
+										 model="Model.Bracket.RoundOf32[i]" />
+							}
+							else
+							{
+								<partial name="_WorldCupPlaceholderMatch" />
+							}
+						}
+
+					</div>
+
+					<!-- RIGHT HALF (matches 8-15) -->
+					<div class="wc-r32-half">
+
+						<div class="wc-round-title">Round of 32 — Bottom Half</div>
+
+						@for (int i = 8; i < 16; i++)
+						{
+							if (Model.Bracket.RoundOf32.Count > i)
+							{
+								<partial name="_WorldCupBracketMatch"
+										 model="Model.Bracket.RoundOf32[i]" />
+							}
+							else
+							{
+								<partial name="_WorldCupPlaceholderMatch" />
+							}
+						}
+
+					</div>
+
+				</div>
+
 			</div>
+
+		</div>
+
+		<!-- ── BRACKET (R16 → FINAL) SUB-TAB ── -->
+		<div id="subBracket"
+			 class="wc-sub-content">
+
+			<div class="wc-bracket-wrapper">
+
+				<div class="wc-bracket-scale">
+
+					<div class="wc-bracket-grid">
+
+						<!-- ROUND OF 16 -->
+						<div class="wc-column r16-round">
+
+							<div class="wc-round-title">
+								Round of 16
+							</div>
+
+							@for (int i = 0; i < 8; i++)
+							{
+								if (Model.Bracket.RoundOf16.Count > i)
+								{
+									<partial name="_WorldCupBracketMatch"
+											 model="Model.Bracket.RoundOf16[i]" />
+								}
+								else
+								{
+									<partial name="_WorldCupPlaceholderMatch" />
+								}
+							}
+
+						</div>
+
+						<!-- QUARTER FINALS -->
+						<div class="wc-column quarters">
+
+							<div class="wc-round-title">
+								Quarter Finals
+							</div>
+
+							@for (int i = 0; i < 4; i++)
+							{
+								<div class="wc-match-node">
+
+									@if (Model.Bracket.QuarterFinals.Count > i)
+									{
+										<partial name="_WorldCupBracketMatch"
+												 model="Model.Bracket.QuarterFinals[i]" />
+									}
+									else
+									{
+										<partial name="_WorldCupPlaceholderMatch" />
+									}
+
+								</div>
+							}
+
+						</div>
+
+						<!-- SEMI FINALS -->
+						<div class="wc-column semis">
+
+							<div class="wc-round-title">
+								Semi Finals
+							</div>
+
+							@for (int i = 0; i < 2; i++)
+							{
+								<div class="wc-match-node">
+
+									@if (Model.Bracket.SemiFinals.Count > i)
+									{
+										<partial name="_WorldCupBracketMatch"
+												 model="Model.Bracket.SemiFinals[i]" />
+									}
+									else
+									{
+										<partial name="_WorldCupPlaceholderMatch" />
+									}
+
+								</div>
+							}
+
+						</div>
+
+						<!-- FINAL -->
+						<div class="wc-column finals">
+
+							<div class="wc-round-title">
+								Final
+							</div>
+
+							<div class="wc-match-node">
+
+								@if (Model.Bracket.Final.Any())
+								{
+									<partial name="_WorldCupBracketMatch"
+											 model="Model.Bracket.Final.First()" />
+								}
+								else
+								{
+									<partial name="_WorldCupPlaceholderMatch" />
+								}
+
+							</div>
+
+						</div>
+
+						<!-- CHAMPION -->
+						<div class="wc-column champion">
+
+							<div class="wc-round-title">
+								Champion
+							</div>
+
+							<div class="wc-champion-slot">
+
+								<img src="~/images/world-cup/generic-team-badge.png"
+									 class="wc-champion-logo" />
+
+								<span class="wc-champion-name">
+									TBD
+								</span>
+
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+
 		</div>
 
 	</div>
 
 	<!-- ========================================= -->
-	<!-- TRACKER TAB -->
+	<!-- TRACKER TAB                               -->
 	<!-- ========================================= -->
 
 	<div id="trackerTab"
 		 class="wc-tab-content">
-
-		<!-- GROUP STANDINGS -->
-		@if (Model.GroupStandings.Any())
-		{
-			<div class="wc-group-standings-section">
-
-				@foreach (var group in Model.GroupStandings)
-				{
-					<div class="wc-group-card">
-
-						<div class="wc-group-title">
-							@group.GroupName
-						</div>
-
-						<table class="wc-standings-table">
-
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Team</th>
-									<th>P</th>
-									<th>W</th>
-									<th>D</th>
-									<th>L</th>
-									<th>GD</th>
-									<th>Pts</th>
-								</tr>
-							</thead>
-
-							<tbody>
-
-								@{
-									int rank = 1;
-								}
-
-								@foreach (var team in group.Teams)
-								{
-									<tr class="@(team.IsQualified
-														  ? "qualified-team"
-														  : "")">
-
-							<td>@rank</td>
-
-										<td class="wc-team-cell">
-
-											<img src="@team.TeamLogo"
-												 class="wc-standing-logo" />
-
-											<span>
-												@team.TeamName
-											</span>
-
-										</td>
-
-										<td>@team.Played</td>
-										<td>@team.Wins</td>
-										<td>@team.Draws</td>
-										<td>@team.Losses</td>
-										<td>@team.GoalDifference</td>
-										<td>@team.Points</td>
-
-									</tr>
-
-												rank++;
-								}
-
-							</tbody>
-
-						</table>
-
-					</div>
-				}
-
-			</div>
-		}
 
 		<!-- MATCH TRACKER -->
 		<div class="wc-stage-tracker">
@@ -279,116 +425,90 @@
 						{
 							<div class="wc-day-section">
 
-							<div class="wc-day-header wc-day-accordion-toggle">
+								<div class="wc-day-header wc-day-accordion-toggle">
 
-								<i class="bi bi-calendar-event"></i>
+									<i class="bi bi-calendar-event"></i>
 
-								@day.Date.ToString("dddd, dd MMMM yyyy")
+									@day.Date.ToString("dddd, dd MMMM yyyy")
 
-								<i class="bi bi-chevron-up wc-day-chevron"></i>
+									<i class="bi bi-chevron-up wc-day-chevron"></i>
 
-							</div>
+								</div>
 
-							<div class="wc-day-grid">
+								<div class="wc-day-grid">
 
-								@foreach (var match in day.Matches)
-								{
-									<div class="wc-match-card">
+									@foreach (var match in day.Matches)
+									{
+										<div class="wc-match-card">
 
-										<div class="wc-match-card-top">
+											<div class="wc-match-card-top">
 
-											<div class="wc-match-status">
+												<div class="wc-match-status">
 
-												@if (match.IsLive || match.IsOngoing)
-												{
-													<span class="live-badge">
-														LIVE
-													</span>
-												}
-												else if (match.IsFinished)
-												{
-													<span class="finished-badge">
-														FT
-													</span>
-												}
-												else
-												{
-													<span class="scheduled-badge">
-														UPCOMING
-													</span>
-												}
+													@if (match.IsLive || match.IsOngoing)
+													{
+														<span class="live-badge">LIVE</span>
+													}
+													else if (match.IsFinished)
+													{
+														<span class="finished-badge">FT</span>
+													}
+													else
+													{
+														<span class="scheduled-badge">UPCOMING</span>
+													}
 
-											</div>
+												</div>
 
-											<div class="wc-match-date">
-												@match.MatchDate?.ToString("HH:mm")
-											</div>
-
-										</div>
-
-										<div class="wc-match-body">
-
-											<div class="wc-team">
-
-												<img src="@match.HomeLogo"
-													 class="wc-team-logo" />
-
-												<div class="wc-team-name">
-													@match.HomeTeam
+												<div class="wc-match-date">
+													@match.MatchDate?.ToString("HH:mm")
 												</div>
 
 											</div>
 
-											<div class="wc-score-section">
+											<div class="wc-match-body">
 
-												@if (match.HomeScore.HasValue &&
-																				match.AwayScore.HasValue)
-												{
-													<div class="wc-score">
-														@match.HomeScore
-														-
-														@match.AwayScore
-													</div>
-												}
-												else
-												{
-													<div class="wc-vs">
-														VS
-													</div>
-												}
+												<div class="wc-team">
+													<img src="@match.HomeLogo" class="wc-team-logo" />
+													<div class="wc-team-name">@match.HomeTeam</div>
+												</div>
 
-											</div>
+												<div class="wc-score-section">
 
-											<div class="wc-team">
+													@if (match.HomeScore.HasValue && match.AwayScore.HasValue)
+													{
+														<div class="wc-score">
+															@match.HomeScore - @match.AwayScore
+														</div>
+													}
+													else
+													{
+														<div class="wc-vs">VS</div>
+													}
 
-												<img src="@match.AwayLogo"
-													 class="wc-team-logo" />
+												</div>
 
-												<div class="wc-team-name">
-													@match.AwayTeam
+												<div class="wc-team">
+													<img src="@match.AwayLogo" class="wc-team-logo" />
+													<div class="wc-team-name">@match.AwayTeam</div>
 												</div>
 
 											</div>
 
+											@if (match.IsAvailableForBetting)
+											{
+												<a asp-controller="Event"
+												   asp-action="LiveEvents"
+												   class="wc-bet-link">
+													<i class="bi bi-crosshair"></i>
+													BET NOW
+												</a>
+											}
+
 										</div>
+									}
 
-										@if (match.IsAvailableForBetting)
-										{
-											<a asp-controller="Event"
-											   asp-action="LiveEvents"
-											   class="wc-bet-link">
-
-												<i class="bi bi-crosshair"></i>
-
-												BET NOW
-
-											</a>
-										}
-
-									</div>
-								}
-
-							</div>
+								</div>
 
 							</div> @* end wc-day-section *@
 						}
@@ -399,17 +519,9 @@
 			else
 			{
 				<div class="wc-empty-state">
-
 					<i class="bi bi-hourglass-split"></i>
-
-					<div class="wc-empty-title">
-						World Cup data is loading...
-					</div>
-
-					<div class="wc-empty-subtitle">
-						Fixtures and standings will appear here.
-					</div>
-
+					<div class="wc-empty-title">World Cup data is loading…</div>
+					<div class="wc-empty-subtitle">Fixtures and standings will appear here.</div>
 				</div>
 			}
 
@@ -425,14 +537,58 @@
 
 		document.addEventListener("DOMContentLoaded", () => {
 
-			// Day accordion
+			// ── Refresh toast auto-dismiss ──
+			const toast = document.querySelector(".wc-refresh-toast");
+			if (toast) {
+				setTimeout(() => toast.classList.add("fade-out"), 1000);
+				setTimeout(() => toast.style.display = "none", 4500);
+			}
+
+			// ── Outer tabs ──
+			const outerTabs     = document.querySelectorAll(".wc-tab");
+			const outerContents = document.querySelectorAll(".wc-tab-content");
+
+			outerTabs.forEach(tab => {
+				tab.addEventListener("click", () => {
+					outerTabs.forEach(t => t.classList.remove("active"));
+					outerContents.forEach(c => c.classList.remove("active"));
+					tab.classList.add("active");
+					document.getElementById(tab.dataset.tab)?.classList.add("active");
+				});
+			});
+
+			// ── Sub-tabs (inside Tournament tab) ──
+			const subTabs     = document.querySelectorAll(".wc-sub-tab");
+			const subContents = document.querySelectorAll(".wc-sub-content");
+
+			subTabs.forEach(tab => {
+				tab.addEventListener("click", () => {
+					subTabs.forEach(t => t.classList.remove("active"));
+					subContents.forEach(c => c.classList.remove("active"));
+					tab.classList.add("active");
+					document.getElementById(tab.dataset.subtab)?.classList.add("active");
+				});
+			});
+
+			// ── Admin toolbar — loading state on submit ──
+			document.querySelectorAll(".wc-admin-toolbar form").forEach(form => {
+				form.addEventListener("submit", () => {
+					const btn = form.querySelector(".wc-refresh-btn");
+					if (!btn) return;
+					btn.classList.add("is-loading");
+					btn.querySelector("i")?.classList.replace("bi-arrow-clockwise", "bi-arrow-clockwise");
+					// Swap icon to a generic spinner look via rotation (CSS handles it)
+				});
+			});
+
+			// ── Day accordion ──
 			document.querySelectorAll(".wc-day-accordion-toggle").forEach(header => {
 				header.addEventListener("click", () => {
 					header.closest(".wc-day-section").classList.toggle("collapsed");
 				});
 			});
 
-			// Auto-collapse days where every match is FT
+			// ── Auto-collapse fully-finished days ──
 			document.querySelectorAll(".wc-day-section").forEach(section => {
 				const badges = section.querySelectorAll(".wc-match-status span");
 				const allFinished = badges.length > 0 &&
@@ -440,32 +596,6 @@
 				if (allFinished) section.classList.add("collapsed");
 			});
 
-			const tabs =
-				document.querySelectorAll(".wc-tab");
-
-			const contents =
-				document.querySelectorAll(
-					".wc-tab-content");
-
-			tabs.forEach(tab => {
-
-				tab.addEventListener("click", () => {
-
-					tabs.forEach(t =>
-						t.classList.remove("active"));
-
-					contents.forEach(c =>
-						c.classList.remove("active"));
-
-					tab.classList.add("active");
-
-					const target =
-						document.getElementById(
-							tab.dataset.tab);
-
-					target.classList.add("active");
-				});
-			});
 		});
 
 	</script>
