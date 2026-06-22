@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
+using static MatchFixer.Common.GeneralConstants.WorldCupApiConstants;
 using static MatchFixer.Common.Identity.Permissions;
 
 
@@ -715,10 +716,10 @@ namespace MatchFixer.Infrastructure.SeedData
 						stage != WorldCupStage.GroupStage,
 
 					IsFinished =
-						fixture.Status == "Match Finished",
+						fixture.Status == StatusMatchFinished,
 
 					IsLive =
-						fixture.Status == "Live",
+						fixture.Status == StatusLive,
 
 					RoundPosition = roundPosition++
 				});
@@ -733,12 +734,36 @@ namespace MatchFixer.Infrastructure.SeedData
 		private static WorldCupStage ParseWorldCupStage(
 			string? round)
 		{
+			// The TheSportsDB API returns intRound as a numeric string.
+			// Group stage = matchdays 1-3.
+			// Knockout rounds follow sequentially: 4=R32, 5=R16, 6=QF,
+			// 7=SF, 8=Third Place, 9=Final.
+			if (int.TryParse(round, out var intRound))
+			{
+				return intRound switch
+				{
+					<= 3 => WorldCupStage.GroupStage,
+					4    => WorldCupStage.RoundOf32,
+					5    => WorldCupStage.RoundOf16,
+					6    => WorldCupStage.QuarterFinal,
+					7    => WorldCupStage.SemiFinal,
+					8    => WorldCupStage.ThirdPlace,
+					_    => WorldCupStage.Final
+				};
+			}
+
+			// Fallback: text-based matching for any future API changes.
 			if (string.IsNullOrWhiteSpace(round))
 			{
 				return WorldCupStage.GroupStage;
 			}
 
 			round = round.ToLower();
+
+			if (round.Contains("round of 32"))
+			{
+				return WorldCupStage.RoundOf32;
+			}
 
 			if (round.Contains("round of 16"))
 			{
@@ -753,6 +778,11 @@ namespace MatchFixer.Infrastructure.SeedData
 			if (round.Contains("semi"))
 			{
 				return WorldCupStage.SemiFinal;
+			}
+
+			if (round.Contains("third"))
+			{
+				return WorldCupStage.ThirdPlace;
 			}
 
 			if (round.Contains("final"))
