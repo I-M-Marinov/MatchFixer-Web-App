@@ -133,9 +133,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var twoDaysAgo = now.AddDays(-2);
 
+				// Won slips settled in the last 48h
 				var topWinners = await _dbContext.BetSlips
-					.Where(s => s.BetTime >= twoDaysAgo)
-					.Where(s => s.Bets.All(b => b.Status == BetStatus.Won))
+					.Where(s => s.SettledAt >= twoDaysAgo
+						&& s.IsSettled
+						&& s.WinAmount > s.Amount)
 					.GroupBy(s => new
 					{
 						s.UserId,
@@ -145,10 +147,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					})
 					.Select(g => new TopUserWinLossRow
 					{
-						UserId = g.Key.UserId,
+						UserId   = g.Key.UserId,
 						Username = g.Key.FirstName + " " + g.Key.LastName,
-						Email = g.Key.Email,
-						Profit = g.Sum(s => (s.WinAmount ?? 0) - s.Amount)
+						Email    = g.Key.Email,
+						Profit   = g.Sum(s => s.WinAmount!.Value - s.Amount)
 					})
 					.OrderByDescending(x => x.Profit)
 					.Take(5)
@@ -158,9 +160,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				   TOP LOSERS (48h)
 				----------------------------- */
 
+				// Lost slips settled in the last 48h.
 				var topLosers = await _dbContext.BetSlips
-					.Where(s => s.BetTime >= twoDaysAgo)
-					.Where(s => s.Bets.Any(b => b.Status == BetStatus.Lost))
+					.Where(s => s.SettledAt >= twoDaysAgo
+						&& s.IsSettled
+						&& s.WinAmount == 0)
 					.GroupBy(s => new
 					{
 						s.UserId,
@@ -170,10 +174,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					})
 					.Select(g => new TopUserWinLossRow
 					{
-						UserId = g.Key.UserId,
+						UserId   = g.Key.UserId,
 						Username = g.Key.FirstName + " " + g.Key.LastName,
-						Email = g.Key.Email,
-						Profit = g.Sum(s => s.Amount)
+						Email    = g.Key.Email,
+						Profit   = g.Sum(s => s.Amount)
 					})
 					.OrderByDescending(x => x.Profit)
 					.Take(5)
