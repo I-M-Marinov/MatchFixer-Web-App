@@ -32,6 +32,9 @@ namespace MatchFixer.Infrastructure.Entities
 		[Comment("Indicates whether the bet slip has been settled")]
 		public bool IsSettled { get; set; }
 
+		[Comment("UTC timestamp when the bet slip was settled (Won, Lost, or Voided)")]
+		public DateTime? SettledAt { get; set; }
+
 		[Comment("The total win amount for the bet slip if successful")]
 		public decimal? WinAmount { get; set; }
 
