@@ -353,7 +353,15 @@ public class BettingService : IBettingService
 			return false;
 
 		if (betSlip.IsSettled)
+		{
+			if (betSlip.SettledAt == null)
+			{
+				betSlip.SettledAt = DateTime.UtcNow;
+				await _dbContext.SaveChangesAsync();
+			}
+
 			return true;
+		}
 
 		bool anyLost = false;
 		bool anyPending = false;
@@ -402,6 +410,7 @@ public class BettingService : IBettingService
 		if (anyVoided)
 		{
 			betSlip.IsSettled = true;
+			betSlip.SettledAt = DateTime.UtcNow;
 			betSlip.WinAmount = 0;
 
 			var alreadyRefunded =
@@ -431,6 +440,7 @@ public class BettingService : IBettingService
 		if (anyLost && !anyPending)
 		{
 			betSlip.IsSettled = true;
+			betSlip.SettledAt = DateTime.UtcNow;
 			betSlip.WinAmount = 0;
 
 			await _dbContext.SaveChangesAsync();
@@ -445,6 +455,7 @@ public class BettingService : IBettingService
 			var winnings = Math.Round(betSlip.Amount * totalOdds, 2);
 
 			betSlip.IsSettled = true;
+			betSlip.SettledAt = DateTime.UtcNow;
 			betSlip.WinAmount = winnings;
 
 			var alreadyPaid =
