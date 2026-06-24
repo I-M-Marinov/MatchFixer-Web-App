@@ -4,9 +4,11 @@ using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using MatchFixer.Common.VirtualLeagues;
+using static MatchFixer.Common.GeneralConstants.CacheKeys;
 using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
 
 namespace MatchFixer_Web_App.Areas.Admin.Services
@@ -15,6 +17,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 	{
 		private readonly HttpClient _http;
 		private readonly MatchFixerDbContext _db;
+		private readonly IMemoryCache _cache;
 		private readonly string _apiKey;
 		public static IReadOnlyDictionary<int, string> LeagueMap => _leagueMap;
 
@@ -37,10 +40,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{ VirtualLeagues.InternationalId, VirtualLeagues.InternationalName },
 			});
 
-		public AdminTeamsService(HttpClient http, MatchFixerDbContext db, IConfiguration config)
+		public AdminTeamsService(HttpClient http, MatchFixerDbContext db, IConfiguration config, IMemoryCache cache)
 		{
 			_http = http;
 			_db = db;
+			_cache = cache;
 			_apiKey = config[ConfigKey];
 		}
 
@@ -161,6 +165,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			await _db.Teams.AddAsync(team, ct);
 			await _db.SaveChangesAsync(ct);
+
+			_cache.Remove(TeamsByLeague);
+
 			return true;
 		}
 
@@ -295,6 +302,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			}
 
 			await _db.SaveChangesAsync();
+
+			_cache.Remove(TeamsByLeague);
+
 			return true;
 		}
 
