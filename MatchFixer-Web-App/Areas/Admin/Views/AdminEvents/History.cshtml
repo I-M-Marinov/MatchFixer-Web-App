@@ -1,24 +1,19 @@
 ﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Events
-@model List<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminEventOverviewDto>
+@model PaginatedEventList<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminEventOverviewDto>
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
 	ViewData["Title"] = "Events History";
 
-	var totalProfit = Model.Sum(m => m.Profit);
-	var totalLoss = Model.Where(m => m.Profit < 0).Sum(m => m.Profit);
-	var totalPositive = Model.Where(m => m.Profit > 0).Sum(m => m.Profit);
-	var totalUserWinnings = Model.Sum(m => m.TotalPayout);   // sum of all payouts to players
+	var filters = ViewBag.Filters as AdminEventHistoryFilters ?? new AdminEventHistoryFilters();
 
-	var leagueStats = Model
-		.GroupBy(m => m.LeagueName)
-		.Select(g => new
-		{
-			League = g.Key,
-			TotalProfit = g.Sum(x => x.Profit),
-			EventCount = g.Count()
-		})
-		.OrderByDescending(x => x.TotalProfit)
-		.ToList();
+	// Aggregates are pre-computed across ALL filtered events in the service
+	var totalProfit       = Model.AllEventsProfit;
+	var totalLoss         = Model.AllEventsLoss;
+	var totalPositive     = Model.AllEventsPositive;
+	var totalUserWinnings = Model.AllEventsPayout;
+
+	// League breakdown across ALL filtered events (pre-computed in service)
+	var leagueStats = Model.AllEventsLeagueStats;
 
 
 	var leagueLogos = new Dictionary<string, int>
@@ -271,6 +266,8 @@
 <div class="background-profile"></div>
 
 <form method="get" class="row g-3 mb-4">
+	<input type="hidden" name="page" value="1" />
+	<input type="hidden" name="pageSize" value="@Model.PageSize" />
 
 	<div class="col-md-3">
 		<label class="form-label">From Date</label>
@@ -322,7 +319,7 @@
 			</thead>
 
 			<tbody>
-				@foreach (var e in Model)
+				@foreach (var e in Model.Items)
 				{
 					<tr class="event-row event-row-main"
 						data-status="@(e.IsCancelled
@@ -439,17 +436,85 @@
 		</table>
 	</div>
 
-	
 
-</div>			
+
+	@{
+		var p     = Model.Page;
+		var total = Model.TotalPages;
+		const int window = 10;
+
+		var wStart = ((p - 1) / window) * window + 1;
+		var wEnd   = Math.Min(wStart + window - 1, total);
+		var prevWinStart = Math.Max(1, wStart - window);
+		var nextWinStart = Math.Min(((total - 1) / window) * window + 1, wStart + window);
+
+		string PageLink(int i) => Url.Action("History", "AdminEvents", new
+		{
+			area      = "Admin",
+			page      = i,
+			pageSize  = filters.PageSize,
+			FromDate  = filters.FromDate?.ToString("yyyy-MM-dd"),
+			ToDate    = filters.ToDate?.ToString("yyyy-MM-dd"),
+			League    = filters.League
+		})!;
+	}
+
+	@if (total > 1)
+	{
+		<div class="d-flex justify-content-center mt-3 mb-2">
+			<ul class="pagination pagination-ivm mb-0">
+
+				<li class="page-item @(p == 1 ? "disabled" : null)">
+					<a class="page-link" href="@(p == 1 ? "#" : PageLink(1))" aria-label="First">&laquo;</a>
+				</li>
+				<li class="page-item @(p == 1 ? "disabled" : null)">
+					<a class="page-link" href="@(p == 1 ? "#" : PageLink(p - 1))" aria-label="Previous">&lsaquo;</a>
+				</li>
+
+				@if (wStart > 1)
+				{
+					<li class="page-item">
+						<a class="page-link" href="@PageLink(prevWinStart)" title="Previous 10">…</a>
+					</li>
+				}
+
+				@for (var i = wStart; i <= wEnd; i++)
+				{
+					<li class="page-item @(i == p ? "active" : null)">
+						<a class="page-link" href="@PageLink(i)">@i</a>
+					</li>
+				}
+
+				@if (wEnd < total)
+				{
+					<li class="page-item">
+						<a class="page-link" href="@PageLink(nextWinStart)" title="Next 10">…</a>
+					</li>
+				}
+
+				<li class="page-item @(p == total ? "disabled" : null)">
+					<a class="page-link" href="@(p == total ? "#" : PageLink(p + 1))" aria-label="Next">&rsaquo;</a>
+				</li>
+				<li class="page-item @(p == total ? "disabled" : null)">
+					<a class="page-link" href="@(p == total ? "#" : PageLink(total))" aria-label="Last">&raquo;</a>
+				</li>
+
+			</ul>
+		</div>
+		<p class="text-center text-muted" style="font-size:0.8em;">
+			Page @p of @total &nbsp;·&nbsp; @Model.TotalCount total events
+		</p>
+	}
+
+</div>
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 
-	const labels = @Html.Raw(Json.Serialize(Model.Select(m => m.MatchDate.HasValue
+	const labels = @Html.Raw(Json.Serialize(Model.Items.Select(m => m.MatchDate.HasValue
 			               ? m.MatchDate.Value.ToString("yyyy-MM-dd")
 			               : "TBA")
                ));
-		const profits = @Html.Raw(Json.Serialize(Model.Select(m => m.Profit)));
+		const profits = @Html.Raw(Json.Serialize(Model.Items.Select(m => m.Profit)));
 
 		const chartEl = document.getElementById("profitChart");
 		if (chartEl) {
