@@ -48,6 +48,7 @@ builder.Services.AddDbContext<MatchFixerDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddMemoryCache();
 
 
 builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
