@@ -12,7 +12,9 @@ using MatchFixer.Infrastructure.Entities;
 using MatchFixer.Infrastructure.Models.FootballAPI;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using static MatchFixer.Common.DerbyLookup.DerbyLookup;
+using static MatchFixer.Common.GeneralConstants.CacheKeys;
 using static MatchFixer.Common.GeneralConstants.MatchEventConstants;
 
 
@@ -23,7 +25,7 @@ namespace MatchFixer.Core.Services
 {
 	public class MatchEventService : IMatchEventService
 	{
-		private readonly MatchFixerDbContext _dbContext; 
+		private readonly MatchFixerDbContext _dbContext;
 		private readonly IUserContextService _userContextService;
 		private readonly IBettingService _bettingService;
 		private readonly IMatchEventNotifier _notifier;
@@ -31,19 +33,21 @@ namespace MatchFixer.Core.Services
 		private readonly IFootballApiService _footballApiService;
 		private readonly ITimezoneService _timezoneService;
 		private readonly INotificationService _notificationService;
+		private readonly IMemoryCache _cache;
 
 
 
 
 		public MatchEventService(
-			MatchFixerDbContext dbContext, 
-			 IUserContextService userContextService,
-			 IBettingService bettingService,
-			 IMatchEventNotifier notifier,
-			 IOddsBoostService oddsBoostService,
+			MatchFixerDbContext dbContext,
+			IUserContextService userContextService,
+			IBettingService bettingService,
+			IMatchEventNotifier notifier,
+			IOddsBoostService oddsBoostService,
 			IFootballApiService footballApiService,
 			ITimezoneService timezoneService,
-			INotificationService notificationService)
+			INotificationService notificationService,
+			IMemoryCache cache)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
@@ -53,6 +57,7 @@ namespace MatchFixer.Core.Services
 			_footballApiService = footballApiService;
 			_timezoneService = timezoneService;
 			_notificationService = notificationService;
+			_cache = cache;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -356,6 +361,12 @@ namespace MatchFixer.Core.Services
 
 		public async Task<Dictionary<string, List<SelectListItem>>> GetTeamsGroupedByLeagueAsync()
 		{
+			if (_cache.TryGetValue(TeamsByLeague,
+				out Dictionary<string, List<SelectListItem>> cached))
+			{
+				return cached;
+			}
+
 			var teams = await _dbContext.Teams
 				.OrderBy(t => t.LeagueName)
 				.ThenBy(t => t.Name)
@@ -380,6 +391,12 @@ namespace MatchFixer.Core.Services
 						};
 					}).ToList()
 				);
+
+			_cache.Set(TeamsByLeague, teamsByLeague,
+				new MemoryCacheEntryOptions
+				{
+					AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
+				});
 
 			return teamsByLeague;
 		}
