@@ -16,11 +16,30 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			_db = db;
 		}
 
-		public async Task<List<AdminEventOverviewDto>> GetFinishedEventsAsync(AdminEventHistoryFilters filters)
+		public async Task<PaginatedEventList<AdminEventOverviewDto>> GetFinishedEventsAsync(AdminEventHistoryFilters filters)
 		{
-			var query = _db.MatchEvents
+			int page     = Math.Max(1, filters.Page);
+			int pageSize = Math.Clamp(filters.PageSize, 5, 50);
+			int skip     = (page - 1) * pageSize;
+
+			// Lean base query (no navigation includes) used for COUNT 
+			var baseQuery = _db.MatchEvents
 				.AsNoTracking()
-				.Where(m => m.LiveResult != null || m.IsCancelled)
+				.Where(m => m.LiveResult != null || m.IsCancelled);
+
+			if (filters.FromDate.HasValue)
+				baseQuery = baseQuery.Where(m => m.MatchDate >= filters.FromDate.Value);
+			if (filters.ToDate.HasValue)
+				baseQuery = baseQuery.Where(m => m.MatchDate <= filters.ToDate.Value);
+			if (!string.IsNullOrWhiteSpace(filters.League))
+				baseQuery = baseQuery.Where(m => m.HomeTeam.LeagueName == filters.League);
+			if (filters.TeamId.HasValue)
+				baseQuery = baseQuery.Where(m => m.HomeTeamId == filters.TeamId || m.AwayTeamId == filters.TeamId);
+
+			var totalCount = await baseQuery.CountAsync();
+
+			// Paginated data query with full includes
+			var events = await baseQuery
 				.Include(m => m.HomeTeam)
 				.Include(m => m.AwayTeam)
 				.Include(m => m.LiveResult)
@@ -29,35 +48,22 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						.ThenInclude(slip => slip.User)
 				.Include(m => m.MatchEventLogs)
 					.ThenInclude(l => l.ChangedBy)
-				.AsQueryable();
-
-			// Filters
-			if (filters.FromDate.HasValue)
-				query = query.Where(m => m.MatchDate >= filters.FromDate.Value);
-
-			if (filters.ToDate.HasValue)
-				query = query.Where(m => m.MatchDate <= filters.ToDate.Value);
-
-			if (!string.IsNullOrWhiteSpace(filters.League))
-				query = query.Where(m => m.HomeTeam.LeagueName == filters.League);
-
-			if (filters.TeamId.HasValue)
-				query = query.Where(m => m.HomeTeamId == filters.TeamId || m.AwayTeamId == filters.TeamId);
-
-			var allSlipIds = await query
-				.SelectMany(e => e.Bets.Select(b => b.BetSlipId))
-				.Distinct()
+				.OrderByDescending(m => m.MatchDate)
+				.Skip(skip)
+				.Take(pageSize)
 				.ToListAsync();
 
+			// slipLegs only for the current page's bet slips 
+			var pageSlipIds = events
+				.SelectMany(e => e.Bets.Select(b => b.BetSlipId))
+				.Distinct()
+				.ToList();
+
 			var slipLegs = await _db.Bets
-				.Where(b => allSlipIds.Contains(b.BetSlipId))
+				.Where(b => pageSlipIds.Contains(b.BetSlipId))
 				.GroupBy(b => b.BetSlipId)
 				.Select(g => new { g.Key, Count = g.Count() })
 				.ToDictionaryAsync(x => x.Key, x => x.Count);
-
-			var events = await query
-				.OrderByDescending(m => m.MatchDate)
-				.ToListAsync();
 
 			var result = events.Select(e =>
 			{
@@ -180,7 +186,73 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			}).ToList();
 
-			return result;
+			// Aggregate totals across ALL filtered events 
+
+			var legCountSubquery = _db.Bets.AsNoTracking()
+				.GroupBy(b => b.BetSlipId)
+				.Select(g => new { BetSlipId = g.Key, Count = g.Count() });
+
+			var allBetRows = await (
+				from b  in _db.Bets.AsNoTracking()
+				join m  in baseQuery                   on b.MatchEventId equals m.Id
+				join bs in _db.BetSlips.AsNoTracking() on b.BetSlipId    equals bs.Id
+				join lc in legCountSubquery            on b.BetSlipId    equals lc.BetSlipId
+				join ht in _db.Teams.AsNoTracking()    on m.HomeTeamId   equals ht.Id
+				select new
+				{
+					b.MatchEventId,
+					b.Odds,
+					bs.Amount,
+					bs.IsSettled,
+					bs.WinAmount,
+					lc.Count,
+					LeagueName = (m.CompetitionName == null || m.CompetitionName == "")
+						? ht.LeagueName
+						: "Rest of World"
+				}
+			).ToListAsync();
+
+			var perEventAggs = allBetRows
+				.GroupBy(b => b.MatchEventId)
+				.Select(g => new
+				{
+					LeagueName = g.First().LeagueName,
+					Stake  = g.Sum(b => b.Amount / (decimal)b.Count),
+					Payout = g.Where(b => b.IsSettled
+									  && b.WinAmount.HasValue
+									  && b.WinAmount > b.Amount)
+							  .Sum(b => (b.Amount / (decimal)b.Count) * b.Odds)
+				})
+				.ToList();
+
+			decimal allStake = perEventAggs.Sum(e => e.Stake);
+			decimal allPayout = perEventAggs.Sum(e => e.Payout);
+			decimal allLoss = perEventAggs.Where(e => e.Stake - e.Payout < 0).Sum(e => e.Stake - e.Payout);
+			decimal allPositive = perEventAggs.Where(e => e.Stake - e.Payout > 0).Sum(e => e.Stake - e.Payout);
+
+			var allLeagueStats = perEventAggs
+				.GroupBy(e => e.LeagueName)
+				.Select(g => new EventLeagueStat
+				{
+					League      = g.Key ?? "Unknown",
+					TotalProfit = g.Sum(e => e.Stake - e.Payout),
+					EventCount  = g.Count()
+				})
+				.OrderByDescending(x => x.TotalProfit)
+				.ToList();
+
+			return new PaginatedEventList<AdminEventOverviewDto>
+			{
+				Items = result,
+				Page= page,
+				PageSize = pageSize,
+				TotalCount = totalCount,
+				AllEventsStake = allStake,
+				AllEventsPayout = allPayout,
+				AllEventsLoss = allLoss,
+				AllEventsPositive = allPositive,
+				AllEventsLeagueStats = allLeagueStats
+			};
 		}
 
 		public async Task<List<AdminTeamBettingStatsDto>>
