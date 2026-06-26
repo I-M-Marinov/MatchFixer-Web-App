@@ -437,6 +437,18 @@
 
 <script>
 
+	// ── Profile timezone — used for ALL date bucketing and tab labelling ──────
+	// Reads from the first card on the page; falls back to browser timezone if
+	// no cards are rendered (e.g. empty board).
+	const userTz = document.querySelector('.event-card[data-user-tz]')
+		?.dataset.userTz
+		|| Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+	/** Format a Date (or timestamp) to an sv-SE date string in the user's profile timezone. */
+	function toUserTzDateStr(date) {
+		return Intl.DateTimeFormat('sv-SE', { timeZone: userTz }).format(date);
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 
 		const allTableHeaders = document.querySelectorAll('.odds-table th');
@@ -617,8 +629,7 @@
 			const kickoff = new Date(card.dataset.kickoff);
 			if (isNaN(kickoff)) return;
 
-			const localDateStr = kickoff.toLocaleDateString('sv-SE'); 
-			// const dateStr = kickoff.toISOString().split('T')[0];
+			const localDateStr = toUserTzDateStr(kickoff); // profile tz, not browser OS tz
 			dateSet.add(localDateStr);
 		});
 
@@ -646,8 +657,7 @@
 
 		getUniqueEventDates().forEach(date => {
 			const btn = document.createElement('button');
-			const dateObj = new Date(date);
-			const displayText = formatDisplayDate(dateObj); // Jul 24th Thu
+			const displayText = formatDisplayDate(date); // receives sv-SE string directly
 
 			btn.textContent = displayText;
 			btn.className = 'custom-date-pill me-2';
@@ -678,27 +688,21 @@
 		return day + "th";
 	}
 
-	function formatDisplayDate(dateObj) {
+	function formatDisplayDate(dateStr) {
+		
+		const todayStr    = toUserTzDateStr(new Date());
+		const tomorrowStr = toUserTzDateStr(new Date(Date.now() + 86_400_000));
 
-		const today = new Date(); // local time for the user 
-		const tomorrow = new Date();
-		tomorrow.setDate(today.getDate() + 1);
+		if (dateStr === todayStr)    return "Today";
+		if (dateStr === tomorrowStr) return "Tomorrow";
 
-		const todayStr = today.toLocaleDateString().split('T')[0];
-		const tomorrowStr = tomorrow.toLocaleDateString().split('T')[0];
-		const dateStr = dateObj.toLocaleDateString().split('T')[0];
-
-		if (dateStr === todayStr) {
-			return "Today";
-		}
-		if (dateStr === tomorrowStr) {
-			return "Tomorrow";
-		}
-
-		const month = dateObj.toLocaleString(undefined, { month: 'short' }); // "Aug"
-		const weekday = dateObj.toLocaleString(undefined, { weekday: 'short' }); // "Sat"
-		const day = getOrdinalSuffix(dateObj.getDate()); // "30th"
-		return `${month} ${day} ${weekday}`; // "Aug 30th Sat"
+		// For display labels use noon-UTC so the date never shifts across a day boundary
+		// regardless of which timezone the profile is in.
+		const dateObj = new Date(dateStr + 'T12:00:00Z');
+		const month   = dateObj.toLocaleString(undefined, { month: 'short',   timeZone: userTz });
+		const weekday = dateObj.toLocaleString(undefined, { weekday: 'short', timeZone: userTz });
+		const day     = getOrdinalSuffix(parseInt(dateStr.split('-')[2], 10));
+		return `${month} ${day} ${weekday}`;
 	}
 
 	// Helper method for activating the all tab when searching
@@ -749,8 +753,7 @@
 						if (isPostponed || !card.dataset.kickoff) {
 							matches = false;
 						} else {
-							// const kickoffDate = card.dataset.kickoff.split('T')[0];
-							const kickoffDate = new Date(card.dataset.kickoff).toLocaleDateString('sv-SE');
+							const kickoffDate = toUserTzDateStr(new Date(card.dataset.kickoff)); // profile tz
 							matches = kickoffDate === selected;
 						}
 					}
