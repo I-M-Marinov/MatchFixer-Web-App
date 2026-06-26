@@ -215,6 +215,18 @@
 				</div>
 			</div>
 
+			<div class="d-flex justify-content-center align-items-center gap-3 mb-2">
+				<button type="button"
+				        id="auto-odds-btn"
+				        class="btn btn-info btn-sm px-3 fw-semibold"
+				        style="box-shadow: 0 3px 10px rgba(13,202,240,0.45); letter-spacing: 0.3px;">
+					<i class="bi bi-stars me-1"></i> Auto-generate odds
+				</button>
+				<span id="auto-odds-status"
+				      class="badge rounded-pill"
+				      style="display:none; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></span>
+			</div>
+
 			<span class="custom-add-match-tooltip-wrapper">
 				<button type="submit" class="btn add-event-icon-container">
 					<div class="text-center my-2">
@@ -225,8 +237,6 @@
 					</div>
 					<span class="custom-add-match-tooltip">Add this game to the Events Board</span>
 				</button>
-
-
 			</span>
 
 		</form>
@@ -2017,4 +2027,51 @@
 	</script>
 	
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+
+	<script>
+		// ── Auto-generate odds ──────────────────────────────────────────────
+		document.getElementById("auto-odds-btn").addEventListener("click", async function () {
+
+			const homeId = document.getElementById("home-team-select").value;
+			const awayId = document.getElementById("away-team-select").value;
+
+			if (!homeId || !awayId) {
+				alert("Select both teams before generating odds.");
+				return;
+			}
+
+			const btn    = this;
+			const status = document.getElementById("auto-odds-status");
+
+			btn.disabled = true;
+			btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Generating…';
+			status.style.display = "none";
+
+			try {
+				const res = await fetch(`/Event/GenerateOdds?homeTeamId=${homeId}&awayTeamId=${awayId}`);
+
+				if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+				const data = await res.json();
+
+				document.getElementById("HomeOdds").value = data.homeOdds;
+				document.getElementById("DrawOdds").value = data.drawOdds;
+				document.getElementById("AwayOdds").value = data.awayOdds;
+
+				status.textContent = "✓ Odds generated — review before saving.";
+				status.className   = "badge rounded-pill bg-success";
+				status.style.display = "inline";
+
+			} catch (err) {
+				status.textContent   = "⚠ Could not generate odds. Try again.";
+				status.className     = "badge rounded-pill bg-danger";
+				status.style.display = "inline";
+				console.error("GenerateOdds failed:", err);
+
+			} finally {
+				btn.disabled = false;
+				btn.innerHTML = '<i class="bi bi-stars me-1"></i> Auto-generate odds';
+			}
+		});
+	</script>
 }
