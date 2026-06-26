@@ -22,6 +22,7 @@ namespace MatchFixer_Web_App.Controllers
 		private readonly IUserContextService _userContextService;
 		private readonly IOddsBoostService _oddsBoostService;
 		private readonly ILiveMatchResultService _liveMatchResultService;
+		private readonly IOddsGeneratorService _oddsGeneratorService;
 
 
 		public EventController(
@@ -29,13 +30,15 @@ namespace MatchFixer_Web_App.Controllers
 			IUpcomingMatchService upcomingMatchService,
 			IUserContextService userContextService,
 			IOddsBoostService oddsBoostService,
-			ILiveMatchResultService liveMatchResultService)
+			ILiveMatchResultService liveMatchResultService,
+			IOddsGeneratorService oddsGeneratorService)
 		{
 			_matchEventService = matchEventService;
 			_upcomingMatchService = upcomingMatchService;
 			_userContextService = userContextService;
 			_oddsBoostService = oddsBoostService;
 			_liveMatchResultService = liveMatchResultService;
+			_oddsGeneratorService = oddsGeneratorService;
 		}
 
 		[HttpGet]
@@ -52,6 +55,24 @@ namespace MatchFixer_Web_App.Controllers
 			};
 
 			return View(model);
+		}
+
+		[HttpGet]
+		[Authorize]
+		[AdminOnly]
+		public async Task<IActionResult> GenerateOdds(Guid homeTeamId, Guid awayTeamId, CancellationToken ct)
+		{
+			if (homeTeamId == Guid.Empty || awayTeamId == Guid.Empty)
+				return BadRequest("Both team IDs are required.");
+
+			var odds = await _oddsGeneratorService.GenerateAsync(homeTeamId, awayTeamId, ct);
+
+			return Json(new
+			{
+				homeOdds = odds.HomeOdds,
+				drawOdds = odds.DrawOdds,
+				awayOdds = odds.AwayOdds
+			});
 		}
 
 		[HttpPost]
