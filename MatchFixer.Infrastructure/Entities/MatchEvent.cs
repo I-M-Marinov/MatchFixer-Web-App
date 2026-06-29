@@ -37,6 +37,12 @@ namespace MatchFixer.Infrastructure.Entities
 		public LiveMatchResult? LiveResult { get; set; }
 		public bool IsCancelled { get; set; } = false;
 
+		/// <summary>
+		/// When true the Draw outcome is unavailable — only Home or Away can be picked.
+		/// Typical use: knockout / cup matches where a draw is not a valid result.
+		/// </summary>
+		public bool NoDraw { get; set; } = false;
+
 		[StringLength(100)]
 		public string? CompetitionName { get; set; }
 		[NotMapped]
