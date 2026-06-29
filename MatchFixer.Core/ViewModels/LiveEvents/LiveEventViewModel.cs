@@ -48,6 +48,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public string UserTimeZone { get; set; }
 		public bool IsCancelled { get; set; }
 		public bool IsPostponed { get; set; }
+		public bool NoDraw { get; set; }
 		public bool HasResult { get; set; }
 		public bool IsFavoriteMatch { get; set; }
 		public List<string> FavoriteTeams { get; set; } = new();
