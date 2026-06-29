@@ -136,7 +136,8 @@ namespace MatchFixer.Core.Services
 					HomeName = match.HomeTeam.Name,
 					AwayName = match.AwayTeam.Name,
 					HomeTeamLogo = match.HomeTeam.LogoUrl,
-					AwayTeamLogo = match.AwayTeam.LogoUrl
+					AwayTeamLogo = match.AwayTeam.LogoUrl,
+					NoDraw = match.NoDraw
 				}, ct);
 			}
 

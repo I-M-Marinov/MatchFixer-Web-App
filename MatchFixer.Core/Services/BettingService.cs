@@ -135,6 +135,10 @@ public class BettingService : IBettingService
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
 				return (InvalidPickOption(betDto.SelectedOption), false);
 
+			// Reject draw pick when the match has no-draw enabled
+			if (parsedPick == MatchPick.Draw && matchEvent.NoDraw)
+				return ("Draw is not available for this match.", false);
+
 			// Use the shared odds calculator
 			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
 				matchEvent.Id,

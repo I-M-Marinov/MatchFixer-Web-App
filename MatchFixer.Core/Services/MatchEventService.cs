@@ -142,6 +142,7 @@ namespace MatchFixer.Core.Services
 					IsEuropeanCompetition = isEuropean,
 					IsDerby = e.IsDerby,
 					IsPostponed = e.IsPostponed,
+					NoDraw = e.NoDraw,
 					FavoriteTeams = favoriteTeams,
 					IsFavoriteMatch = favoriteTeams.Any(),
 					HasResult = e.LiveResult != null,
@@ -236,6 +237,7 @@ namespace MatchFixer.Core.Services
 					HomeTeamLocalLogoUrl = e.HomeTeam.LocalLogoUrl,
 					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
 					IsDerby = e.IsDerby,
+					NoDraw = e.NoDraw,
 					UserTimeZone = user.TimeZone,
 					IsCancelled = e.IsCancelled,
 					FavoriteTeams = favoriteTeams,
@@ -299,7 +301,8 @@ namespace MatchFixer.Core.Services
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby,
-				Status = MatchStatus.Scheduled, // on creation mark events as scheduled
+				NoDraw = model.NoDraw,
+				Status = MatchStatus.Scheduled,
 				CompetitionName = competitionName
 			};
 
@@ -401,7 +404,7 @@ namespace MatchFixer.Core.Services
 			return teamsByLeague;
 		}
 
-		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime)
+		public async Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime, bool noDraw = false)
 		{
 			var user = await _userContextService.GetCurrentUserAsync();
 			var userId = user.Id;
@@ -457,16 +460,36 @@ namespace MatchFixer.Core.Services
 				}
 			}
 
+			if (match.NoDraw != noDraw)
+			{
+				LogChange(match.Id, nameof(match.NoDraw), match.NoDraw, noDraw, userId);
+				match.NoDraw = noDraw;
+				anyChange = true;
+			}
+
 			if (!anyChange)
 				return false;
 
 			await _dbContext.SaveChangesAsync();
 
+			// Look up any active boost so the client knows the boost is still live
+			var now = DateTime.UtcNow;
+			var activeBoost = await _dbContext.OddsBoosts
+				.AsNoTracking()
+				.Where(b => b.MatchEventId == matchEventId && b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
+				.OrderByDescending(b => b.StartUtc)
+				.FirstOrDefaultAsync();
+
 			await _notifier.NotifyMatchEventUpdatedAsync(
 				matchEventId,
 				homeOdds,
 				drawOdds,
-				awayOdds
+				awayOdds,
+				effectiveHomeOdds: activeBoost != null ? homeOdds + activeBoost.BoostValue : null,
+				effectiveDrawOdds: activeBoost != null ? drawOdds + activeBoost.BoostValue : null,
+				effectiveAwayOdds: activeBoost != null ? awayOdds + activeBoost.BoostValue : null,
+				activeBoostId: activeBoost?.Id,
+				noDraw: noDraw
 			);
 
 			return true;
@@ -556,7 +579,8 @@ namespace MatchFixer.Core.Services
 						.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
 						.OrderByDescending(b => b.BoostValue)
 						.Select(b => b.BoostValue)
-						.FirstOrDefault()
+						.FirstOrDefault(),
+					NoDraw = me.NoDraw
 				})
 				.ToDictionaryAsync(x => x.Id, x => x);
 		}

@@ -60,7 +60,8 @@ namespace MatchFixer.Core.Services
 					HomeTeamName = m.HomeTeam != null ? m.HomeTeam.Name : null,
 					AwayTeamName = m.AwayTeam != null ? m.AwayTeam.Name : null,
 					HomeTeamLogo = m.HomeTeam != null ? m.HomeTeam.LogoUrl : null,
-					AwayTeamLogo = m.AwayTeam != null ? m.AwayTeam.LogoUrl : null
+					AwayTeamLogo = m.AwayTeam != null ? m.AwayTeam.LogoUrl : null,
+					m.NoDraw
 				});
 
 
@@ -89,7 +90,8 @@ namespace MatchFixer.Core.Services
 					HomeTeamName = m?.HomeTeamName,
 					AwayTeamName = m?.AwayTeamName,
 					HomeTeamLogo = m?.HomeTeamLogo,
-					AwayTeamLogo = m?.AwayTeamLogo
+					AwayTeamLogo = m?.AwayTeamLogo,
+					NoDraw = m?.NoDraw ?? false
 				};
 			}).ToList();
 
@@ -129,7 +131,8 @@ namespace MatchFixer.Core.Services
 					HomeTeamName = m.HomeTeam != null ? m.HomeTeam.Name : null,
 					AwayTeamName = m.AwayTeam != null ? m.AwayTeam.Name : null,
 					HomeTeamLogo = m.HomeTeam != null ? m.HomeTeam.LogoUrl : null,
-					AwayTeamLogo = m.AwayTeam != null ? m.AwayTeam.LogoUrl : null
+					AwayTeamLogo = m.AwayTeam != null ? m.AwayTeam.LogoUrl : null,
+					m.NoDraw
 				});
 
 
@@ -158,7 +161,8 @@ namespace MatchFixer.Core.Services
 					HomeTeamName = m?.HomeTeamName,
 					AwayTeamName = m?.AwayTeamName,
 					HomeTeamLogo = m?.HomeTeamLogo,
-					AwayTeamLogo = m?.AwayTeamLogo
+					AwayTeamLogo = m?.AwayTeamLogo,
+					NoDraw = m?.NoDraw ?? false
 				};
 			}).ToList();
 
