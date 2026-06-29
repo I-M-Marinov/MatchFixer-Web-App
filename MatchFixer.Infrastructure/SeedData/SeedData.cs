@@ -666,7 +666,7 @@ namespace MatchFixer.Infrastructure.SeedData
 				}
 
 				var stage =
-					ParseWorldCupStage(fixture.Round);
+					ParseWorldCupStage(fixture.Round, fixture.Group);
 
 				worldCupMatches.Add(new WorldCupMatch
 				{
@@ -732,23 +732,31 @@ namespace MatchFixer.Infrastructure.SeedData
 		}
 
 		private static WorldCupStage ParseWorldCupStage(
-			string? round)
+			string? round,
+			string? group = null)
 		{
-			// The TheSportsDB API returns intRound as a numeric string.
-			// Group stage = matchdays 1-3.
-			// Knockout rounds follow sequentially: 4=R32, 5=R16, 6=QF,
-			// 7=SF, 8=Third Place, 9=Final.
+			// TheSportsDB uses intRound as the literal remaining-team count:
+			//   1, 2, 3  → Group Stage matchdays (strGroup is non-empty e.g. "A")
+			//   32       → Round of 32
+			//   16       → Round of 16
+			//   8        → Quarter-Final
+			//   4        → Semi-Final
+			//   3        → Third Place (when strGroup is empty)
+			//   2 or 1   → Final
 			if (int.TryParse(round, out var intRound))
 			{
+				if (intRound == 3 && !string.IsNullOrWhiteSpace(group))
+					return WorldCupStage.GroupStage;
+
 				return intRound switch
 				{
-					<= 3 => WorldCupStage.GroupStage,
-					4    => WorldCupStage.RoundOf32,
-					5    => WorldCupStage.RoundOf16,
-					6    => WorldCupStage.QuarterFinal,
-					7    => WorldCupStage.SemiFinal,
-					8    => WorldCupStage.ThirdPlace,
-					_    => WorldCupStage.Final
+					1 or 2 => WorldCupStage.GroupStage,
+					3      => WorldCupStage.ThirdPlace,
+					4      => WorldCupStage.SemiFinal,
+					8      => WorldCupStage.QuarterFinal,
+					16     => WorldCupStage.RoundOf16,
+					32     => WorldCupStage.RoundOf32,
+					_      => WorldCupStage.Final
 				};
 			}
 
