@@ -16,6 +16,6 @@ namespace MatchFixer.Core.DTOs.Bets
 		public decimal? EffectiveAwayOdds { get; set; }
 
 		public bool HasActiveBoost { get; set; }
-
+		public bool NoDraw { get; set; }
 	}
 }
