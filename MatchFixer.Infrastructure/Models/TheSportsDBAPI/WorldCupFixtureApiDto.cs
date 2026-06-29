@@ -38,5 +38,8 @@ namespace MatchFixer.Infrastructure.Models.TheSportsDBAPI
 
 		[JsonPropertyName("strStatus")]
 		public string? Status { get; set; }
+
+		[JsonPropertyName("strGroup")]
+		public string? Group { get; set; }
 	}
 }
