@@ -130,11 +130,11 @@ namespace MatchFixer_Web_App.Controllers
 		[AdminOnly]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> EditMatchEvent(Guid id, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime matchDate)
+		public async Task<IActionResult> EditMatchEvent(Guid id, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime matchDate, bool noDraw = false)
 		{
 			try
 			{
-				var result = await _matchEventService.EditMatchEventAsync(id, homeOdds, drawOdds, awayOdds, matchDate);
+				var result = await _matchEventService.EditMatchEventAsync(id, homeOdds, drawOdds, awayOdds, matchDate, noDraw);
 
 				if (!result)
 				{
