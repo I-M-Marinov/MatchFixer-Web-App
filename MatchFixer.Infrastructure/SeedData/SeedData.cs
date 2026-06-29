@@ -2,7 +2,6 @@
 using MatchFixer.Common.FootballClubNames;
 using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Common.Identity;
-using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -802,20 +801,5 @@ namespace MatchFixer.Infrastructure.SeedData
 			return WorldCupStage.GroupStage;
 		}
 
-		public static async Task RefreshKnockoutBracketIfStaleAsync(IServiceProvider serviceProvider)
-		{
-			var db = serviceProvider.GetRequiredService<MatchFixerDbContext>();
-
-			var hasStale = await db.WorldCupMatches
-				.AnyAsync(m => m.IsKnockout
-					&& (m.HomeTeam.StartsWith("TBD") || m.AwayTeam.StartsWith("TBD")
-					 || m.HomeTeam == string.Empty || m.AwayTeam == string.Empty));
-
-			if (hasStale)
-			{
-				var worldCupService = serviceProvider.GetRequiredService<IWorldCupService>();
-				await worldCupService.ReclassifyAndRefreshAsync();
-			}
-		}
 	}
 }

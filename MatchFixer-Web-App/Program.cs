@@ -252,3 +252,19 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+static async Task RefreshKnockoutBracketIfStaleAsync(IServiceProvider services)
+{
+	var db = services.GetRequiredService<MatchFixerDbContext>();
+
+	var hasStale = await db.WorldCupMatches
+		.AnyAsync(m => m.IsKnockout
+			&& (m.HomeTeam.StartsWith("TBD") || m.AwayTeam.StartsWith("TBD")
+			 || m.HomeTeam == string.Empty || m.AwayTeam == string.Empty));
+
+	if (hasStale)
+	{
+		var worldCupService = services.GetRequiredService<IWorldCupService>();
+		await worldCupService.ReclassifyAndRefreshAsync();
+	}
+}
