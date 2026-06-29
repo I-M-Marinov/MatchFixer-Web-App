@@ -400,8 +400,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const d = card.querySelector(".odds-draw");
         const a = card.querySelector(".odds-away");
         if (eh != null && h) h.textContent = fmtOdds(eh);
-        if (ed != null && d) d.textContent = fmtOdds(ed);
         if (ea != null && a) a.textContent = fmtOdds(ea);
+
+        // NoDraw — hide the Draw chip entirely
+        const drawChip = d ? d.closest(".odds-chip") : null;
+        const noDraw = msg.noDraw === true;
+        if (drawChip) {
+          drawChip.style.display = noDraw ? "none" : "";
+          if (!noDraw && ed != null && d) d.textContent = fmtOdds(ed);
+        }
       }
 
       function updateCarouselLimits(card, msg){
