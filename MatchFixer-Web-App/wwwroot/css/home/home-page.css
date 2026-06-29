@@ -757,9 +757,9 @@ border: 2px #0DAB76 solid;
 .info-boost-card .odds {
     grid-area: odds;
     display: flex;
-    justify-content: center !important;
+    justify-content: stretch;
     align-items: center;
-    gap: 1.85rem;
+    gap: 0.6rem;
     font-variant-numeric: tabular-nums;
     text-align: center;
 }
@@ -824,6 +824,8 @@ border: 2px #0DAB76 solid;
     border: 1px solid rgba(255,255,255,.08);
     text-shadow: 1px 1px 2px white;
     box-shadow: 1px 1px 2px black;
+    flex: 1;
+    text-align: center;
 }
 
 

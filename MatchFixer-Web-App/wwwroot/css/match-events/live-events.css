@@ -50,6 +50,7 @@ body.live-events-no-scroll {
     background-color: #ffffff;
 }
 
+
 .odds-table:hover button {
     border-radius: 0.75em;
     background-color: #65feb3;
@@ -475,6 +476,13 @@ body.live-events-no-scroll {
     text-shadow: 1px 1px 1px white !important;
 }
 
+
+/* NoDraw: 2 visible columns share the full table width equally */
+.no-draw-table th,
+.no-draw-table tbody td {
+    width: 50%;
+}
+
 #home-header .bet-option {
     background-color: white;
     color: black;
@@ -511,9 +519,9 @@ body.live-events-no-scroll {
     color: white;
 }
 
-/* --------------------------------------------------------------
+/* -----------------------------------------------
 |  CUSTOM CLASS FOR THE DATE PILLS INSIDE THE LIVE EVENTS VIEW  |
---------------------------------------------------------------- */
+----------------------------------------------- */
 
 .custom-date-pill {
     position: relative;
@@ -1294,6 +1302,28 @@ body.live-events-no-scroll {
 .boost-timer-row {
     position: relative;
     border-color: #fff !important;
+}
+
+.boost-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #fff;
+    border-radius: 0 0 0.5rem 0.5rem;
+    padding: 0.5rem 0.75rem 0.6rem;
+    width: 100%;
+}
+
+.boost-meta-row .boost-max-stake,
+.boost-meta-row .boost-max-uses {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    border-radius: 999px;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.70rem;
 }
 
 .boost-max-stake {

@@ -380,6 +380,14 @@ body:has(.world-cup-page) .footer {
     gap: .5rem;
 }
 
+.wc-bracket-logo {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
 .wc-bracket-score {
     font-weight: 700;
     min-width: 20px;
@@ -802,6 +810,7 @@ body:has(.world-cup-page) .footer {
 
 .wc-bracket-scale {
     transform-origin: top left;
+    min-width: 2260px;
 }
 
 .wc-bracket-scale {
