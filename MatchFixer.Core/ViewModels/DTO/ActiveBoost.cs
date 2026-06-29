@@ -16,5 +16,6 @@
 		public string? AwayTeamName { get; init; }
 		public string? HomeTeamLogo { get; init; }
 		public string? AwayTeamLogo { get; init; }
+		public bool NoDraw { get; init; }
 	}
 }
