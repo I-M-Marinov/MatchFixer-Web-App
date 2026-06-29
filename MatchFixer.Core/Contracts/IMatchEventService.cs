@@ -14,7 +14,7 @@ namespace MatchFixer.Core.Contracts
 		Task<string> GetTeamLogo(string name);
 		Task<bool> UpdateCompetitionAsync(Guid eventId, string? competition);
 		Task<Dictionary<string, List<SelectListItem>>> GetTeamsGroupedByLeagueAsync();
-		Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime);
+		Task<bool> EditMatchEventAsync(Guid matchEventId, decimal homeOdds, decimal drawOdds, decimal awayOdds, DateTime? kickoffTime, bool noDraw = false);
 		Task<bool> CancelMatchEventAsync(Guid matchEventId);
 		Task<Dictionary<Guid, OddsDTO>> GetOddsForMatchesAsync(Guid[] matchIds);
 		Task<List<ApiLeagueSelectViewModel>> GetApiLeaguesAsync();

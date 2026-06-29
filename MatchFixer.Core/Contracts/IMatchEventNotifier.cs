@@ -12,7 +12,8 @@ namespace MatchFixer.Core.Contracts
 			decimal? effectiveHomeOdds = null,
 			decimal? effectiveDrawOdds = null,
 			decimal? effectiveAwayOdds = null,
-			Guid? activeBoostId = null);
+			Guid? activeBoostId = null,
+			bool noDraw = false);
 
 		Task NotifyBoostStartedAsync(
 			Guid matchEventId,
@@ -48,6 +49,7 @@ namespace MatchFixer.Core.Contracts
 			public string? AwayName { get; init; }
 			public string? HomeTeamLogo { get; init; }
 			public string? AwayTeamLogo { get; init; }
+			public bool NoDraw { get; init; }
 		}
 	}
 }
