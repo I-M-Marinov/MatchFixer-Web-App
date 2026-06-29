@@ -77,7 +77,8 @@ namespace MatchFixer_Web_App.Hubs
 					HomeName = a.HomeTeamName,
 					AwayName = a.AwayTeamName,
 					HomeTeamLogo = a.HomeTeamLogo,
-					AwayTeamLogo = a.AwayTeamLogo
+					AwayTeamLogo = a.AwayTeamLogo,
+					NoDraw = a.NoDraw
 				});
 			}
 			catch (Exception ex)
@@ -104,6 +105,7 @@ namespace MatchFixer_Web_App.Hubs
 			public string? AwayName { get; set; }
 			public string? HomeTeamLogo { get; init; }
 			public string? AwayTeamLogo { get; init; }
+			public bool NoDraw { get; set; }
 		}
 	}
 }
