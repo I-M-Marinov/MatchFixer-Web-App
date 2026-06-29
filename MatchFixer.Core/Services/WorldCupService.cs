@@ -297,17 +297,11 @@ namespace MatchFixer.Core.Services
 			var fixtures = await _sportsDbApiService
 				.GetWorldCupFixturesAsync();
 
+			// The API uses intRound as the literal round size (32, 16, 8, 4, …).
+			// Group-stage matchdays are 1, 2, 3 and have a non-empty strGroup.
+			// Knockout fixtures have strGroup = "" — that's the most reliable filter.
 			var knockoutFixtures = fixtures
-				.Where(f =>
-				{
-					var round = f.Round?.ToLower() ?? string.Empty;
-					return round.Contains("round of 32")
-						|| round.Contains("round of 16")
-						|| round.Contains("quarter")
-						|| round.Contains("semi")
-						|| round.Contains("third")
-						|| round.Contains("final");
-				})
+				.Where(f => string.IsNullOrWhiteSpace(f.Group))
 				.ToList();
 
 			if (!knockoutFixtures.Any())
@@ -391,16 +385,7 @@ namespace MatchFixer.Core.Services
 				.GetWorldCupFixturesAsync();
 
 			var knockoutFixtures = fixtures
-				.Where(f =>
-				{
-					var round = f.Round?.ToLower() ?? string.Empty;
-					return round.Contains("round of 32")
-						|| round.Contains("round of 16")
-						|| round.Contains("quarter")
-						|| round.Contains("semi")
-						|| round.Contains("third")
-						|| round.Contains("final");
-				})
+				.Where(f => string.IsNullOrWhiteSpace(f.Group))
 				.ToList();
 
 			if (!knockoutFixtures.Any())
@@ -417,7 +402,8 @@ namespace MatchFixer.Core.Services
 			foreach (var fixture in knockoutFixtures)
 			{
 				var stage = ParseWorldCupStageFromRound(
-					fixture.Round);
+					fixture.Round,
+					fixture.Group);
 
 				newMatches.Add(new WorldCupMatch
 				{
@@ -464,31 +450,41 @@ namespace MatchFixer.Core.Services
 		}
 
 		private static WorldCupStage ParseWorldCupStageFromRound(
-			string? round)
+			string? round,
+			string? group = null)
 		{
-			// API returns intRound as a numeric string (1-3 = Group Stage,
-			// 4 = R32, 5 = R16, 6 = QF, 7 = SF, 8 = Third Place, 9+ = Final).
+			// TheSportsDB uses intRound as the literal remaining-team count:
+			//   1, 2, 3  → Group Stage matchdays (strGroup is non-empty, e.g. "A")
+			//   32       → Round of 32
+			//   16       → Round of 16
+			//   8        → Quarter-Final
+			//   4        → Semi-Final
+			//   3        → Third Place (intRound=3 but strGroup is empty)
+			//   2 or 1   → Final
 			if (int.TryParse(round, out var intRound))
 			{
+				// intRound 3 is ambiguous: group-stage matchday 3 OR third-place match.
+				// Disambiguate via strGroup — knockout fixtures have an empty group.
+				if (intRound == 3 && !string.IsNullOrWhiteSpace(group))
+					return WorldCupStage.GroupStage;
+
 				return intRound switch
 				{
-					<= 3 => WorldCupStage.GroupStage,
-					4    => WorldCupStage.RoundOf32,
-					5    => WorldCupStage.RoundOf16,
-					6    => WorldCupStage.QuarterFinal,
-					7    => WorldCupStage.SemiFinal,
-					8    => WorldCupStage.ThirdPlace,
-					_    => WorldCupStage.Final
+					1 or 2 => WorldCupStage.GroupStage,
+					3      => WorldCupStage.ThirdPlace, // group is empty here
+					4      => WorldCupStage.SemiFinal,
+					8      => WorldCupStage.QuarterFinal,
+					16     => WorldCupStage.RoundOf16,
+					32     => WorldCupStage.RoundOf32,
+					_      => WorldCupStage.Final       // 0, 64, or any other value
 				};
 			}
 
 			if (string.IsNullOrWhiteSpace(round))
-			{
 				return WorldCupStage.GroupStage;
-			}
 
+			// Fallback: text-based matching for any future API changes.
 			var r = round.ToLower();
-
 			if (r.Contains("round of 32")) return WorldCupStage.RoundOf32;
 			if (r.Contains("round of 16")) return WorldCupStage.RoundOf16;
 			if (r.Contains("quarter"))     return WorldCupStage.QuarterFinal;
