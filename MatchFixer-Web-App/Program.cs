@@ -189,8 +189,10 @@ using (var scope = app.Services.CreateScope())
 	await SeedMatchResultsAsync(services);                     // Seed the Match Results for the 2023 seasons in the Premier League, LaLiga, Bundesliga and Serie A
 	// seed the Admin & Moderator Roles
 	await SeedRolesAndAdminAsync(services);					 // Seed the Roles ( Admin and Moderator ) and the Admin account	
-    // seed the World Cup Matches 
-	await SeedWorldCupMatchesAsync(services);			   // Seed all the World Cup 2026 matches 
+    // seed the World Cup Matches
+	await SeedWorldCupMatchesAsync(services);			        // Seed all the World Cup 2026 matches
+	// auto-refresh knockout bracket if any slot still shows TBD team names
+	await RefreshKnockoutBracketIfStaleAsync(services);         // Fix stale TBD knockout slots on startup
 
 }
 
