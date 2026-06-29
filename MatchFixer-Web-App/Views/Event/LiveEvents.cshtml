@@ -81,11 +81,12 @@
 			     data-kickoff="@(match.KickoffTime?.ToString("o") ?? "")"
 			     data-user-tz="@match.UserTimeZone"
 			     data-has-boost="@(match.ActiveBoost != null ? "true" : "false")"
-			     data-postponed="@(match.IsPostponed ? "true" : "false")" 
+			     data-postponed="@(match.IsPostponed ? "true" : "false")"
 			     data-home-team="@match.HomeTeam"
 			     data-away-team="@match.AwayTeam"
 			     data-home-logo="@match.EffectiveHomeTeamLogo"
-			     data-away-logo="@match.EffectiveAwayTeamLogo">
+			     data-away-logo="@match.EffectiveAwayTeamLogo"
+			     data-no-draw="@(match.NoDraw ? "true" : "false")">
 
 
 			<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
@@ -196,7 +197,7 @@
 
 				<div class="tw-overflow-x-auto">
 
-					<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden">
+					<table class="odds-table tw-min-w-full tw-bg-white tw-rounded-lg tw-overflow-hidden @(match.NoDraw ? "no-draw-table" : "")">
 						<thead class="tw-bg-gray-50 tw-shadow">
 						<tr>
 							<th id="home-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="0"
@@ -213,7 +214,9 @@
 									Home
 								</button>
 							</th>
-							<th id="draw-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="1"
+							<th id="draw-header"
+							    class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 @(!match.NoDraw ? "bet-trigger" : "") animate__animated animate__slideInDown"
+							    data-column-index="1"
 							    data-match-id="@match.Id"
 							    data-home="@match.HomeTeam"
 							    data-away="@match.AwayTeam"
@@ -221,11 +224,9 @@
 							    data-away-logo-url="@match.EffectiveAwayTeamLogo"
 							    data-option="Draw"
 							    data-odds="@match.DrawOdds"
-							    data-start-time="@(match.KickoffTime?.ToString("o") ?? "")">
-
-								<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">
-									Draw
-								</button>
+							    data-start-time="@(match.KickoffTime?.ToString("o") ?? "")"
+							    style="@(match.NoDraw ? "display:none;" : "")">
+								<button class="bet-option @(match.ActiveBoost != null ? "boosted" : "")">Draw</button>
 							</th>
 							<th id="away-header" class="tw-px-4 tw-py-3 tw-text-center tw-text-xs tw-font-medium tw-text-gray-600 bet-trigger animate__animated animate__slideInDown" data-column-index="2"
 							    data-match-id="@match.Id"
@@ -272,10 +273,10 @@
 							</td>
 
 							<!-- Draw Odds -->
-							<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center bet-trigger">
+							<td class="tw-px-4 tw-py-4 tw-whitespace-nowrap tw-text-center @(!match.NoDraw ? "bet-trigger" : "")"
+							    style="@(match.NoDraw ? "display:none;" : "")">
 								<span class="badge tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold animate__animated animate__slideInUp
-																			@(match.ActiveBoost != null ? "pill-boosted-yellow" : "pill-brand-yellow")"
-
+																		@(match.ActiveBoost != null ? "pill-boosted-yellow" : "pill-brand-yellow")"
 								      data-match-id="@match.Id"
 								      data-home="@match.HomeTeam"
 								      data-away="@match.AwayTeam"
@@ -325,61 +326,32 @@
 							</td>
 
 						</tr>
-						@if (match.ActiveBoost != null)
-						{
-							<tr class="boost-timer-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
-								<td colspan="3" class="text-center">
-
-									<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-										<i class="ri-fire-fill boost-fire-icon me-1"></i>
-										<span class="boost-countdown"> 00:00</span>
-									</span>
-									<small class="badge text-white fw-bold boost-max-stake">
-										Max:<br/>
-										€@match.ActiveBoost?.MaxStakePerBet
-									</small>
-
-									@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
-									{
-										<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold" style="margin-left: -1em;">
-											@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
-											{
-												<div class="me-1">x</div>
-											}
-											@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
-											{
-												<div style="text-align: center;">No limit</div>
-											}
-											else
-											{
-												@match.ActiveBoost?.MaxUsesPerUser
-											}
-										</small>
-									}
-									else
-									{
-										<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
-											@if (@match.ActiveBoost?.MaxUsesPerUser != 9999)
-											{
-												<div class="me-1">x</div>
-											}
-											@if (@match.ActiveBoost?.MaxUsesPerUser == 9999)
-											{
-												<div style="text-align: center;">No limit</div>
-											}
-											else
-											{
-												@match.ActiveBoost?.MaxUsesPerUser
-											}
-										</small>
-									}
-
-
-								</td>
-							</tr>
-						}
 						</tbody>
 					</table>
+					@if (match.ActiveBoost != null)
+					{
+						<div class="boost-meta-row" data-boost-end="@match.ActiveBoost?.EndUtc.ToString("o")">
+							<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+								@if (match.ActiveBoost?.MaxUsesPerUser == 9999)
+								{
+									<div style="text-align: center;">No limit</div>
+								}
+								else
+								{
+									<div class="me-1">x</div>
+									@match.ActiveBoost?.MaxUsesPerUser
+								}
+							</small>
+							<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">
+								<i class="ri-fire-fill boost-fire-icon me-1"></i>
+								<span class="boost-countdown"> 00:00</span>
+							</span>
+							<span class="badge text-white fw-bold boost-max-stake d-flex flex-column align-items-center">
+								<span>Max:</span>
+								<span>€@match.ActiveBoost?.MaxStakePerBet</span>
+							</span>
+						</div>
+					}
 
 					<div class="d-flex justify-content-center mb-3 odds-container">
 						<div class="tw-overflow-x-auto">
@@ -828,7 +800,7 @@
 					// Only reset if the card WAS boosted
 					if (card.dataset.hasBoost === "true") {
 
-						const timerRow = card.querySelector(".boost-timer-row");
+						const timerRow = card.querySelector(".boost-timer-row, .boost-meta-row");
 						if (timerRow) resetBoost(timerRow);
 
 						["Home", "Draw", "Away"].forEach(opt => {
@@ -853,26 +825,29 @@
 
 			const hasBoost = update.activeBoostId != null;
 
+			// Detect if this update is purely a NoDraw toggle on an already-boosted card
+			// (odds unchanged, boost still active). If so, skip animating Home/Away —
+			// only Draw needs to be handled by the noDraw block below.
+			const isNoDrawToggleOnly = hasBoost
+				&& card.dataset.hasBoost === "true"
+				&& typeof update.noDraw !== 'undefined';
+
 			if (!hasBoost) {
-				// No boost, just run original logic
-					if (homeOddsElement && homeHeader) {
-						homeHeader.dataset.odds = update.homeOdds;
-						animateOddsChange(homeOddsElement, update.homeOdds, update.matchEventId, "Home", false);
-					}
-
-					if (drawOddsElement && drawHeader) {
-						drawHeader.dataset.odds = update.drawOdds;
-						animateOddsChange(drawOddsElement, update.drawOdds, update.matchEventId, "Draw", false);
-					}
-
-					if (awayOddsElement && awayHeader) {
-						awayHeader.dataset.odds = update.awayOdds;
-						animateOddsChange(awayOddsElement, update.awayOdds, update.matchEventId, "Away", false);
-					}
-			} else {
-
-				// Boosted match logic
-				// Use effective odds and ensure boost prevails in the UI and localStorage
+				// No boost — animate all three
+				if (homeOddsElement && homeHeader) {
+					homeHeader.dataset.odds = update.homeOdds;
+					animateOddsChange(homeOddsElement, update.homeOdds, update.matchEventId, "Home", false);
+				}
+				if (drawOddsElement && drawHeader) {
+					drawHeader.dataset.odds = update.drawOdds;
+					animateOddsChange(drawOddsElement, update.drawOdds, update.matchEventId, "Draw", false);
+				}
+				if (awayOddsElement && awayHeader) {
+					awayHeader.dataset.odds = update.awayOdds;
+					animateOddsChange(awayOddsElement, update.awayOdds, update.matchEventId, "Away", false);
+				}
+			} else if (!isNoDrawToggleOnly) {
+				// Boosted and odds actually changed — animate all three
 				animateOddsChange(homeOddsElement, update.effectiveHomeOdds, update.matchEventId, "Home", true);
 				animateOddsChange(drawOddsElement, update.effectiveDrawOdds, update.matchEventId, "Draw", true);
 				animateOddsChange(awayOddsElement, update.effectiveAwayOdds, update.matchEventId, "Away", true);
@@ -880,6 +855,38 @@
 				if (homeHeader) homeHeader.dataset.odds = update.effectiveHomeOdds.toFixed(2);
 				if (drawHeader) drawHeader.dataset.odds = update.effectiveDrawOdds.toFixed(2);
 				if (awayHeader) awayHeader.dataset.odds = update.effectiveAwayOdds.toFixed(2);
+			}
+			// else: NoDraw-only toggle on boosted card — leave Home/Away completely untouched
+
+			// Handle NoDraw flag change in real-time
+			if (typeof update.noDraw !== 'undefined') {
+				const drawTd = drawOddsElement ? drawOddsElement.closest('td') : null;
+				const table = card ? card.querySelector('.odds-table') : null;
+				if (update.noDraw) {
+					if (drawHeader) { drawHeader.style.display = 'none'; drawHeader.classList.remove('bet-trigger'); }
+					if (drawTd)     { drawTd.style.display = 'none';     drawTd.classList.remove('bet-trigger'); }
+					if (table)      table.classList.add('no-draw-table');
+					card.dataset.noDraw = "true";
+				} else {
+					if (drawHeader) { drawHeader.style.display = '';     drawHeader.classList.add('bet-trigger'); }
+					if (drawTd)     { drawTd.style.display = '';         drawTd.classList.add('bet-trigger'); }
+					if (table)      table.classList.remove('no-draw-table');
+					card.dataset.noDraw = "false";
+
+					// If a boost is active, slot Draw back in as boosted
+					if (update.activeBoostId != null && drawOddsElement && update.effectiveDrawOdds) {
+						drawOddsElement.classList.remove('pill-brand-yellow');
+						drawOddsElement.classList.add('pill-boosted-yellow');
+						drawOddsElement.dataset.hasBoost = "true";
+						drawOddsElement.dataset.odds = update.effectiveDrawOdds.toFixed(2);
+						const baseOdds = update.drawOdds?.toFixed(2) ?? drawOddsElement.textContent.trim();
+						drawOddsElement.innerHTML = `<div class="d-flex flex-column align-items-center justify-content-center"><span class="old-odds">${baseOdds}</span><span class="boosted-odds">${update.effectiveDrawOdds.toFixed(2)}</span></div>`;
+						if (drawHeader) {
+							const drawBtn = drawHeader.querySelector('.bet-option');
+							if (drawBtn) drawBtn.classList.add('boosted');
+						}
+					}
+				}
 			}
 		});
 
@@ -930,7 +937,9 @@
 	function animateOddsChange(element, newOdds, matchId, option, isBoosted = false) {
 		if (!element) return;
 
-		const oldOdds = parseFloat(element.dataset.lastOdds ?? element.textContent) || 0;
+		const boostedSpan = element.querySelector('.boosted-odds');
+		const rawText = element.dataset.lastOdds ?? (boostedSpan ? boostedSpan.textContent : element.textContent);
+		const oldOdds = parseFloat(rawText) || 0;
 		newOdds = parseFloat(newOdds);
 
 		const boostKey = `boost_${matchId}_${option}`;
@@ -981,7 +990,7 @@
 	}
 
 	document.addEventListener("DOMContentLoaded", () => {
-		document.querySelectorAll(".boost-timer-row").forEach(row => {
+		document.querySelectorAll(".boost-timer-row, .boost-meta-row").forEach(row => {
 			const countdownEl = row.querySelector(".boost-countdown");
 			const endTimeStr = row.dataset.boostEnd;
 			if (!endTimeStr || !countdownEl) return;
@@ -1126,6 +1135,16 @@
 		// 6. Remove boost timer row
 		row.remove();
 
+		// 6.1 Re-apply NoDraw state if still active (may have been set via SignalR)
+		if (cardEl && cardEl.dataset.noDraw === "true") {
+			const table = cardBody.querySelector(".odds-table");
+			const dh = cardBody.querySelector('th[data-option="Draw"]');
+			const dt = cardBody.querySelector('span[data-option="Draw"]')?.closest('td');
+			if (dh) { dh.style.display = 'none'; dh.classList.remove('bet-trigger'); }
+			if (dt) { dt.style.display = 'none'; dt.classList.remove('bet-trigger'); }
+			if (table) table.classList.add('no-draw-table');
+		}
+
 		// 7. Sync boosted date pill
 		syncBoostedDatePill();
 	}
@@ -1174,26 +1193,23 @@
 			}
 		});
 
-		const tableBody = cardBody.querySelector("tbody");
-		if (tableBody && !tableBody.querySelector(".boost-timer-row")) {
-			const timerRow = document.createElement("tr");
-			timerRow.classList.add("boost-timer-row");
+		const oddsTable = cardBody.querySelector(".odds-table");
+		if (oddsTable && !oddsTable.nextElementSibling?.classList.contains("boost-meta-row")) {
+			const timerRow = document.createElement("div");
+			timerRow.classList.add("boost-meta-row");
 
-			// Make sure this is proper UTC ISO string
 			const boostEndIso = new Date(boostData.boostEndUtc).toISOString();
 			timerRow.dataset.boostEnd = boostEndIso;
 
 			timerRow.innerHTML = `
-				<td colspan="3" class="text-center">
-					<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs">
-						<i class="ri-fire-fill boost-fire-icon me-1"></i>
-						<span class="boost-countdown">00:00</span>
-					</span>
-					<small class="badge text-white fw-bold boost-max-stake">Max:<br/>€${boostData.maxStake}</small>
-					<small class="badge text-white fw-bold boost-max-uses">x${boostData.maxUses}</small>
-				</td>`;
+				<small class="badge text-white fw-bold boost-max-uses tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs tw-font-semibold">x${boostData.maxUses}</small>
+				<span class="badge pill-boosted tw-inline-flex tw-items-center tw-px-3 tw-py-1.5 tw-rounded-full tw-text-xs">
+					<i class="ri-fire-fill boost-fire-icon me-1"></i>
+					<span class="boost-countdown">00:00</span>
+				</span>
+				<span class="badge text-white fw-bold boost-max-stake d-flex flex-column align-items-center"><span>Max:</span><span>€${boostData.maxStake}</span></span>`;
 
-			tableBody.appendChild(timerRow);
+			oddsTable.insertAdjacentElement("afterend", timerRow);
 
 			const countdownEl = timerRow.querySelector(".boost-countdown");
 			const endTime = new Date(timerRow.dataset.boostEnd);
@@ -1252,7 +1268,7 @@
 
 		if (end) {
 		  timers.stop = setTimeout(() => {
-			const timerRow = row.parentElement.querySelector(".boost-timer-row");
+			const timerRow = row.parentElement.querySelector(".boost-timer-row, .boost-meta-row");
 			if (timerRow) resetBoost(timerRow);
 			boostTimers.delete(key);
 		  }, Math.max(0, end - Date.now()));
