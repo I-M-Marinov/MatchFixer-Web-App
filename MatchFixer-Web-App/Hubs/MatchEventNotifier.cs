@@ -25,7 +25,8 @@ namespace MatchFixer_Web_App.Hubs
 			decimal? effectiveHomeOdds = null,
 			decimal? effectiveDrawOdds = null,
 			decimal? effectiveAwayOdds = null,
-			Guid? activeBoostId = null)
+			Guid? activeBoostId = null,
+			bool noDraw = false)
 		{
 			var payload = new
 			{
@@ -36,7 +37,8 @@ namespace MatchFixer_Web_App.Hubs
 				effectiveHomeOdds = effectiveHomeOdds ?? homeOdds,
 				effectiveDrawOdds = effectiveDrawOdds ?? drawOdds,
 				effectiveAwayOdds = effectiveAwayOdds ?? awayOdds,
-				activeBoostId
+				activeBoostId,
+				noDraw
 			};
 
 			return Task.WhenAll(
@@ -101,7 +103,8 @@ namespace MatchFixer_Web_App.Hubs
 				HomeName = msg.HomeName,
 				AwayName = msg.AwayName,
 				HomeTeamLogo = msg.HomeTeamLogo,
-				AwayTeamLogo = msg.AwayTeamLogo
+				AwayTeamLogo = msg.AwayTeamLogo,
+				NoDraw = msg.NoDraw
 			};
 
 			await Task.WhenAll(
