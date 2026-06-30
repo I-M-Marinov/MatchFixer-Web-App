@@ -64,6 +64,7 @@ namespace MatchFixer.Core.Services
 					AwayTeam = e.AwayTeam!.Name,
 					HomeScore = e.LiveResult!.HomeScore,
 					AwayScore = e.LiveResult!.AwayScore,
+					HomeWonOnPenalties = e.LiveResult!.HomeWonOnPenalties,
 					HomeLogoUrl = e.HomeTeam!.LogoUrl,
 					AwayLogoUrl = e.AwayTeam!.LogoUrl,
 					CompetitionName = string.IsNullOrWhiteSpace(e.CompetitionName)

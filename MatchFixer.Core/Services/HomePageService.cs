@@ -63,6 +63,10 @@ namespace MatchFixer.Core.Services
 
 						AwayScore = b.MatchEvent.LiveResult != null
 							? b.MatchEvent.LiveResult.AwayScore
+							: null,
+
+						HomeWonOnPenalties = b.MatchEvent.LiveResult != null
+							? b.MatchEvent.LiveResult.HomeWonOnPenalties
 							: null
 
 					}).ToList()

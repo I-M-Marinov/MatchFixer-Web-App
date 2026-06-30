@@ -102,6 +102,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					MatchDate = e.MatchDate,
 					HomeScore = matchResult?.HomeScore,
 					AwayScore = matchResult?.AwayScore,
+					HomeWonOnPenalties = matchResult?.HomeWonOnPenalties,
 					IsCancelled = e.IsCancelled,
 
 					TotalBets = e.Bets.Count,
@@ -118,10 +119,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						}
 						else if (matchResult != null)
 						{
-							bool won =
-								(b.Pick == MatchPick.Home && matchResult.HomeScore > matchResult.AwayScore) ||
-								(b.Pick == MatchPick.Away && matchResult.AwayScore > matchResult.HomeScore) ||
-								(b.Pick == MatchPick.Draw && matchResult.HomeScore == matchResult.AwayScore);
+							bool won = matchResult.HomeWonOnPenalties.HasValue
+								? (b.Pick == MatchPick.Home &&  matchResult.HomeWonOnPenalties.Value) ||
+								  (b.Pick == MatchPick.Away && !matchResult.HomeWonOnPenalties.Value)
+								: (b.Pick == MatchPick.Home && matchResult.HomeScore > matchResult.AwayScore) ||
+								  (b.Pick == MatchPick.Away && matchResult.AwayScore > matchResult.HomeScore) ||
+								  (b.Pick == MatchPick.Draw && matchResult.HomeScore == matchResult.AwayScore);
 
 							computedStatus = won ? BetStatus.Won.ToString() : BetStatus.Lost.ToString();
 						}
