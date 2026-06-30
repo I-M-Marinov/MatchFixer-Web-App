@@ -343,7 +343,7 @@
 							}
 							else
 							{
-								<span>@e.HomeScore - @e.AwayScore</span>
+								<span>@e.HomeScore - @e.AwayScore@if (e.HomeWonOnPenalties.HasValue) { <span class="badge bg-warning text-dark ms-1" title="Decided on penalties">P</span> }</span>
 							}
 						</td>
 						<td class="text-center">@e.TotalBets</td>
