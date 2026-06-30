@@ -40,6 +40,7 @@ namespace MatchFixer_Web_App.Controllers
 				input.MatchId,
 				input.HomeScore,
 				input.AwayScore,
+				input.HomeWonOnPenalties,
 				input.Notes
 			);
 
