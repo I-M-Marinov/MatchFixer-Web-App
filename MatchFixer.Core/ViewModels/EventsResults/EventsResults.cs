@@ -9,6 +9,7 @@
 		public string LeagueName { get; set; } = null!; 
 		public int HomeScore { get; set; }
 		public int AwayScore { get; set; }
+		public bool? HomeWonOnPenalties { get; set; }
 
 		public string? HomeLogoUrl { get; set; }
 		public string? AwayLogoUrl { get; set; }

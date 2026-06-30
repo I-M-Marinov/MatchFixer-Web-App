@@ -16,6 +16,8 @@ namespace MatchFixer.Core.ViewModels.MatchResults
 		[Range(0, 20, ErrorMessage = "Score must be between 0 and 20.")]
 		public int AwayScore { get; set; }
 
+		public bool? HomeWonOnPenalties { get; set; }
+
 		public string? Notes { get; set; }
 	}
 }

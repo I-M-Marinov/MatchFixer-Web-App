@@ -19,5 +19,7 @@ namespace MatchFixer.Core.ViewModels.Index
 		public int? HomeScore { get; set; }
 
 		public int? AwayScore { get; set; }
+
+		public bool? HomeWonOnPenalties { get; set; }
 	}
 }

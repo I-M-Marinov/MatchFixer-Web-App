@@ -8,6 +8,7 @@
 		public DateTime? MatchDate { get; set; }
 		public int? HomeScore { get; set; }
 		public int? AwayScore { get; set; }
+		public bool? HomeWonOnPenalties { get; set; }
 		public bool IsCancelled { get; set; }
 
 		// Betting Summary
