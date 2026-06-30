@@ -31,6 +31,7 @@ namespace MatchFixer.Core.Services
 			Guid matchEventId,
 			int homeScore,
 			int awayScore,
+			bool? homeWonOnPenalties = null,
 			string? notes = null)
 		{
 			var match = await _dbContext.MatchEvents
@@ -51,6 +52,7 @@ namespace MatchFixer.Core.Services
 				MatchEventId = match.Id,
 				HomeScore = homeScore,
 				AwayScore = awayScore,
+				HomeWonOnPenalties = homeWonOnPenalties,
 				Notes = notes,
 				RecordedAt = DateTime.UtcNow
 			};

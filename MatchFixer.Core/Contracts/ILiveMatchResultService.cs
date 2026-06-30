@@ -4,7 +4,7 @@ namespace MatchFixer.Core.Contracts
 {
 	public interface ILiveMatchResultService
 	{
-		Task<bool> AddMatchResultAsync(Guid matchEventId, int homeScore, int awayScore, string? notes = null);
+		Task<bool> AddMatchResultAsync(Guid matchEventId, int homeScore, int awayScore, bool? homeWonOnPenalties = null, string? notes = null);
 		Task<List<MatchResultInputViewModel>> GetUnresolvedMatchResultsAsync();
 		Task<bool> MarkMatchAsFullTimeAsync(Guid matchId);
 	}
