@@ -15,6 +15,9 @@ namespace MatchFixer.Infrastructure.Entities
 
 		[Required] [Range(0, 20)] public int AwayScore { get; set; }
 
+		// True = Home won, False = Away won
+		public bool? HomeWonOnPenalties { get; set; }
+
 		[Required] public DateTime RecordedAt { get; set; } = DateTime.UtcNow;
 
 		public string? Notes { get; set; }
