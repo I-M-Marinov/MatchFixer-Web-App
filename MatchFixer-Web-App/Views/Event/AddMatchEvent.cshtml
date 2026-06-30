@@ -415,6 +415,7 @@
 														        data-home="@ev.HomeTeam"
 														        data-away="@ev.AwayTeam"
 														        data-time="@(ev.KickoffTime?.ToLocalTime().ToString("g"))"
+														        data-no-draw="@ev.NoDraw.ToString().ToLower()"
 														        data-bs-toggle="modal"
 														        data-bs-target="#scoreMatchModal">
 															<i class="bi bi-pencil-square"></i>
@@ -978,6 +979,24 @@
 								       required>
 							</div>
 
+						</div>
+
+						<input type="hidden" id="HomeWonOnPenaltiesHidden" name="HomeWonOnPenalties" value="" />
+						<div id="penaltyTogglesRow" class="d-none d-flex justify-content-center gap-3 mb-3">
+							<div class="form-check form-switch d-flex align-items-center gap-2">
+								<input class="form-check-input penalty-toggle" type="checkbox" role="switch"
+								       id="HomeWonPenalties" data-value="true" />
+								<label class="form-check-label fw-semibold text-info" for="HomeWonPenalties" id="HomeWonPenaltiesLabel">
+									Home won <span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem;">P</span>
+								</label>
+							</div>
+							<div class="form-check form-switch d-flex align-items-center gap-2">
+								<input class="form-check-input penalty-toggle" type="checkbox" role="switch"
+								       id="AwayWonPenalties" data-value="false" />
+								<label class="form-check-label fw-semibold text-info" for="AwayWonPenalties" id="AwayWonPenaltiesLabel">
+									Away won <span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem;">P</span>
+								</label>
+							</div>
 						</div>
 
 						<div class="mb-3">
@@ -1869,53 +1888,46 @@
 				const button = event.relatedTarget;
 
 				const matchId = button.getAttribute("data-match-id");
-				const home = button.getAttribute("data-home");
-				const away = button.getAttribute("data-away");
-				const time = button.getAttribute("data-time");
+				const home    = button.getAttribute("data-home");
+				const away    = button.getAttribute("data-away");
+				const time    = button.getAttribute("data-time");
+				const noDraw  = button.getAttribute("data-no-draw") === "true";
 
 				document.getElementById("scoreMatchId").value = matchId;
+				document.getElementById("scoreMatchTitle").innerText = `${home} vs ${away}`;
+				document.getElementById("scoreMatchTime").innerText = time;
 
-				document.getElementById("scoreMatchTitle").innerText =
-					`${home} vs ${away}`;
-
-				document.getElementById("scoreMatchTime").innerText =
-					time;
-			});
-
-		});
-
-
-		document.addEventListener("DOMContentLoaded", function () {
-
-			const scoreModal = document.getElementById("scoreMatchModal");
-
-			scoreModal.addEventListener("show.bs.modal", function (event) {
-
-				const button = event.relatedTarget;
-
-				const matchId = button.getAttribute("data-match-id");
-				const home = button.getAttribute("data-home");
-				const away = button.getAttribute("data-away");
-				const time = button.getAttribute("data-time");
-
-				document.getElementById("scoreMatchId").value = matchId;
-
-				document.getElementById("scoreMatchTitle").innerText =
-					`${home} vs ${away}`;
-
-				document.getElementById("scoreMatchTime").innerText =
-					time;
+				// Penalty toggles — only show for NoDraw matches
+				const penaltyRow = document.getElementById("penaltyTogglesRow");
+				if (noDraw) {
+					document.getElementById("HomeWonPenaltiesLabel").firstChild.textContent = `${home} won `;
+					document.getElementById("AwayWonPenaltiesLabel").firstChild.textContent = `${away} won `;
+					penaltyRow.classList.remove("d-none");
+				} else {
+					penaltyRow.classList.add("d-none");
+				}
 
 				const googleBtn = document.getElementById("googleScoreSearch");
-
 				googleBtn.onclick = () => {
-
 					const query = `${home} vs ${away} score`;
-					const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-
-					window.open(url, "_blank");
+					window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank");
 				};
+			});
 
+			scoreModal.addEventListener("hidden.bs.modal", function () {
+				document.querySelectorAll(".penalty-toggle").forEach(t => t.checked = false);
+				document.getElementById("HomeWonOnPenaltiesHidden").value = "";
+			});
+
+			document.querySelectorAll(".penalty-toggle").forEach(function (toggle) {
+				toggle.addEventListener("change", function () {
+					if (this.checked) {
+						document.querySelectorAll(".penalty-toggle").forEach(t => { if (t !== this) t.checked = false; });
+						document.getElementById("HomeWonOnPenaltiesHidden").value = this.dataset.value;
+					} else {
+						document.getElementById("HomeWonOnPenaltiesHidden").value = "";
+					}
+				});
 			});
 
 		});
