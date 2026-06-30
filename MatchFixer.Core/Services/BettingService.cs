@@ -243,11 +243,13 @@ public class BettingService : IBettingService
 
 					string? outcome = result == null
 						? null
-						: result.HomeScore > result.AwayScore
-							? MatchPick.Home.ToString()
-							: result.HomeScore < result.AwayScore
-								? MatchPick.Away.ToString()
-								: MatchPick.Draw.ToString();
+						: result.HomeWonOnPenalties.HasValue
+							? (result.HomeWonOnPenalties.Value ? MatchPick.Home.ToString() : MatchPick.Away.ToString())
+							: result.HomeScore > result.AwayScore
+								? MatchPick.Home.ToString()
+								: result.HomeScore < result.AwayScore
+									? MatchPick.Away.ToString()
+									: MatchPick.Draw.ToString();
 
 					return new SingleBetDto
 					{
@@ -293,10 +295,12 @@ public class BettingService : IBettingService
 		if (result == null)
 			return BetStatus.Pending;
 
-		bool won =
-			(b.Pick == MatchPick.Home && result.HomeScore > result.AwayScore) ||
-			(b.Pick == MatchPick.Away && result.AwayScore > result.HomeScore) ||
-			(b.Pick == MatchPick.Draw && result.HomeScore == result.AwayScore);
+		bool won = result.HomeWonOnPenalties.HasValue
+			? (b.Pick == MatchPick.Home && result.HomeWonOnPenalties.Value) ||
+			  (b.Pick == MatchPick.Away && !result.HomeWonOnPenalties.Value)
+			: (b.Pick == MatchPick.Home && result.HomeScore > result.AwayScore) ||
+			  (b.Pick == MatchPick.Away && result.AwayScore > result.HomeScore) ||
+			  (b.Pick == MatchPick.Draw && result.HomeScore == result.AwayScore);
 
 		return won ? BetStatus.Won : BetStatus.Lost;
 	}
@@ -391,10 +395,11 @@ public class BettingService : IBettingService
 				continue;
 			}
 
-			var actualOutcome =
-				result.HomeScore > result.AwayScore ? MatchPick.Home :
-				result.HomeScore < result.AwayScore ? MatchPick.Away :
-				MatchPick.Draw;
+			var actualOutcome = result.HomeWonOnPenalties.HasValue
+				? (result.HomeWonOnPenalties.Value ? MatchPick.Home : MatchPick.Away)
+				: result.HomeScore > result.AwayScore ? MatchPick.Home
+				: result.HomeScore < result.AwayScore ? MatchPick.Away
+				: MatchPick.Draw;
 
 			if (bet.Pick == actualOutcome)
 			{
