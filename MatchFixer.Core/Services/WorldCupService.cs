@@ -384,9 +384,29 @@ namespace MatchFixer.Core.Services
 			var fixtures = await _sportsDbApiService
 				.GetWorldCupFixturesAsync();
 
-			var knockoutFixtures = fixtures
+			// Fixtures with no strGroup are candidates for knockout rounds.
+			// However the API also returns Group Stage matchday 3 (June 24-28) with
+			// an empty strGroup, causing them to be misclassified as Third Place.
+			// Disambiguate by counting fixtures per round: knockout stages have few
+			// fixtures per round (Final=1, Third=1, SF=2, QF=4), while group-stage
+			// matchdays produce many (12+ per matchday). Guard only applies to the
+			// ambiguous low-value rounds 1, 2, 3 — rounds ≥ 4 are unambiguous.
+			var noGroupFixtures = fixtures
 				.Where(f => string.IsNullOrWhiteSpace(f.Group))
 				.ToList();
+
+			var countByRound = noGroupFixtures
+				.GroupBy(f => f.Round)
+				.ToDictionary(g => g.Key, g => g.Count());
+
+			var knockoutFixtures = noGroupFixtures.Where(f =>
+			{
+				if (!int.TryParse(f.Round, out var r)) return true;
+				if (r is 32 or 16 or 8 or 4) return true; // unambiguous knockout rounds
+				// For ambiguous rounds (1, 2, 3): only treat as knockout if ≤ 4 fixtures
+				// share that round value (group-stage matchdays have 12+ per round).
+				return countByRound.GetValueOrDefault(f.Round, 0) <= 4;
+			}).ToList();
 
 			if (!knockoutFixtures.Any())
 			{
