@@ -89,7 +89,7 @@
 								</div>
 
 								<div class="bet-result">
-									@(bet.HomeScore)-@(bet.AwayScore)
+									@(bet.HomeScore)-@(bet.AwayScore)@if (bet.HomeWonOnPenalties.HasValue) { <span class="badge bg-warning text-dark ms-1" title="Decided on penalties">P</span> }
 								</div>
 
 								<div class="bet-pick
