@@ -1310,7 +1310,8 @@ body.live-events-no-scroll {
     justify-content: center;
     gap: 0.5rem;
     background: #fff;
-    border-radius: 0 0 0.5rem 0.5rem;
+    border-radius: 0.5rem;
+    margin-top: 0.25em;
     padding: 0.5rem 0.75rem 0.6rem;
     width: 100%;
 }
