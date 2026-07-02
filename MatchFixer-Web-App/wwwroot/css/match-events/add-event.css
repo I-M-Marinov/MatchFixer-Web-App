@@ -754,6 +754,19 @@ table.responsive-stack td {
     font-size: 0.85em;
 }
 
+#AwayWonPenaltiesLabel,
+#HomeWonPenaltiesLabel {
+    font-size: 0.70em;
+}
+
+#penaltyTogglesRow .form-switch:nth-last-of-type(n){
+    padding-left: 2em;
+}
+
+#penaltyTogglesRow .form-switch .penalty-toggle:nth-last-of-type(n) {
+    margin-left: 0.5em !important;
+}
+
 .pill-brand-red {
     display: inline-block;
     padding: 0.35em 0.65em;
@@ -765,7 +778,7 @@ table.responsive-stack td {
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 50rem;
-    background-color: #dc3545; 
+    background-color: #dc3545;
     text-shadow: 0px 1px 1px black;
 }
 
