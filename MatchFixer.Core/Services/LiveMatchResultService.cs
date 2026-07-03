@@ -44,6 +44,9 @@ namespace MatchFixer.Core.Services
 			if (match.Status != MatchStatus.FullTime)
 				return false; // Only FullTime matches can be scored
 
+			if (match.MatchDate.HasValue && match.MatchDate.Value > DateTime.UtcNow)
+				return false; // Cannot submit a result for a match that hasn't kicked off yet
+
 			if (match.LiveResult != null)
 				return false; // already has a result recorded
 
