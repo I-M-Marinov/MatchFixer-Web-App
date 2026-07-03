@@ -36,11 +36,12 @@ namespace MatchFixer.Core.Services
 			var user = await _userContextService.GetCurrentUserAsync();
 			var userTimeZone = user.TimeZone;
 
+			// Restrict to FIFA World Cup events only 
 			var matchEvents = await _context.MatchEvents
 				.Include(x => x.HomeTeam)
 				.Include(x => x.AwayTeam)
 				.Include(x => x.LiveResult)
-				.Where(x => !x.IsCancelled)
+				.Where(x => !x.IsCancelled && x.CompetitionName == "FIFA World Cup")
 				.ToListAsync();
 
 			var groupedStages = matches
@@ -165,8 +166,17 @@ namespace MatchFixer.Core.Services
 				x.AwayTeam.Name == match.AwayTeam);
 
 			var liveResult = matchEvent?.LiveResult;
-			var isFinished = match.IsFinished || liveResult != null;
-			var isOngoing = !isFinished && !match.IsLive && match.MatchDate <= DateTime.UtcNow;
+
+			var matchDateUtc  = match.MatchDate;
+			var dateHasPassed = matchDateUtc <= DateTime.UtcNow;
+
+			var isFinished = liveResult != null
+				|| (match.IsFinished && dateHasPassed);
+
+			var isOngoing = !isFinished && !match.IsLive && dateHasPassed;
+
+			var homeScore = isFinished ? (liveResult?.HomeScore ?? match.HomeScore) : (int?)null;
+			var awayScore = isFinished ? (liveResult?.AwayScore ?? match.AwayScore) : (int?)null;
 
 			return new WorldCupMatchCardViewModel
 			{
@@ -180,8 +190,8 @@ namespace MatchFixer.Core.Services
 
 				MatchDate = matchDateLocal,
 
-				HomeScore = liveResult?.HomeScore ?? match.HomeScore,
-				AwayScore = liveResult?.AwayScore ?? match.AwayScore,
+				HomeScore = homeScore,
+				AwayScore = awayScore,
 
 				IsFinished = isFinished,
 				IsLive = match.IsLive,
