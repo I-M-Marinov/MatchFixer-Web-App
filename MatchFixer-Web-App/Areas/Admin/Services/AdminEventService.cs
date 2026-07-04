@@ -92,7 +92,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				string leagueName = string.IsNullOrWhiteSpace(e.CompetitionName)
 					? e.HomeTeam.LeagueName
-					: "Rest of World";
+					: e.CompetitionName == "FIFA World Cup"
+						? "FIFA World Cup"
+						: "Rest of World";
 
 				return new AdminEventOverviewDto
 				{
@@ -211,7 +213,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					lc.Count,
 					LeagueName = (m.CompetitionName == null || m.CompetitionName == "")
 						? ht.LeagueName
-						: "Rest of World"
+						: m.CompetitionName == "FIFA World Cup"
+							? "FIFA World Cup"
+							: "Rest of World"
 				}
 			).ToListAsync();
 
