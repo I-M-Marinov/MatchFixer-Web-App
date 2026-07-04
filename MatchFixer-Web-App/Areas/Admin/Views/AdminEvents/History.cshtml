@@ -158,12 +158,19 @@
 										{
 											<span style="font-size: 1.8rem;">🌍</span>
 										}
-										else
+										else if (league.League == "FIFA World Cup")
+										{
+											<img src="/images/live-events/fifa_world_cup.png"
+											     alt="FIFA World Cup"
+											     class="img-fluid mb-2"
+											     style="height:40px; width:auto; object-fit:contain;" />
+										}
+					else
 										{
 											<img src="@logoUrl"
 											     alt="@league.League logo"
 											     class="img-fluid mb-2"
-											     style="height:40px; width:auto; object-fit:contain;" />											
+											     style="height:40px; width:auto; object-fit:contain;" />
 										}
 										<!-- League name -->
 										<h6 class="mb-1">@league.League</h6>
