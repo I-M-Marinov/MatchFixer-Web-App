@@ -60,7 +60,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					Id = s.Id,
 					SlipStatus = status,
 					Stake = s.Amount,
-					WinAmount = s.WinAmount,
+					WinAmount = s.WinAmount ?? (status == BetStatus.Won ? potential : null),
 					PotentialReturn = potential,
 					Selections = s.Bets.Count,
 					CreatedUtc = DateTime.SpecifyKind(s.BetTime, DateTimeKind.Utc),
