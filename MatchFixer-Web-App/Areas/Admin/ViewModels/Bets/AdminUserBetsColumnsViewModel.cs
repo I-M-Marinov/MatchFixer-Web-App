@@ -25,10 +25,9 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Bets
 		public decimal TotalLost => LostOrVoided
 			.Where(x => x.SlipStatus == BetStatus.Lost)
 			.Sum(x => x.Stake);
-		public decimal TotalSettledStake =>
-			Won.Sum(x => x.Stake) +
-			LostOrVoided.Where(x => x.SlipStatus == BetStatus.Lost).Sum(x => x.Stake);
-		// Net profit over settled slips
-		public decimal NetProfit => TotalReturns - TotalSettledStake;
+		public decimal VoidedStake =>
+			LostOrVoided.Where(x => x.SlipStatus == BetStatus.Voided).Sum(x => x.Stake);
+		// Net profit: (won returns + voided refunds) - total staked
+		public decimal NetProfit => TotalReturns + VoidedStake - TotalStake;
 	}
 }
