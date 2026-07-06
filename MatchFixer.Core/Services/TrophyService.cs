@@ -6,6 +6,7 @@ using MatchFixer.Core.ViewModels.Profile;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,15 +20,17 @@ namespace MatchFixer.Core.Services
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IEmailSender _emailSender;
 		private readonly ITimezoneService _timezoneService;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 
 		private readonly Dictionary<string, Func<UserTrophyContext, Task<bool>>> _trophyConditions;
 
 
-		public TrophyService(MatchFixerDbContext dbContext, IEmailSender emailSender, ITimezoneService timezoneService)
+		public TrophyService(MatchFixerDbContext dbContext, IEmailSender emailSender, ITimezoneService timezoneService, IHttpContextAccessor httpContextAccessor)
 		{
 			_dbContext = dbContext;
 			_emailSender = emailSender;
 			_timezoneService = timezoneService;
+			_httpContextAccessor = httpContextAccessor;
 
 			_trophyConditions = new Dictionary<string, Func<UserTrophyContext, Task<bool>>>
 			{
@@ -373,7 +376,7 @@ namespace MatchFixer.Core.Services
 				DbContext = _dbContext
 			};
 
-			var profileUrl = $"/Profile/{userId}";
+			var profileUrl = BuildProfileUrl(userId);
 
 			foreach (var (trophyName, condition) in _trophyConditions)
 			{
@@ -399,6 +402,18 @@ namespace MatchFixer.Core.Services
 				userTrophy.IsNew = false;
 				await _dbContext.SaveChangesAsync();
 			}
+		}
+
+		private string BuildProfileUrl(Guid userId)
+		{
+			var ctx = _httpContextAccessor.HttpContext;
+			if (ctx != null)
+			{
+				var req = ctx.Request;
+				return $"{req.Scheme}://{req.Host}/Profile/{userId}";
+			}
+			// Fallback for background jobs where HttpContext is unavailable
+			return $"/Profile/{userId}";
 		}
 
 		private async Task AwardTrophy(Guid userId, int trophyId, string profileUrl, string? notes = null)
