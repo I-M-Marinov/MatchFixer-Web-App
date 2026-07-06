@@ -493,20 +493,20 @@ namespace MatchFixer.Core.Services
 			//   2 or 1   → Final
 			if (int.TryParse(round, out var intRound))
 			{
-				// intRound 3 is ambiguous: group-stage matchday 3 OR third-place match.
-				// Disambiguate via strGroup — knockout fixtures have an empty group.
-				if (intRound == 3 && !string.IsNullOrWhiteSpace(group))
+				// intRound 1, 2, 3 are ambiguous: could be group-stage matchdays OR knockout rounds.
+				// Disambiguate via strGroup — knockout fixtures have an empty/null group.
+				if (intRound <= 3 && !string.IsNullOrWhiteSpace(group))
 					return WorldCupStage.GroupStage;
 
 				return intRound switch
 				{
-					1 or 2 => WorldCupStage.GroupStage,
-					3      => WorldCupStage.ThirdPlace, // group is empty here
+					1 or 2 => WorldCupStage.Final,        // 2 teams remain → Final (group is empty)
+					3      => WorldCupStage.ThirdPlace,   // 3 teams but group is empty → 3rd place
 					4      => WorldCupStage.SemiFinal,
 					8      => WorldCupStage.QuarterFinal,
 					16     => WorldCupStage.RoundOf16,
 					32     => WorldCupStage.RoundOf32,
-					_      => WorldCupStage.Final       // 0, 64, or any other value
+					_      => WorldCupStage.GroupStage    // unknown → safer to treat as group stage
 				};
 			}
 
