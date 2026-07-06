@@ -229,3 +229,8 @@
   <img src="./world-cup-full-time-matches.png" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">World Cup Matches on the Events Board</h3>
+
+<p align="center">
+  <img src="./World-cup-matches-example.png" align="center" border="10" width="600px"/>
+</p>
