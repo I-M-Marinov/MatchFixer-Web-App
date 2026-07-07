@@ -290,28 +290,52 @@ namespace MatchFixer.Common.EmailTemplates
 		{
 			return $@"
 				<!DOCTYPE html>
-				<html>
+				<html lang='en'>
 				  <head>
 				    <meta charset='UTF-8'>
+				    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 				    <title>{HtmlEncoder.Default.Encode(subject)}</title>
 				  </head>
-				  <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;'>
-				    <div style='max-width: 1000px; margin: auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
-				      <div style='text-align: center; background-color: #2c3e50; padding: 20px 0;'>
-				        <div style='max-width: 320px; margin: 0 auto;'>
-								<img src='{LogoUrl}' alt='MatchFixer Logo' width='320' style='width: 100%; height: auto; display: block;' />
-							</div>
-				      </div>
-				      <div style='padding: 30px;'>
-				        <h2 style='color: #333; text-align:center;'>{HtmlEncoder.Default.Encode(subject)}</h2>
-				        <div style='color:#555; font-size:16px; line-height:1.6;'>
-				          {contentHtml}
-				        </div>
-				        <p style='margin-top: 15px; font-size: 12px; color: #040bcf; text-align:center;'>
-				           All Rights Reserved. MatchFixer ® 2025 - {DateTime.UtcNow.Year}
-				        </p>
-				      </div>
-				    </div>
+				  <body style='margin:0;padding:0;background-color:#070d1a;font-family:""Helvetica Neue"",Helvetica,Arial,sans-serif;'>
+				    <table width='100%' cellpadding='0' cellspacing='0' style='background-color:#070d1a;padding:40px 20px;'>
+				      <tr>
+				        <td align='center'>
+				          <table width='600' cellpadding='0' cellspacing='0' style='max-width:600px;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 0 60px rgba(13,171,118,0.12),0 24px 60px rgba(0,0,0,0.6);'>
+
+				            <!-- HEADER -->
+				            <tr>
+				              <td style='background:linear-gradient(135deg,#0a1628 0%,#162040 100%);padding:30px 40px;text-align:center;border-bottom:1px solid rgba(13,171,118,0.25);'>
+				                <img src='{LogoUrl}' alt='MatchFixer' width='260' style='width:260px;max-width:100%;height:auto;display:block;margin:0 auto;' />
+				              </td>
+				            </tr>
+
+				            <!-- SUBJECT BANNER -->
+				            <tr>
+				              <td style='background:linear-gradient(90deg,#0dab76 0%,#0a8f62 100%);padding:13px 40px;text-align:center;'>
+				                <p style='margin:0;font-size:11px;font-weight:700;color:#fff;letter-spacing:2.5px;text-transform:uppercase;'>{HtmlEncoder.Default.Encode(subject)}</p>
+				              </td>
+				            </tr>
+
+				            <!-- CONTENT -->
+				            <tr>
+				              <td style='background-color:#0c1525;padding:40px 40px 32px;'>
+				                <div style='color:#cbd5e1;font-size:15px;line-height:1.8;'>
+				                  {contentHtml}
+				                </div>
+				              </td>
+				            </tr>
+
+				            <!-- FOOTER -->
+				            <tr>
+				              <td style='background-color:#070d1a;padding:20px 40px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);'>
+				                <p style='margin:0;font-size:12px;color:#3d5068;letter-spacing:0.3px;'>All Rights Reserved. MatchFixer ® 2025 – {DateTime.UtcNow.Year}</p>
+				              </td>
+				            </tr>
+
+				          </table>
+				        </td>
+				      </tr>
+				    </table>
 				  </body>
 				</html>";
 		}
@@ -504,6 +528,125 @@ namespace MatchFixer.Common.EmailTemplates
 					</div>
 				</body>
 				</html>";
+		}
+
+		// ══════════════════════════════════════════════════════════════════════
+		// Blast template body snippets 
+		// ══════════════════════════════════════════════════════════════════════
+
+		// Shared inline-CSS constants (email-safe, no flexbox)
+		private const string _ctaBtn   = "display:inline-block;padding:15px 40px;background:linear-gradient(135deg,#0dab76,#0a8f62);color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:16px;letter-spacing:0.5px;box-shadow:0 6px 25px rgba(13,171,118,0.35);";
+		private const string _heroTitle = "margin:14px 0 6px;font-size:26px;color:#fff;font-weight:800;line-height:1.2;";
+		private const string _heroSub   = "margin:0 0 28px;font-size:15px;color:#94a3b8;";
+		private const string _accentTxt = "color:#0dab76;font-weight:600;";
+		private const string _footerTxt = "margin:28px 0 0;font-size:13px;color:#475569;";
+
+		public static string BlastBodyWelcomeBack() => $@"
+<table width='100%' cellpadding='0' cellspacing='0'>
+  <tr><td style='text-align:center;padding:10px 0 32px;'>
+    <p style='font-size:44px;margin:0 0 4px;'>👋</p>
+    <h2 style='{_heroTitle}'>We Miss You</h2>
+    <p style='{_heroSub}'>It&rsquo;s been a while since your last bet on <span style='{_accentTxt}'>MatchFixer</span></p>
+    <p style='color:#cbd5e1;font-size:15px;line-height:1.8;margin:0 0 24px;'>
+      We&rsquo;ve got exciting matches lined up and some big odds waiting to be claimed.<br/>
+      Your next big win could be just one slip away.
+    </p>
+    <table cellpadding='0' cellspacing='0' style='margin:0 auto 28px;background:rgba(13,171,118,0.08);border:1px solid rgba(13,171,118,0.28);border-radius:12px;'>
+      <tr><td style='padding:15px 28px;text-align:center;'>
+        <p style='margin:0;font-size:14px;color:#0dab76;font-weight:600;'>⚽&nbsp; Today&rsquo;s matches are live &mdash; your odds are waiting</p>
+      </td></tr>
+    </table>
+    <a href='[INSERT LINK]' style='{_ctaBtn}'>Back to the Action &rarr;</a>
+    <p style='{_footerTxt}'>Good luck &mdash; The MatchFixer Team</p>
+  </td></tr>
+</table>";
+
+		public static string BlastBodyWorldCup() => $@"
+<table width='100%' cellpadding='0' cellspacing='0'>
+  <tr><td style='text-align:center;padding:10px 0 32px;'>
+    <p style='font-size:50px;margin:0 0 4px;'>🌍</p>
+    <h2 style='{_heroTitle}'>FIFA World Cup 2026</h2>
+    <p style='{_heroSub}'>The biggest stage in football is here</p>
+    <table width='100%' cellpadding='0' cellspacing='0' style='background:linear-gradient(135deg,rgba(13,171,118,0.12),rgba(51,112,168,0.12));border:1px solid rgba(13,171,118,0.22);border-radius:14px;margin-bottom:28px;'>
+      <tr><td style='padding:22px 28px;text-align:center;'>
+        <p style='margin:0 0 10px;font-size:16px;color:#fff;font-weight:700;'>🏆&nbsp; Group Stage &middot; Round of 16 &middot; Quarter-Finals</p>
+        <p style='margin:0;font-size:14px;color:#94a3b8;line-height:1.75;'>
+          New matches drop daily. Back your favourites, call the upsets,<br/>and build your winning slip &mdash; all on <span style='{_accentTxt}'>MatchFixer</span>.
+        </p>
+      </td></tr>
+    </table>
+    <a href='[INSERT LINK]' style='{_ctaBtn}'>Bet on the World Cup &rarr;</a>
+    <p style='{_footerTxt}'>Good luck &mdash; The MatchFixer Team</p>
+  </td></tr>
+</table>";
+
+		public static string BlastBodyWeekend() => $@"
+<table width='100%' cellpadding='0' cellspacing='0'>
+  <tr><td style='text-align:center;padding:10px 0 20px;'>
+    <p style='font-size:44px;margin:0 0 4px;'>⚽</p>
+    <h2 style='{_heroTitle}'>Big Weekend Ahead</h2>
+    <p style='{_heroSub}'>Don&rsquo;t let it pass without your bets placed</p>
+  </td></tr>
+  <tr><td style='padding:0 0 28px;'>
+    <table width='100%' cellpadding='0' cellspacing='0' style='border-left:4px solid #0dab76;background:rgba(255,255,255,0.04);border-radius:0 10px 10px 0;margin-bottom:10px;'>
+      <tr><td style='padding:13px 18px;font-size:14px;color:#e2e8f0;'>🏟️&nbsp; Top-flight leagues with deep markets</td></tr>
+    </table>
+    <table width='100%' cellpadding='0' cellspacing='0' style='border-left:4px solid #3370a8;background:rgba(255,255,255,0.04);border-radius:0 10px 10px 0;margin-bottom:10px;'>
+      <tr><td style='padding:13px 18px;font-size:14px;color:#e2e8f0;'>🌍&nbsp; International action across all competitions</td></tr>
+    </table>
+    <table width='100%' cellpadding='0' cellspacing='0' style='border-left:4px solid #0dab76;background:rgba(255,255,255,0.04);border-radius:0 10px 10px 0;'>
+      <tr><td style='padding:13px 18px;font-size:14px;color:#e2e8f0;'>💰&nbsp; Build your slip and make it count this weekend</td></tr>
+    </table>
+  </td></tr>
+  <tr><td style='text-align:center;padding-bottom:12px;'>
+    <a href='[INSERT LINK]' style='{_ctaBtn}'>View Weekend Fixtures &rarr;</a>
+    <p style='{_footerTxt}'>Good luck &mdash; The MatchFixer Team</p>
+  </td></tr>
+</table>";
+
+		/// <param name="boosts">Sequence of (HomeTeam, AwayTeam, BoostLabel e.g. "+0.25", ExpiryLabel e.g. "12 Jul, 20:00")</param>
+		public static string BlastBodyBoostedMatches(IEnumerable<(string Home, string Away, string Boost, string Until)> boosts)
+		{
+			var sb = new System.Text.StringBuilder();
+			sb.AppendLine($@"
+<table width='100%' cellpadding='0' cellspacing='0'>
+  <tr><td style='text-align:center;padding:10px 0 24px;'>
+    <p style='font-size:44px;margin:0 0 4px;'>🔥</p>
+    <h2 style='margin:12px 0 4px;font-size:26px;color:#fff;font-weight:800;'>Boosted Odds &mdash; Live Now</h2>
+    <p style='margin:0 0 28px;font-size:15px;color:#94a3b8;'>For a limited time only. Grab them before they&rsquo;re gone.</p>
+  </td></tr>
+  <tr><td style='padding-bottom:28px;'>");
+
+			foreach (var (home, away, boost, until) in boosts)
+			{
+				sb.AppendLine($@"
+    <table width='100%' cellpadding='0' cellspacing='0' style='background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.28);border-radius:12px;margin-bottom:10px;'>
+      <tr>
+        <td style='padding:14px 18px;'>
+          <p style='margin:0;font-size:15px;font-weight:700;color:#fff;'>{home} <span style='color:#64748b;font-weight:400;'>vs</span> {away}</p>
+          <p style='margin:5px 0 0;font-size:12px;color:#64748b;'>&#9200; Expires: {until} UTC</p>
+        </td>
+        <td style='padding:14px 18px;text-align:right;white-space:nowrap;vertical-align:middle;'>
+          <table cellpadding='0' cellspacing='0' style='display:inline-table;background:linear-gradient(135deg,#f97316,#dc6011);border-radius:8px;'>
+            <tr><td style='padding:8px 16px;text-align:center;'>
+              <span style='display:block;font-size:15px;font-weight:800;color:#fff;line-height:1.1;'>{boost}</span>
+              <span style='display:block;font-size:9px;color:rgba(255,255,255,0.75);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;'>BOOST</span>
+            </td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>");
+			}
+
+			sb.AppendLine($@"
+  </td></tr>
+  <tr><td style='text-align:center;'>
+    <a href='[INSERT LINK]' style='{_ctaBtn}'>Claim Boosted Odds &rarr;</a>
+    <p style='margin:28px 0 0;font-size:13px;color:#475569;'>Good luck &mdash; The MatchFixer Team</p>
+  </td></tr>
+</table>");
+
+			return sb.ToString();
 		}
 
 		public static string GetMatchNotificationSubject(string favoriteTeam, string opponent)
