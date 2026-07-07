@@ -1,4 +1,5 @@
 ﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Email
+@using System.Text.Json
 @model MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -6,6 +7,7 @@
     var roles = (IEnumerable<string>)(ViewBag.Roles ?? Array.Empty<string>());
     var count = ViewBag.RecipientCount as int?;
     var previewHtml = ViewBag.PreviewHtml as string;
+    var emailTemplates = ViewBag.EmailTemplates as List<EmailTemplateDto> ?? new List<EmailTemplateDto>();
 
     bool showRole = Model.Mode == EmailBlastCommand.RecipientMode.Role;
     bool showStatus = Model.Mode == EmailBlastCommand.RecipientMode.Status;
@@ -106,9 +108,25 @@
 			    </div>
 
 
+			    @if (emailTemplates.Any())
+			    {
+				    <div class="col-12 d-flex justify-content-center">
+					    <div class="email-template-picker-wrap">
+						    <label class="form-label d-block text-center">Load a template</label>
+						    <select id="templatePicker" class="form-select">
+							    <option value="">— select a template —</option>
+							    @foreach (var t in emailTemplates)
+							    {
+								    <option value="@t.Id">@t.Label</option>
+							    }
+						    </select>
+					    </div>
+				    </div>
+			    }
+
 			    <div class="col-md-8 email-subject-container">
 				    <label class="form-label d-block text-center">Subject</label>
-				    <input class="form-control" name="Subject" value="@Model.Subject" required />
+				    <input class="form-control" name="Subject" id="emailSubject" value="@Model.Subject" required />
 			    </div>
 
 			    <div class="col-md-4 email-logourl-container">
@@ -118,7 +136,7 @@
 
 			    <div class="col-12 email-body-container">
 				    <label class="form-label d-block text-center">Body (HTML allowed)</label>
-				    <textarea class="form-control" name="BodyHtml" rows="8" required>@Model.BodyHtml</textarea>
+				    <textarea class="form-control" name="BodyHtml" id="emailBody" rows="8" required>@Model.BodyHtml</textarea>
 			    </div>
 
 			    <div class="col-12 d-flex gap-2 justify-content-center">
@@ -202,6 +220,30 @@
       });
 
       updateFromRadios();
+    })();
+
+    // ── Template picker ────────────────────────────────────────────────────────
+    (function () {
+        const templates = @Html.Raw(JsonSerializer.Serialize(emailTemplates.Select(t => new {
+            id      = t.Id,
+            subject = t.Subject,
+            body    = t.Body
+        })));
+
+        const picker  = document.getElementById('templatePicker');
+        const subject = document.getElementById('emailSubject');
+        const body    = document.getElementById('emailBody');
+        if (!picker) return;
+
+        picker.addEventListener('change', function () {
+            const tpl = templates.find(t => t.id === this.value);
+            if (!tpl) return;
+            if (subject && !subject.value) subject.value = tpl.subject;
+            else if (subject && confirm('Replace the current subject with the template subject?'))
+                subject.value = tpl.subject;
+            if (body && (!body.value.trim() || confirm('Replace the current body with the template body?')))
+                body.value = tpl.body;
+        });
     })();
 </script>
 
