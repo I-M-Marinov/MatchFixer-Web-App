@@ -1,8 +1,7 @@
-﻿using MatchFixer.Common.Identity;
+using MatchFixer.Common.Identity;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Email;
 using MatchFixer.Infrastructure.Security;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand;
@@ -35,11 +34,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				LogoUrl = LogoUrl
 			};
 
-			ViewBag.Roles = await _db.Roles
-				.AsNoTracking()
-				.OrderBy(r => r.Name)
-				.Select(r => r.Name)
-				.ToListAsync();
+			ViewBag.Roles          = await _db.Roles.AsNoTracking().OrderBy(r => r.Name).Select(r => r.Name).ToListAsync();
+			ViewBag.EmailTemplates = await _emailService.GetEmailTemplatesAsync();
 
 			return View(model);
 		}
@@ -54,13 +50,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				return RedirectToAction(nameof(Compose), new { userId = model.UserId });
 			}
 
-			var count = await _emailService.CountRecipientsAsync(model);
-			ViewBag.RecipientCount = count;
-
-			ViewBag.PreviewHtml = MatchFixer.Common.EmailTemplates.EmailTemplates
-				.BlastTemplate(model.Subject, model.BodyHtml);
-
-			ViewBag.Roles = await _db.Roles.AsNoTracking().OrderBy(r => r.Name).Select(r => r.Name).ToListAsync();
+			ViewBag.RecipientCount = await _emailService.CountRecipientsAsync(model);
+			ViewBag.PreviewHtml    = MatchFixer.Common.EmailTemplates.EmailTemplates.BlastTemplate(model.Subject, model.BodyHtml);
+			ViewBag.Roles          = await _db.Roles.AsNoTracking().OrderBy(r => r.Name).Select(r => r.Name).ToListAsync();
+			ViewBag.EmailTemplates = await _emailService.GetEmailTemplatesAsync();
 
 			return View("Compose", model);
 		}
