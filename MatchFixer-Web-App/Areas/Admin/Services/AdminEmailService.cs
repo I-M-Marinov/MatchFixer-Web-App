@@ -4,7 +4,7 @@ using static MatchFixer.Common.Admin.AdminUserServiceConstants;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Email;
-using Microsoft.AspNetCore.Identity.UI.Services; 
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand;
 
@@ -63,6 +63,45 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			return new EmailBlastResult(recipients.Count, sent, skipped);
 		}
 
+
+		public async Task<List<EmailTemplateDto>> GetEmailTemplatesAsync()
+		{
+			var templates = new List<EmailTemplateDto>
+			{
+				new("welcome_back",  "Welcome Back Promotion",          "We Miss You – Come Back and Bet!",              EmailTemplates.BlastBodyWelcomeBack()),
+				new("world_cup",     "World Cup Special",               "🌍 World Cup Bets Are Live – Place Yours Now!", EmailTemplates.BlastBodyWorldCup()),
+				new("weekend_promo", "Weekend Promo",                   "⚽ Big Weekend Ahead – Don't Miss It!",          EmailTemplates.BlastBodyWeekend()),
+			};
+
+			// Boosted-matches template — only when at least one active boost exists
+			var now = DateTime.UtcNow;
+			var activeBoosts = await _db.OddsBoosts
+				.AsNoTracking()
+				.Include(b => b.MatchEvent).ThenInclude(m => m.HomeTeam)
+				.Include(b => b.MatchEvent).ThenInclude(m => m.AwayTeam)
+				.Where(b => b.IsActive && b.StartUtc <= now && b.EndUtc >= now && !b.MatchEvent.IsCancelled)
+				.OrderBy(b => b.MatchEvent.MatchDate)
+				.ToListAsync();
+
+			if (activeBoosts.Any())
+			{
+				var boostData = activeBoosts.Select(b => (
+					Home:  b.MatchEvent.HomeTeam.Name,
+					Away:  b.MatchEvent.AwayTeam.Name,
+					Boost: $"+{b.BoostValue:0.00}",
+					Until: b.EndUtc.ToString("dd MMM, HH:mm")
+				));
+
+				templates.Insert(0, new EmailTemplateDto(
+					Id:      "boosted_matches",
+					Label:   "🔥 Boosted Matches (Active Now)",
+					Subject: "🔥 Boosted Odds Alert – Limited Time Only!",
+					Body:    EmailTemplates.BlastBodyBoostedMatches(boostData)
+				));
+			}
+
+			return templates;
+		}
 
 		private IQueryable<ApplicationUser> BuildRecipientsQuery(EmailBlastCommand cmd)
 		{
