@@ -164,10 +164,14 @@
 
                                     <td class="ft-cell badge status-box bg-info text-dark">
                                         <span class="score-pill">
-                                            @r.HomeScore&nbsp;–&nbsp;@r.AwayScore
-                                            @if (r.HomeWonOnPenalties.HasValue)
+                                            @if (r.HomeWonOnPenalties == true)
                                             {
-                                                <span class="badge bg-warning text-dark ms-1" title="Decided on penalties">P</span>
+                                                <sup class="pen-badge pen-badge--home" title="Won on penalties">P</sup>
+                                            }
+                                            @r.HomeScore&nbsp;–&nbsp;@r.AwayScore
+                                            @if (r.HomeWonOnPenalties == false)
+                                            {
+                                                <sup class="pen-badge pen-badge--away" title="Won on penalties">P</sup>
                                             }
                                         </span>
                                     </td>
@@ -233,10 +237,14 @@
 
                                     <td class="ft-cell badge status-box bg-info text-dark">
                                         <span class="score-pill">
-                                            @r.HomeScore&nbsp;–&nbsp;@r.AwayScore
-                                            @if (r.HomeWonOnPenalties.HasValue)
+                                            @if (r.HomeWonOnPenalties == true)
                                             {
-                                                <span class="badge bg-warning text-dark ms-1" title="Decided on penalties">P</span>
+                                                <sup class="pen-badge pen-badge--home" title="Won on penalties">P</sup>
+                                            }
+                                            @r.HomeScore&nbsp;–&nbsp;@r.AwayScore
+                                            @if (r.HomeWonOnPenalties == false)
+                                            {
+                                                <sup class="pen-badge pen-badge--away" title="Won on penalties">P</sup>
                                             }
                                         </span>
                                     </td>
