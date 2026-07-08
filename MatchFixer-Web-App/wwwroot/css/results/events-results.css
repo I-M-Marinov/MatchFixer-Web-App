@@ -87,6 +87,28 @@
     font-size: 1.1em;
 }
 
+.pen-badge {
+    font-family: sans-serif !important;
+    font-size: 0.6em;
+    font-weight: 800;
+    color: #fff;
+    background: #e67e22;
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+    vertical-align: middle;
+    line-height: 1;
+    letter-spacing: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.pen-badge--home {
+    margin-right: 0.3em;
+}
+
+.pen-badge--away {
+    margin-left: 0.3em;
+}
+
 .past-results-table tbody tr:hover td {
     color: white !important;
     text-shadow: 1px 1px 2px black;
