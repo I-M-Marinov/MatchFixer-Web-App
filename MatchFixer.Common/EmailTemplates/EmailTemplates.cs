@@ -541,7 +541,7 @@ namespace MatchFixer.Common.EmailTemplates
 		private const string _accentTxt = "color:#0dab76;font-weight:600;";
 		private const string _footerTxt = "margin:28px 0 0;font-size:13px;color:#475569;";
 
-		public static string BlastBodyWelcomeBack() => $@"
+		public static string BlastBodyWelcomeBack(string ctaUrl) => $@"
 <table width='100%' cellpadding='0' cellspacing='0'>
   <tr><td style='text-align:center;padding:10px 0 32px;'>
     <p style='font-size:44px;margin:0 0 4px;'>👋</p>
@@ -556,12 +556,12 @@ namespace MatchFixer.Common.EmailTemplates
         <p style='margin:0;font-size:14px;color:#0dab76;font-weight:600;'>⚽&nbsp; Today&rsquo;s matches are live &mdash; your odds are waiting</p>
       </td></tr>
     </table>
-    <a href='[INSERT LINK]' style='{_ctaBtn}'>Back to the Action &rarr;</a>
+    <a href='{HtmlEncoder.Default.Encode(ctaUrl)}' style='{_ctaBtn}'>Back to the Action &rarr;</a>
     <p style='{_footerTxt}'>Good luck &mdash; The MatchFixer Team</p>
   </td></tr>
 </table>";
 
-		public static string BlastBodyWorldCup() => $@"
+		public static string BlastBodyWorldCup(string ctaUrl) => $@"
 <table width='100%' cellpadding='0' cellspacing='0'>
   <tr><td style='text-align:center;padding:10px 0 32px;'>
     <p style='font-size:50px;margin:0 0 4px;'>🌍</p>
@@ -575,12 +575,12 @@ namespace MatchFixer.Common.EmailTemplates
         </p>
       </td></tr>
     </table>
-    <a href='[INSERT LINK]' style='{_ctaBtn}'>Bet on the World Cup &rarr;</a>
+    <a href='{HtmlEncoder.Default.Encode(ctaUrl)}' style='{_ctaBtn}'>Bet on the World Cup &rarr;</a>
     <p style='{_footerTxt}'>Good luck &mdash; The MatchFixer Team</p>
   </td></tr>
 </table>";
 
-		public static string BlastBodyWeekend() => $@"
+		public static string BlastBodyWeekend(string ctaUrl) => $@"
 <table width='100%' cellpadding='0' cellspacing='0'>
   <tr><td style='text-align:center;padding:10px 0 20px;'>
     <p style='font-size:44px;margin:0 0 4px;'>⚽</p>
@@ -599,13 +599,14 @@ namespace MatchFixer.Common.EmailTemplates
     </table>
   </td></tr>
   <tr><td style='text-align:center;padding-bottom:12px;'>
-    <a href='[INSERT LINK]' style='{_ctaBtn}'>View Weekend Fixtures &rarr;</a>
+    <a href='{HtmlEncoder.Default.Encode(ctaUrl)}' style='{_ctaBtn}'>View Weekend Fixtures &rarr;</a>
     <p style='{_footerTxt}'>Good luck &mdash; The MatchFixer Team</p>
   </td></tr>
 </table>";
 
 		/// <param name="boosts">Sequence of (HomeTeam, AwayTeam, BoostLabel e.g. "+0.25", ExpiryLabel e.g. "12 Jul, 20:00")</param>
-		public static string BlastBodyBoostedMatches(IEnumerable<(string Home, string Away, string Boost, string Until)> boosts)
+		/// <param name="ctaUrl">Absolute URL the CTA button should point to.</param>
+		public static string BlastBodyBoostedMatches(IEnumerable<(string Home, string Away, string Boost, string Until)> boosts, string ctaUrl)
 		{
 			var sb = new System.Text.StringBuilder();
 			sb.AppendLine($@"
@@ -641,7 +642,7 @@ namespace MatchFixer.Common.EmailTemplates
 			sb.AppendLine($@"
   </td></tr>
   <tr><td style='text-align:center;'>
-    <a href='[INSERT LINK]' style='{_ctaBtn}'>Claim Boosted Odds &rarr;</a>
+    <a href='{HtmlEncoder.Default.Encode(ctaUrl)}' style='{_ctaBtn}'>Claim Boosted Odds &rarr;</a>
     <p style='margin:28px 0 0;font-size:13px;color:#475569;'>Good luck &mdash; The MatchFixer Team</p>
   </td></tr>
 </table>");
