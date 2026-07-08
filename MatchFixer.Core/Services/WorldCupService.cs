@@ -332,43 +332,36 @@ namespace MatchFixer.Core.Services
 					&& apiEventIds.Contains(m.ApiEventId.Value))
 				.ToListAsync();
 
+			// Build stage date map once — used to infer stage for fixtures missing intRound.
+			var stageDateMap = BuildStageDateMap(knockoutFixtures);
+
 			var updatedCount = 0;
 
 			foreach (var fixture in knockoutFixtures)
 			{
 				if (!int.TryParse(fixture.EventId, out var apiId))
-				{
 					continue;
-				}
 
-				var match = existingMatches
-					.FirstOrDefault(m => m.ApiEventId == apiId);
-
+				var match = existingMatches.FirstOrDefault(m => m.ApiEventId == apiId);
 				if (match == null)
-				{
 					continue;
-				}
 
 				match.HomeTeam = fixture.HomeTeam;
 				match.AwayTeam = fixture.AwayTeam;
 				match.HomeLogo = fixture.HomeBadge ?? match.HomeLogo;
 				match.AwayLogo = fixture.AwayBadge ?? match.AwayLogo;
 
-				match.HomeScore =
-					int.TryParse(fixture.HomeScore, out var hs)
-						? hs
-						: null;
+				match.HomeScore  = int.TryParse(fixture.HomeScore, out var hs)  ? hs  : null;
+				match.AwayScore  = int.TryParse(fixture.AwayScore, out var aws) ? aws : null;
+				match.IsFinished = fixture.Status == StatusMatchFinished;
+				match.IsLive     = fixture.Status == StatusLive;
 
-				match.AwayScore =
-					int.TryParse(fixture.AwayScore, out var aws)
-						? aws
-						: null;
-
-				match.IsFinished =
-					fixture.Status == StatusMatchFinished;
-
-				match.IsLive =
-					fixture.Status == StatusLive;
+				// Re-classify stage when API now has intRound, or infer from date.
+				var updatedStage = ParseWorldCupStageFromRound(fixture.Round, fixture.Group);
+				if (updatedStage is null && DateTime.TryParse($"{fixture.Date} {fixture.Time}", out var kickoff))
+					updatedStage = InferStageFromDate(kickoff, stageDateMap);
+				if (updatedStage.HasValue && updatedStage.Value != WorldCupStage.GroupStage)
+					match.Stage = updatedStage.Value;
 
 				updatedCount++;
 			}
@@ -427,13 +420,24 @@ namespace MatchFixer.Core.Services
 			var maxPosition = await _context.WorldCupMatches
 				.MaxAsync(m => (int?)m.RoundPosition) ?? 0;
 
+			// Build a stage→date map from fixtures whose intRound IS known so we can
+			// infer the stage of fixtures where the API hasn't assigned intRound yet.
+			var stageDateMap = BuildStageDateMap(knockoutFixtures);
+
 			var newMatches = new List<WorldCupMatch>();
 
 			foreach (var fixture in knockoutFixtures)
 			{
-				var stage = ParseWorldCupStageFromRound(
-					fixture.Round,
-					fixture.Group);
+				var stage = ParseWorldCupStageFromRound(fixture.Round, fixture.Group);
+
+				// If intRound is missing, fall back to date-based inference.
+				// e.g. a fixture dated after the last R16 match → Quarter-Final.
+				if (stage is null && DateTime.TryParse($"{fixture.Date} {fixture.Time}", out var kickoffForInference))
+					stage = InferStageFromDate(kickoffForInference, stageDateMap);
+
+				// Still unknown — skip until the API provides usable data.
+				if (stage is null)
+					continue;
 
 				newMatches.Add(new WorldCupMatch
 				{
@@ -464,7 +468,7 @@ namespace MatchFixer.Core.Services
 							? aws
 							: null,
 
-					Stage = stage,
+					Stage = stage.Value,
 					GroupName = null,
 					IsKnockout = true,
 					IsFinished = fixture.Status == StatusMatchFinished,
@@ -479,50 +483,140 @@ namespace MatchFixer.Core.Services
 			return newMatches.Count;
 		}
 
-		private static WorldCupStage ParseWorldCupStageFromRound(
+		/// <summary>
+		/// Maps TheSportsDB <c>intRound</c> + <c>strGroup</c> to a <see cref="WorldCupStage"/>.
+		/// Returns <c>null</c> when the stage cannot be determined from the round value alone.
+		/// Callers should attempt date-based inference before giving up.
+		/// </summary>
+		private static WorldCupStage? ParseWorldCupStageFromRound(
 			string? round,
 			string? group = null)
 		{
-			// TheSportsDB uses intRound as the literal remaining-team count:
-			//   1, 2, 3  → Group Stage matchdays (strGroup is non-empty, e.g. "A")
-			//   32       → Round of 32
-			//   16       → Round of 16
-			//   8        → Quarter-Final
-			//   4        → Semi-Final
-			//   3        → Third Place (intRound=3 but strGroup is empty)
-			//   2 or 1   → Final
+			// TheSportsDB uses intRound as the literal remaining-team count for 2026:
+			//   1, 2, 3 with strGroup  → Group Stage matchdays
+			//   32                     → Round of 32
+			//   16                     → Round of 16
+			//   8                      → Quarter-Final
+			//   4                      → Semi-Final
+			//   3 with no strGroup     → Third Place play-off
+			//   1 or 2 with no strGroup→ Final
 			if (int.TryParse(round, out var intRound))
 			{
-				// intRound 1, 2, 3 are ambiguous: could be group-stage matchdays OR knockout rounds.
-				// Disambiguate via strGroup — knockout fixtures have an empty/null group.
+				// intRound 1–3 are ambiguous: group matchday OR late-stage knockout.
+				// Disambiguate via strGroup presence.
 				if (intRound <= 3 && !string.IsNullOrWhiteSpace(group))
 					return WorldCupStage.GroupStage;
 
 				return intRound switch
 				{
-					1 or 2 => WorldCupStage.Final,        // 2 teams remain → Final (group is empty)
-					3      => WorldCupStage.ThirdPlace,   // 3 teams but group is empty → 3rd place
+					1 or 2 => WorldCupStage.Final,
+					3      => WorldCupStage.ThirdPlace,
 					4      => WorldCupStage.SemiFinal,
 					8      => WorldCupStage.QuarterFinal,
 					16     => WorldCupStage.RoundOf16,
 					32     => WorldCupStage.RoundOf32,
-					_      => WorldCupStage.GroupStage    // unknown → safer to treat as group stage
+					_      => null   // unrecognised number — try date inference
 				};
 			}
 
-			if (string.IsNullOrWhiteSpace(round))
+			// Empty/null round with a known group → Group Stage.
+			if (!string.IsNullOrWhiteSpace(group))
 				return WorldCupStage.GroupStage;
 
-			// Fallback: text-based matching for any future API changes.
-			var r = round.ToLower();
-			if (r.Contains("round of 32")) return WorldCupStage.RoundOf32;
-			if (r.Contains("round of 16")) return WorldCupStage.RoundOf16;
-			if (r.Contains("quarter"))     return WorldCupStage.QuarterFinal;
-			if (r.Contains("semi"))        return WorldCupStage.SemiFinal;
-			if (r.Contains("third"))       return WorldCupStage.ThirdPlace;
-			if (r.Contains("final"))       return WorldCupStage.Final;
+			// Fallback: text-based matching for non-numeric round strings.
+			if (!string.IsNullOrWhiteSpace(round))
+			{
+				var r = round.ToLower();
+				if (r.Contains("round of 32")) return WorldCupStage.RoundOf32;
+				if (r.Contains("round of 16")) return WorldCupStage.RoundOf16;
+				if (r.Contains("quarter"))     return WorldCupStage.QuarterFinal;
+				if (r.Contains("semi"))        return WorldCupStage.SemiFinal;
+				if (r.Contains("third"))       return WorldCupStage.ThirdPlace;
+				if (r.Contains("final"))       return WorldCupStage.Final;
+			}
 
-			return WorldCupStage.GroupStage;
+			// round is empty/null AND group is empty/null: definitely a knockout fixture
+			// but the API hasn't provided intRound yet — caller must use date inference.
+			return null;
+		}
+
+		/// <summary>
+		/// Infers the knockout stage for a fixture whose <c>intRound</c> is missing,
+		/// by comparing its date to the date ranges of other fixtures that DO have a
+		/// known stage.  Knockout stages are chronologically ordered, so if a fixture
+		/// falls after the last Round-of-16 date it must be a Quarter-Final, etc.
+		/// </summary>
+		private static WorldCupStage? InferStageFromDate(
+			DateTime matchDate,
+			IReadOnlyDictionary<WorldCupStage, (DateTime Min, DateTime Max)> stageDateMap)
+		{
+			// Chronological knockout order
+			var order = new[]
+			{
+				WorldCupStage.RoundOf32,
+				WorldCupStage.RoundOf16,
+				WorldCupStage.QuarterFinal,
+				WorldCupStage.SemiFinal,
+				WorldCupStage.ThirdPlace,
+				WorldCupStage.Final,
+			};
+
+			// 1. Exact date-window match (date falls within a known stage's range)
+			foreach (var stage in order)
+			{
+				if (!stageDateMap.TryGetValue(stage, out var range)) continue;
+				if (matchDate.Date >= range.Min.Date && matchDate.Date <= range.Max.Date)
+					return stage;
+			}
+
+			// 2. Gap inference: if the date falls in the gap between two consecutive
+			//    known stages, it belongs to the later of the two.
+			for (int i = 0; i < order.Length - 1; i++)
+			{
+				var curr = order[i];
+				var next = order[i + 1];
+				if (!stageDateMap.TryGetValue(curr, out var currRange)) continue;
+				if (!stageDateMap.TryGetValue(next, out var nextRange)) continue;
+
+				if (matchDate.Date > currRange.Max.Date && matchDate.Date < nextRange.Min.Date)
+					return next;
+			}
+
+			// 3. After the last known stage — it belongs to the following stage in order.
+			for (int i = order.Length - 1; i >= 0; i--)
+			{
+				if (!stageDateMap.TryGetValue(order[i], out var range)) continue;
+				if (matchDate.Date > range.Max.Date && i + 1 < order.Length)
+					return order[i + 1];
+				break;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Builds a stage → (earliest date, latest date) map from the subset of
+		/// knockout fixtures whose <c>intRound</c> is already known.
+		/// </summary>
+		private static Dictionary<WorldCupStage, (DateTime Min, DateTime Max)>
+			BuildStageDateMap(IEnumerable<WorldCupFixtureApiDto> knockoutFixtures)
+		{
+			var map = new Dictionary<WorldCupStage, (DateTime Min, DateTime Max)>();
+
+			foreach (var f in knockoutFixtures)
+			{
+				var stage = ParseWorldCupStageFromRound(f.Round, f.Group);
+				if (stage is null || stage == WorldCupStage.GroupStage) continue;
+				if (!DateTime.TryParse($"{f.Date} {f.Time}", out var d)) continue;
+
+				if (map.TryGetValue(stage.Value, out var existing))
+					map[stage.Value] = (d < existing.Min ? d : existing.Min,
+					                    d > existing.Max ? d : existing.Max);
+				else
+					map[stage.Value] = (d, d);
+			}
+
+			return map;
 		}
 
 		private int ParseInt(string? value)
