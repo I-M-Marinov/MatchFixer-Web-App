@@ -4,6 +4,7 @@ using static MatchFixer.Common.Admin.AdminUserServiceConstants;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Email;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using static MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand;
@@ -13,12 +14,21 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 	public class AdminEmailService : IAdminEmailService
 	{
 		private readonly MatchFixerDbContext _db;
-		private readonly IEmailSender _email; 
+		private readonly IEmailSender _email;
+		private readonly IHttpContextAccessor _http;
 
-		public AdminEmailService(MatchFixerDbContext db, IEmailSender email)
+		public AdminEmailService(MatchFixerDbContext db, IEmailSender email, IHttpContextAccessor http)
 		{
-			_db = db;
+			_db   = db;
 			_email = email;
+			_http  = http;
+		}
+
+		// Builds an absolute base URL (scheme + host) 
+		private string BaseUrl()
+		{
+			var req = _http.HttpContext?.Request;
+			return req is null ? "" : $"{req.Scheme}://{req.Host}";
 		}
 
 		public async Task<int> CountRecipientsAsync(EmailBlastCommand cmd)
@@ -66,11 +76,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 		public async Task<List<EmailTemplateDto>> GetEmailTemplatesAsync()
 		{
+			var baseUrl = BaseUrl();
+
 			var templates = new List<EmailTemplateDto>
 			{
-				new("welcome_back",  "Welcome Back Promotion",          "We Miss You – Come Back and Bet!",              EmailTemplates.BlastBodyWelcomeBack()),
-				new("world_cup",     "World Cup Special",               "🌍 World Cup Bets Are Live – Place Yours Now!", EmailTemplates.BlastBodyWorldCup()),
-				new("weekend_promo", "Weekend Promo",                   "⚽ Big Weekend Ahead – Don't Miss It!",          EmailTemplates.BlastBodyWeekend()),
+				new("welcome_back",  "Welcome Back Promotion",          "We Miss You – Come Back and Bet!",              EmailTemplates.BlastBodyWelcomeBack($"{baseUrl}/")),
+				new("world_cup",     "World Cup Special",               "🌍 World Cup Bets Are Live – Place Yours Now!", EmailTemplates.BlastBodyWorldCup($"{baseUrl}/WorldCup/WorldCup")),
+				new("weekend_promo", "Weekend Promo",                   "⚽ Big Weekend Ahead – Don't Miss It!",          EmailTemplates.BlastBodyWeekend($"{baseUrl}/")),
 			};
 
 			// Boosted-matches template — only when at least one active boost exists
@@ -96,7 +108,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					Id:      "boosted_matches",
 					Label:   "🔥 Boosted Matches (Active Now)",
 					Subject: "🔥 Boosted Odds Alert – Limited Time Only!",
-					Body:    EmailTemplates.BlastBodyBoostedMatches(boostData)
+					Body:    EmailTemplates.BlastBodyBoostedMatches(boostData, $"{baseUrl}/")
 				));
 			}
 
