@@ -4,16 +4,37 @@ using MatchFixer.Infrastructure;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Events;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MatchFixer_Web_App.Areas.Admin.Services
 {
 	public class AdminEventService: IAdminEventsService
 	{
 		private readonly MatchFixerDbContext _db;
+		private readonly IMemoryCache _cache;
 
-		public AdminEventService(MatchFixerDbContext db)
+		private static readonly MemoryCacheEntryOptions AggCacheOpts =
+			new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+
+		// Cache key derived from filter fields that affect aggregate results (not Page/PageSize)
+		private static string AggCacheKey(AdminEventHistoryFilters f) =>
+			$"hist:agg:{f.FromDate:yyyyMMdd}:{f.ToDate:yyyyMMdd}:{f.League}:{f.TeamId}";
+
+		private static string TeamStatsCacheKey(AdminEventHistoryFilters f) =>
+			$"hist:teams:{f.FromDate:yyyyMMdd}:{f.ToDate:yyyyMMdd}:{f.League}:{f.TeamId}";
+
+		private sealed record AggregateCache(
+			decimal AllStake,
+			decimal AllPayout,
+			decimal AllLoss,
+			decimal AllPositive,
+			List<EventLeagueStat> LeagueStats
+		);
+
+		public AdminEventService(MatchFixerDbContext db, IMemoryCache cache)
 		{
-			_db = db;
+			_db    = db;
+			_cache = cache;
 		}
 
 		public async Task<PaginatedEventList<AdminEventOverviewDto>> GetFinishedEventsAsync(AdminEventHistoryFilters filters)
@@ -191,80 +212,90 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			}).ToList();
 
-			// Aggregate totals across ALL filtered events 
+			// Aggregate totals across ALL filtered events — cached by filter key (not page)
+			if (!_cache.TryGetValue(AggCacheKey(filters), out AggregateCache? agg))
+			{
+				var legCountSubquery = _db.Bets.AsNoTracking()
+					.GroupBy(b => b.BetSlipId)
+					.Select(g => new { BetSlipId = g.Key, Count = g.Count() });
 
-			var legCountSubquery = _db.Bets.AsNoTracking()
-				.GroupBy(b => b.BetSlipId)
-				.Select(g => new { BetSlipId = g.Key, Count = g.Count() });
+				var allBetRows = await (
+					from b  in _db.Bets.AsNoTracking()
+					join m  in baseQuery                   on b.MatchEventId equals m.Id
+					join bs in _db.BetSlips.AsNoTracking() on b.BetSlipId    equals bs.Id
+					join lc in legCountSubquery            on b.BetSlipId    equals lc.BetSlipId
+					join ht in _db.Teams.AsNoTracking()    on m.HomeTeamId   equals ht.Id
+					select new
+					{
+						b.MatchEventId,
+						b.Odds,
+						bs.Amount,
+						bs.IsSettled,
+						bs.WinAmount,
+						lc.Count,
+						LeagueName = (m.CompetitionName == null || m.CompetitionName == "")
+							? ht.LeagueName
+							: m.CompetitionName == "FIFA World Cup"
+								? "FIFA World Cup"
+								: "Rest of World"
+					}
+				).ToListAsync();
 
-			var allBetRows = await (
-				from b  in _db.Bets.AsNoTracking()
-				join m  in baseQuery                   on b.MatchEventId equals m.Id
-				join bs in _db.BetSlips.AsNoTracking() on b.BetSlipId    equals bs.Id
-				join lc in legCountSubquery            on b.BetSlipId    equals lc.BetSlipId
-				join ht in _db.Teams.AsNoTracking()    on m.HomeTeamId   equals ht.Id
-				select new
-				{
-					b.MatchEventId,
-					b.Odds,
-					bs.Amount,
-					bs.IsSettled,
-					bs.WinAmount,
-					lc.Count,
-					LeagueName = (m.CompetitionName == null || m.CompetitionName == "")
-						? ht.LeagueName
-						: m.CompetitionName == "FIFA World Cup"
-							? "FIFA World Cup"
-							: "Rest of World"
-				}
-			).ToListAsync();
+				var perEventAggs = allBetRows
+					.GroupBy(b => b.MatchEventId)
+					.Select(g => new
+					{
+						LeagueName = g.First().LeagueName,
+						Stake  = g.Sum(b => b.Amount / (decimal)b.Count),
+						Payout = g.Where(b => b.IsSettled
+										  && b.WinAmount.HasValue
+										  && b.WinAmount > b.Amount)
+								  .Sum(b => (b.Amount / (decimal)b.Count) * b.Odds)
+					})
+					.ToList();
 
-			var perEventAggs = allBetRows
-				.GroupBy(b => b.MatchEventId)
-				.Select(g => new
-				{
-					LeagueName = g.First().LeagueName,
-					Stake  = g.Sum(b => b.Amount / (decimal)b.Count),
-					Payout = g.Where(b => b.IsSettled
-									  && b.WinAmount.HasValue
-									  && b.WinAmount > b.Amount)
-							  .Sum(b => (b.Amount / (decimal)b.Count) * b.Odds)
-				})
-				.ToList();
+				var leagueStats = perEventAggs
+					.GroupBy(e => e.LeagueName)
+					.Select(g => new EventLeagueStat
+					{
+						League      = g.Key ?? "Unknown",
+						TotalProfit = g.Sum(e => e.Stake - e.Payout),
+						EventCount  = g.Count()
+					})
+					.OrderByDescending(x => x.TotalProfit)
+					.ToList();
 
-			decimal allStake = perEventAggs.Sum(e => e.Stake);
-			decimal allPayout = perEventAggs.Sum(e => e.Payout);
-			decimal allLoss = perEventAggs.Where(e => e.Stake - e.Payout < 0).Sum(e => e.Stake - e.Payout);
-			decimal allPositive = perEventAggs.Where(e => e.Stake - e.Payout > 0).Sum(e => e.Stake - e.Payout);
+				agg = new AggregateCache(
+					AllStake    : perEventAggs.Sum(e => e.Stake),
+					AllPayout   : perEventAggs.Sum(e => e.Payout),
+					AllLoss     : perEventAggs.Where(e => e.Stake - e.Payout < 0).Sum(e => e.Stake - e.Payout),
+					AllPositive : perEventAggs.Where(e => e.Stake - e.Payout > 0).Sum(e => e.Stake - e.Payout),
+					LeagueStats : leagueStats
+				);
 
-			var allLeagueStats = perEventAggs
-				.GroupBy(e => e.LeagueName)
-				.Select(g => new EventLeagueStat
-				{
-					League      = g.Key ?? "Unknown",
-					TotalProfit = g.Sum(e => e.Stake - e.Payout),
-					EventCount  = g.Count()
-				})
-				.OrderByDescending(x => x.TotalProfit)
-				.ToList();
+				_cache.Set(AggCacheKey(filters), agg, AggCacheOpts);
+			}
 
 			return new PaginatedEventList<AdminEventOverviewDto>
 			{
-				Items = result,
-				Page= page,
-				PageSize = pageSize,
-				TotalCount = totalCount,
-				AllEventsStake = allStake,
-				AllEventsPayout = allPayout,
-				AllEventsLoss = allLoss,
-				AllEventsPositive = allPositive,
-				AllEventsLeagueStats = allLeagueStats
+				Items                = result,
+				Page                 = page,
+				PageSize             = pageSize,
+				TotalCount           = totalCount,
+				AllEventsStake       = agg!.AllStake,
+				AllEventsPayout      = agg.AllPayout,
+				AllEventsLoss        = agg.AllLoss,
+				AllEventsPositive    = agg.AllPositive,
+				AllEventsLeagueStats = agg.LeagueStats
 			};
 		}
 
 		public async Task<List<AdminTeamBettingStatsDto>>
 		GetTeamBettingStatsAsync(AdminEventHistoryFilters filters)
 		{
+			if (_cache.TryGetValue(TeamStatsCacheKey(filters), out List<AdminTeamBettingStatsDto>? cached))
+				return cached!;
+
 			var betsQuery = _db.Bets
 				.AsNoTracking()
 				.Where(b =>
@@ -339,6 +370,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				})
 				.OrderByDescending(x => x.TotalBets)
 				.ToList();
+
+			_cache.Set(TeamStatsCacheKey(filters), teamStats, AggCacheOpts);
 
 			return teamStats;
 		}
