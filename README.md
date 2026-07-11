@@ -217,6 +217,12 @@
   <img src="./updated-admin-dashboard-view.png" align="center" border="10" width="600px"/>
 </p>
 
+<h3 align="center">Updated Manual Match Event Add + Draw option ( on/off ) and Auto Generation of odds</h3>
+
+<p align="center">
+  <img src="./manual-event-updated.png" align="center" border="10" width="600px"/>
+</p>
+
 <h3 align="center">World Cup 2026 View</h3>
 
 <p align="center">
