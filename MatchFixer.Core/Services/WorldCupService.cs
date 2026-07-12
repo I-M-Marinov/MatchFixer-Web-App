@@ -368,6 +368,14 @@ namespace MatchFixer.Core.Services
 
 			await _context.SaveChangesAsync();
 
+			var allKnockout = await _context.WorldCupMatches
+				.Where(m => m.IsKnockout)
+				.OrderBy(m => m.MatchDate)
+				.ToListAsync();
+
+			CapKnockoutStages(allKnockout);
+			await _context.SaveChangesAsync();
+
 			return updatedCount;
 		}
 
@@ -476,6 +484,10 @@ namespace MatchFixer.Core.Services
 					RoundPosition = ++maxPosition
 				});
 			}
+
+			// Correct any stages that were over-assigned due to API returning the same
+			// intRound value for multiple stages (e.g. intRound=8 for both QF and SF).
+			CapKnockoutStages(newMatches);
 
 			await _context.WorldCupMatches.AddRangeAsync(newMatches);
 			await _context.SaveChangesAsync();
@@ -592,6 +604,53 @@ namespace MatchFixer.Core.Services
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Maximum number of fixtures allowed per knockout stage in the 48-team 2026 World Cup.
+		/// TheSportsDB sometimes assigns the same <c>intRound</c> value (e.g. 8) to both
+		/// Quarter-Finals and Semi-Finals, causing later matches to be misclassified.
+		/// After the main classification loop, <see cref="CapKnockoutStages"/> redistributes
+		/// any excess fixtures to the chronologically next stage.
+		/// </summary>
+		private static readonly Dictionary<WorldCupStage, (int Max, WorldCupStage Next)> StageCaps = new()
+		{
+			{ WorldCupStage.RoundOf32,    (16, WorldCupStage.RoundOf16)    },
+			{ WorldCupStage.RoundOf16,    ( 8, WorldCupStage.QuarterFinal) },
+			{ WorldCupStage.QuarterFinal, ( 4, WorldCupStage.SemiFinal)    },
+			{ WorldCupStage.SemiFinal,    ( 2, WorldCupStage.ThirdPlace)   },
+		};
+
+		/// <summary>
+		/// Corrects over-assigned knockout stages by capping each stage at its known
+		/// maximum and re-labelling chronologically later fixtures to the next stage.
+		/// Processed in forward order so cascading corrections propagate correctly
+		/// (e.g. QF overflow → SF, SF overflow → ThirdPlace).
+		/// </summary>
+		private static void CapKnockoutStages(List<WorldCupMatch> matches)
+		{
+			var order = new[]
+			{
+				WorldCupStage.RoundOf32,
+				WorldCupStage.RoundOf16,
+				WorldCupStage.QuarterFinal,
+				WorldCupStage.SemiFinal,
+			};
+
+			foreach (var stage in order)
+			{
+				if (!StageCaps.TryGetValue(stage, out var cap)) continue;
+
+				var stageMatches = matches
+					.Where(m => m.Stage == stage)
+					.OrderBy(m => m.MatchDate)
+					.ToList();
+
+				if (stageMatches.Count <= cap.Max) continue;
+
+				foreach (var m in stageMatches.Skip(cap.Max))
+					m.Stage = cap.Next;
+			}
 		}
 
 		/// <summary>
