@@ -424,6 +424,14 @@ namespace MatchFixer.Core.Services
 				return 0;
 			}
 
+			// Sort by date + time so RoundPosition reflects chronological (bracket) order.
+			// Same-day matches are from the same bracket half, which ensures correct
+			// visual grouping (e.g. QF[0]+QF[1] → SF[0], QF[2]+QF[3] → SF[1]).
+			knockoutFixtures = knockoutFixtures
+				.OrderBy(f => f.Date)
+				.ThenBy(f => f.Time)
+				.ToList();
+
 			// Determine the next RoundPosition to avoid collisions with existing group-stage rows.
 			var maxPosition = await _context.WorldCupMatches
 				.MaxAsync(m => (int?)m.RoundPosition) ?? 0;
