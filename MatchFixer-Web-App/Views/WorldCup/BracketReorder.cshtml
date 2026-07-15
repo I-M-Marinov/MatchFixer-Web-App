@@ -1,0 +1,313 @@
+@using MatchFixer.Common.Enums
+@using MatchFixer.Core.ViewModels.WordCup
+@model List<BracketMatchOrderDto>
+
+@{
+    ViewData["Title"] = "Bracket Reorder";
+
+    var stageOrder = new[]
+    {
+        WorldCupStage.RoundOf32,
+        WorldCupStage.RoundOf16,
+        WorldCupStage.QuarterFinal,
+        WorldCupStage.SemiFinal,
+        WorldCupStage.ThirdPlace,
+        WorldCupStage.Final,
+    };
+
+    var stageLabels = new Dictionary<WorldCupStage, string>
+    {
+        { WorldCupStage.RoundOf32,    "Round of 32"    },
+        { WorldCupStage.RoundOf16,    "Round of 16"    },
+        { WorldCupStage.QuarterFinal, "Quarter Finals"  },
+        { WorldCupStage.SemiFinal,    "Semi Finals"     },
+        { WorldCupStage.ThirdPlace,   "Third Place"     },
+        { WorldCupStage.Final,        "Final"           },
+    };
+
+    var byStage = Model
+        .GroupBy(m => m.Stage)
+        .ToDictionary(g => g.Key, g => g.OrderBy(m => m.RoundPosition).ToList());
+}
+
+<link rel="stylesheet" href="~/css/world-cup/world-cup.css" />
+
+<style>
+    .br-page {
+        max-width: 820px;
+        margin: 2rem auto;
+        padding: 0 1rem 4rem;
+        color: #e8eaf0;
+    }
+
+    .br-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .br-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #d4b700;
+        letter-spacing: 0.04em;
+    }
+
+    .br-back {
+        color: #0dab76;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .br-back:hover { color: #0ecc8d; }
+
+    .br-stage-card {
+        background: #0c1525;
+        border: 1px solid rgba(13,171,118,.25);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .br-stage-header {
+        background: rgba(13,171,118,.12);
+        padding: 0.65rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #0dab76;
+        border-bottom: 1px solid rgba(13,171,118,.2);
+    }
+
+    .br-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .br-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1rem;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+        cursor: grab;
+        user-select: none;
+        transition: background 0.15s;
+    }
+
+    .br-item:last-child { border-bottom: none; }
+    .br-item:hover { background: rgba(255,255,255,.04); }
+    .br-item.sortable-chosen { background: rgba(13,171,118,.15); cursor: grabbing; }
+    .br-item.sortable-ghost { opacity: 0.35; }
+
+    .br-handle {
+        color: #4a5568;
+        font-size: 1rem;
+        flex-shrink: 0;
+        cursor: grab;
+    }
+
+    .br-pos {
+        width: 24px;
+        text-align: center;
+        font-size: 0.7rem;
+        color: #4a5568;
+        flex-shrink: 0;
+    }
+
+    .br-logo {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .br-name {
+        font-size: 0.82rem;
+        font-weight: 600;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .br-score {
+        font-size: 0.75rem;
+        color: #0dab76;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .br-score.pending { color: #4a5568; }
+
+    .br-save-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #070d1a;
+        border-top: 1px solid rgba(13,171,118,.3);
+        padding: 0.9rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        z-index: 100;
+    }
+
+    .br-status {
+        font-size: 0.82rem;
+        color: #4a5568;
+        flex: 1;
+    }
+
+    .br-status.success { color: #0dab76; }
+    .br-status.error   { color: #e53e3e; }
+
+    .br-btn-save {
+        background: #0dab76;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.55rem 1.4rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .br-btn-save:hover { background: #0ecc8d; }
+    .br-btn-save:disabled { background: #2d3748; color: #4a5568; cursor: not-allowed; }
+</style>
+
+<div class="br-page">
+
+    <div class="br-header">
+        <span class="br-title"><i class="bi bi-arrows-move me-2"></i>Bracket Reorder</span>
+        <a class="br-back" href="@Url.Action("WorldCup", "WorldCup")">
+            <i class="bi bi-arrow-left"></i> Back to World Cup
+        </a>
+    </div>
+
+    <p style="font-size:0.82rem; color:#6b7280; margin-bottom:1.5rem;">
+        Drag rows within each stage to set the correct bracket position order.
+        The first two matches in a stage form the top bracket half; the next two form the bottom half.
+        Click <strong style="color:#0dab76">Save Order</strong> when done.
+    </p>
+
+    @foreach (var stage in stageOrder)
+    {
+        if (!byStage.TryGetValue(stage, out var matches) || matches.Count == 0)
+            continue;
+
+        <div class="br-stage-card">
+            <div class="br-stage-header">@stageLabels[stage]</div>
+            <ul class="br-list" data-stage="@((int)stage)">
+                @foreach (var m in matches)
+                {
+                    var hasScore = m.HomeScore.HasValue && m.AwayScore.HasValue;
+                    <li class="br-item" data-id="@m.Id">
+                        <span class="br-handle"><i class="bi bi-grip-vertical"></i></span>
+                        <span class="br-pos">@m.RoundPosition</span>
+                        <img class="br-logo" src="@m.HomeLogo" alt="@m.HomeTeam" />
+                        <span class="br-name">@m.HomeTeam vs @m.AwayTeam</span>
+                        <img class="br-logo" src="@m.AwayLogo" alt="@m.AwayTeam" />
+                        @if (hasScore)
+                        {
+                            <span class="br-score">@m.HomeScore – @m.AwayScore</span>
+                        }
+                        else
+                        {
+                            <span class="br-score pending">TBD</span>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+</div>
+
+<!-- Fixed save bar -->
+<div class="br-save-bar">
+    <span class="br-status" id="saveStatus">Drag to reorder, then save.</span>
+    <button class="br-btn-save" id="saveBtn" onclick="saveOrder()">
+        <i class="bi bi-floppy-fill me-1"></i> Save Order
+    </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+    // Initialise SortableJS on every stage list
+    document.querySelectorAll('.br-list').forEach(list => {
+        Sortable.create(list, {
+            animation: 150,
+            handle: '.br-handle',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: updatePositionLabels
+        });
+    });
+
+    function updatePositionLabels() {
+        document.querySelectorAll('.br-list').forEach(list => {
+            // Collect the global starting position offset from first item's current label
+            // so we don't renumber across stages — we just show 1-based within-list index
+            list.querySelectorAll('.br-item').forEach((item, idx) => {
+                item.querySelector('.br-pos').textContent = idx + 1;
+            });
+        });
+        document.getElementById('saveStatus').textContent = 'Unsaved changes — click Save Order.';
+        document.getElementById('saveStatus').className = 'br-status';
+    }
+
+    async function saveOrder() {
+        const btn = document.getElementById('saveBtn');
+        const status = document.getElementById('saveStatus');
+
+        btn.disabled = true;
+        status.textContent = 'Saving…';
+        status.className = 'br-status';
+
+        // Build payload: assign sequential positions within each stage,
+        // offset by stage order so positions don't collide across stages.
+        const stageOrder = [1, 2, 3, 4, 5, 6]; // WorldCupStage enum values
+        const payload = [];
+        let globalBase = 1;
+
+        document.querySelectorAll('.br-list').forEach(list => {
+            const items = list.querySelectorAll('.br-item');
+            items.forEach((item, idx) => {
+                payload.push({ id: parseInt(item.dataset.id), position: globalBase + idx });
+            });
+            globalBase += items.length;
+        });
+
+        try {
+            const resp = await fetch('@Url.Action("SaveBracketOrder", "WorldCup")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await resp.json();
+
+            if (result.success) {
+                status.textContent = '✓ ' + result.message;
+                status.className = 'br-status success';
+            } else {
+                status.textContent = '✗ ' + result.message;
+                status.className = 'br-status error';
+            }
+        } catch (e) {
+            status.textContent = '✗ Network error — try again.';
+            status.className = 'br-status error';
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
