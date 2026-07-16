@@ -424,14 +424,6 @@ namespace MatchFixer.Core.Services
 				return 0;
 			}
 
-			// Sort by date + time so RoundPosition reflects chronological (bracket) order.
-			// Same-day matches are from the same bracket half, which ensures correct
-			// visual grouping (e.g. QF[0]+QF[1] → SF[0], QF[2]+QF[3] → SF[1]).
-			knockoutFixtures = knockoutFixtures
-				.OrderBy(f => f.Date)
-				.ThenBy(f => f.Time)
-				.ToList();
-
 			// Determine the next RoundPosition to avoid collisions with existing group-stage rows.
 			var maxPosition = await _context.WorldCupMatches
 				.MaxAsync(m => (int?)m.RoundPosition) ?? 0;
@@ -684,6 +676,45 @@ namespace MatchFixer.Core.Services
 			}
 
 			return map;
+		}
+
+		public async Task<List<BracketMatchOrderDto>> GetKnockoutMatchOrderAsync()
+		{
+			return await _context.WorldCupMatches
+				.AsNoTracking()
+				.Where(m => m.IsKnockout)
+				.OrderBy(m => m.Stage)
+				.ThenBy(m => m.RoundPosition)
+				.Select(m => new BracketMatchOrderDto(
+					m.Id,
+					m.HomeTeam,
+					m.AwayTeam,
+					m.HomeLogo,
+					m.AwayLogo,
+					m.HomeScore,
+					m.AwayScore,
+					m.Stage,
+					m.RoundPosition))
+				.ToListAsync();
+		}
+
+		public async Task SaveBracketOrderAsync(IEnumerable<(int Id, int Position)> order)
+		{
+			var ids = order.Select(x => x.Id).ToList();
+
+			var matches = await _context.WorldCupMatches
+				.Where(m => ids.Contains(m.Id))
+				.ToListAsync();
+
+			var positionMap = order.ToDictionary(x => x.Id, x => x.Position);
+
+			foreach (var match in matches)
+			{
+				if (positionMap.TryGetValue(match.Id, out var newPos))
+					match.RoundPosition = newPos;
+			}
+
+			await _context.SaveChangesAsync();
 		}
 
 		private int ParseInt(string? value)
