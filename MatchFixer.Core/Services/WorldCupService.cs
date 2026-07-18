@@ -619,6 +619,7 @@ namespace MatchFixer.Core.Services
 			{ WorldCupStage.RoundOf16,    ( 8, WorldCupStage.QuarterFinal) },
 			{ WorldCupStage.QuarterFinal, ( 4, WorldCupStage.SemiFinal)    },
 			{ WorldCupStage.SemiFinal,    ( 2, WorldCupStage.ThirdPlace)   },
+			{ WorldCupStage.ThirdPlace,   ( 1, WorldCupStage.Final)        },
 		};
 
 		/// <summary>
@@ -635,6 +636,7 @@ namespace MatchFixer.Core.Services
 				WorldCupStage.RoundOf16,
 				WorldCupStage.QuarterFinal,
 				WorldCupStage.SemiFinal,
+				WorldCupStage.ThirdPlace,
 			};
 
 			foreach (var stage in order)
