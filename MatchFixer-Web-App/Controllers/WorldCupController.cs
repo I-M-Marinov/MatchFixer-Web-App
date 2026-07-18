@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using static MatchFixer.Common.GeneralConstants.WorldCupApiConstants;
 
 namespace MatchFixer_Web_App.Controllers
@@ -65,5 +66,43 @@ namespace MatchFixer_Web_App.Controllers
 
 			return RedirectToAction(nameof(WorldCup));
 		}
+
+		[HttpGet]
+		[AdminOnly]
+		public async Task<IActionResult> BracketReorder()
+		{
+			var matches = await _worldCupService.GetKnockoutMatchOrderAsync();
+			return View(matches);
+		}
+
+		[HttpPost]
+		[AdminOnly]
+		public async Task<IActionResult> SaveBracketOrder()
+		{
+			using var reader = new StreamReader(Request.Body);
+			var body = await reader.ReadToEndAsync();
+
+			List<BracketOrderItem>? items;
+			try
+			{
+				items = JsonSerializer.Deserialize<List<BracketOrderItem>>(
+					body,
+					new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+			}
+			catch
+			{
+				return BadRequest(new { success = false, message = "Invalid payload." });
+			}
+
+			if (items == null || items.Count == 0)
+				return BadRequest(new { success = false, message = "No items received." });
+
+			var order = items.Select(x => (x.Id, x.Position));
+			await _worldCupService.SaveBracketOrderAsync(order);
+
+			return Ok(new { success = true, message = $"{items.Count} positions saved." });
+		}
+
+		private sealed record BracketOrderItem(int Id, int Position);
 	}
 }
