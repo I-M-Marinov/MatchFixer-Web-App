@@ -19,7 +19,8 @@ namespace MatchFixer.Core.Contracts
 		Task<Dictionary<Guid, OddsDTO>> GetOddsForMatchesAsync(Guid[] matchIds);
 		Task<List<ApiLeagueSelectViewModel>> GetApiLeaguesAsync();
 		Task<bool> MatchExistsByApiFixtureAsync(int apiFixtureId);
-		Task AddEventFromUpcomingAsync(UpcomingMatchRowViewModel dto);
+		/// <summary>Returns null on success, or a human-readable skip reason when the match cannot be imported.</summary>
+		Task<string?> AddEventFromUpcomingAsync(UpcomingMatchRowViewModel dto);
 		Task<bool> PostponeMatchAsync(Guid matchEventId, Guid userId);
 	}
 }
