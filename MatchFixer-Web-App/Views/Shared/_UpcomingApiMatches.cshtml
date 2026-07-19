@@ -1,31 +1,33 @@
-﻿
+
 @model MatchFixer.Infrastructure.Models.FootballAPI.UpcomingMatchesSelectionViewModel
 
 @for (int i = 0; i < Model.Selected.Count; i++)
 {
-    <tr>
+    var m = Model.Selected[i];
+    var disabled = m.IsAlreadyImported ? "disabled" : "";
+    <tr data-home-id="@m.HomeTeamId" data-away-id="@m.AwayTeamId" data-no-draw="false">
 	    <td>
 		    <input type="checkbox"
 		           name="Selected[@i].Selected"
 		           value="true"
 		           class="form-check-input"
-		           disabled="@Model.Selected[i].IsAlreadyImported" />
+		           disabled="@m.IsAlreadyImported" />
 
-		    <input type="hidden" name="Selected[@i].ApiFixtureId" value="@Model.Selected[i].ApiFixtureId" />
-		    <input type="hidden" name="Selected[@i].HomeTeamId" value="@Model.Selected[i].HomeTeamId" />
-		    <input type="hidden" name="Selected[@i].AwayTeamId" value="@Model.Selected[i].AwayTeamId" />
-			<input type="hidden" name="Selected[@i].IsManualDuplicate" value="@Model.Selected[i].IsManualDuplicate.ToString().ToLower()" />
-		    <input type="hidden" name="Selected[@i].HomeName" value="@Model.Selected[i].HomeName" />
-		    <input type="hidden" name="Selected[@i].AwayName" value="@Model.Selected[i].AwayName" />
-		    <input type="hidden" name="Selected[@i].HomeLogo" value="@Model.Selected[i].HomeLogo" />
-		    <input type="hidden" name="Selected[@i].AwayLogo" value="@Model.Selected[i].AwayLogo" />
+		    <input type="hidden" name="Selected[@i].ApiFixtureId"      value="@m.ApiFixtureId" />
+		    <input type="hidden" name="Selected[@i].HomeTeamId"        value="@m.HomeTeamId" />
+		    <input type="hidden" name="Selected[@i].AwayTeamId"        value="@m.AwayTeamId" />
+		    <input type="hidden" name="Selected[@i].IsManualDuplicate" value="@m.IsManualDuplicate.ToString().ToLower()" />
+		    <input type="hidden" name="Selected[@i].HomeName"          value="@m.HomeName" />
+		    <input type="hidden" name="Selected[@i].AwayName"          value="@m.AwayName" />
+		    <input type="hidden" name="Selected[@i].HomeLogo"          value="@m.HomeLogo" />
+		    <input type="hidden" name="Selected[@i].AwayLogo"          value="@m.AwayLogo" />
+		    <input type="hidden" name="Selected[@i].NoDraw"            value="false" class="no-draw-hidden" />
+	    </td>
 
-		</td>
-        
 	    <td class="text-center" style="font-size: 1.2em;">
-		    @if (Model.Selected[i].IsAlreadyImported)
+		    @if (m.IsAlreadyImported)
 		    {
-				if (Model.Selected[i].IsManualDuplicate == true)
+			    if (m.IsManualDuplicate == true)
 			    {
 				    <i class="bi bi-person-check-fill text-primary"
 				       data-bs-toggle="tooltip"
@@ -51,52 +53,73 @@
 			    </i>
 		    }
 	    </td>
-	    <td>
 
+	    <td>
 		    <input type="datetime-local"
 		           name="Selected[@i].KickoffInput"
-		           value="@Model.Selected[i].KickoffInput"
+		           value="@m.KickoffInput"
 		           class="form-control form-control-sm"
-		           @(Model.Selected[i].IsAlreadyImported ? "readonly" : "") />
-
+		           @(m.IsAlreadyImported ? "readonly" : "") />
 	    </td>
+
 	    <td>
-		    <img src="@Model.Selected[i].HomeLogo" height="24" />
-		    @Model.Selected[i].HomeName
+		    <img src="@m.HomeLogo" height="24" />
+		    @m.HomeName
 	    </td>
 	    <td>
 		    <img src="/images/live-events/versus.png" height="18" />
 	    </td>
-        <td>
-            <img src="@Model.Selected[i].AwayLogo" height="24" />
-            @Model.Selected[i].AwayName
-        </td>
+	    <td>
+		    <img src="@m.AwayLogo" height="24" />
+		    @m.AwayName
+	    </td>
 
 	    <td>
 		    <input type="number"
 		           name="Selected[@i].HomeOdds"
-		           value="@Model.Selected[i].HomeOdds"
+		           value="@m.HomeOdds"
 		           step="0.01"
 		           class="form-control form-control-sm home-odds"
-		           disabled="@Model.Selected[i].IsAlreadyImported"/>
+		           @disabled />
 	    </td>
 
 	    <td>
 		    <input type="number"
 		           name="Selected[@i].DrawOdds"
-		           value="@Model.Selected[i].DrawOdds"
+		           value="@m.DrawOdds"
 		           step="0.01"
 		           class="form-control form-control-sm draw-odds"
-		           disabled="@Model.Selected[i].IsAlreadyImported"/>
+		           @disabled />
 	    </td>
 
 	    <td>
 		    <input type="number"
 		           name="Selected[@i].AwayOdds"
-		           value="@Model.Selected[i].AwayOdds"
+		           value="@m.AwayOdds"
 		           step="0.01"
 		           class="form-control form-control-sm away-odds"
-		           disabled="@Model.Selected[i].IsAlreadyImported"/>
+		           @disabled />
+	    </td>
+
+	    @* Auto-odds + NoDraw column *@
+	    <td class="text-center">
+		    @if (!m.IsAlreadyImported)
+		    {
+			    <div class="d-flex flex-column align-items-center gap-1">
+				    <button type="button"
+				            class="btn btn-xs btn-info auto-odds-row-btn"
+				            title="Auto-generate odds"
+				            style="font-size:0.72rem; padding:2px 7px; white-space:nowrap;">
+					    <i class="bi bi-stars"></i> Auto
+				    </button>
+				    <button type="button"
+				            class="btn btn-xs btn-outline-secondary no-draw-row-btn"
+				            title="Toggle No-Draw"
+				            style="font-size:0.72rem; padding:2px 7px; white-space:nowrap;">
+					    <i class="bi bi-slash-circle"></i> Draw
+				    </button>
+			    </div>
+		    }
 	    </td>
     </tr>
 }
