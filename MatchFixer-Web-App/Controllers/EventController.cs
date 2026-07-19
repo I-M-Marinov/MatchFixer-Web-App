@@ -3,6 +3,7 @@ using MatchFixer.Common.VirtualLeagues;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.DTO;
 using MatchFixer.Core.ViewModels.LiveEvents;
+using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Models.FootballAPI;
 using MatchFixer.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,7 @@ namespace MatchFixer_Web_App.Controllers
 	{
 		private readonly IMatchEventService _matchEventService;
 		private readonly IUpcomingMatchService _upcomingMatchService;
+		private readonly IUpcomingMatchSeederService _upcomingMatchSeederService;
 		private readonly IUserContextService _userContextService;
 		private readonly IOddsBoostService _oddsBoostService;
 		private readonly ILiveMatchResultService _liveMatchResultService;
@@ -28,6 +30,7 @@ namespace MatchFixer_Web_App.Controllers
 		public EventController(
 			IMatchEventService matchEventService,
 			IUpcomingMatchService upcomingMatchService,
+			IUpcomingMatchSeederService upcomingMatchSeederService,
 			IUserContextService userContextService,
 			IOddsBoostService oddsBoostService,
 			ILiveMatchResultService liveMatchResultService,
@@ -35,6 +38,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			_matchEventService = matchEventService;
 			_upcomingMatchService = upcomingMatchService;
+			_upcomingMatchSeederService = upcomingMatchSeederService;
 			_userContextService = userContextService;
 			_oddsBoostService = oddsBoostService;
 			_liveMatchResultService = liveMatchResultService;
@@ -228,19 +232,65 @@ namespace MatchFixer_Web_App.Controllers
 			}
 		}
 
+		[HttpPost]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ReseedUpcoming(int leagueId)
+		{
+			if (leagueId <= 0)
+				return BadRequest(new { success = false, message = "Invalid league." });
+
+			try
+			{
+				await _upcomingMatchSeederService.ReseedForLeagueAsync(leagueId);
+				return Ok(new { success = true, message = "Upcoming matches refreshed." });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { success = false, message = ex.Message });
+			}
+		}
+
+		[HttpPost]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ReseedAllUpcoming()
+		{
+			try
+			{
+				await _upcomingMatchSeederService.ReseedAllLeaguesAsync();
+				return Ok(new { success = true, message = "All leagues refreshed." });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { success = false, message = ex.Message });
+			}
+		}
+
 		[HttpGet]
 		[Authorize]
 		[AdminOnly]
 		public async Task<IActionResult> UpcomingFromApi(int leagueId)
 		{
-			var matches = await _upcomingMatchService.GetUpcomingMatchesAsync(leagueId);
-
-			var model = new UpcomingMatchesSelectionViewModel
+			try
 			{
-				Selected = matches
-			};
+				var matches = await _upcomingMatchService.GetUpcomingMatchesAsync(leagueId);
 
-			return PartialView("_UpcomingApiMatches", model);
+				var model = new UpcomingMatchesSelectionViewModel
+				{
+					Selected = matches
+				};
+
+				return PartialView("_UpcomingApiMatches", model);
+			}
+			catch (HttpRequestException ex)
+			{
+				return Content($"<div class=\"alert error-message\">⚠ Could not reach the football API: {ex.Message}</div>", "text/html");
+			}
+			catch (Exception ex)
+			{
+				return Content($"<div class=\"alert error-message\">⚠ Failed to load matches: {ex.Message}</div>", "text/html");
+			}
 		}
 		[HttpPost]
 		[Authorize]
@@ -264,17 +314,24 @@ namespace MatchFixer_Web_App.Controllers
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			foreach (var match in model.Selected.Where(x => x.Selected))
-				await _matchEventService.AddEventFromUpcomingAsync(match);
+			var skipped = new List<string>();
 
-			if (model.Selected.Count > 1 && model.Selected.Count != 0)
+			foreach (var match in model.Selected.Where(x => x.Selected))
 			{
-				TempData["SuccessMessage"] = MatchEventsWereAddedSuccessfully;
+				var skipReason = await _matchEventService.AddEventFromUpcomingAsync(match);
+				if (skipReason != null)
+					skipped.Add(skipReason);
 			}
-			else
-			{
-				TempData["SuccessMessage"] = MatchEventWasAddedSuccessfully;
-			}
+
+			var added = model.Selected.Count(x => x.Selected) - skipped.Count;
+
+			if (added > 0)
+				TempData["SuccessMessage"] = added == 1
+					? MatchEventWasAddedSuccessfully
+					: string.Format(MatchEventsWereAddedSuccessfully);
+
+			if (skipped.Any())
+				TempData["SkippedMatches"] = System.Text.Json.JsonSerializer.Serialize(skipped);
 
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
