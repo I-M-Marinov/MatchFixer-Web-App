@@ -78,6 +78,74 @@ namespace MatchFixer.Infrastructure.Services
 			}
 		}
 
+		public async Task ReseedAllLeaguesAsync()
+		{
+			foreach (var league in Football.Keys)
+			{
+				await ReseedForLeagueAsync(league);
+				await Task.Delay(1000); // API rate limit
+			}
+		}
+
+		public async Task ReseedForLeagueAsync(int leagueId)
+		{
+			// Delete only non-imported rows for this league so historical imported data (IsImported = true) is preserved.
+			var stale = await _dbContext.UpcomingMatchEvents
+				.Where(x => x.ApiLeagueId == leagueId && !x.IsImported)
+				.ToListAsync();
+
+			if (stale.Any())
+			{
+				_dbContext.UpcomingMatchEvents.RemoveRange(stale);
+				await _dbContext.SaveChangesAsync();
+			}
+
+			Console.WriteLine($"[UpcomingSeeder] Reseeding league {leagueId} — removed {stale.Count} stale row(s)");
+
+			var upcomingFromApi = await _footballApiService.GetUpcomingFromApiAsync(leagueId);
+
+			if (!upcomingFromApi.Any())
+			{
+				Console.WriteLine($"[UpcomingSeeder] No upcoming fixtures returned for league {leagueId}");
+				return;
+			}
+
+			foreach (var apiMatch in upcomingFromApi)
+			{
+				bool exists = await _dbContext.UpcomingMatchEvents
+					.AnyAsync(x => x.ApiFixtureId == apiMatch.ApiFixtureId);
+
+				if (exists)
+					continue;
+
+				var homeTeam = await ResolveTeamAsync(apiMatch.HomeName, apiMatch.HomeLogo);
+				var awayTeam = await ResolveTeamAsync(apiMatch.AwayName, apiMatch.AwayLogo);
+
+				if (homeTeam == null || awayTeam == null)
+				{
+					Console.WriteLine($"[UpcomingSeeder] Skipped fixture {apiMatch.ApiFixtureId} (team missing)");
+					continue;
+				}
+
+				await _dbContext.UpcomingMatchEvents.AddAsync(new UpcomingMatchEvent
+				{
+					Id             = Guid.NewGuid(),
+					ApiFixtureId   = apiMatch.ApiFixtureId,
+					ApiLeagueId    = leagueId,
+					MatchDateUtc   = apiMatch.KickoffUtc.UtcDateTime,
+					HomeTeamId     = homeTeam.Id,
+					AwayTeamId     = awayTeam.Id,
+					IsCancelled    = false,
+					IsImported     = false,
+					ImportedAtUtc  = DateTime.UtcNow
+				});
+			}
+
+			await _dbContext.SaveChangesAsync();
+
+			Console.WriteLine($"[UpcomingSeeder] Reseed complete for league {leagueId}");
+		}
+
 		// =========================
 		// Helpers (copied logic)
 		// =========================
