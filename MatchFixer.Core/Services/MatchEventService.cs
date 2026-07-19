@@ -605,13 +605,25 @@ namespace MatchFixer.Core.Services
 				.AnyAsync(e => e.ApiFixtureId == apiFixtureId && !e.IsCancelled);
 		}
 
-		public async Task AddEventFromUpcomingAsync(UpcomingMatchRowViewModel m)
+		public async Task<string?> AddEventFromUpcomingAsync(UpcomingMatchRowViewModel m)
 		{
 			if (await MatchExistsByApiFixtureAsync(m.ApiFixtureId))
-				return;
+				return null; // already imported — silent skip
 
-			var homeId = await ResolveTeamIdAsync(m.HomeName);
-			var awayId = await ResolveTeamIdAsync(m.AwayName);
+			Guid homeId, awayId;
+
+			try { homeId = await ResolveTeamIdAsync(m.HomeName); }
+			catch (InvalidOperationException)
+			{
+				return $"{m.HomeName} not found in the database — add the team first.";
+			}
+
+			try { awayId = await ResolveTeamIdAsync(m.AwayName); }
+			catch (InvalidOperationException)
+			{
+				return $"{m.AwayName} not found in the database — add the team first.";
+			}
+
 			var user = await _userContextService.GetCurrentUserAsync();
 
 			if (!DateTime.TryParseExact(
@@ -621,25 +633,24 @@ namespace MatchFixer.Core.Services
 				    DateTimeStyles.None,
 				    out var parsed))
 			{
-				throw new Exception("Invalid kickoff time.");
+				return $"{m.HomeName} vs {m.AwayName}: invalid kickoff time '{m.KickoffInput}'.";
 			}
 
-			var utc = _timezoneService.ConvertFromUserTimeToUtc(
-				parsed,
-				user.TimeZone
-			);
+			var utc = _timezoneService.ConvertFromUserTimeToUtc(parsed, user.TimeZone);
 
 			var model = new MatchEventFormModel
 			{
 				HomeTeamId = homeId,
 				AwayTeamId = awayId,
-				MatchDate = utc,
-				HomeOdds = m.HomeOdds,
-				DrawOdds = m.DrawOdds,
-				AwayOdds = m.AwayOdds
+				MatchDate  = utc,
+				HomeOdds   = m.HomeOdds,
+				DrawOdds   = m.DrawOdds,
+				AwayOdds   = m.AwayOdds,
+				NoDraw     = m.NoDraw
 			};
 
 			await AddEventAsync(model, m.ApiFixtureId);
+			return null;
 		}
 
 		private async Task<Guid> ResolveTeamIdAsync(string teamName, string? logoUrl = null)
