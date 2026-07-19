@@ -23,6 +23,20 @@
 		</div>
 	}
 
+	@if (TempData["SkippedMatches"] != null)
+	{
+		var skippedList = System.Text.Json.JsonSerializer.Deserialize<List<string>>(TempData["SkippedMatches"]!.ToString()!);
+		<div class="alert error-message" id="error-message">
+			<strong>⚠ @skippedList!.Count match(es) could not be imported:</strong>
+			<ul class="mb-0 mt-1">
+				@foreach (var reason in skippedList!)
+				{
+					<li>@reason</li>
+				}
+			</ul>
+		</div>
+	}
+
 </div>
 
 
@@ -757,25 +771,35 @@
 				<form id="addUpcomingForm" asp-action="AddUpcomingMatches" asp-controller="Event" method="post">
 					@Html.AntiForgeryToken()
 
-					<div class="row mb-3 d-flex justify-content-center align-items-end">
-						<div class="col-md-4 text-center">
-							<select id="apiLeagueSelect" class="form-select">
-								<option value="">Select league</option>
-								@foreach (var league in Model.ApiLeagues)
-								{
-									<option value="@league.ApiLeagueId"
-											data-logo="@league.LeagueLogoUrl">
-										@league.Name
-									</option>
-								}
-							</select>
-						</div>
+					<div class="upcoming-toolbar">
 
-						<div class="col-md-3">
-							<button type="button" id="loadUpcomingBtn" class="btn btn-primary">
-								Load upcoming matches
+						<select id="apiLeagueSelect" class="upcoming-league-select">
+							<option value="">Select league</option>
+							@foreach (var league in Model.ApiLeagues)
+							{
+								<option value="@league.ApiLeagueId"
+										data-logo="@league.LeagueLogoUrl">
+									@league.Name
+								</option>
+							}
+						</select>
+
+						<div class="upcoming-toolbar-actions">
+							<button type="button" id="loadUpcomingBtn" class="upk-btn upk-btn--primary">
+								<i class="bi bi-cloud-download"></i>
+								Load matches
+							</button>
+							<div class="upk-divider"></div>
+							<button type="button" id="reseedUpcomingBtn" class="upk-btn upk-btn--ghost" title="Clear stale fixtures for this league and re-fetch from API">
+								<i class="bi bi-arrow-clockwise"></i>
+								Refresh league
+							</button>
+							<button type="button" id="reseedAllUpcomingBtn" class="upk-btn upk-btn--ghost upk-btn--danger" title="Re-fetch all leagues from API (takes a while)">
+								<i class="bi bi-arrow-repeat"></i>
+								Refresh all leagues
 							</button>
 						</div>
+
 					</div>
 
 					<div class="upcoming-layout">
@@ -803,6 +827,7 @@
 										<th>H</th>
 										<th>D</th>
 										<th>A</th>
+										<th>Auto / ND</th>
 									</tr>
 									</thead>
 									<tbody id="apiMatchesBody">
@@ -1372,6 +1397,43 @@
 
 			const res = await fetch(`/Event/UpcomingFromApi?leagueId=${leagueId}`);
 			document.getElementById("apiMatchesBody").innerHTML = await res.text();
+		});
+
+		document.getElementById("reseedUpcomingBtn").addEventListener("click", async () => {
+			const leagueId = document.getElementById("apiLeagueSelect").value;
+			if (!leagueId) {
+				alert("Select a league first");
+				return;
+			}
+
+			const btn = document.getElementById("reseedUpcomingBtn");
+			btn.disabled = true;
+			btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Refreshing…';
+
+			const token = document.querySelector("input[name='__RequestVerificationToken']")?.value;
+
+			try {
+				const res = await fetch(`/Event/ReseedUpcoming?leagueId=${leagueId}`, {
+					method: "POST",
+					headers: { "RequestVerificationToken": token }
+				});
+
+				const result = await res.json();
+
+				if (result.success) {
+					// Auto-reload the table with fresh data
+					const tableRes = await fetch(`/Event/UpcomingFromApi?leagueId=${leagueId}`);
+					document.getElementById("apiMatchesBody").innerHTML = await tableRes.text();
+					showPromoModal({ success: true, title: "✓ Refreshed", message: "Upcoming matches reloaded from API." });
+				} else {
+					showPromoModal({ success: false, title: "✗ Failed", message: result.message });
+				}
+			} catch (err) {
+				showPromoModal({ success: false, title: "✗ Error", message: err.message });
+			} finally {
+				btn.disabled = false;
+				btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refresh';
+			}
 		});
 
 				
@@ -1970,9 +2032,120 @@
 
 		});
 
+		document.getElementById("reseedAllUpcomingBtn").addEventListener("click", async () => {
+			const btn = document.getElementById("reseedAllUpcomingBtn");
+			btn.disabled = true;
+			btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Refreshing all…';
+
+			const token = document.querySelector("input[name='__RequestVerificationToken']")?.value;
+
+			try {
+				const res = await fetch('/Event/ReseedAllUpcoming', {
+					method: 'POST',
+					headers: { 'RequestVerificationToken': token }
+				});
+
+				const result = await res.json();
+
+				if (result.success) {
+					showPromoModal({ success: true, title: '✓ All Leagues Refreshed', message: result.message });
+
+					// Auto-reload the table if a league is already selected
+					const leagueId = document.getElementById("apiLeagueSelect").value;
+					if (leagueId) {
+						const tableRes = await fetch(`/Event/UpcomingFromApi?leagueId=${leagueId}`);
+						document.getElementById("apiMatchesBody").innerHTML = await tableRes.text();
+					}
+				} else {
+					showPromoModal({ success: false, title: '✗ Failed', message: result.message });
+				}
+			} catch (err) {
+				showPromoModal({ success: false, title: '✗ Error', message: err.message });
+			} finally {
+				btn.disabled = false;
+				btn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Refresh All';
+			}
+		});
+
 		document.getElementById("reviewUpcomingBtn")
 		.addEventListener("click", function () {
-			this.blur(); 
+			this.blur();
+		});
+
+		// ── Per-row Auto-odds in upcoming table ──────────────────────────────
+		document.getElementById("apiMatchesBody").addEventListener("click", async function (e) {
+
+			// Auto-odds button
+			const autoBtn = e.target.closest(".auto-odds-row-btn");
+			if (autoBtn) {
+				const row = autoBtn.closest("tr");
+				const homeId = row.dataset.homeId;
+				const awayId = row.dataset.awayId;
+
+				if (!homeId || !awayId || homeId === "" || awayId === "") {
+					alert("Team IDs not available for this row.");
+					return;
+				}
+
+				const origHtml = autoBtn.innerHTML;
+				autoBtn.disabled = true;
+				autoBtn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+				try {
+					const res = await fetch(`/Event/GenerateOdds?homeTeamId=${homeId}&awayTeamId=${awayId}`);
+					if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+					const data = await res.json();
+
+					row.querySelector(".home-odds").value = data.homeOdds;
+					row.querySelector(".away-odds").value = data.awayOdds;
+
+					// Only fill draw if NoDraw is not active for this row
+					if (row.dataset.noDraw !== "true") {
+						row.querySelector(".draw-odds").value = data.drawOdds;
+					}
+
+					autoBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+					setTimeout(() => { autoBtn.innerHTML = origHtml; }, 1500);
+
+				} catch (err) {
+					autoBtn.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+					setTimeout(() => { autoBtn.innerHTML = origHtml; }, 2000);
+				} finally {
+					autoBtn.disabled = false;
+				}
+				return;
+			}
+
+			// NoDraw toggle button
+			const noDrawBtn = e.target.closest(".no-draw-row-btn");
+			if (noDrawBtn) {
+				const row = noDrawBtn.closest("tr");
+				const current = row.dataset.noDraw === "true";
+				const next = !current;
+
+				row.dataset.noDraw = next.toString();
+
+				const hiddenInput = row.querySelector(".no-draw-hidden");
+				if (hiddenInput) hiddenInput.value = next.toString();
+
+				const drawInput = row.querySelector(".draw-odds");
+				if (drawInput) {
+					if (next) {
+						drawInput.value = "1.01";
+						drawInput.readOnly = true;
+						drawInput.classList.add("no-draw-locked");
+					} else {
+						drawInput.readOnly = false;
+						drawInput.classList.remove("no-draw-locked");
+						if (drawInput.value === "1.01") drawInput.value = "";
+					}
+				}
+
+				noDrawBtn.classList.toggle("btn-warning", next);
+				noDrawBtn.classList.toggle("btn-outline-secondary", !next);
+				noDrawBtn.title = next ? "Draw disabled — click to re-enable" : "Toggle No-Draw";
+			}
 		});
 
 		document.addEventListener("DOMContentLoaded", function () {
