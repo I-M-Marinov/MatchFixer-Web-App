@@ -22,8 +22,7 @@ namespace MatchFixer.Core.Services
 
 
 		public async Task<List<UpcomingMatchRowViewModel>> GetUpcomingMatchesAsync(
-			int leagueId,
-			int take = 20)
+			int leagueId)
 		{
 			var user = await _userContextService.GetCurrentUserAsync();
 
@@ -152,9 +151,45 @@ namespace MatchFixer.Core.Services
 				}).ToList();
 			}
 
-			// API fallback — MARK imported here
+			// API fallback — resolve teams, persist to DB, then return
+			// No limit passed → API uses &status=NS → returns the full remaining season
 			var apiUpcoming = await _footballApiService
-				.GetUpcomingFromApiAsync(leagueId, take);
+				.GetUpcomingFromApiAsync(leagueId);
+
+			// Persist API results so the next "Load" reads from DB instead of calling the API again
+			foreach (var m in apiUpcoming)
+			{
+				bool alreadyInUpcomingTable = await _dbContext.UpcomingMatchEvents
+					.AnyAsync(x => x.ApiFixtureId == m.ApiFixtureId);
+
+				if (alreadyInUpcomingTable)
+					continue;
+
+				var homeTeam = await ResolveTeamAsync(m.HomeName, m.HomeLogo);
+				var awayTeam = await ResolveTeamAsync(m.AwayName, m.AwayLogo);
+
+				if (homeTeam == null || awayTeam == null)
+					continue;
+
+				// Populate team IDs on the DTO so the view gets them without a second query
+				m.HomeTeamId = homeTeam.Id;
+				m.AwayTeamId = awayTeam.Id;
+
+				await _dbContext.UpcomingMatchEvents.AddAsync(new MatchFixer.Infrastructure.Entities.UpcomingMatchEvent
+				{
+					Id            = Guid.NewGuid(),
+					ApiFixtureId  = m.ApiFixtureId,
+					ApiLeagueId   = leagueId,
+					MatchDateUtc  = m.KickoffUtc.UtcDateTime,
+					HomeTeamId    = homeTeam.Id,
+					AwayTeamId    = awayTeam.Id,
+					IsCancelled   = false,
+					IsImported    = false,
+					ImportedAtUtc = DateTime.UtcNow
+				});
+			}
+
+			await _dbContext.SaveChangesAsync();
 
 			foreach (var m in apiUpcoming)
 			{
@@ -203,6 +238,25 @@ namespace MatchFixer.Core.Services
 					IsManualDuplicate = m.IsManualDuplicate
 				})
 				.ToList();
+		}
+
+		private async Task<MatchFixer.Infrastructure.Entities.Team?> ResolveTeamAsync(string teamName, string logoUrl)
+		{
+			var apiTeamId = _footballApiService.ExtractTeamIdFromLogoUrl(logoUrl);
+
+			if (apiTeamId.HasValue)
+			{
+				var byId = await _dbContext.Teams
+					.AsNoTracking()
+					.FirstOrDefaultAsync(t => t.TeamId == apiTeamId.Value);
+
+				if (byId != null)
+					return byId;
+			}
+
+			return await _dbContext.Teams
+				.AsNoTracking()
+				.FirstOrDefaultAsync(t => t.Name == teamName);
 		}
 
 	}
