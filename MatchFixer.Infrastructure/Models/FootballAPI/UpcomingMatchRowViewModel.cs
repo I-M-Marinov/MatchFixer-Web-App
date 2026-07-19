@@ -21,5 +21,7 @@
 
 		public bool IsAlreadyImported { get; set; }
 		public bool? IsManualDuplicate { get; set; }
+
+		public bool NoDraw { get; set; }
 	}
 }
