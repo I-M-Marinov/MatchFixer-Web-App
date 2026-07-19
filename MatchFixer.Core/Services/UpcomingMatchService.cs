@@ -151,8 +151,6 @@ namespace MatchFixer.Core.Services
 				}).ToList();
 			}
 
-			// API fallback — resolve teams, persist to DB, then return
-			// No limit passed → API uses &status=NS → returns the full remaining season
 			var apiUpcoming = await _footballApiService
 				.GetUpcomingFromApiAsync(leagueId);
 
