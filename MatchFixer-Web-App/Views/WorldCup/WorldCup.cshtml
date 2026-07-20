@@ -387,13 +387,21 @@
 								Champion
 							</div>
 
+							@{
+								var finalMatch = Model.Bracket.Final.FirstOrDefault();
+								var champion = finalMatch?.Winner;
+								var championLogo = champion == null ? null
+									: champion == finalMatch!.HomeTeam ? finalMatch.HomeLogo
+									: finalMatch.AwayLogo;
+							}
+
 							<div class="wc-champion-slot">
 
-								<img src="~/images/world-cup/generic-team-badge.png"
+								<img src="@(championLogo ?? "~/images/world-cup/generic-team-badge.png")"
 									 class="wc-champion-logo" />
 
 								<span class="wc-champion-name">
-									TBD
+									@(champion ?? "TBD")
 								</span>
 
 							</div>
