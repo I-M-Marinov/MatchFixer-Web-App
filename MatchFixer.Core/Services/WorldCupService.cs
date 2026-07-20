@@ -197,6 +197,12 @@ namespace MatchFixer.Core.Services
 				IsLive = match.IsLive,
 				IsOngoing = isOngoing,
 
+				Winner = isFinished
+					? homeScore > awayScore ? match.HomeTeam
+					: awayScore > homeScore ? match.AwayTeam
+					: null
+					: null,
+
 				Stage = match.Stage,
 
 				IsAvailableForBetting = matchEvent != null
