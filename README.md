@@ -110,7 +110,8 @@
 <h3 align="center">Add Match Event View - Api Upcoming Matches Tab ( with auto odds generation ) </h3>
 <h4 align="center"> * Updated with auto odds generation and new toolbar  </h4>
 <p align="center">
-  <img src="./upcoming-api-matches-tab.png" align="center" border="10" width="800px"/>
+   <img src="./assets/upcoming-api-matches-tab.png" align="center" border="10" width="800px"/>
+  <img src="./revamped-upcoming-matches-tab.png" align="center" border="10" width="800px"/>
 </p>
 
 <h3 align="center">Admin Events History View </h3>
