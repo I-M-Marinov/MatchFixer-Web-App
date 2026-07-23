@@ -165,19 +165,130 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   </div>
 </details>
 
-<details>
-  <summary><h2>Odds Boosts</h2></summary>
-  <div align="center">
-    <p>
-      - Admins can create time-limited odds boosts on any active match event.<br/>
-      - Boosted events are promoted on the Home Page with a dedicated banner.<br/>
-      - Users receive a real-time notification in the app when a boost goes live.
-    </p>
-    <img src="./assets/odds-boosts-home-screen-new.png" width="700px" />
-    <br/><br/>
-    <img src="./assets/boost-notifications.png" width="700px" />
-  </div>
-</details>
+<h3 align="center">Boost notifications</h3>
+
+<p align="center">
+  <img src="./assets/boost-notifications.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Add Match Event View - Api Upcoming Matches Tab ( with auto odds generation ) </h3>
+<h4 align="center"> * Updated with auto odds generation and new toolbar  </h4>
+<p align="center">
+   <img src="./assets/upcoming-api-matches-tab.png" align="center" border="10" width="800px"/>
+  <img src="./revamped-upcoming-matches-tab.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Admin Events History View </h3>
+
+<p align="center">
+  <img src="./assets/events-history-table-single-event.png" align="center" border="10" width="800px"/>
+</p>
+
+<h3 align="center">Boosted events showcasing on the Home Page</h3>
+<p align="center">
+  <img src="./assets/odds-boosts-home-screen-new.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Manchester United custom wiki tooltip</h3>
+
+<p align="center">
+  <img src="./assets/manutd-wiki-tooltip.gif" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Derby and Boosted Events</h3>
+
+<h4 align="center">Boosted Events</h4>
+
+<p align="center">
+  <img src="./assets/boosted-event-card.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">Derby Match Events</h4>
+
+<p align="center">
+  <img src="./assets/updated-derby-event-card.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Competition Cards Styling and Animations ( UCL / UEL / UECL )</h3>
+
+<h4 align="center">Champions League</h4>
+
+<p align="center">
+  <img src="./assets/updated-ucl-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">Europa League</h4>
+
+<p align="center">
+  <img src="./assets/updated-uel-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">Conference League</h4>
+
+<p align="center">
+  <img src="./assets/updated-uecl-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">FIFA World Cup</h4>
+
+<p align="center">
+  <img src="./assets/world-cup-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h4 align="center">International Friendlies</h4>
+
+<p align="center">
+  <img src="./assets/international-event-cards.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Style of events that already started</h3>
+
+<p align="center">
+  <img src="./assets/matchfixer-started-events.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">League Tables View for the TOP 7 Leagues</h3>
+
+<p align="center">
+  <img src="./assets/league-table-view.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Latest Results</h3>
+
+<p align="center">
+  <img src="./assets/latest-results.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Admin Events Bets Distribution View</h3>
+
+<p align="center">
+  <img src="./assets/admin-area-events-bets.gif" align="center" border="10" width="700px"/>
+</p>
+
+<h3 align="center">Admin Teams View</h3>
+
+<p align="center">
+  <img src="./assets/admin-teams-view.png" align="center" border="10" width="600px"/>
+</p>
+<h4 align="center">Team View Modal</h4>
+
+<p align="center">
+  <img src="./assets/admin-edit-team.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Admin Dashboard View</h3>
+
+<p align="center">
+  <img src="./assets/updated-admin-dashboard-view.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">Updated Manual Match Event Add + Draw option ( on/off ) and Auto Generation of odds</h3>
+
+<p align="center">
+  <img src="./assets/manual-event-updated.png" align="center" border="10" width="600px"/>
+</p>
+
+<h3 align="center">World Cup 2026 View</h3>
 
 <details>
   <summary><h2>League Tables</h2></summary>
