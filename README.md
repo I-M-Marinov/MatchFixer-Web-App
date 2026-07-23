@@ -1,249 +1,233 @@
-
-
-<h1 align="center" style="inline-block">:construction: :construction: UNDER CONSTRUCTION :construction: :construction:</h1>
-
-<h3 align="center">MatchFixer Home Page</h3>
-
-<p align="center">
-  <img src="./assets/new-home-page-view.png" align="center" border="10" width="600px"/>
-</p>
-
-<p align="center">Winning Bet Slip</p>
-
-<p align="center">
-  <img src="./assets/winning-betslip.png" align="center" border="10" width="350px"/>
-</p>
-
-<h3 align="center">MatchFixer Confirmation Email</h3>
-
-<p align="center">
-  <img src="./assets/matchfixer-confirmation-email.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">The MatchFixer Game</h3>
-
-<p align="center">
-  <img src="./assets/matfixer-game.jpg" align="center" border="10" width="500px" />
-</p>
-
-<h3 align="center">The Logo Quiz Game</h3>
-
-<p align="center">
-  <img src="./assets/LogoQuiz.jpg" align="center" border="10" width="500px"/>
-</p>
-
-<h3 align="center">Match Events as they appear on the Events Board</h3>
-
-<p align="center">
-  <img src="./assets/match-events.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Submitting a betslip</h3>
-
 <div align="center">
-  <img src="./assets/submit-betslip.gif" width="325" alt="Submitting a betslip" />
+  <img src="./assets/matchFixer-logo.png" width="220px" alt="MatchFixer Logo" />
+  <h1>MatchFixer</h1>
+  <p>A football sports betting web application built with ASP.NET Core MVC</p>
 </div>
 
-<h3 align="center">Profile Page</h3>
+---
+
+<div align="center">
+
+## Overview
+
+</div>
 
 <p align="center">
-  <img src="./assets/profile-page-final.png" align="center" border="10" width="800px"/>
+MatchFixer is a football sports betting platform where users can browse upcoming match events, build and submit betslips, track their winnings and unlock trophies. The application supports domestic leagues, UEFA club competitions (Champions League, Europa League, Conference League), international matches and the FIFA World Cup 2026, with live score updates pulled directly from external APIs.
 </p>
-
-<h4 align="center">Favorite Teams</h4>
 
 <p align="center">
-  <img src="./assets/favorite-teams-profile-page.png" align="center" border="10" width="800px"/>
+Users can set their favourite teams and receive email notifications whenever one of them is about to play. A dedicated World Cup 2026 tab provides a full tournament tracker — group stage standings and a live knockout bracket that updates as results come in. Admins have a full back-office: creating and managing match events manually or importing them from the API, setting odds, applying odds boosts, managing teams, viewing user bet history and sending email blasts to the entire user base.
 </p>
-
-<h4 align="center">FYour Favorite Team is playing emails</h4>
 
 <p align="center">
-  <img src="./assets/favorite-team-playing-email.png" align="center" border="10" width="300px"/>
-  <img src="./assets/favorite-team-playing-email2.png" align="center" border="10" width="300px"/>
-  <img src="./assets/favorite-team-playing-email3.png" align="center" border="10" width="600px"/>
+The application also features two mini-games — <strong>The MatchFixer Game</strong> (predict match outcomes) and the <strong>Logo Quiz</strong> (identify football club badges) — adding a gamified layer on top of the core betting experience.
 </p>
 
-<h4 align="center">Favorite Teams on the Events Board</h4>
+---
 
-<p align="center">
-  <img src="./assets/favorite-teams.gif" align="center" border="10" width="800px"/>
-</p>
+<div align="center">
 
-<h3 align="center">Trophies</h3>
+## Technology Stack
 
-<p align="center">
-  <img src="./assets/rigged-to-win-trophy.png" align="center" border="10" width="800px"/>
-</p>
+</div>
 
-<h3 align="center">Admin viewing of a user's bets</h3>
+<div align="center">
+<h3>Front End</h3>
+</div>
 
-<p align="center">
-  <img src="./assets/admin-users-bets.png" align="center" border="10" width="800px"/>
-</p>
+<ul>
+  <li>HTML5 &amp; CSS3</li>
+  <li>SCSS (compiled via LibSassBuilder)</li>
+  <li>Bootstrap 5</li>
+  <li>Bootstrap Icons</li>
+  <li>JavaScript &amp; jQuery 3.7</li>
+  <li>AJAX</li>
+  <li>Animate.css</li>
+  <li>Select2 (enhanced dropdowns)</li>
+  <li>SortableJS (drag-and-drop bracket reordering)</li>
+</ul>
 
-<h3 align="center">Email Blast</h3>
+<div align="center">
+<h3>Back End</h3>
+</div>
 
-<p align="center">
-  <img src="./assets/email-blast.png" align="center" border="10" width="800px"/>
-</p>
+<ul>
+  <li>C#</li>
+  <li>.NET 8.0</li>
+  <li>ASP.NET Core with MVC pattern</li>
+  <li>Microsoft SQL Server</li>
+  <li>Entity Framework Core 8</li>
+  <li>ASP.NET Core Identity</li>
+  <li>NodaTime</li>
+  <li>ISO3166</li>
+  <li>API-Football (api-sports.io) — upcoming matches, live odds, fixture data</li>
+  <li>TheSportsDB API — World Cup fixtures, group standings and live scores</li>
+  <li>Cloudinary — cloud-hosted team logo management</li>
+</ul>
 
-<h3 align="center">Test-Email Sent Via the Email Blast</h3>
+<div align="center">
+<h3>Source Control</h3>
+</div>
 
-<p align="center">
-  <img src="./assets/test-email.png" align="center" border="10" width="800px"/>
-</p>
+<ul>
+  <li>Git / GitHub</li>
+</ul>
 
+---
 
-<h3 align="center">Admin Add Match Event View</h3>
+<div align="center">
 
-<p align="center">
-  <img src="./assets/add-match-event-view.png" align="center" border="10" width="800px"/>
-</p>
+## User Guide
 
-<h3 align="center">Boost notifications</h3>
+</div>
 
-<p align="center">
-  <img src="./assets/boost-notifications.png" align="center" border="10" width="800px"/>
-</p>
+<details>
+  <summary><h2>Home Page</h2></summary>
+  <div align="center">
+    <p>
+      - The Home Page displays all currently active match events grouped by league, with styled event cards per competition type.<br/>
+      - Users can browse events, click into a match to view details or add selections to their betslip directly from the board.<br/>
+      - Any active Odds Boosts are highlighted in the boost banner at the top of the page.<br/>
+      - Events that have already kicked off are visually distinguished with a different style to indicate they are live or in progress.
+    </p>
+    <img src="./assets/new-home-page-view.png" width="800px" />
+    <br/><br/>
+    <img src="./assets/matchfixer-started-events.png" width="800px" />
+  </div>
+</details>
 
-<h3 align="center">Add Match Event View - Api Upcoming Matches Tab ( with auto odds generation ) </h3>
-<h4 align="center"> * Updated with auto odds generation and new toolbar  </h4>
-<p align="center">
-   <img src="./assets/upcoming-api-matches-tab.png" align="center" border="10" width="800px"/>
-  <img src="./revamped-upcoming-matches-tab.png" align="center" border="10" width="800px"/>
-</p>
+<details>
+  <summary><h2>Match Event Cards</h2></summary>
+  <div align="center">
+    <p>
+      - Each competition has its own distinct card style and colour palette.<br/>
+      - Derby matches and boosted events receive additional visual treatment to stand out on the board.
+    </p>
+    <h4>UEFA Champions League</h4>
+    <img src="./assets/updated-ucl-event-cards.png" width="700px" />
+    <h4>UEFA Europa League</h4>
+    <img src="./assets/updated-uel-event-cards.png" width="700px" />
+    <h4>UEFA Conference League</h4>
+    <img src="./assets/updated-uecl-event-cards.png" width="700px" />
+    <h4>FIFA World Cup</h4>
+    <img src="./assets/world-cup-event-cards.png" width="700px" />
+    <h4>International Friendlies</h4>
+    <img src="./assets/international-event-cards.png" width="700px" />
+    <h4>Derby Match</h4>
+    <img src="./assets/updated-derby-event-card.png" width="700px" />
+    <h4>Boosted Event</h4>
+    <img src="./assets/boosted-event-card.png" width="700px" />
+  </div>
+</details>
 
-<h3 align="center">Admin Events History View </h3>
+<details>
+  <summary><h2>Betslip</h2></summary>
+  <div align="center">
+    <p>
+      - Users build a betslip by selecting outcomes (Home / Draw / Away) from events on the board.<br/>
+      - The betslip panel shows the current selections, the combined odds and the potential payout.<br/>
+      - Upon submission the betslip is saved and the user can track its result once the events are settled.
+    </p>
+    <img src="./assets/submit-betslip.gif" width="500px" />
+    <br/><br/>
+    <img src="./assets/winning-betslip.png" width="500px" />
+  </div>
+</details>
 
-<p align="center">
-  <img src="./assets/events-history-table-single-event.png" align="center" border="10" width="800px"/>
-</p>
+<details>
+  <summary><h2>Profile Page</h2></summary>
+  <div align="center">
+    <p>
+      - After logging in, users land on their Profile Page.<br/>
+      - The page shows the user's personal stats, bet history summary and trophy cabinet.<br/>
+      - Users can edit their profile info, upload a profile picture and change their password from dedicated tabs.
+    </p>
+    <h4>Profile Overview</h4>
+    <img src="./assets/profile-page-final.png" width="800px" />
+    <h4>Favourite Teams</h4>
+    <p>
+      - Users can set their favourite teams from the profile page.<br/>
+      - Favourite teams are highlighted on the Events Board whenever they are playing.<br/>
+      - An automated email notification is sent to the user before each match involving one of their favourite teams.
+    </p>
+    <img src="./assets/favorite-teams-profile-page.png" width="800px" />
+    <br/><br/>
+    <img src="./assets/favorite-teams.gif" width="800px" />
+    <br/><br/>
+    <img src="./assets/favorite-team-playing-email.png" width="300px" />
+    <img src="./assets/favorite-team-playing-email2.png" width="300px" />
+    <br/><br/>
+    <img src="./assets/favorite-team-playing-email3.png" width="700px" />
+    <h4>Trophies</h4>
+    <p>- Users unlock trophies based on their betting activity and milestones reached on the platform.</p>
+    <img src="./assets/rigged-to-win-trophy.png" width="800px" />
+  </div>
+</details>
 
-<h3 align="center">Boosted events showcasing on the Home Page</h3>
-<p align="center">
-  <img src="./assets/odds-boosts-home-screen-new.png" align="center" border="10" width="600px"/>
-</p>
+<details>
+  <summary><h2>Odds Boosts</h2></summary>
+  <div align="center">
+    <p>
+      - Admins can create time-limited odds boosts on any active match event.<br/>
+      - Boosted events are promoted on the Home Page with a dedicated banner.<br/>
+      - Users receive a real-time notification in the app when a boost goes live.
+    </p>
+    <img src="./assets/odds-boosts-home-screen-new.png" width="700px" />
+    <br/><br/>
+    <img src="./assets/boost-notifications.png" width="700px" />
+  </div>
+</details>
 
-<h3 align="center">Manchester United custom wiki tooltip</h3>
+<details>
+  <summary><h2>League Tables</h2></summary>
+  <div align="center">
+    <p>- Live standings for the top 7 domestic leagues, pulled from the API and displayed in a clean table view.</p>
+    <img src="./assets/league-table-view.png" width="700px" />
+  </div>
+</details>
 
-<p align="center">
-  <img src="./assets/manutd-wiki-tooltip.gif" align="center" border="10" width="600px"/>
-</p>
+<details>
+  <summary><h2>Latest Results</h2></summary>
+  <div align="center">
+    <p>- Displays the most recently concluded matches with final scores across all supported competitions.</p>
+    <img src="./assets/latest-results.png" width="700px" />
+  </div>
+</details>
 
-<h3 align="center">Derby and Boosted Events</h3>
+<details>
+  <summary><h2>World Cup 2026 Tracker</h2></summary>
+  <div align="center">
+    <p>
+      - A dedicated tab for the FIFA World Cup 2026 with two sub-sections: Group Stage and Knockout Bracket.<br/>
+      - Group standings are fetched from TheSportsDB API and cached in the database.<br/>
+      - The knockout bracket visualises all rounds from Round of 32 through to the Final, updating as results come in.<br/>
+      - The Champion slot is automatically populated with the winner of the Final once the result is confirmed.
+    </p>
+    <img src="./assets/world-cup-view.gif" width="700px" />
+    <br/><br/>
+    <img src="./assets/world-cup-full-time-matches.png" width="700px" />
+    <br/><br/>
+    <img src="./assets/World-cup-matches-example.png" width="700px" />
+    <br/><br/>
+    <img src="./assets/world-cup-results-decided-on-penalties .png" width="700px" />
+  </div>
+</details>
 
-<h4 align="center">Boosted Events</h4>
+<details>
+  <summary><h2>Mini-Games</h2></summary>
+  <div align="center">
+    <h4>The MatchFixer Game</h4>
+    <p>- Predict the outcome of upcoming matches and compete for the top spot.</p>
+    <img src="./assets/matfixer-game.jpg" width="600px" />
+    <h4>Logo Quiz</h4>
+    <p>- Identify football club badges from across the world. Your score is tracked on your profile.</p>
+    <img src="./assets/LogoQuiz.jpg" width="600px" />
+  </div>
+</details>
 
-<p align="center">
-  <img src="./assets/boosted-event-card.png" align="center" border="10" width="600px"/>
-</p>
+---
 
-<h4 align="center">Derby Match Events</h4>
-
-<p align="center">
-  <img src="./assets/updated-derby-event-card.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Competition Cards Styling and Animations ( UCL / UEL / UECL )</h3>
-
-<h4 align="center">Champions League</h4>
-
-<p align="center">
-  <img src="./assets/updated-ucl-event-cards.png" align="center" border="10" width="600px"/>
-</p>
-
-<h4 align="center">Europa League</h4>
-
-<p align="center">
-  <img src="./assets/updated-uel-event-cards.png" align="center" border="10" width="600px"/>
-</p>
-
-<h4 align="center">Conference League</h4>
-
-<p align="center">
-  <img src="./assets/updated-uecl-event-cards.png" align="center" border="10" width="600px"/>
-</p>
-
-<h4 align="center">FIFA World Cup</h4>
-
-<p align="center">
-  <img src="./assets/world-cup-event-cards.png" align="center" border="10" width="600px"/>
-</p>
-
-<h4 align="center">International Friendlies</h4>
-
-<p align="center">
-  <img src="./assets/international-event-cards.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Style of events that already started</h3>
-
-<p align="center">
-  <img src="./assets/matchfixer-started-events.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">League Tables View for the TOP 7 Leagues</h3>
-
-<p align="center">
-  <img src="./assets/league-table-view.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Latest Results</h3>
-
-<p align="center">
-  <img src="./assets/latest-results.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Admin Events Bets Distribution View</h3>
-
-<p align="center">
-  <img src="./assets/admin-area-events-bets.gif" align="center" border="10" width="700px"/>
-</p>
-
-<h3 align="center">Admin Teams View</h3>
-
-<p align="center">
-  <img src="./assets/admin-teams-view.png" align="center" border="10" width="600px"/>
-</p>
-<h4 align="center">Team View Modal</h4>
-
-<p align="center">
-  <img src="./assets/admin-edit-team.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Admin Dashboard View</h3>
-
-<p align="center">
-  <img src="./assets/updated-admin-dashboard-view.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Updated Manual Match Event Add + Draw option ( on/off ) and Auto Generation of odds</h3>
-
-<p align="center">
-  <img src="./assets/manual-event-updated.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">World Cup 2026 View</h3>
-
-<p align="center">
-  <img src="./assets/world-cup-view.gif" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">Group Stage Matches That already concluded</h3>
-
-<p align="center">
-  <img src="./assets/world-cup-full-time-matches.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">World Cup Matches on the Events Board</h3>
-
-<p align="center">
-  <img src="./assets/World-cup-matches-example.png" align="center" border="10" width="600px"/>
-</p>
-
-<h3 align="center">World Cup Matches Results decided on penalties</h3>
-
-<p align="center">
-  <img src="./assets/world-cup-results-decided-on-penalties .png" align="center" border="10" width="600px"/>
-</p>
+<div align="center">
+  <h3>If you like this project 💯 please give it a star ⭐</h3>
+</div>
