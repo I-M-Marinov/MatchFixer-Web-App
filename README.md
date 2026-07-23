@@ -329,7 +329,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <summary><h2>Mini-Games</h2></summary>
   <div align="center">
     <h4>The MatchFixer Game</h4>
-    <p>- Predict the outcome of upcoming matches and compete for the top spot.</p>
+    <p>- Predict the outcome of already finished matches for the 2023/24 Season for the top 4 leagues and compete for the top spot.</p>
     <img src="./assets/matfixer-game.jpg" width="600px" />
     <h4>Logo Quiz</h4>
     <p>- Identify football club badges from across the world. Your score is tracked on your profile.</p>
