@@ -72,17 +72,30 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			CancellationToken ct)
 		{
 			var url = $"{BaseUrl}/teams?{mainParam.key}={Uri.EscapeDataString(mainParam.value)}";
-			using var req = new HttpRequestMessage(HttpMethod.Get, url);
-			req.Headers.Add(ApiHeader, _apiKey);
 
-			using var resp = await _http.SendAsync(req, ct);
-			if (!resp.IsSuccessStatusCode) return new List<SearchTeamResponseItem>();
+			for (var attempt = 0; attempt < 2; attempt++)
+			{
+				try
+				{
+					using var req = new HttpRequestMessage(HttpMethod.Get, url);
+					req.Headers.Add(ApiHeader, _apiKey);
 
-			var json = await resp.Content.ReadAsStringAsync(ct);
-			var parsed = JsonSerializer.Deserialize<SearchTeamListApiResponse>(
-				json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+					using var resp = await _http.SendAsync(req, ct);
+					if (!resp.IsSuccessStatusCode) return new List<SearchTeamResponseItem>();
 
-			return parsed?.Response ?? new List<SearchTeamResponseItem>();
+					var json = await resp.Content.ReadAsStringAsync(ct);
+					var parsed = JsonSerializer.Deserialize<SearchTeamListApiResponse>(
+						json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+					return parsed?.Response ?? new List<SearchTeamResponseItem>();
+				}
+				catch (HttpRequestException) when (attempt == 0)
+				{
+					await Task.Delay(500, ct);
+				}
+			}
+
+			return new List<SearchTeamResponseItem>();
 		}
 
 		public async Task<PaginatedTeamsList<TeamListRow>> GetTeamsPageAsync(
