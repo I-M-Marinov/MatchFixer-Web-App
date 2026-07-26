@@ -1,6 +1,8 @@
 ﻿using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
+using static MatchFixer.Common.GeneralConstants.LogoQuizConstants;
+
 namespace MatchFixer_Web_App.Controllers
 {
 	public class LogoQuizController : Controller
@@ -22,7 +24,7 @@ namespace MatchFixer_Web_App.Controllers
 			if (skip)
 			{
 				currentScore = await _logoQuizService.DeductSkipPenaltyAsync(user.Id);
-				TempData["ErrorMessage"] = "Question skipped! -1 point.";
+				TempData["ErrorMessage"] = SkippedQuestion;
 			}
 			else
 			{
