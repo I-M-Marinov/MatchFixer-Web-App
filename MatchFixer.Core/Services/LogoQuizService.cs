@@ -145,7 +145,19 @@ namespace MatchFixer.Core.Services
 			return (message, user.LogoQuizScore);
 		}
 
+		public async Task<int> DeductSkipPenaltyAsync(Guid userId)
+		{
+			var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+			if (user == null) return 0;
 
+			if (user.LogoQuizScore <= 0)
+				return 0;
+
+			user.LogoQuizScore = user.LogoQuizScore - SkipPenaltyPoints;
+			await _dbContext.SaveChangesAsync();
+
+			return user.LogoQuizScore;
+		}
 
 
 	}
