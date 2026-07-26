@@ -17,8 +17,12 @@
 		public const double PenaltyHigh = 0.85;
 
 
+		// Skip penalty
+		public const int SkipPenaltyPoints = 1;
+
 		public const string UserNotFound = "User not found.";
 		public const string NoPenalty = "Incorrect! You have just one point, so no penalty for now!";
+		public const string SkippedQuestion = "Question skipped! -1 point.";
 
 		public static string CorrectAnswer(int points)
 			=> $"Correct! You have earned {points} point{(points > 1 ? "s" : "")}!";
