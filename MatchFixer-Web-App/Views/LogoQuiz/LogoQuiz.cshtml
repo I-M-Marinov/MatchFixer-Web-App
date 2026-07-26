@@ -28,8 +28,62 @@
 
 <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 75vh;">
 
-	<div class="quiz-card p-4" style="width: 100%; max-width: 600px;">
-		
+	<div class="quiz-card p-4" style="width: 100%; max-width: 600px; position: relative;">
+
+		<!-- How to Play — icon + overlay panel, both absolutely positioned inside the card -->
+		<div style="position: absolute; top: 30px; right: 33px; z-index: 20;">
+			<button class="btn btn-link p-0 text-info"
+			        type="button"
+			        data-bs-toggle="collapse"
+			        data-bs-target="#howToPlay"
+			        aria-expanded="false"
+			        title="How to Play"
+			        style="outline: none; box-shadow: none; border: none;">
+				<i class="bi bi-info-circle-fill fs-4"></i>
+			</button>
+		</div>
+
+		<div class="collapse" id="howToPlay"
+		     style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; border-radius: inherit;">
+			<div style="background: rgba(0,0,0,0.88); border-radius: 12px; padding: 20px 22px; color: #f0f0f0; font-size: 0.82rem;">
+				<div style="font-size: 0.95rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 14px; text-align: center; text-transform: uppercase; color: #ffd700;">
+					⚽ How to Play
+				</div>
+				<div style="display: flex; flex-direction: column; gap: 10px;">
+					<div style="display: flex; align-items: flex-start; gap: 10px;">
+						<span style="font-size: 1rem; flex-shrink: 0;">🎯</span>
+						<span>Identify the football club from its badge and pick the correct answer from 4 options.</span>
+					</div>
+					<div style="display: flex; align-items: flex-start; gap: 10px;">
+						<span style="font-size: 1rem; flex-shrink: 0;">✅</span>
+						<div>
+							<strong style="color: #4ade80;">Correct answer</strong>
+							<div style="margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap;">
+								<span style="background: rgba(74,222,128,0.15); border: 1px solid #4ade80; border-radius: 6px; padding: 2px 8px;">score &lt; 500 → <strong>+1 pt</strong></span>
+								<span style="background: rgba(74,222,128,0.15); border: 1px solid #4ade80; border-radius: 6px; padding: 2px 8px;">500–750 → <strong>+2 pts</strong></span>
+								<span style="background: rgba(74,222,128,0.15); border: 1px solid #4ade80; border-radius: 6px; padding: 2px 8px;">750+ → <strong>+3 pts</strong></span>
+							</div>
+						</div>
+					</div>
+					<div style="display: flex; align-items: flex-start; gap: 10px;">
+						<span style="font-size: 1rem; flex-shrink: 0;">❌</span>
+						<div>
+							<strong style="color: #f87171;">Wrong answer</strong>
+							<div style="margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap;">
+								<span style="background: rgba(248,113,113,0.15); border: 1px solid #f87171; border-radius: 6px; padding: 2px 8px;">score &lt; 500 → <strong>−50%</strong></span>
+								<span style="background: rgba(248,113,113,0.15); border: 1px solid #f87171; border-radius: 6px; padding: 2px 8px;">500–750 → <strong>−30%</strong></span>
+								<span style="background: rgba(248,113,113,0.15); border: 1px solid #f87171; border-radius: 6px; padding: 2px 8px;">750+ → <strong>−15%</strong></span>
+							</div>
+						</div>
+					</div>
+					<div style="display: flex; align-items: flex-start; gap: 10px;">
+						<span style="font-size: 1rem; flex-shrink: 0;">⏭️</span>
+						<span><strong style="color: #facc15;">Skipping</strong> without answering costs <strong>−1 pt</strong>. Advancing after you've already answered is always free.</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="logo-quiz-score d-flex flex-column justify-content-center align-items-center">
 			<p>Your score: <span class="score-number">@Model.CurrentScore</span></p>
 		</div>
@@ -120,10 +174,25 @@
 
 		<div class="mt-2 d-flex justify-content-center align-items-center" style="height: 50px;">
 
+			@{
+				bool canSkip = !Model.IsCorrect.HasValue && Model.CurrentScore > 0;
+				bool isUnanswered = !Model.IsCorrect.HasValue;
+			}
 			<form method="get" asp-action="LogoQuiz" id="auto-next-form">
 				<input type="hidden" name="currentScore" value="@Model.CurrentScore"/>
-				<button type="submit" class="btn btn-primary px-4 guess-next-btn">
+				@if (canSkip)
+				{
+					<input type="hidden" name="skip" value="true"/>
+				}
+				<button type="submit"
+				        class="btn btn-primary px-4 guess-next-btn"
+				        @(isUnanswered && !canSkip ? "disabled" : "")
+				        title="@(isUnanswered && !canSkip ? "You need at least 1 point to skip" : "")">
 					<i class="bi bi-arrow-right-circle-fill"></i> Guess Next
+					@if (canSkip)
+					{
+						<span class="badge bg-danger ms-2" style="font-size: 0.7rem;">-1 pt</span>
+					}
 				</button>
 			</form>
 
