@@ -15,10 +15,19 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> LogoQuiz(int currentScore = 0)
+		public async Task<IActionResult> LogoQuiz(int currentScore = 0, bool skip = false)
 		{
 			var user = await _userContextService.GetCurrentUserAsync();
-			currentScore = user.LogoQuizScore;
+
+			if (skip)
+			{
+				currentScore = await _logoQuizService.DeductSkipPenaltyAsync(user.Id);
+				TempData["ErrorMessage"] = "Question skipped! -1 point.";
+			}
+			else
+			{
+				currentScore = user.LogoQuizScore;
+			}
 
 			var question = await _logoQuizService.GenerateQuestionAsync(currentScore);
 			return View(question);
