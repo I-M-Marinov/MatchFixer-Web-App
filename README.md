@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/matchFixer-logo.png" width="220px" alt="MatchFixer Logo" />
+  <img src="./assets/matchFixer-logo.png" width="320px" alt="MatchFixer Logo" />
   <p>A football sports betting web application built with ASP.NET Core MVC</p>
 </div>
 
