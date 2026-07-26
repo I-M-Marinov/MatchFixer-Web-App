@@ -7,5 +7,6 @@ namespace MatchFixer.Core.Contracts
 		Task<LogoQuizQuestionViewModel> GenerateQuestionAsync(int currentScore);
 		LogoQuizQuestionViewModel BuildAnsweredModel(string selectedAnswer, string correctAnswer, string logoUrl, List<string> originalOptions);
 		Task<(string Message, int NewScore)> UpdateLogoQuizScoreAsync(Guid userId, bool isCorrect);
+		Task<int> DeductSkipPenaltyAsync(Guid userId);
 	}
 }
