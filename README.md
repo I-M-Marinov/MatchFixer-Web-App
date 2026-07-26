@@ -62,7 +62,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <li>NodaTime</li>
   <li>ISO3166</li>
   <li>API-Football (api-sports.io) — upcoming matches, live odds, fixture data</li>
-  <li>TheSportsDB API — World Cup fixtures, group standings and live scores</li>
+  <li>TheSportsDB API —  fixtures, group standings and live scores</li>
   <li>Cloudinary — cloud-hosted team logo management</li>
 </ul>
 
@@ -175,7 +175,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
 <h4 align="center"> * Updated with auto odds generation and new toolbar  </h4>
 <p align="center">
    <img src="./assets/upcoming-api-matches-tab.png" align="center" border="10" width="800px"/>
-  <img src="./revamped-upcoming-matches-tab.png" align="center" border="10" width="800px"/>
+  <img src="./assets/revamped-upcoming-matches-tab.png" align="center" border="10" width="800px"/>
 </p>
 
 <h3 align="center">Admin Events History View </h3>
@@ -288,7 +288,6 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <img src="./assets/manual-event-updated.png" align="center" border="10" width="600px"/>
 </p>
 
-<h3 align="center">World Cup 2026 View</h3>
 
 <details>
   <summary><h2>League Tables</h2></summary>
