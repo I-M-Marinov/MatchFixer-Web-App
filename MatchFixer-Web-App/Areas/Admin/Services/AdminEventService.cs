@@ -16,9 +16,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		private static readonly MemoryCacheEntryOptions AggCacheOpts =
 			new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
 
-		// Cache key derived from filter fields that affect aggregate results (not Page/PageSize)
-		private static string AggCacheKey(AdminEventHistoryFilters f) =>
-			$"hist:agg:{f.FromDate:yyyyMMdd}:{f.ToDate:yyyyMMdd}:{f.League}:{f.TeamId}";
+		// Global aggregate — always all-time, never filtered
+		private const string GlobalAggCacheKey = "hist:agg:global";
 
 		private static string TeamStatsCacheKey(AdminEventHistoryFilters f) =>
 			$"hist:teams:{f.FromDate:yyyyMMdd}:{f.ToDate:yyyyMMdd}:{f.League}:{f.TeamId}";
@@ -212,16 +211,20 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			}).ToList();
 
-			// Aggregate totals across ALL filtered events — cached by filter key (not page)
-			if (!_cache.TryGetValue(AggCacheKey(filters), out AggregateCache? agg))
+			// All-time aggregate totals — no date/league filters, static cache key
+			if (!_cache.TryGetValue(GlobalAggCacheKey, out AggregateCache? agg))
 			{
+				var allEventsQuery = _db.MatchEvents
+					.AsNoTracking()
+					.Where(m => m.LiveResult != null || m.IsCancelled);
+
 				var legCountSubquery = _db.Bets.AsNoTracking()
 					.GroupBy(b => b.BetSlipId)
 					.Select(g => new { BetSlipId = g.Key, Count = g.Count() });
 
 				var allBetRows = await (
 					from b  in _db.Bets.AsNoTracking()
-					join m  in baseQuery                   on b.MatchEventId equals m.Id
+					join m  in allEventsQuery              on b.MatchEventId equals m.Id
 					join bs in _db.BetSlips.AsNoTracking() on b.BetSlipId    equals bs.Id
 					join lc in legCountSubquery            on b.BetSlipId    equals lc.BetSlipId
 					join ht in _db.Teams.AsNoTracking()    on m.HomeTeamId   equals ht.Id
@@ -273,7 +276,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					LeagueStats : leagueStats
 				);
 
-				_cache.Set(AggCacheKey(filters), agg, AggCacheOpts);
+				_cache.Set(GlobalAggCacheKey, agg, AggCacheOpts);
 			}
 
 			return new PaginatedEventList<AdminEventOverviewDto>
