@@ -19,8 +19,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		[HttpGet]
 		public async Task<IActionResult> History(AdminEventHistoryFilters filters)
 		{
-			// Bound the query: default to last 30 days when no date filter is provided
-			filters.FromDate ??= DateTime.Today.AddDays(-30);
+			// Last 60 days
+			filters.FromDate ??= DateTime.Today.AddDays(-75);
 			filters.ToDate   ??= DateTime.Today;
 
 			var pagedEvents = await _adminEventsService.GetFinishedEventsAsync(filters);
