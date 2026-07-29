@@ -1651,6 +1651,13 @@
 					if (firstTd) {
 						firstTd.remove();
 					}
+
+					// Do not show the Auto/ND column
+					const allTds = clone.querySelectorAll("td");
+					const lastTd = allTds[allTds.length - 1];
+					if (lastTd) {
+						lastTd.remove();
+					}
 					clone.querySelectorAll("input[type='number']").forEach(input => {
 						const td = input.closest("td");
 						if (!td) return;
