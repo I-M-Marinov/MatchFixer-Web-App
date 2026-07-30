@@ -23,24 +23,70 @@
 <!-- Rules Modal -->
 <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			<div class="modal-header d-flex flex-column justify-content-center align-items-center">
-				<h4 class="modal-title" id="rulesModalLabel">Rules</h4>
+		<div class="modal-content" style="background: rgba(0,0,0,0.92); border-radius: 14px; border: 1px solid rgba(255,215,0,0.25); color: #f0f0f0;">
+			<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="position:absolute; top:14px; right:16px; z-index:10; outline:none; box-shadow:none;"></button>
+			<div class="modal-header border-0 d-flex flex-column justify-content-center align-items-center pb-1">
+				<h4 class="modal-title" id="rulesModalLabel" style="font-size:0.95rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:#ffd700;">
+					⚽ Rules
+				</h4>
 			</div>
-			<div class="modal-body">
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item">⚽ Guess the actual result of <span class="badge bg-primary p-2">10</span> football matches.</li>
-					<li class="list-group-item">⚽ Football matches are from the 2023/24 Season in the Premier League, La Liga, Bundesliga and the Serie A.</li>
-					<li class="list-group-item">⚽ You have <span class="badge bg-danger p-2">15</span> seconds per match ( fix ) to guess what the actual result is.</li>
-					<li class="list-group-item">⚽ You have to guess the correct score for both teams.</li>
-					<li class="list-group-item">⚽ You earn <span class="badge bg-success p-2">10</span> points for each correct guess.</li>
-					<li class="list-group-item">⚽ You earn <span class="badge bg-warning p-2">X2</span> the points ( either <span class="badge bg-success p-2">10</span> or <span class="badge bg-success p-2">20</span>  ) for correct guesses on derby matches.</li>
-					<li class="list-group-item">⚽ If you guess the home or away team score only, you do not get points !</li>
-					<li class="list-group-item">⚽ If you guess at least <span class="badge bg-primary p-2">5</span> results out of <span class="badge bg-primary p-2">10</span>, your points ( <span class="badge bg-success p-2">50</span> ) would be doubled to ( <span class="badge bg-success p-2">100</span> ).</li>
-					<li class="list-group-item">⚽ When you double your points you start earning  <span class="badge bg-success p-2">20</span> points per correct guess !</li>
-					<li class="list-group-item text-center"> Last but not least ---> HAVE FUN AT ALL TIMES !!!</li>
-				</ul>
+			<div class="modal-body pt-1" style="font-size:0.82rem;">
+				<div style="display:flex; flex-direction:column; gap:10px;">
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">🎯</span>
+						<span>Guess the actual result of <span style="background:rgba(59,130,246,0.2); border:1px solid #3b82f6; border-radius:6px; padding:1px 8px; font-weight:700;">10</span> football matches.</span>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">🏆</span>
+						<span>Matches are from the <strong style="color:#ffd700;">2023/24 Season</strong> — Premier League, La Liga, Bundesliga and Serie A.</span>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">⏱️</span>
+						<span>You have <span style="background:rgba(248,113,113,0.2); border:1px solid #f87171; border-radius:6px; padding:1px 8px; font-weight:700;">15s</span> per match to guess the actual result.</span>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">🎯</span>
+						<span>You must guess the correct score for <strong>both</strong> teams — partial scores score nothing.</span>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">✅</span>
+						<span>Each correct guess earns <span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; border-radius:6px; padding:1px 8px; font-weight:700;">+10 pts</span>.</span>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">⚡</span>
+						<div>
+							<strong style="color:#facc15;">Derby matches</strong> are worth <span style="background:rgba(250,204,21,0.15); border:1px solid #facc15; border-radius:6px; padding:1px 8px; font-weight:700;">×2</span> — either
+							<span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; border-radius:6px; padding:1px 6px; font-weight:700;">10</span> or
+							<span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; border-radius:6px; padding:1px 6px; font-weight:700;">20</span> points.
+						</div>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">🚀</span>
+						<div>
+							Get at least <span style="background:rgba(59,130,246,0.2); border:1px solid #3b82f6; border-radius:6px; padding:1px 8px; font-weight:700;">5</span> out of <span style="background:rgba(59,130,246,0.2); border:1px solid #3b82f6; border-radius:6px; padding:1px 8px; font-weight:700;">10</span> correct
+							and your score gets doubled:
+							<span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; border-radius:6px; padding:1px 6px; font-weight:700;">50</span> →
+							<span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; border-radius:6px; padding:1px 6px; font-weight:700;">100</span>.
+						</div>
+					</div>
+
+					<div style="display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+						<span style="font-size:1rem; flex-shrink:0;">⭐</span>
+						<span>Once doubled, every correct guess earns <span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; border-radius:6px; padding:1px 8px; font-weight:700;">+20 pts</span>.</span>
+					</div>
+
+					<div style="text-align:center; padding-top:4px; font-weight:700; color:#ffd700; letter-spacing:0.03em;">
+						Last but not least — HAVE FUN AT ALL TIMES! 🎉
+					</div>
+
+				</div>
 			</div>
 		</div>
 	</div>
