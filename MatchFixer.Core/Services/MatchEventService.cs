@@ -158,7 +158,12 @@ namespace MatchFixer.Core.Services
 		public async Task<List<LiveEventViewModel>> GetAllEventsAsync()
 		{
 			var now = DateTime.UtcNow;
-			var user = await _userContextService.GetCurrentUserAsync();
+			var userId = _userContextService.GetUserId();
+
+			var timeZone = await _dbContext.Users
+				.Where(u => u.Id == userId)
+				.Select(u => u.TimeZone)
+				.FirstOrDefaultAsync();
 
 			var events = await _dbContext.MatchEvents
 				.Include(e => e.HomeTeam)
@@ -167,8 +172,7 @@ namespace MatchFixer.Core.Services
 				.Include(e => e.OddsBoosts)
 				.Where(e =>
 					e.LiveResult == null &&
-					e.Status != MatchStatus.Cancelled &&
-					e.LiveResult == null
+					e.Status != MatchStatus.Cancelled
 				)
 				.OrderBy(e => e.IsPostponed)
 				.ThenBy(e => e.MatchDate)
@@ -176,7 +180,7 @@ namespace MatchFixer.Core.Services
 				.ToListAsync();
 
 			var favoriteTeamIds = (await _dbContext.UserFavoriteTeams
-					.Where(x => x.UserId == user.Id)
+					.Where(x => x.UserId == userId)
 					.Select(x => x.TeamId)
 					.ToListAsync())
 				.ToHashSet();
@@ -238,7 +242,7 @@ namespace MatchFixer.Core.Services
 					AwayTeamLocalLogoUrl = e.AwayTeam.LocalLogoUrl,
 					IsDerby = e.IsDerby,
 					NoDraw = e.NoDraw,
-					UserTimeZone = user.TimeZone,
+					UserTimeZone = timeZone,
 					IsCancelled = e.IsCancelled,
 					FavoriteTeams = favoriteTeams,
 					IsFavoriteMatch = favoriteTeams.Any(),
