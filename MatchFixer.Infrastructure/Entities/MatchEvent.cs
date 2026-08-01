@@ -31,8 +31,9 @@ namespace MatchFixer.Infrastructure.Entities
 		public decimal? AwayOdds { get; set; }
 		public int? ApiFixtureId { get; set; } // only for admin-imported matches ( manual matches leave it null ) 
 		public bool IsDerby { get; set; } = false; // default to false ( not a derby match ) 
-		public bool IsPostponed { get; set; } = false; // default to false ( match is not postponed ) 
-		public MatchStatus Status { get; set; } = MatchStatus.Scheduled; // default all match events to scheduled at first 
+		public bool IsPostponed { get; set; } = false; // default to false ( match is not postponed )
+		public MatchStatus Status { get; set; } = MatchStatus.Scheduled; // default all match events to scheduled at first
+		public MatchStatus? PrePostponeStatus { get; set; } // status before postponement, restored on unpostpone
 		public DateTime? FinishedAtUtc { get; set; } // optional utc time the event finished
 		public LiveMatchResult? LiveResult { get; set; }
 		public bool IsCancelled { get; set; } = false;
