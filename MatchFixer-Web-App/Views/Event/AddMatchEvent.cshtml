@@ -646,7 +646,9 @@
 												</span>
 											}
 											
-											@if (ev.MatchStatus == MatchStatus.Scheduled)
+											@if (ev.MatchStatus == MatchStatus.Scheduled
+											  || ev.MatchStatus == MatchStatus.Live
+											  || (ev.MatchStatus == MatchStatus.FullTime && !ev.HasResult))
 											{
 												<span class="custom-save-remove-tooltip-wrapper">
 
