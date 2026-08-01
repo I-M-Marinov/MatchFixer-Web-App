@@ -455,12 +455,17 @@ namespace MatchFixer.Core.Services
 				// ---- UNPOSTPONE THE MATCH IF A NEW DATE IS PRESENT ----
 				if (kickoffTime.HasValue && match.IsPostponed && match.Status == MatchStatus.Postponed)
 				{
+					// Restore to whatever state the match was in before it was postponed.
+					var restoredStatus = match.PrePostponeStatus ?? MatchStatus.Scheduled;
+
 					LogChange(match.Id, nameof(match.Status),
 						MatchStatus.Postponed,
-						MatchStatus.Scheduled,
-						userId); 
+						restoredStatus,
+						userId);
+
 					match.IsPostponed = false;
-					match.Status = MatchStatus.Scheduled;
+					match.Status = restoredStatus;
+					match.PrePostponeStatus = null;
 				}
 			}
 
@@ -704,6 +709,7 @@ namespace MatchFixer.Core.Services
 			if (match.IsPostponed)
 				return true;
 
+			match.PrePostponeStatus = match.Status; // remember current state for restore
 			match.IsPostponed = true;
 			match.Status = MatchStatus.Postponed;
 			match.MatchDate = null;
