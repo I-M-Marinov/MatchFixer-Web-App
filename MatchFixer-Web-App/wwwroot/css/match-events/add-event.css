@@ -1134,3 +1134,29 @@ table.responsive-stack td {
 .fifa-world-cup-class:hover td {
     background: linear-gradient( 180deg, rgba(238, 244, 250, 0.98) 0%, rgba(231, 237, 245, 0.96) 52%, rgba(241, 220, 78, 0.48) 100% ) !important;
 }
+
+/* ── Event action button grid ─────────────────────────────────────────────── */
+.event-action-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto;
+    gap: 4px;
+    align-items: center;
+}
+
+.event-action-grid .pos-r1c1 { grid-column: 1; grid-row: 1; display: flex; align-items: center; }
+.event-action-grid .pos-r1c2 { grid-column: 2; grid-row: 1; }
+.event-action-grid .pos-r2c1 { grid-column: 1; grid-row: 2; }
+.event-action-grid .pos-r2c2 { grid-column: 2; grid-row: 2; }
+
+.event-action-grid .pos-r12c3 {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+}
+
+.event-action-grid .pos-r12c3 .btn {
+    height: 100%;
+}
