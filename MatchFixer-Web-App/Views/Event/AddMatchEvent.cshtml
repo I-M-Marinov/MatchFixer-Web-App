@@ -539,7 +539,7 @@
 
 									}
 								</td>
-								<td style="max-width: 350px;">
+								<td>
 									<div class="d-flex justify-content-center align-items-center gap-1">
 
 										<div class="d-flex flex-column gap-1">
@@ -550,32 +550,33 @@
 											}
 
 
-											<div class="d-flex gap-2">
+											<div class="d-flex gap-1">
 												<input type="number" id="HomeOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-												       value="@ev.HomeWinOdds" class="form-control form-control-sm home-odds-style" style="width: 80px;" placeholder="Home" @isDisabled/>
+												       value="@ev.HomeWinOdds" class="form-control form-control-sm home-odds-style" style="width: 65px;" placeholder="Home" @isDisabled/>
 												<input type="number" id="DrawOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-												       value="@ev.DrawOdds" class="form-control form-control-sm draw-odds-style" style="width: 80px;" placeholder="Draw" @isDisabled/>
+												       value="@ev.DrawOdds" class="form-control form-control-sm draw-odds-style" style="width: 65px;" placeholder="Draw" @isDisabled/>
 												<input type="number" id="AwayOddsInput-@ev.Id" data-id="@ev.Id" step="0.01"
-												       value="@ev.AwayWinOdds" class="form-control form-control-sm away-odds-style" style="width: 80px;" placeholder="Away" @isDisabled/>
+												       value="@ev.AwayWinOdds" class="form-control form-control-sm away-odds-style" style="width: 65px;" placeholder="Away" @isDisabled/>
 											</div>
 
 											<input type="datetime-local"
 											       id="MatchDateInput-@ev.Id"
 											       data-id="@ev.Id"
-											       value="@(ev.KickoffTime.HasValue 
-												              ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm") 
+											       value="@(ev.KickoffTime.HasValue
+												              ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")
 												              : "")"
 											       class="form-control form-control-sm matchdate-style"
-											       style="min-width: 240px;"
+											       style="width: 100%;"
 											       @isDisabled />
 
 										</div>
 
-										<div class="d-flex flex-column gap-1 align-items-end">
+										<div class="event-action-grid">
 
+											@* Row 1 col 1: Save *@
 											@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
 											{
-												<form asp-action="EditMatchEvent" asp-controller="Event" method="post" class="d-inline" id="editForm-@ev.Id">
+												<form asp-action="EditMatchEvent" asp-controller="Event" method="post" id="editForm-@ev.Id" class="pos-r1c1">
 													@Html.AntiForgeryToken()
 													<input type="hidden" name="Id" value="@ev.Id"/>
 													<input type="hidden" name="HomeOdds" id="HiddenHomeOdds-@ev.Id"/>
@@ -583,55 +584,19 @@
 													<input type="hidden" name="AwayOdds" id="HiddenAwayOdds-@ev.Id"/>
 													<input type="hidden" name="MatchDate" id="HiddenMatchDate-@ev.Id"/>
 													<input type="hidden" name="NoDraw" id="HiddenNoDraw-@ev.Id" value="@ev.NoDraw.ToString().ToLower()"/>
-
 													<span class="custom-save-remove-tooltip-wrapper">
 														<button type="submit" class="btn btn-outline-success btn-sm update-event-btn">
-															<div class="icon">
-																<i class="bx bxs-save"></i>
-															</div>
+															<i class="bx bxs-save"></i>
 														</button>
 														<span class="custom-save-remove-tooltip">Save the event</span>
 													</span>
 												</form>
-
-												<span class="custom-save-remove-tooltip-wrapper">
-													<button type="button"
-													        class="btn btn-sm no-draw-toggle-btn @(ev.NoDraw ? "btn-warning" : "btn-outline-secondary")"
-													        data-event-id="@ev.Id"
-													        data-no-draw="@ev.NoDraw.ToString().ToLower()">
-														<i class="bi bi-slash-circle"></i>
-													</button>
-																	<span class="custom-save-remove-tooltip">@(ev.NoDraw ? "Enable Draw" : "Disable Draw")</span>
-												</span>
 											}
 
-											@if (ev.IsCancelled != true)
-											{
-												<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="d-inline">
-													@Html.AntiForgeryToken()
-													<input type="hidden" name="id" value="@ev.Id"/>
-													<span class="custom-save-remove-tooltip-wrapper">
-														<button type="button"
-														        class="btn btn-outline-danger btn-sm update-event-btn"
-														        data-bs-toggle="modal"
-														        data-bs-target="#confirmCancelModal"
-														        data-event-id="@ev.Id">
-															<div class="icon">
-																<i class="ri-delete-bin-2-fill"></i>
-																<div class="label"></div>
-															</div>
-														</button>
-														<span class="custom-save-remove-tooltip">Cancel the event</span>
-													</span>
-
-												</form>
-											}
-										</div>
-										<div class="d-flex flex-column gap-1 align-items-end">
-
+											@* Row 1 col 2: Edit competition *@
 											@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
 											{
-												<span class="custom-save-remove-tooltip-wrapper">
+												<span class="custom-save-remove-tooltip-wrapper pos-r1c2">
 													<button type="button"
 													        class="btn btn-outline-primary btn-sm open-competition-modal"
 													        data-bs-toggle="modal"
@@ -640,33 +605,58 @@
 													        data-competition="@ev.CompetitionName">
 														<i class="bi bi-pencil-square"></i>
 													</button>
-													<span class="custom-edit-competition-remove-tooltip">
-														Edit competition
-													</span>
+													<span class="custom-edit-competition-remove-tooltip">Edit competition</span>
 												</span>
 											}
-											
+
+											@* Row 2 col 1: NoDraw *@
+											@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
+											{
+												<span class="custom-save-remove-tooltip-wrapper pos-r2c1">
+													<button type="button"
+													        class="btn btn-sm no-draw-toggle-btn @(ev.NoDraw ? "btn-warning" : "btn-outline-secondary")"
+													        data-event-id="@ev.Id"
+													        data-no-draw="@ev.NoDraw.ToString().ToLower()">
+														<i class="bi bi-slash-circle"></i>
+													</button>
+													<span class="custom-save-remove-tooltip">@(ev.NoDraw ? "Enable Draw" : "Disable Draw")</span>
+												</span>
+											}
+
+											@* Row 2 col 2: Postpone *@
 											@if (ev.MatchStatus == MatchStatus.Scheduled
 											  || ev.MatchStatus == MatchStatus.Live
 											  || (ev.MatchStatus == MatchStatus.FullTime && !ev.HasResult))
 											{
-												<span class="custom-save-remove-tooltip-wrapper">
-
+												<span class="custom-save-remove-tooltip-wrapper pos-r2c2">
 													<button type="button"
 													        class="btn btn-outline-secondary btn-sm open-postpone-modal"
 													        data-bs-toggle="modal"
 													        data-bs-target="#confirmPostponeModal"
 													        data-event-id="@ev.Id">
-
 														<i class="bi bi-pause-circle"></i>
-
 													</button>
-
-													<span class="custom-postponed-remove-tooltip">
-														Mark as postponed
-													</span>
-
+													<span class="custom-postponed-remove-tooltip">Mark as postponed</span>
 												</span>
+											}
+
+											@* Col 3 rows 1+2: Delete spanning both rows *@
+											@if (ev.IsCancelled != true)
+											{
+												<form asp-action="CancelMatchEvent" asp-controller="Event" method="post" class="pos-r12c3">
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="id" value="@ev.Id"/>
+													<span class="custom-save-remove-tooltip-wrapper">
+														<button type="button"
+														        class="btn btn-outline-danger btn-sm update-event-btn"
+														        data-bs-toggle="modal"
+														        data-bs-target="#confirmCancelModal"
+														        data-event-id="@ev.Id">
+															<i class="ri-delete-bin-2-fill"></i>
+														</button>
+														<span class="custom-save-remove-tooltip">Cancel the event</span>
+													</span>
+												</form>
 											}
 
 										</div>
