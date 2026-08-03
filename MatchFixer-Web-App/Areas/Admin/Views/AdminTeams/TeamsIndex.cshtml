@@ -387,6 +387,38 @@
 				{
 					<p class="text-muted mt-3">No results for “@vm.Query”. Try exact name spelling or a shorter search.</p>
 				}
+
+				<hr class="my-4" style="border-color: rgba(255,255,255,0.2);" />
+
+				<h3 class="h6 mb-3 text-white">Add Manually</h3>
+				<form asp-area="Admin" asp-controller="AdminTeams" asp-action="AddManual" method="post"
+				      class="d-flex flex-column gap-3 w-100" style="max-width: 400px;">
+					@Html.AntiForgeryToken()
+
+					<div class="d-flex flex-column gap-1">
+						<label class="form-label text-white mb-0">Team name <span class="text-danger">*</span></label>
+						<input name="name" class="form-control form-control-sm" placeholder="e.g., Lokomotiv Sofia" required />
+					</div>
+
+					<div class="d-flex flex-column gap-1">
+						<label class="form-label text-white mb-0">Assign to league <span class="text-danger">*</span></label>
+						<select name="leagueId" class="form-select form-select-sm">
+							@foreach (var kv in leagues)
+							{
+								<option value="@kv.Key">@kv.Value</option>
+							}
+						</select>
+					</div>
+
+					<div class="d-flex flex-column gap-1">
+						<label class="form-label text-white mb-0">Logo URL <span class="text-muted" style="font-size:0.8em;">(optional)</span></label>
+						<input name="logoUrl" type="url" class="form-control form-control-sm" placeholder="https://..." />
+					</div>
+
+					<button type="submit" class="btn btn-success btn-sm align-self-start">
+						<i class="bi bi-plus-circle me-1"></i> Add Team
+					</button>
+				</form>
 			</div>
 		</div>
 	</div>
