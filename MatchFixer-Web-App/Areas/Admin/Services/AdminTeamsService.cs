@@ -245,7 +245,34 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		}
 
 
-		public async Task<bool> UpdateTeamAsync(TeamEditorVm vm)
+		public async Task<bool> AddTeamManuallyAsync(string name, int leagueId, string? logoUrl, CancellationToken ct = default)
+	{
+		var trimmed = name.Trim();
+		var exists = await _db.Teams.AnyAsync(t => t.Name == trimmed, ct);
+		if (exists) return false;
+
+		var leagueName = _leagueMap.TryGetValue(leagueId, out var ln) ? ln : $"League {leagueId}";
+
+		const string defaultLogo = "https://res.cloudinary.com/doorb7d6i/image/upload/v1771689175/rest-of-world2_tczptr.png";
+
+		var team = new Team
+		{
+			Id = Guid.NewGuid(),
+			TeamId = null,
+			Name = trimmed,
+			LogoUrl = !string.IsNullOrWhiteSpace(logoUrl) ? logoUrl.Trim() : defaultLogo,
+			LeagueName = leagueName,
+			IsNationalTeam = leagueId == VirtualLeagues.InternationalId
+		};
+
+		await _db.Teams.AddAsync(team, ct);
+		await _db.SaveChangesAsync(ct);
+		_cache.Remove(TeamsByLeague);
+
+		return true;
+	}
+
+	public async Task<bool> UpdateTeamAsync(TeamEditorVm vm)
 		{
 			var team = await _db.Teams
 				.Include(t => t.Aliases)
