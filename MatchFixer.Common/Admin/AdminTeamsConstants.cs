@@ -7,5 +7,7 @@
 
 		public const string TeamAddedSuccessfully = "Team added successfully.";
 		public const string TeamAlreadyExists = "This team already exists.";
+		public const string ManualTeamAddedSuccessfully = "Manual team added successfully.";
+		public const string ManualTeamNameExists = "A team with that name already exists.";
 	}
 }
