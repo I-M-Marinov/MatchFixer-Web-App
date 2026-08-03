@@ -276,7 +276,8 @@ namespace MatchFixer.Core.Services
 			}
 
 			
-			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
+			var isDerby = homeTeam.TeamId.HasValue && awayTeam.TeamId.HasValue
+				&& IsDerby(homeTeam.TeamId.Value, awayTeam.TeamId.Value);
 
 			string? competitionName = null;
 
@@ -331,7 +332,8 @@ namespace MatchFixer.Core.Services
 			if (homeTeam == null || awayTeam == null)
 				throw new Exception(TeamDoesNotExist);
 
-			var isDerby = IsDerby((int)homeTeam.TeamId, (int)awayTeam.TeamId);
+			var isDerby = homeTeam.TeamId.HasValue && awayTeam.TeamId.HasValue
+				&& IsDerby(homeTeam.TeamId.Value, awayTeam.TeamId.Value);
 
 			var matchEvent = new MatchEvent
 			{
