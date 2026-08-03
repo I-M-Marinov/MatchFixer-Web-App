@@ -110,6 +110,24 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddManual(string name, int leagueId, string? logoUrl, CancellationToken ct)
+		{
+			if (string.IsNullOrWhiteSpace(name))
+			{
+				TempData["ErrorMessage"] = "Team name is required.";
+				return RedirectToAction(nameof(TeamsIndex));
+			}
+
+			var ok = await _teamService.AddTeamManuallyAsync(name, leagueId, logoUrl, ct);
+			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok
+				? ManualTeamAddedSuccessfully
+				: ManualTeamNameExists;
+
+			return RedirectToAction(nameof(TeamsIndex));
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> SyncLogos(bool force = false, CancellationToken ct = default)
 		{
 			var result = await _logoSyncService.SyncAllTeamLogosAsync(force, ct);
