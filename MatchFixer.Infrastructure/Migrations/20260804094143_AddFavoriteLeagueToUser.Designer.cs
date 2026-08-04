@@ -4,6 +4,7 @@ using MatchFixer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchFixer.Infrastructure.Migrations
 {
     [DbContext(typeof(MatchFixerDbContext))]
-    partial class MatchFixerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260804094143_AddFavoriteLeagueToUser")]
+    partial class AddFavoriteLeagueToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,6 +58,11 @@ namespace MatchFixer.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FavoriteLeagueName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("User's favourite domestic league name");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -655,19 +663,6 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.ToTable("UpcomingMatchEvents");
                 });
 
-            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.UserFavoriteLeague", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("LeagueName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId", "LeagueName");
-
-                    b.ToTable("UserFavoriteLeagues");
-                });
-
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.UserFavoriteTeam", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -1204,17 +1199,6 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Navigation("HomeTeam");
                 });
 
-            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.UserFavoriteLeague", b =>
-                {
-                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "User")
-                        .WithMany("FavoriteLeagues")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.UserFavoriteTeam", b =>
                 {
                     b.HasOne("MatchFixer.Infrastructure.Entities.Team", "Team")
@@ -1329,8 +1313,6 @@ namespace MatchFixer.Infrastructure.Migrations
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("BetSlips");
-
-                    b.Navigation("FavoriteLeagues");
 
                     b.Navigation("FavoriteTeams");
 
