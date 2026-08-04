@@ -20,6 +20,7 @@ using static MatchFixer.Common.GeneralConstants.ProfileConstants;
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 using static MatchFixer.Common.ServiceConstants.PasswordRequirements;
 using MatchFixer.Common.EmailTemplates;
+using MatchFixer.Common.FootballLeagues;
 using Country = ISO3166.Country;
 
 
@@ -189,7 +190,15 @@ namespace MatchFixer.Core.Services
 				CountryOptions = countryOptions,
 				Trophies = trophyViewModels,
 				FavoriteTeams = favoriteTeams,
-				AllTeams = allTeams
+				AllTeams = allTeams,
+				FavoriteLeagues = await _dbContext.UserFavoriteLeagues
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.LeagueName)
+					.ToListAsync(),
+				AllLeagues = LeagueNameMap.Domestic
+					.OrderBy(kv => kv.Value)
+					.Select(kv => new SelectListItem { Value = kv.Value, Text = kv.Value })
+					.ToList()
 			};
 		}
 
@@ -669,6 +678,34 @@ namespace MatchFixer.Core.Services
 			_dbContext.UserFavoriteTeams.Remove(favorite);
 			await _dbContext.SaveChangesAsync();
 
+			return true;
+		}
+
+		public async Task<bool> AddFavoriteLeagueAsync(string userId, string leagueName)
+		{
+			if (string.IsNullOrWhiteSpace(leagueName)) return false;
+			var userGuid = Guid.Parse(userId);
+			var entry = new UserFavoriteLeague { UserId = userGuid, LeagueName = leagueName.Trim() };
+			try
+			{
+				_dbContext.UserFavoriteLeagues.Add(entry);
+				await _dbContext.SaveChangesAsync();
+				return true;
+			}
+			catch (DbUpdateException)
+			{
+				return false;
+			}
+		}
+
+		public async Task<bool> RemoveFavoriteLeagueAsync(string userId, string leagueName)
+		{
+			var userGuid = Guid.Parse(userId);
+			var entry = await _dbContext.UserFavoriteLeagues
+				.FirstOrDefaultAsync(x => x.UserId == userGuid && x.LeagueName == leagueName);
+			if (entry == null) return false;
+			_dbContext.UserFavoriteLeagues.Remove(entry);
+			await _dbContext.SaveChangesAsync();
 			return true;
 		}
 
