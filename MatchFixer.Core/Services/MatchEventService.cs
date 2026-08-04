@@ -88,6 +88,12 @@ namespace MatchFixer.Core.Services
 					.ToListAsync())
 				.ToHashSet();
 
+			var favoriteLeagueNames = (await _dbContext.UserFavoriteLeagues
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.LeagueName)
+					.ToListAsync())
+				.ToHashSet();
+
 
 
 
@@ -148,7 +154,9 @@ namespace MatchFixer.Core.Services
 					HasResult = e.LiveResult != null,
 					UserTimeZone = user.TimeZone,
 					ApiFixtureId = e.ApiFixtureId,
-					CompetitionName = e.CompetitionName
+					CompetitionName = e.CompetitionName,
+					LeagueName = e.HomeTeam.LeagueName,
+					IsFavoriteLeague = !string.IsNullOrWhiteSpace(e.HomeTeam.LeagueName) && favoriteLeagueNames.Contains(e.HomeTeam.LeagueName)
 				});
 			}
 
@@ -247,6 +255,7 @@ namespace MatchFixer.Core.Services
 					FavoriteTeams = favoriteTeams,
 					IsFavoriteMatch = favoriteTeams.Any(),
 					HasResult = e.LiveResult != null,
+					LeagueName = e.HomeTeam.LeagueName,
 					MatchStatus = e.Status == MatchStatus.Scheduled &&
 					              e.MatchDate.HasValue &&
 					              e.MatchDate <= now
