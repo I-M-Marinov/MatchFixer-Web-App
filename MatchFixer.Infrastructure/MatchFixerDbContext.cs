@@ -31,6 +31,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<OddsBoost> OddsBoosts { get; set; }
 		public virtual DbSet<UpcomingMatchEvent> UpcomingMatchEvents { get; set; }
 		public virtual DbSet<UserFavoriteTeam> UserFavoriteTeams { get; set; }
+		public virtual DbSet<UserFavoriteLeague> UserFavoriteLeagues { get; set; }
 		public virtual DbSet<TeamWikiInfo> TeamWikiInfos { get; set; }
 		public virtual DbSet<WorldCupMatch> WorldCupMatches { get; set; }
 		public virtual DbSet<WorldCupGroupStanding> WorldCupGroupStandings { get; set; }
@@ -156,6 +157,16 @@ namespace MatchFixer.Infrastructure
 					.OnDelete(DeleteBehavior.Cascade);
 
 				entity.HasIndex(x => x.TeamId);
+			});
+
+			builder.Entity<UserFavoriteLeague>(entity =>
+			{
+				entity.HasKey(x => new { x.UserId, x.LeagueName });
+
+				entity.HasOne(x => x.User)
+					.WithMany(u => u.FavoriteLeagues)
+					.HasForeignKey(x => x.UserId)
+					.OnDelete(DeleteBehavior.Cascade);
 			});
 
 			builder.Entity<TeamWikiInfo>()
