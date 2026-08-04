@@ -26,5 +26,7 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public List<TrophyViewModel> Trophies { get; set; } = new();
 		public List<TeamDto> FavoriteTeams { get; set; } = new();
 		public List<SelectListItem> AllTeams { get; set; } = new();
+		public List<string> FavoriteLeagues { get; set; } = new();
+		public List<SelectListItem> AllLeagues { get; set; } = new();
 	}
 }
