@@ -63,7 +63,7 @@
 			</div>
 				
 
-			<div id="datePillContainer" class="d-flex flex-wrap justify-content-center gap-2 position-relative" style="z-index: 1;">
+			<div id="datePillContainer" class="d-flex flex-wrap justify-content-center gap-2 position-relative" style="z-index: 1; align-items: center; row-gap: 28px;">
 			</div>
 
 		</div>
@@ -86,7 +86,8 @@
 			     data-away-team="@match.AwayTeam"
 			     data-home-logo="@match.EffectiveHomeTeamLogo"
 			     data-away-logo="@match.EffectiveAwayTeamLogo"
-			     data-no-draw="@(match.NoDraw ? "true" : "false")">
+			     data-no-draw="@(match.NoDraw ? "true" : "false")"
+			     data-league="@match.LeagueName">
 
 
 			<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
@@ -158,9 +159,45 @@
 						};
 					}
 
+					string GetLeagueIcon(string league)
+					{
+						return league switch
+						{
+							"Premier League"            => "https://media.api-sports.io/football/leagues/39.png",
+							"La Liga"                   => "https://media.api-sports.io/football/leagues/140.png",
+							"Bundesliga"                => "https://media.api-sports.io/football/leagues/78.png",
+							"Serie A"                   => "https://media.api-sports.io/football/leagues/135.png",
+							"Ligue 1"                   => "https://media.api-sports.io/football/leagues/61.png",
+							"Eredivisie"                => "https://media.api-sports.io/football/leagues/88.png",
+							"Liga Portugal"             => "https://media.api-sports.io/football/leagues/94.png",
+							"Polish League Ekstraklasa" => "https://media.api-sports.io/football/leagues/106.png",
+							"Swiss League"              => "https://media.api-sports.io/football/leagues/207.png",
+							"Parva Liga"                => "https://media.api-sports.io/football/leagues/172.png",
+							_ => null
+						};
+					}
+
 				}
 
 			</div>
+
+			@* Domestic league badge — top-center, only when no competition and not a derby *@
+			@if (string.IsNullOrWhiteSpace(match.CompetitionName) && !match.IsDerby)
+			{
+				var leagueIcon = GetLeagueIcon(match.LeagueName ?? "");
+				if (leagueIcon != null)
+				{
+					<div class="league-badge-center-wrapper">
+						<span class="league-badge-tooltip-wrapper">
+							<img src="@leagueIcon"
+							     alt="@match.LeagueName"
+							     class="league-badge-center-img animate__animated animate__fadeIn" />
+							<span class="league-badge-tooltip">@match.LeagueName</span>
+						</span>
+					</div>
+				}
+			}
+
 			<div class="d-flex justify-content-around align-items-center mb-2 mt-2 @(!string.IsNullOrWhiteSpace(match.CompetitionName) ? "competition-negative-margin" : (match.IsDerby ? "derby-negative-margin" : ""))">
 				<div class="tw-flex tw-justify-around tw-items-center mb-2 gap-4">
 					<div class="text-center">
@@ -739,10 +776,15 @@
 	});
 
 
+	const userFavoriteLeagues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+		Model.Where(m => m.IsFavoriteLeague).Select(m => m.LeagueName).Distinct().ToList()
+	));
+
 	document.addEventListener('DOMContentLoaded', () => {
 		renderDatePills();
 		renderCompetitionBubbles();
 		renderFavoriteBubbles();
+		renderFavoriteLeagueBubble();
 		syncBoostedDatePill();
 
 	});
@@ -781,11 +823,11 @@
 		connection.start()
 			.then(() => {
 				console.log("SignalR connected");
+				connection.invoke("JoinBoostChannel")
+					.catch(err => console.error("Failed to join boost channel:", err.toString()));
 				document.querySelectorAll('.event-card').forEach(card => {
 					const matchId = card.dataset.matchId;
-					console.log("Subscribing to match", matchId);
-					connection.invoke("SubscribeToEvent", matchId)
-						.then(() => console.log("Subscribed to", matchId))
+					connection.invoke("JoinMatch", matchId)
 						.catch(err => console.error(`Failed to subscribe to match ${matchId}:`, err.toString()));
 				});
 		})
@@ -1424,6 +1466,22 @@
 		}
 	}
 
+	function getLeagueIcon(league) {
+		const map = {
+			"Premier League":            "https://media.api-sports.io/football/leagues/39.png",
+			"La Liga":                   "https://media.api-sports.io/football/leagues/140.png",
+			"Bundesliga":                "https://media.api-sports.io/football/leagues/78.png",
+			"Serie A":                   "https://media.api-sports.io/football/leagues/135.png",
+			"Ligue 1":                   "https://media.api-sports.io/football/leagues/61.png",
+			"Eredivisie":                "https://media.api-sports.io/football/leagues/88.png",
+			"Liga Portugal":             "https://media.api-sports.io/football/leagues/94.png",
+			"Polish League Ekstraklasa": "https://media.api-sports.io/football/leagues/106.png",
+			"Swiss League":              "https://media.api-sports.io/football/leagues/207.png",
+			"Parva Liga":                "https://media.api-sports.io/football/leagues/172.png",
+		};
+		return map[league] ?? null;
+	}
+
 	function getCompetitionClass(name) {
 		switch (name) {
 			case "UEFA Champions League":
@@ -1500,6 +1558,46 @@
 			wrapper.appendChild(bubble);
 
 			insertAfter.after(wrapper);
+			insertAfter = wrapper;
+		});
+	}
+
+	function renderFavoriteLeagueBubble() {
+		const container = document.getElementById("datePillContainer");
+		if (!container || !userFavoriteLeagues?.length) return;
+
+		container.querySelectorAll(".fav-league-bubble-wrapper").forEach(e => e.remove());
+
+		const cards = [...document.querySelectorAll(".event-card")];
+
+		// Find the insertion point: after team bubbles, before competition bubbles
+		const lastTeamBubble = [...container.querySelectorAll(".favorite-bubble-wrapper:not(.fav-league-bubble-wrapper)")]
+			.at(-1);
+		let insertAfter = lastTeamBubble ?? document.getElementById("allTab");
+
+		userFavoriteLeagues.forEach(league => {
+			const hasMatches = cards.some(card => card.dataset.league === league);
+			if (!hasMatches) return;
+
+			const icon = getLeagueIcon(league);
+			if (!icon) return;
+
+			const wrapper = document.createElement("div");
+			wrapper.className = "fav-league-bubble-wrapper favorite-bubble-wrapper";
+			wrapper.dataset.league = league;
+			wrapper.title = league;
+
+			const bubble = document.createElement("div");
+			bubble.className = "favorite-bubble logo-bubble fav-league-bubble";
+
+			const img = document.createElement("img");
+			img.src = icon;
+			img.alt = league;
+
+			bubble.appendChild(img);
+			wrapper.appendChild(bubble);
+
+			if (insertAfter) insertAfter.after(wrapper);
 			insertAfter = wrapper;
 		});
 	}
@@ -1589,7 +1687,6 @@
 		document.querySelectorAll(".competition-bubble-wrapper")
 			.forEach(b => b.classList.remove("active"));
 
-		// Clear favorite bubbles
 		document.querySelectorAll(".favorite-bubble-wrapper")
 			.forEach(b => b.classList.remove("active"));
 
@@ -1614,7 +1711,35 @@
 
 		if (!(e.target instanceof Element)) return;
 
-		const bubble = e.target.closest(".favorite-bubble-wrapper");
+		const bubble = e.target.closest(".fav-league-bubble-wrapper");
+		if (!bubble) return;
+
+		const selectedLeague = bubble.dataset.league;
+
+		document.querySelectorAll(".favorite-bubble-wrapper")
+			.forEach(b => b.classList.remove("active"));
+		document.querySelectorAll(".competition-bubble-wrapper")
+			.forEach(b => b.classList.remove("active"));
+		document.querySelectorAll("#datePillContainer button")
+			.forEach(btn => btn.classList.remove("active"));
+
+		bubble.classList.add("active");
+
+		document.querySelectorAll(".event-card").forEach(card => {
+			const matches =
+				card.dataset.league === selectedLeague &&
+				card.dataset.postponed !== "true";
+			card.closest(".col").style.display = matches ? "" : "none";
+		});
+
+		updateMatchCount();
+	});
+
+	document.addEventListener("click", e => {
+
+		if (!(e.target instanceof Element)) return;
+
+		const bubble = e.target.closest(".favorite-bubble-wrapper:not(.fav-league-bubble-wrapper)");
 		if (!bubble) return;
 
 		const selectedTeam = bubble.dataset.team;
