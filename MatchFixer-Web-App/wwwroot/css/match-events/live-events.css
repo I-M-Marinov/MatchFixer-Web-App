@@ -312,6 +312,51 @@ body.live-events-no-scroll {
     opacity: 1;
 }
 
+/* ── Domestic league badge — top-center ──────────────────────────────────── */
+.league-badge-center-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.15rem;
+    padding-top: 0.15em;
+}
+
+.league-badge-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.league-badge-center-img {
+    height: 35px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+}
+
+.league-badge-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #f1d302;
+    color: black;
+    text-align: center;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    transition: opacity 0.2s;
+}
+
+.league-badge-tooltip-wrapper:hover .league-badge-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+
 .custom-event-tooltip-wrapper i {
     font-size: 1.3em;
     position: absolute;
@@ -525,11 +570,14 @@ body.live-events-no-scroll {
 
 .custom-date-pill {
     position: relative;
-    padding: 0.25em 0.85em;
+    padding: 0 0.85em;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
     font-size: 0.70em;
     font-weight: 800;
-    line-height: 1.75;
-    margin-top: 0.30em;
+    line-height: 1;
+    margin-top: 0;
     color: black;
     text-align: center;
     white-space: nowrap;
@@ -1541,9 +1589,9 @@ body.live-events-no-scroll {
 }
 
 .logo-bubble {
-    width: 42px;
-    height: 42px;
-    margin-top: 0.30em;
+    width: 40px;
+    height: 40px;
+    margin-top: 0;
     border-radius: 50%;
     background: white;
     display: flex;
@@ -1574,6 +1622,12 @@ body.live-events-no-scroll {
     border: 3px solid var(--primary-color);
     transform: scale(1.12);
     box-shadow: 0 12px 26px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.9);
+}
+
+.fav-league-bubble.logo-bubble {
+    width: 50px;
+    height: 50px;
+    margin-top: 0;
 }
 
 
