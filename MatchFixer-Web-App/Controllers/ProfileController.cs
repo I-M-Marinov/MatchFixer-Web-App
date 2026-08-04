@@ -84,6 +84,26 @@ namespace MatchFixer_Web_App.Controllers
 		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddFavoriteLeague(string leagueName)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			await _profileService.AddFavoriteLeagueAsync(userId, leagueName);
+			return RedirectToAction(nameof(Profile));
+		}
+
+		[Authorize]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RemoveFavoriteLeague(string leagueName)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			await _profileService.RemoveFavoriteLeagueAsync(userId, leagueName);
+			return RedirectToAction(nameof(Profile));
+		}
+
+		[Authorize]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
 		{
 			if (!ModelState.IsValid)
