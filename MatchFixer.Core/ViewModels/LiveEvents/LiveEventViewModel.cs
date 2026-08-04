@@ -52,6 +52,8 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public bool HasResult { get; set; }
 		public bool IsFavoriteMatch { get; set; }
 		public List<string> FavoriteTeams { get; set; } = new();
+		public string? LeagueName { get; set; }
+		public bool IsFavoriteLeague { get; set; }
 		public MatchStatus MatchStatus { get; set; } = MatchStatus.Scheduled;
 		public BoostViewModel? BoostActive { get; set; }
 		public int? ApiFixtureId { get; set; }
