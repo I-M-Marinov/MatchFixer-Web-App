@@ -34,6 +34,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{ PolishLeagueId, PolishLeagueName },
 				{ SwissLeagueId, SwissLeagueName },
 				{ BulgarianLeagueId, BulgarianLeagueName },
+				{ BulgarianSecondLeagueId, BulgarianSecondLeagueName },
 
 				// Competition-only virtual league 
 				{ VirtualLeagues.RestOfWorldId, VirtualLeagues.RestOfWorldName },
