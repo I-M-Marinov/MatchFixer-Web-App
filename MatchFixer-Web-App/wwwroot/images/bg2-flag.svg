@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20">
+  <!-- Bulgarian flag: white / green / red -->
+  <rect width="30" height="20" fill="white"/>
+  <rect y="6.67" width="30" height="6.67" fill="#00966E"/>
+  <rect y="13.33" width="30" height="6.67" fill="#D62612"/>
+  <!-- Centered dark circle with "2" -->
+  <circle cx="15" cy="10" r="6" fill="#1a1a2e" opacity="0.85"/>
+  <text x="15" y="13.5" font-family="Arial,sans-serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">2</text>
+</svg>
