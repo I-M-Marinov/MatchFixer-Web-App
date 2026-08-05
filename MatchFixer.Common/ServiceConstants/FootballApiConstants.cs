@@ -19,6 +19,7 @@
 		public const int PolishLeagueId = 106;
 		public const int SwissLeagueId = 207;
 		public const int BulgarianLeagueId = 172;
+		public const int BulgarianSecondLeagueId = 491;
 
 
 		public const string PremierLeagueName = "Premier League";
@@ -31,6 +32,7 @@
 		public const string PolishLeagueName = "Polish League Ekstraklasa";
 		public const string SwissLeagueName = "Swiss League";
 		public const string BulgarianLeagueName = "Parva Liga";
+		public const string BulgarianSecondLeagueName = "Vtora Liga";
 
 		public const string PremierLeagueLogoUrl = "https://media.api-sports.io/football/leagues/39.png";
 		public const string LaLigaLogoUrl = "https://media.api-sports.io/football/leagues/140.png";
