@@ -8,6 +8,7 @@
     {
 	    ["Premier League"] = 39,
 	    ["Parva Liga"] = 172,
+	    ["Vtora Liga"] = 491,
 	    ["Bundesliga"] = 78,
 	    ["La Liga"] = 140,
 	    ["Eredivisie"] = 88,
@@ -265,7 +266,9 @@ const leagueLogoMap = @Html.Raw(
 			}
 
 			const img = document.createElement("img");
-			img.src = `https://media.api-sports.io/football/leagues/${leagueId}.png`;
+			img.src = league === "Vtora Liga"
+				? "/images/bg2-flag.svg"
+				: `https://media.api-sports.io/football/leagues/${leagueId}.png`;
 			img.alt = league;
 
 			btn.appendChild(img);
