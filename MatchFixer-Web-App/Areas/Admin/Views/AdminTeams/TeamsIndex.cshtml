@@ -222,6 +222,7 @@
 
 										@t.LeagueName
 									</td>
+									
 								</tr>
 							}
 						}
@@ -427,6 +428,31 @@
 </div>
 
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" style="max-width:420px">
+		<div class="modal-content" style="border-radius:12px; overflow:hidden;">
+			<div class="modal-header border-0 pb-0">
+				<h5 class="modal-title text-danger fw-bold" id="deleteConfirmLabel">
+					<i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Team
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body pt-2">
+				<p class="mb-1">You are about to permanently delete:</p>
+				<p class="fw-bold fs-6 text-center my-3" id="deleteConfirmTeamName"></p>
+				<p class="text-muted small mb-0">This action <strong>cannot be undone</strong>. All associated data will be removed.</p>
+			</div>
+			<div class="modal-footer border-0 d-flex justify-content-between">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-danger" id="deleteConfirmBtn">
+					<i class="bi bi-trash me-1"></i> Yes, delete
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="modal fade" id="teamEditorModal" tabindex="-1">
 	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content">
@@ -556,6 +582,46 @@
 		list.appendChild(row);
 
 		input.focus();
+	});
+
+	// Delete — show custom confirmation modal
+	let _pendingDeleteId   = null;
+	let _pendingDeleteName = null;
+
+	document.addEventListener('click', e => {
+		const btn = e.target.closest('.delete-team-btn');
+		if (!btn) return;
+		e.stopPropagation();
+
+		_pendingDeleteId   = btn.dataset.teamId;
+		_pendingDeleteName = btn.dataset.teamName;
+
+		document.getElementById('deleteConfirmTeamName').textContent = _pendingDeleteName;
+		bootstrap.Modal.getOrCreate(document.getElementById('deleteConfirmModal')).show();
+	});
+
+	document.getElementById('deleteConfirmBtn').addEventListener('click', async () => {
+		if (!_pendingDeleteId) return;
+
+		const token = document.getElementById('teamEditorForm')
+			?.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+		const res = await fetch('/Admin/AdminTeams/DeleteTeam', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: `teamId=${encodeURIComponent(_pendingDeleteId)}&__RequestVerificationToken=${encodeURIComponent(token)}`
+		});
+
+		bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'))?.hide();
+
+		if (res.ok) {
+			bootstrap.Modal.getInstance(document.getElementById('teamEditorModal'))?.hide();
+			document.querySelector(`.team-row[data-team-id="${_pendingDeleteId}"]`)?.remove();
+		} else {
+			alert('Failed to delete team.');
+		}
+
+		_pendingDeleteId = _pendingDeleteName = null;
 	});
 
 	document.addEventListener('submit', async e => {
