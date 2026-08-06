@@ -26,6 +26,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 
 		Task<bool> UpdateTeamAsync(TeamEditorVm vm);
 
+	Task<bool> DeleteTeamAsync(Guid teamId, CancellationToken ct = default);
+
 	Task<bool> AddTeamManuallyAsync(
 		string name,
 		int leagueId,
