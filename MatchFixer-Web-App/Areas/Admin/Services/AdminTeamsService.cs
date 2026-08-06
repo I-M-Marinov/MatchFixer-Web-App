@@ -284,6 +284,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			team.Name = vm.Name.Trim();
 
+			if (vm.ApiTeamId.HasValue)
+				team.TeamId = vm.ApiTeamId.Value;
+
 			// Resolve league name from static map
 			if (!_leagueMap.TryGetValue(vm.LeagueId, out var leagueName))
 				return false;
@@ -346,6 +349,17 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			_cache.Remove(TeamsByLeague);
 
+			return true;
+		}
+
+		public async Task<bool> DeleteTeamAsync(Guid teamId, CancellationToken ct = default)
+		{
+			var team = await _db.Teams.FirstOrDefaultAsync(t => t.Id == teamId, ct);
+			if (team == null) return false;
+
+			_db.Teams.Remove(team);
+			await _db.SaveChangesAsync(ct);
+			_cache.Remove(TeamsByLeague);
 			return true;
 		}
 
