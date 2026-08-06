@@ -41,6 +41,15 @@
                 </div>
 
                 <div class="mb-3">
+                    <label>API Team ID</label>
+                    <input class="form-control"
+                           name="ApiTeamId"
+                           type="number"
+                           value="@Model.ApiTeamId"
+                           placeholder="e.g. 855" />
+                </div>
+
+                <div class="mb-3">
                     <label>League</label>
                     <select class="form-select" name="LeagueId">
                         @foreach (var l in Model.Leagues)
@@ -122,10 +131,13 @@
 		            </div>
 	            }
 
-	            <div class="team-editor-save">
-		            <button class="btn btn-primary">
-			            Save team
+	            <div class="team-editor-save d-flex justify-content-between align-items-center mt-3">
+		            <button type="button" class="btn btn-outline-danger btn-sm delete-team-btn"
+		                    data-team-id="@Model.TeamId"
+		                    data-team-name="@Model.Name">
+			            <i class="bi bi-trash me-1"></i> Delete team
 		            </button>
+		            <button class="btn btn-primary">Save team</button>
 	            </div>
             </form>
         </div>
