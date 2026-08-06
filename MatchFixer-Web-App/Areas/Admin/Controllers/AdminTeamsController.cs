@@ -110,6 +110,16 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteTeam(Guid teamId, CancellationToken ct)
+		{
+			var ok = await _teamService.DeleteTeamAsync(teamId, ct);
+			if (!ok)
+				return BadRequest("Could not delete team.");
+			return Ok();
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddManual(string name, int leagueId, string? logoUrl, CancellationToken ct)
 		{
 			if (string.IsNullOrWhiteSpace(name))
