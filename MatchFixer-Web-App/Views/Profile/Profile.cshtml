@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using MatchFixer.Common.FootballLeagues
+@using MatchFixer.Common.FootballCompetitions
 @model MatchFixer.Core.ViewModels.Profile.ProfileViewModel
 
 @{
@@ -366,10 +368,26 @@
 			}
 
 
+			@{
+				var leagueLogoMap = LeagueNameMap.Domestic
+					.ToDictionary(
+						kv => kv.Value,
+						kv => FootballCompetitionLogos.GetLeagueLogo(kv.Value) ?? $"https://media.api-sports.io/football/leagues/{kv.Key}.png",
+						StringComparer.OrdinalIgnoreCase);
+			}
 			@foreach (var league in Model.FavoriteLeagues)
 			{
+				var leagueLogo = leagueLogoMap.TryGetValue(league, out var logoUrl) ? logoUrl : null;
 				<div class="favorite-team-pill d-flex align-items-center gap-2">
-					<span>🏆 @league</span>
+					@if (leagueLogo != null)
+					{
+						<img src="@leagueLogo" height="22" width="22" style="object-fit:contain;" alt="@league" />
+					}
+					else
+					{
+						<span>🏆</span>
+					}
+					<span>@league</span>
 					<form asp-action="RemoveFavoriteLeague" asp-controller="Profile" method="post">
 						@Html.AntiForgeryToken()
 						<input type="hidden" name="leagueName" value="@league" />
