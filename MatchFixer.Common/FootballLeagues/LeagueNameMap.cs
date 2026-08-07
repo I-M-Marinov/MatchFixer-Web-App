@@ -23,7 +23,7 @@ namespace MatchFixer.Common.FootballLeagues
 			{ 106, "Polish League Ekstraklasa" },
 			{ 207, "Swiss League" },
 			{ 172, "Parva Liga" },
-			{ 491, "Vtora Liga" },
+			{ 173, "Vtora Liga" },
 		};
 	}
 }
