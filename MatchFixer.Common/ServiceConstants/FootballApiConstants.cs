@@ -19,7 +19,7 @@
 		public const int PolishLeagueId = 106;
 		public const int SwissLeagueId = 207;
 		public const int BulgarianLeagueId = 172;
-		public const int BulgarianSecondLeagueId = 491;
+		public const int BulgarianSecondLeagueId = 173;
 
 
 		public const string PremierLeagueName = "Premier League";
