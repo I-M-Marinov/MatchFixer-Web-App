@@ -357,6 +357,18 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var team = await _db.Teams.FirstOrDefaultAsync(t => t.Id == teamId, ct);
 			if (team == null) return false;
 
+			// Delete FK-Restrict dependents first — EF won't cascade these automatically
+			var upcomingMatches = await _db.UpcomingMatchEvents
+				.Where(e => e.HomeTeamId == teamId || e.AwayTeamId == teamId)
+				.ToListAsync(ct);
+			_db.UpcomingMatchEvents.RemoveRange(upcomingMatches);
+
+			var matchResults = await _db.MatchResults
+				.Where(r => r.HomeTeamId == teamId || r.AwayTeamId == teamId)
+				.ToListAsync(ct);
+			_db.MatchResults.RemoveRange(matchResults);
+
+			// TeamAlias, UserFavoriteTeam, TeamWikiInfo are Cascade — handled automatically
 			_db.Teams.Remove(team);
 			await _db.SaveChangesAsync(ct);
 			_cache.Remove(TeamsByLeague);
