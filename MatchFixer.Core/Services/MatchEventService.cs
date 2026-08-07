@@ -612,7 +612,9 @@ namespace MatchFixer.Core.Services
 				{
 					ApiLeagueId = l.Key,
 					Name = l.Value,
-					LeagueLogoUrl = $"https://media.api-sports.io/football/leagues/{l.Key}.png"
+					LeagueLogoUrl = SupportedApiLeagues.LogoOverrides.TryGetValue(l.Key, out var overrideUrl)
+						? overrideUrl
+						: $"https://media.api-sports.io/football/leagues/{l.Key}.png"
 				})
 				.ToList();
 
