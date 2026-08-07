@@ -18,7 +18,14 @@
 			{ 207, "Super League (Switzerland)" },
 
 			// Regional
-			{ 172, "First Professional League (Bulgaria)" }
+			{ 172, "First Professional League (Bulgaria)" },
+			{ 173, "Vtora Liga (Bulgaria)" }
+		};
+
+		// Logo overrides for leagues where the API Sports image is wrong or missing
+		public static readonly Dictionary<int, string> LogoOverrides = new()
+		{
+			{ 173, "https://bulgarian-football.com/files/logos/vtora-liga_226.png" }
 		};
 
 		// Leagues where NS status is unreliable
