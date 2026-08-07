@@ -428,7 +428,19 @@
 </div>
 
 
-<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="teamEditorModal" tabindex="-1">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-body" id="teamEditorBody">
+				<div class="text-center p-4">
+					<div class="spinner-border"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Delete Confirmation Modal — must come AFTER teamEditorModal so it stacks on top (same z-index, DOM order wins) -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" style="max-width:420px">
 		<div class="modal-content" style="border-radius:12px; overflow:hidden;">
@@ -448,18 +460,6 @@
 				<button type="button" class="btn btn-danger" id="deleteConfirmBtn">
 					<i class="bi bi-trash me-1"></i> Yes, delete
 				</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="teamEditorModal" tabindex="-1">
-	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-		<div class="modal-content">
-			<div class="modal-body" id="teamEditorBody">
-				<div class="text-center p-4">
-					<div class="spinner-border"></div>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -585,43 +585,58 @@
 	});
 
 	// Delete — show custom confirmation modal
-	let _pendingDeleteId   = null;
-	let _pendingDeleteName = null;
+	let _pendingDeleteId    = null;
+	let _pendingDeleteName  = null;
+	let _pendingDeleteToken = null;
 
 	document.addEventListener('click', e => {
 		const btn = e.target.closest('.delete-team-btn');
 		if (!btn) return;
 		e.stopPropagation();
 
-		_pendingDeleteId   = btn.dataset.teamId;
-		_pendingDeleteName = btn.dataset.teamName;
+		_pendingDeleteId    = btn.dataset.teamId;
+		_pendingDeleteName  = btn.dataset.teamName;
+
+		// Capture the token NOW while the editor modal's form is still in the DOM
+		_pendingDeleteToken = document.getElementById('teamEditorForm')
+			?.querySelector('input[name="__RequestVerificationToken"]')?.value;
 
 		document.getElementById('deleteConfirmTeamName').textContent = _pendingDeleteName;
-		bootstrap.Modal.getOrCreate(document.getElementById('deleteConfirmModal')).show();
+
+		const confirmModalEl = document.getElementById('deleteConfirmModal');
+		const confirmModal   = bootstrap.Modal.getInstance(confirmModalEl) ?? new bootstrap.Modal(confirmModalEl);
+
+		// Hide the editor first — showing two modals simultaneously causes
+		// backdrop/z-index conflicts. Show confirm once the editor is fully gone.
+		const editorModalEl = document.getElementById('teamEditorModal');
+		const editorModal   = bootstrap.Modal.getInstance(editorModalEl);
+
+		if (editorModal) {
+			editorModalEl.addEventListener('hidden.bs.modal', () => confirmModal.show(), { once: true });
+			editorModal.hide();
+		} else {
+			confirmModal.show();
+		}
 	});
 
 	document.getElementById('deleteConfirmBtn').addEventListener('click', async () => {
 		if (!_pendingDeleteId) return;
 
-		const token = document.getElementById('teamEditorForm')
-			?.querySelector('input[name="__RequestVerificationToken"]')?.value;
-
 		const res = await fetch('/Admin/AdminTeams/DeleteTeam', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: `teamId=${encodeURIComponent(_pendingDeleteId)}&__RequestVerificationToken=${encodeURIComponent(token)}`
+			body: `teamId=${encodeURIComponent(_pendingDeleteId)}&__RequestVerificationToken=${encodeURIComponent(_pendingDeleteToken ?? '')}`
 		});
 
 		bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'))?.hide();
 
 		if (res.ok) {
-			bootstrap.Modal.getInstance(document.getElementById('teamEditorModal'))?.hide();
 			document.querySelector(`.team-row[data-team-id="${_pendingDeleteId}"]`)?.remove();
 		} else {
 			alert('Failed to delete team.');
 		}
 
-		_pendingDeleteId = _pendingDeleteName = null;
+		_pendingDeleteId = _pendingDeleteName = _pendingDeleteToken = null;
 	});
 
 	document.addEventListener('submit', async e => {
