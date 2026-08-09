@@ -19,7 +19,7 @@
 
 			// Regional
 			{ 172, "First Professional League (Bulgaria)" },
-			{ 173, "Vtora Liga (Bulgaria)" }
+			{ 173, "Second Professional League (Bulgaria)" }
 		};
 
 		// Logo overrides for leagues where the API Sports image is wrong or missing
