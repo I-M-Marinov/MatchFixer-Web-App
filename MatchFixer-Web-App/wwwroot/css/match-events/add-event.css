@@ -117,6 +117,55 @@
 
 
 /*----------------------------------------------------------------
+|                   LEAGUE FILTER PILLS                          |
+-----------------------------------------------------------------*/
+
+#eventLeagueTabs {
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#eventLeagueTabs .league-pill {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* The "All" pill is styled together with the date-filter "All" button */
+
+#eventLeagueTabs .league-pill:not([data-league="all"]) {
+    position: static !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    line-height: 1;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#eventLeagueTabs .league-pill-logo {
+    display: block;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: contain;
+    padding: 3px;
+    opacity: 0.65;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+#eventLeagueTabs .league-pill:hover .league-pill-logo {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#eventLeagueTabs .league-pill.active .league-pill-logo {
+    opacity: 1;
+    transform: scale(1.12);
+}
+
+
+/*----------------------------------------------------------------
 |             MODEL ERRORS SPAN + VALIDATION ERRORS              |
 -----------------------------------------------------------------*/
 
@@ -668,7 +717,8 @@ table.responsive-stack td {
     gap: 0.5em;
 }
 
-#eventDateTabs .nav-link {
+#eventDateTabs .nav-link,
+#eventLeagueTabs .league-pill[data-league="all"] {
     position: relative;
     border-radius: 999px;
     padding: 0.45rem 1.1rem;
@@ -680,28 +730,33 @@ table.responsive-stack td {
     transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
 }
 
-#eventDateTabs .nav-link:hover {
+#eventDateTabs .nav-link:hover,
+#eventLeagueTabs .league-pill[data-league="all"]:hover {
     background: rgba(13, 110, 253, 0.12);
     transform: translateY(-1px);
 }
 
-#eventDateTabs .nav-link.active {
+#eventDateTabs .nav-link.active,
+#eventLeagueTabs .league-pill[data-league="all"].active {
     background: linear-gradient(135deg, #0d6efd, #3b82f6);
     color: #fff;
     box-shadow: 0 6px 18px rgba(13, 110, 253, 0.35), inset 0 -2px 0 rgba(255,255,255,0.2);
 }
 
-#eventDateTabs .nav-link:active {
+#eventDateTabs .nav-link:active,
+#eventLeagueTabs .league-pill[data-league="all"]:active {
     transform: translateY(1px) scale(0.87);
     box-shadow: 0 3px 8px rgba(13, 110, 253, 0.4), inset 0 2px 4px rgba(0,0,0,0.15);
 }
 
-#eventDateTabs .nav-link:focus-visible {
+#eventDateTabs .nav-link:focus-visible,
+#eventLeagueTabs .league-pill[data-league="all"]:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(13,110,253,.35);
 }
 
-#eventDateTabs .nav-link::after {
+#eventDateTabs .nav-link::after,
+#eventLeagueTabs .league-pill[data-league="all"]::after {
     content: "";
     position: absolute;
     inset: 50%;
@@ -714,7 +769,8 @@ table.responsive-stack td {
     transition: width 0.45s ease, height 0.45s ease, opacity 0.6s;
 }
 
-#eventDateTabs .nav-link:active::after {
+#eventDateTabs .nav-link:active::after,
+#eventLeagueTabs .league-pill[data-league="all"]:active::after {
     width: 160%;
     height: 160%;
     opacity: 0;
