@@ -346,6 +346,7 @@
 
 	<div class="live-events-section mx-auto" style="max-width: 1400px;">
 		<ul class="nav nav-pills justify-content-center mb-3" id="eventDateTabs"></ul>
+		<ul class="nav nav-pills justify-content-center mb-2" id="eventLeagueTabs" style="display:none"></ul>
 
 		@if (Model.CurrentEvents.Any())
 		{
@@ -372,7 +373,8 @@
 							    data-date="@(ev.KickoffTime.HasValue 
 								               ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-dd") 
 								               : "tba")"
-							    data-postponed="@ev.IsPostponed">
+							    data-postponed="@ev.IsPostponed"
+				    data-league="@ev.LeagueName">
 								<td>
 									<div class="d-flex flex-column justify-content-center align-items-center">
 										@switch (ev.MatchStatus)
@@ -1475,106 +1477,142 @@
 
 
 
+		function getLeagueIcon(league) {
+			const map = {
+				"Premier League":            "https://media.api-sports.io/football/leagues/39.png",
+				"La Liga":                   "https://media.api-sports.io/football/leagues/140.png",
+				"Bundesliga":                "https://media.api-sports.io/football/leagues/78.png",
+				"Serie A":                   "https://media.api-sports.io/football/leagues/135.png",
+				"Ligue 1":                   "https://media.api-sports.io/football/leagues/61.png",
+				"Eredivisie":                "https://media.api-sports.io/football/leagues/88.png",
+				"Liga Portugal":             "https://media.api-sports.io/football/leagues/94.png",
+				"Polish League Ekstraklasa": "https://media.api-sports.io/football/leagues/106.png",
+				"Swiss League":              "https://media.api-sports.io/football/leagues/207.png",
+				"Parva Liga":                "https://media.api-sports.io/football/leagues/172.png",
+				"Vtora Liga":                "https://bulgarian-football.com/files/logos/vtora-liga_226.png",
+			};
+			return map[league] ?? null;
+		}
+
 		document.addEventListener("DOMContentLoaded", () => {
 			const rows = [...document.querySelectorAll("#live-events-table tbody tr")];
 
+			// Normalise date to LOCAL yyyy-MM-dd
 			rows.forEach(r => {
-
 				const kickoffStr = r.dataset.kickoff;
 				if (!kickoffStr) return;
-
 				const kickoff = new Date(kickoffStr);
-
 				if (isNaN(kickoff)) return;
-
-				// Convert to LOCAL date 
-				const localDate = kickoff.toLocaleDateString('sv-SE');
-
-				// Overwrite dataset.date
-				r.dataset.date = localDate;
+				r.dataset.date = kickoff.toLocaleDateString('sv-SE');
 			});
 
-			const tabs = document.getElementById("eventDateTabs");
+			const dateTabs   = document.getElementById("eventDateTabs");
+			const leagueTabs = document.getElementById("eventLeagueTabs");
 
 			if (!rows.length) return;
 
-			const uniqueDates = [
-			  ...new Set(
-				rows
-				  .map(r => r.dataset.date)
-				  .filter(d => d && d !== "tba")
-			  )
-			];
+			// ── Combined filter state ───────────────────────────────────────────
+			let activeDateFilter   = "all";
+			let activeLeagueFilter = "all";
+
+			function applyFilters() {
+				rows.forEach(r => {
+					const dateOk   = activeDateFilter   === "all" || r.dataset.date   === activeDateFilter;
+					const leagueOk = activeLeagueFilter === "all" || r.dataset.league === activeLeagueFilter;
+					r.style.display = (dateOk && leagueOk) ? "" : "none";
+				});
+			}
+
+			// ── Date pills ──────────────────────────────────────────────────────
+			const uniqueDates = [...new Set(rows.map(r => r.dataset.date).filter(d => d && d !== "tba"))];
 
 			const today = new Date();
 			today.setHours(0,0,0,0);
 
 			function labelFor(dateStr) {
-				const d = new Date(dateStr + "T00:00:00");
+				const d    = new Date(dateStr + "T00:00:00");
 				const diff = (d - today) / 86400000;
-
 				if (diff === 0) return "Today";
 				if (diff === 1) return "Tomorrow";
-
-				return d.toLocaleDateString(undefined, {
-					weekday: "short",
-					day: "numeric",
-					month: "short"
-				});
-			}
-
-			function filter(date) {
-				rows.forEach(r => {
-					if (date === "all") {
-						r.style.display = "";
-					} else {
-						r.style.display = r.dataset.date === date ? "" : "none";
-					}
-				});
+				return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 			}
 
 			const allLi = document.createElement("li");
-				allLi.className = "nav-item";
-				allLi.innerHTML = `
-					<button class="nav-link active" data-date="all">
-						All
-					</button>
-				`;
-
-				tabs.appendChild(allLi);
+			allLi.className = "nav-item";
+			allLi.innerHTML = `<button class="nav-link active" data-date="all">All</button>`;
+			dateTabs.appendChild(allLi);
 
 			const postponedLi = document.createElement("li");
-				postponedLi.className = "nav-item";
-				postponedLi.innerHTML = `
-				  <button class="nav-link" data-date="tba">
-					Postponed
-				  </button>
-				`;
+			postponedLi.className = "nav-item";
+			postponedLi.innerHTML = `<button class="nav-link" data-date="tba">Postponed</button>`;
+			dateTabs.appendChild(postponedLi);
 
-				tabs.appendChild(postponedLi);
-
-			uniqueDates.forEach((date, i) => {
+			uniqueDates.forEach(date => {
 				const li = document.createElement("li");
 				li.className = "nav-item";
-
-				li.innerHTML = `
-					<button class="nav-link"
-							data-date="${date}">
-						${labelFor(date)}
-					</button>
-				`;
-
-				tabs.appendChild(li);
+				li.innerHTML = `<button class="nav-link" data-date="${date}">${labelFor(date)}</button>`;
+				dateTabs.appendChild(li);
 			});
 
-			tabs.addEventListener("click", e => {
+			dateTabs.addEventListener("click", e => {
 				if (!e.target.dataset.date) return;
-
-				tabs.querySelectorAll(".nav-link").forEach(b => b.classList.remove("active"));
+				dateTabs.querySelectorAll(".nav-link").forEach(b => b.classList.remove("active"));
 				e.target.classList.add("active");
-
-				filter(e.target.dataset.date);
+				activeDateFilter = e.target.dataset.date;
+				applyFilters();
 			});
+
+			// ── League pills ────────────────────────────────────────────────────
+			const uniqueLeagues = [...new Set(rows.map(r => r.dataset.league).filter(Boolean))];
+
+			// Order the pills to match the Events-Spread admin view:
+			const leaguePriority = [
+				"Premier League",
+				"La Liga",
+				"Bundesliga",
+				"Serie A",
+				"Ligue 1",
+				"Parva Liga",
+				"Vtora Liga"
+			];
+			uniqueLeagues.sort((a, b) => {
+				const pa = leaguePriority.indexOf(a);
+				const pb = leaguePriority.indexOf(b);
+				if (pa !== -1 || pb !== -1) {
+					return (pa === -1 ? 999 : pa) - (pb === -1 ? 999 : pb);
+				}
+				return a.localeCompare(b);
+			});
+
+			if (uniqueLeagues.length >= 1 && leagueTabs) {
+				leagueTabs.style.display = "";
+
+				const allLeagueLi = document.createElement("li");
+				allLeagueLi.className = "nav-item";
+				allLeagueLi.innerHTML = `<button class="nav-link league-pill active" data-league="all">All</button>`;
+				leagueTabs.appendChild(allLeagueLi);
+
+				uniqueLeagues.forEach(league => {
+					const logo = getLeagueIcon(league) || "";
+					const li   = document.createElement("li");
+					li.className = "nav-item";
+					li.innerHTML = logo
+						? `<button class="nav-link league-pill" data-league="${league}" title="${league}">
+							<img src="${logo}" alt="${league}" class="league-pill-logo" />
+						   </button>`
+						: `<button class="nav-link league-pill" data-league="${league}" title="${league}">${league}</button>`;
+					leagueTabs.appendChild(li);
+				});
+
+				leagueTabs.addEventListener("click", e => {
+					const btn = e.target.closest(".league-pill");
+					if (!btn) return;
+					leagueTabs.querySelectorAll(".league-pill").forEach(b => b.classList.remove("active"));
+					btn.classList.add("active");
+					activeLeagueFilter = btn.dataset.league;
+					applyFilters();
+				});
+			}
 		});
 
 
