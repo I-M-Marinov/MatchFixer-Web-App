@@ -121,7 +121,7 @@
 -----------------------------------------------------------------*/
 
 #eventLeagueTabs {
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
@@ -144,13 +144,13 @@
 
 #eventLeagueTabs .league-pill-logo {
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: #fff;
-    object-fit: contain;
-    padding: 3px;
-    opacity: 0.65;
+    object-fit: contain !important;
+    padding: 4px;
+    opacity: 0.75;
     transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
