@@ -249,7 +249,7 @@ function renderBetSlip() {
         const textBefore = document.createTextNode("Go to the  ");
 
         const link = document.createElement("a");
-        link.href = "/Event/LiveEvents";
+        link.href = "/events";
         link.className = "btn btn-link events-board-btn";
         link.textContent = "Events Board";
 
