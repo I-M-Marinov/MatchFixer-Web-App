@@ -16,7 +16,7 @@ namespace MatchFixer_Web_App.Controllers
 			_userContextService = userContextService;
 		}
 
-		[HttpGet]
+		[HttpGet("/games/logo-quiz")]
 		public async Task<IActionResult> LogoQuiz(int currentScore = 0, bool skip = false)
 		{
 			var user = await _userContextService.GetCurrentUserAsync();
@@ -35,7 +35,7 @@ namespace MatchFixer_Web_App.Controllers
 			return View(question);
 		}
 
-		[HttpPost]
+		[HttpPost("/games/logo-quiz")]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> LogoQuiz(string SelectedAnswer, string CorrectAnswer, string LogoUrl, List<string> OriginalOptions)
 		{

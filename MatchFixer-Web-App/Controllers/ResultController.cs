@@ -52,7 +52,7 @@ namespace MatchFixer_Web_App.Controllers
 			return RedirectToAction("AddMatchEvent", "Event");
 		}
 
-		[HttpGet]
+		[HttpGet("/results")]
 		public async Task<IActionResult> EventsResults(int day = 0)
 		{
 			var model = await _eventsResultsService.GetByDayAsync(day);

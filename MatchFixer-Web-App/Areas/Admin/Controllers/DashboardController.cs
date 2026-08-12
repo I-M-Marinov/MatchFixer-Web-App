@@ -6,8 +6,6 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	
 	[Area("Admin")]
-	[Route("Admin")]                        // /Admin  -> Index
-	[Route("Admin/[controller]")]           // /Admin/Dashboard  -> Index
 	[AdminOnly]
 	public class DashboardController : Controller
 	{
@@ -18,8 +16,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			_dashboardService = dashboardService;
 		}
 
-		[HttpGet("")]
-		[HttpGet("Index")]
+		[HttpGet("/admin/dashboard")]
 		[AdminOnly]
 		public async Task<IActionResult> Index()
 		{

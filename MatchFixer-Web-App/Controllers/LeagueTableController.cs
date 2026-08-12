@@ -13,6 +13,7 @@ namespace MatchFixer_Web_App.Controllers
 			_leagueTableService = leagueTableServicebles;
 		}
 
+		[HttpGet("/league-tables")]
 		public async Task<IActionResult> LeagueTables(
 			InternalLeague? league,
 			string? season)

@@ -25,7 +25,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 		}
 
-		[HttpGet]
+		[HttpGet("/admin/teams", Name = "AdminTeamsList")]
 		public async Task<IActionResult> TeamsIndex(
 			int page = 1,
 			[FromQuery] int[]? leagueIds = null,

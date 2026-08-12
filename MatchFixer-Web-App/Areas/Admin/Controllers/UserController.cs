@@ -6,23 +6,24 @@ using System.Security.Claims;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Route("Admin/Users")]
+	[Route("admin/users")]
 	[AdminOnly]
 	public class UsersController : Controller
 	{
 		private readonly IAdminUserService _svc;
 		public UsersController(IAdminUserService svc) => _svc = svc;
 
-		[HttpGet("")]                     
-		[HttpGet("[action]")]
+		[HttpGet("/admin/users", Name = "AdminUsersList")]
 		public async Task<IActionResult> ShowUsers(string? query, string? status, int page = 1, int pageSize = 5)
 		{
 
+			// Default to the "active" filter without redirecting, so /admin/users
+			// renders directly (no self-redirect that could mis-generate a URL).
 			if (string.IsNullOrWhiteSpace(status))
 			{
-				return RedirectToAction(nameof(ShowUsers), new { query, status = "active", page, pageSize });
+				status = "active";
 			}
-			
+
 			var vm = await _svc.GetUsersAsync(query, status, page, pageSize);
 			return View(vm);
 

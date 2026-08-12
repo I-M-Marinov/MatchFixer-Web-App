@@ -20,7 +20,7 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[Authorize]
-		[HttpGet]
+		[HttpGet("/games/matchfix")]
 		public async Task<IActionResult> Landing()
 		{
 			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 

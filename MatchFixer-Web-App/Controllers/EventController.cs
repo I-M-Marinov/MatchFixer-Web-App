@@ -45,7 +45,7 @@ namespace MatchFixer_Web_App.Controllers
 			_oddsGeneratorService = oddsGeneratorService;
 		}
 
-		[HttpGet]
+		[HttpGet("/events/manage")]
 		[Authorize]
 		[AdminOnly]
 		public async Task<IActionResult> AddMatchEvent()
@@ -79,7 +79,7 @@ namespace MatchFixer_Web_App.Controllers
 			});
 		}
 
-		[HttpPost]
+		[HttpPost("/events/manage")]
 		[Authorize]
 		[AdminOnly]
 		[ValidateAntiForgeryToken]
@@ -112,7 +112,7 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 
-		[HttpGet]
+		[HttpGet("/events")]
 		[Authorize]
 		public async Task<IActionResult> LiveEvents()
 		{

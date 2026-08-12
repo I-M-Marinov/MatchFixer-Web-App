@@ -14,7 +14,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 		public AdminInsightsController(IAdminBetInsightsService svc) => _svc = svc;
 
-		[HttpGet]
+		[HttpGet("/admin/events", Name = "AdminEventsSpread")]
 		public async Task<IActionResult> EventsSpread(
 			string? league,
 			string? competition,               

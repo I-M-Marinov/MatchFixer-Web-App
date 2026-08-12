@@ -31,7 +31,7 @@ namespace MatchFixer_Web_App.Controllers
 		}
 
 		[Authorize]
-		[HttpGet]
+		[HttpGet("/profile")]
 		public async Task<IActionResult> Profile()
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 

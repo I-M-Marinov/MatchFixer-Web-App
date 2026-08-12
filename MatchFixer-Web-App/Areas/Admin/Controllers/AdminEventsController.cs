@@ -16,7 +16,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			_adminEventsService = adminEventsService;
 		}
 
-		[HttpGet]
+		[HttpGet("/admin/events/history", Name = "AdminEventsHistory")]
 		public async Task<IActionResult> History(AdminEventHistoryFilters filters)
 		{
 			// Last 60 days
