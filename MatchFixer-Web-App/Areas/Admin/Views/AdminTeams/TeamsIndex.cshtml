@@ -150,8 +150,8 @@
 					<button type="submit" class="btn btn-primary btn-sm">Filter</button>
 					@if (!string.IsNullOrWhiteSpace(vm.NameFilter))
 					{
-						var clearUrl = Url.Action("TeamsIndex", "AdminTeams",
-							new { area = "Admin", page = 1, leagueIds = selectedIds.ToArray() })!;
+						var clearUrl = Url.RouteUrl("AdminTeamsList",
+							new { page = 1, leagueIds = selectedIds.ToArray() })!;
 						<a href="@clearUrl" class="btn btn-secondary btn-sm">✕ Clear</a>
 					}
 				</form>
@@ -246,10 +246,9 @@
 											var selectedIdsArr = vm.SelectedLeagueIds ?? Array.Empty<int>();
 											var nameFilterParam = vm.NameFilter;
 
-											string Link(int i) => Url.Action(
-												"TeamsIndex",
-												"AdminTeams",
-												new { area = "Admin", page = i, leagueIds = selectedIdsArr, nameFilter = nameFilterParam }
+											string Link(int i) => Url.RouteUrl(
+												"AdminTeamsList",
+												new { page = i, leagueIds = selectedIdsArr, nameFilter = nameFilterParam }
 											)!;
 
 											int prevWindowStart = Math.Max(1, start - window);
@@ -473,7 +472,7 @@
 	  const btnClear = document.getElementById('leagueClear');
 	  const btnAll   = document.getElementById('leagueSelectAll');
 
-	  const baseUrl = '@Url.Action("TeamsIndex", "AdminTeams", new { area = "Admin" })';
+	  const baseUrl = '@Url.RouteUrl("AdminTeamsList")';
 
 	  function goToFiltered(ids){
 		const qs = new URLSearchParams();
