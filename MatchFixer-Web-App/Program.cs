@@ -129,6 +129,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+// Generate all outgoing URLs in lowercase (path only; query-string values untouched).
+builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteOptions>(options =>
+{
+	options.LowercaseUrls = true;
+});
+
 // SignalR (single registration, with detailed errors)
 builder.Services.AddSignalR(o =>
 {
