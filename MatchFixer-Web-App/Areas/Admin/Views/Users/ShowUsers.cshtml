@@ -291,9 +291,7 @@
 					{
 						<li class="page-item @(p == Model.Page ? "active" : "")">
 							<a class="page-link"
-							   asp-area="Admin"
-							   asp-controller="Users"
-							   asp-action="ShowUsers"
+							   asp-route="AdminUsersList"
 							   asp-route-query="@Model.Query"
 							   asp-route-status="@Model.Status"
 							   asp-route-page="@p"
