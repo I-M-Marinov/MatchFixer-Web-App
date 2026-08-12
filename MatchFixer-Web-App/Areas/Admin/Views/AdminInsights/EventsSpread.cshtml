@@ -76,11 +76,9 @@
 	                @{
 		                var p = Model.Page;
 		                var total = Model.TotalPages;
-		                string Link(int i) => Url.Action(
-			                "EventsSpread",
-			                "AdminInsights",
+		                string Link(int i) => Url.RouteUrl(
+			                "AdminEventsSpread",
 			                new {
-				                area = "Admin",
 				                page = i,
 				                sort = Context.Request.Query["sort"],
 				                desc = Context.Request.Query["desc"],
