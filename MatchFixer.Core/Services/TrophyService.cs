@@ -410,10 +410,10 @@ namespace MatchFixer.Core.Services
 			if (ctx != null)
 			{
 				var req = ctx.Request;
-				return $"{req.Scheme}://{req.Host}/Profile/{userId}";
+				return $"{req.Scheme}://{req.Host}/profile";
 			}
 			// Fallback for background jobs where HttpContext is unavailable
-			return $"/Profile/{userId}";
+			return "/profile";
 		}
 
 		private async Task AwardTrophy(Guid userId, int trophyId, string profileUrl, string? notes = null)

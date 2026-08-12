@@ -82,7 +82,7 @@ namespace MatchFixer.Core.Services
 					? match.HomeTeam.Name
 					: match.AwayTeam.Name;
 
-				var callbackUrl = $"{baseUrl}/Event/LiveEvents?team={Uri.EscapeDataString(favoriteTeamName)}";
+				var callbackUrl = $"{baseUrl}/events?team={Uri.EscapeDataString(favoriteTeamName)}";
 
 				var opponent = favoriteTeamName == match.HomeTeam.Name
 					? match.AwayTeam.Name
