@@ -457,9 +457,8 @@
 		var prevWinStart = Math.Max(1, wStart - window);
 		var nextWinStart = Math.Min(((total - 1) / window) * window + 1, wStart + window);
 
-		string PageLink(int i) => Url.Action("History", "AdminEvents", new
+		string PageLink(int i) => Url.RouteUrl("AdminEventsHistory", new
 		{
-			area      = "Admin",
 			page      = i,
 			pageSize  = filters.PageSize,
 			FromDate  = filters.FromDate?.ToString("yyyy-MM-dd"),
