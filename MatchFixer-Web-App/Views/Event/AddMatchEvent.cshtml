@@ -374,7 +374,8 @@
 								               ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-dd") 
 								               : "tba")"
 							    data-postponed="@ev.IsPostponed"
-				    data-league="@ev.LeagueName">
+				    data-league="@ev.LeagueName"
+				    data-competition="@ev.CompetitionName">
 								<td>
 									<div class="d-flex flex-column justify-content-center align-items-center">
 										@switch (ev.MatchStatus)
@@ -1494,6 +1495,18 @@
 			return map[league] ?? null;
 		}
 
+		function getCompetitionIcon(comp) {
+			const map = {
+				"UEFA Champions League":         "/images/live-events/champions-league.png",
+				"UEFA Europa League":            "/images/live-events/europa-league.png",
+				"UEFA Europa Conference League": "/images/live-events/conference-league.png",
+				"FIFA World Cup":                "/images/live-events/fifa_world_cup.png",
+				"UEFA Euro":                     "/images/live-events/uefa_euro.png",
+				"International":                 "/images/live-events/international_match.png"
+			};
+			return map[comp] ?? null;
+		}
+
 		document.addEventListener("DOMContentLoaded", () => {
 			const rows = [...document.querySelectorAll("#live-events-table tbody tr")];
 
@@ -1504,6 +1517,13 @@
 				const kickoff = new Date(kickoffStr);
 				if (isNaN(kickoff)) return;
 				r.dataset.date = kickoff.toLocaleDateString('sv-SE');
+			});
+
+			// Filter key: use the European competition when a match is tagged with one,
+			// otherwise fall back to the home team's domestic league.
+			rows.forEach(r => {
+				const comp = (r.dataset.competition || "").trim();
+				r.dataset.group = getCompetitionIcon(comp) ? comp : (r.dataset.league || "");
 			});
 
 			const dateTabs   = document.getElementById("eventDateTabs");
@@ -1518,7 +1538,7 @@
 			function applyFilters() {
 				rows.forEach(r => {
 					const dateOk   = activeDateFilter   === "all" || r.dataset.date   === activeDateFilter;
-					const leagueOk = activeLeagueFilter === "all" || r.dataset.league === activeLeagueFilter;
+					const leagueOk = activeLeagueFilter === "all" || r.dataset.group === activeLeagueFilter;
 					r.style.display = (dateOk && leagueOk) ? "" : "none";
 				});
 			}
@@ -1563,10 +1583,16 @@
 			});
 
 			// ── League pills ────────────────────────────────────────────────────
-			const uniqueLeagues = [...new Set(rows.map(r => r.dataset.league).filter(Boolean))];
+			const uniqueLeagues = [...new Set(rows.map(r => r.dataset.group).filter(Boolean))];
 
-			// Order the pills to match the Events-Spread admin view:
+			// European competitions surface first, then domestic leagues (Events-Spread order).
 			const leaguePriority = [
+				"UEFA Champions League",
+				"UEFA Europa League",
+				"UEFA Europa Conference League",
+				"FIFA World Cup",
+				"UEFA Euro",
+				"International",
 				"Premier League",
 				"La Liga",
 				"Bundesliga",
@@ -1593,7 +1619,7 @@
 				leagueTabs.appendChild(allLeagueLi);
 
 				uniqueLeagues.forEach(league => {
-					const logo = getLeagueIcon(league) || "";
+					const logo = getCompetitionIcon(league) || getLeagueIcon(league) || "";
 					const li   = document.createElement("li");
 					li.className = "nav-item";
 					li.innerHTML = logo
