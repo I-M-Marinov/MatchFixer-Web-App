@@ -23,5 +23,8 @@
 		public bool? IsManualDuplicate { get; set; }
 
 		public bool NoDraw { get; set; }
+
+		// Competition tag derived from the source API league (null for domestic leagues).
+		public string? Competition { get; set; }
 	}
 }
