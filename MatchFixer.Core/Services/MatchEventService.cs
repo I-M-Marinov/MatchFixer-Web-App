@@ -356,7 +356,7 @@ namespace MatchFixer.Core.Services
 				IsDerby = isDerby,
 				ApiFixtureId = apiFixtureId,
 				Status = MatchStatus.Scheduled, // on creation mark events as scheduled
-				CompetitionName = null // signifies that this is a domestic match only ! 
+				CompetitionName = model.CompetitionName // European cups get tagged; domestic stays null
 			};
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
@@ -668,7 +668,8 @@ namespace MatchFixer.Core.Services
 				HomeOdds   = m.HomeOdds,
 				DrawOdds   = m.DrawOdds,
 				AwayOdds   = m.AwayOdds,
-				NoDraw     = m.NoDraw
+				NoDraw     = m.NoDraw,
+				CompetitionName = m.Competition
 			};
 
 			await AddEventAsync(model, m.ApiFixtureId);
