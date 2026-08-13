@@ -26,6 +26,11 @@ namespace MatchFixer.Core.Services
 		{
 			var user = await _userContextService.GetCurrentUserAsync();
 
+			// European cups (2 = Champions, 3 = Europa, 848 = Conference) get a competition
+			// tag; domestic leagues resolve to null and stay untagged.
+			var competition = MatchFixer.Common.FootballCompetitions.FootballCompetitions
+				.ByApiLeagueId.TryGetValue(leagueId, out var comp) ? comp : null;
+
 			var teams = await _dbContext.Teams
 				.AsNoTracking()
 				.Select(t => new
@@ -127,6 +132,7 @@ namespace MatchFixer.Core.Services
 				return fromDb.Select(m => new UpcomingMatchRowViewModel
 				{
 					ApiFixtureId = m.ApiFixtureId,
+					Competition = competition,
 
 					HomeTeamId = m.HomeTeamId,
 					AwayTeamId = m.AwayTeamId,
@@ -213,6 +219,7 @@ namespace MatchFixer.Core.Services
 				.Select(m => new UpcomingMatchRowViewModel
 				{
 					ApiFixtureId = m.ApiFixtureId,
+					Competition = competition,
 
 					HomeTeamId = m.HomeTeamId,
 					AwayTeamId = m.AwayTeamId,
