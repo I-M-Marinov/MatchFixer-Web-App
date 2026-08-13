@@ -19,7 +19,12 @@
 
 			// Regional
 			{ 172, "First Professional League (Bulgaria)" },
-			{ 173, "Second Professional League (Bulgaria)" }
+			{ 173, "Second Professional League (Bulgaria)" },
+
+			// European competitions (UEFA)
+			{ 2,   "UEFA Champions League" },
+			{ 3,   "UEFA Europa League" },
+			{ 848, "UEFA Conference League" }
 		};
 
 		// Logo overrides for leagues where the API Sports image is wrong or missing
