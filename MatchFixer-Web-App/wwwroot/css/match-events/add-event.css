@@ -1209,8 +1209,15 @@ table.responsive-stack td {
     grid-column: 3;
     grid-row: 1 / 3;
     display: flex;
-    align-items: center;
+    align-items: stretch;   /* fill the full two-row height instead of floating centered */
     align-self: stretch;
+}
+
+/* Let the tooltip wrapper stretch so the button's height:100% resolves against
+   the full spanned height, not the wrapper's content height. */
+.event-action-grid .pos-r12c3 .custom-save-remove-tooltip-wrapper {
+    display: flex;
+    align-items: stretch;
 }
 
 .event-action-grid .pos-r12c3 .btn {
