@@ -3,6 +3,7 @@
 	public enum InternalLeague
 	{
 		PremierLeague,
+		Championship,
 		ParvaLiga,
 		Bundesliga,
 		LaLiga,
