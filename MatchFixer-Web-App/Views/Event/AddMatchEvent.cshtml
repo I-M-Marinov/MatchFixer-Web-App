@@ -1481,6 +1481,7 @@
 		function getLeagueIcon(league) {
 			const map = {
 				"Premier League":            "https://media.api-sports.io/football/leagues/39.png",
+				"Championship":              "https://media.api-sports.io/football/leagues/40.png",
 				"La Liga":                   "https://media.api-sports.io/football/leagues/140.png",
 				"Bundesliga":                "https://media.api-sports.io/football/leagues/78.png",
 				"Serie A":                   "https://media.api-sports.io/football/leagues/135.png",
@@ -1594,6 +1595,7 @@
 				"UEFA Euro",
 				"International",
 				"Premier League",
+				"Championship",
 				"La Liga",
 				"Bundesliga",
 				"Serie A",
@@ -1785,7 +1787,9 @@
 
 			document.getElementById("confirmAddUpcoming")
 				.addEventListener("click", () => {
-					form.submit();
+					// requestSubmit() fires the form's submit event so the cleanup handler runs
+					// (drops unchecked rows + reindexes) — only the selected matches are posted.
+					form.requestSubmit();
 			});
 		});
 
