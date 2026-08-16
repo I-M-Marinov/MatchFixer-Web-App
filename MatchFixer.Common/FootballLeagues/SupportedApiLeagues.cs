@@ -6,6 +6,7 @@
 		{
 			// Top 5
 			{ 39,  "Premier League (England)" },
+			{ 40,  "Championship (England)" },
 			{ 140, "La Liga (Spain)" },
 			{ 135, "Serie A (Italy)" },
 			{ 78,  "Bundesliga (Germany)" },

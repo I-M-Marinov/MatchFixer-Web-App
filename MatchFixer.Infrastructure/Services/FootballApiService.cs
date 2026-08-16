@@ -119,6 +119,7 @@ namespace MatchFixer.Infrastructure.Services
 			var leagues = new Dictionary<int, string>
 			{
 				{ PremierLeagueId, PremierLeagueName },
+				{ ChampionshipId, ChampionshipName },
 				{ LaLigaId, LaLigaName },
 				{ BundesligaId, BundesligaName },
 				{ SeriaAId, SeriaAName },

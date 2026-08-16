@@ -9,6 +9,7 @@
 		public const int Season = 2023;
 
 		public const int PremierLeagueId = 39;
+		public const int ChampionshipId = 40;
 		public const int LaLigaId = 140;
 		public const int BundesligaId = 78;
 		public const int SeriaAId = 135;
@@ -23,6 +24,7 @@
 
 
 		public const string PremierLeagueName = "Premier League";
+		public const string ChampionshipName = "Championship";
 		public const string LaLigaName = "La Liga";
 		public const string BundesligaName = "Bundesliga";
 		public const string SeriaAName = "Serie A";

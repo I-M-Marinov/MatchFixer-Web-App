@@ -14,6 +14,7 @@ namespace MatchFixer.Common.FootballLeagues
 		public static readonly IReadOnlyDictionary<int, string> Domestic = new Dictionary<int, string>
 		{
 			{ 39,  "Premier League" },
+			{ 40,  "Championship" },
 			{ 140, "La Liga" },
 			{ 78,  "Bundesliga" },
 			{ 135, "Serie A" },
