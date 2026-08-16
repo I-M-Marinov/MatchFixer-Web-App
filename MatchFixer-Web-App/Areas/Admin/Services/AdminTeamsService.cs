@@ -25,6 +25,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			new ReadOnlyDictionary<int, string>(new Dictionary<int, string>
 			{
 				{ PremierLeagueId, PremierLeagueName },
+				{ ChampionshipId, ChampionshipName },
 				{ LaLigaId, LaLigaName },
 				{ BundesligaId, BundesligaName },
 				{ SeriaAId, SeriaAName },
