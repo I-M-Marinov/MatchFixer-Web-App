@@ -16,6 +16,11 @@ namespace MatchFixer.Common.FootballCompetitions
 					ApiFootballLeagueId = 39,
 					TheSportsDbLeagueId = 4328
 				},
+				[InternalLeague.Championship] = new()
+				{
+					ApiFootballLeagueId = 40,
+					TheSportsDbLeagueId = 4329
+				},
 				[InternalLeague.Bundesliga] = new()
 				{
 					ApiFootballLeagueId = 78,

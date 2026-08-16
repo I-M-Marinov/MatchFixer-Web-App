@@ -9,6 +9,7 @@ namespace MatchFixer.Common.FootballCompetitions
 			new(StringComparer.OrdinalIgnoreCase)
 			{
 				["Premier League"] = 39,
+				["Championship"] = 40,
 				["Parva Liga"] = 172,
 				["Vtora Liga"] = 173,
 				["Bundesliga"] = 78,
