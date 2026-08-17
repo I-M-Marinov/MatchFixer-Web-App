@@ -1205,6 +1205,12 @@ table.responsive-stack td {
 .event-action-grid .pos-r2c1 { grid-column: 1; grid-row: 2; }
 .event-action-grid .pos-r2c2 { grid-column: 2; grid-row: 2; }
 
+/* Save/delete carry a legacy margin-left that only shifts the top-left cell,
+   knocking column 1 out of alignment with the no-draw button below it. */
+.event-action-grid .update-event-btn {
+    margin-left: 0;
+}
+
 .event-action-grid .pos-r12c3 {
     grid-column: 3;
     grid-row: 1 / 3;
