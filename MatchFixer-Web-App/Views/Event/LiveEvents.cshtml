@@ -1580,7 +1580,9 @@
 		let insertAfter = lastTeamBubble ?? document.getElementById("allTab");
 
 		userFavoriteLeagues.forEach(league => {
-			const hasMatches = cards.some(card => card.dataset.league === league);
+			// Only count true domestic matches — competition matches (Champions/Europa/etc.)
+			// belong under their competition bubble, not the home team's domestic league.
+			const hasMatches = cards.some(card => card.dataset.league === league && !card.dataset.competition);
 			if (!hasMatches) return;
 
 			const icon = getLeagueIcon(league);
@@ -1732,6 +1734,7 @@
 		document.querySelectorAll(".event-card").forEach(card => {
 			const matches =
 				card.dataset.league === selectedLeague &&
+				!card.dataset.competition &&
 				card.dataset.postponed !== "true";
 			card.closest(".col").style.display = matches ? "" : "none";
 		});
