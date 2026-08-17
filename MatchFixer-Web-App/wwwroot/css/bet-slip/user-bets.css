@@ -16,6 +16,24 @@
     text-shadow: 3px 4px 5px #0dab76 !important;
 }
 
+/* Slip reference number container  */
+.betslip-slip-number {
+    background: #ffffff;
+    color: #000000;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 0.2em 1em;
+    max-width: 300px;
+    text-align: center;
+    word-break: break-all;
+    border: 2px dotted #0dab76;
+    border-radius: 0.5rem 1em 0.5rem 1em;
+    text-shadow: 3px 4px 5px #0dab76;
+    margin-top: 0.45rem;
+    margin-bottom: 0.45rem;
+}
+
 .slip-container .card-header {
     background-color: #125fa7 !important;
 }
