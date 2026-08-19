@@ -1,135 +1,184 @@
-﻿@using MatchFixer.Common.Enums
-@model IEnumerable<MatchFixer.Core.DTOs.Bets.UserBetSlipDTO>
+@using MatchFixer.Common.Enums
+@model MatchFixer.Core.DTOs.Bets.PagedBetSlipsDTO
 
 @{
-	var currentTab = Model.FirstOrDefault()?.Status ?? "Pending";
+	var currentTab = Model.Status;
+	decimal summaryAmount = Model.SummaryAmount;
 
-    decimal summaryAmount = currentTab switch
-    {
-        "Pending" => Model.Sum(x => x.Amount * x.TotalOdds),
-        "Won" => Model.Sum(x => x.WinAmount ?? 0),
-        "Lost" => Model.Sum(x => x.Amount),
-        "Voided" => Model.Sum(x => x.Amount),
-        _ => 0
-    };
+	string summaryTitle = currentTab switch
+	{
+		"Pending" => "Total Potential Win",
+		"Won" => "Total Won",
+		"Lost" => "Total Lost",
+		"Voided" => "Total Refunded",
+		_ => "Summary"
+	};
 
-    string summaryTitle = currentTab switch
-    {
-        "Pending" => "Total Potential Win",
-        "Won" => "Total Won",
-        "Lost" => "Total Lost",
-        "Voided" => "Total Refunded",
-        _ => "Summary"
-    };
-
-    string summaryClass = currentTab switch
-    {
+	string summaryClass = currentTab switch
+	{
 		"Pending" => "bg-warning text-dark pending-betslips potential-wins-summary",
 		"Won" => "bg-success text-dark won-betslips wins-summary",
 		"Lost" => "bg-danger text-white lost-betslips lost-summary",
 		_ => "bg-secondary text-dark"
-    };
+	};
 
+	string pagerBadgeClass = currentTab switch
+	{
+		"Pending" => "status-pending",
+		"Won" => "status-won",
+		"Lost" => "status-lost",
+		"Voided" => "status-void",
+		_ => "status-pending"
+	};
 
+	int windowSize = 5;
+	int startPage = Math.Max(1, Model.Page - windowSize / 2);
+	int endPage = Math.Min(Model.TotalPages, startPage + windowSize - 1);
+	startPage = Math.Max(1, endPage - windowSize + 1);
 }
 
-@if (!Model.Any())
+@if (Model.TotalCount == 0)
 {
-    <div class="alert-custom-info-wrapper">
-        <div class="alert-custom-info">No bet slips in this category right now.</div>
-    </div>
+	<div class="alert-custom-info-wrapper">
+		<div class="alert-custom-info">No bet slips in this category right now.</div>
+	</div>
 }
 else
 {
-    <div class="row">
-        <!-- Left Betslips Column -->
+	<!-- Pager — sits between the tab strip and the first slip -->
+	<div class="betslip-pager d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"
+		 data-status="@Model.Status">
+
+		<div class="betslip-pager-size d-flex align-items-center gap-2">
+			<span>Show</span>
+			<select class="betslip-page-size-select form-select form-select-sm" aria-label="Slips per page">
+				@foreach (var size in new[] { 15, 25, 50 })
+				{
+					if (Model.PageSize == size)
+					{
+						<option value="@size" selected>@size</option>
+					}
+					else
+					{
+						<option value="@size">@size</option>
+					}
+				}
+			</select>
+			<span>per page</span>
+		</div>
+
+		@if (Model.TotalPages > 1)
+		{
+			<ul class="pagination pagination-sm betslip-pagination mb-0">
+				<li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+					<button type="button" class="page-link" data-page="@(Model.Page - 1)" aria-label="Previous">&lsaquo;</button>
+				</li>
+				@for (int p = startPage; p <= endPage; p++)
+				{
+					<li class="page-item @(p == Model.Page ? "active" : "")">
+						<button type="button" class="page-link" data-page="@p">@p</button>
+					</li>
+				}
+				<li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+					<button type="button" class="page-link" data-page="@(Model.Page + 1)" aria-label="Next">&rsaquo;</button>
+				</li>
+			</ul>
+		}
+
+		<span class="betslip-events-badge @pagerBadgeClass">
+			@Model.TotalCount slip@(Model.TotalCount == 1 ? "" : "s")
+		</span>
+	</div>
+
+	<div class="row">
+		<!-- Left Betslips Column -->
 		<div class="col-md-8 betslips-col">
-	        <div class="d-flex flex-column gap-3">
-		        @for (int i = 0; i < Model.Count(); i++)
-		        {
-			        var betSlip = Model.ElementAt(i);
-			        var collapseId = $"collapseBetslip{i}";
-			        var eventsCount = betSlip.Bets?.Count ?? 0;
+			<div class="d-flex flex-column gap-3">
+				@for (int i = 0; i < Model.Slips.Count; i++)
+				{
+					var betSlip = Model.Slips[i];
+					var collapseId = $"collapseBetslip{Model.Status}{i}";
+					var eventsCount = betSlip.Bets?.Count ?? 0;
 
-			        var statusClass = betSlip.Status switch
-			        {
-				        "Won" => "bg-success",
-				        "Lost" => "bg-danger",
-				        "Pending" => "bg-warning text-dark",
-				        _ => "bg-secondary"
-			        };
+					var statusClass = betSlip.Status switch
+					{
+						"Won" => "bg-success",
+						"Lost" => "bg-danger",
+						"Pending" => "bg-warning text-dark",
+						_ => "bg-secondary"
+					};
 
-			        var borderClass = betSlip.Status switch
-			        {
-				        "Won"     => "slip-border-won",
-				        "Lost"    => "slip-border-lost",
-				        "Pending" => "slip-border-pending",
-				        "Voided"  => "slip-border-void",
-				        _         => ""
-			        };
+					var borderClass = betSlip.Status switch
+					{
+						"Won"     => "slip-border-won",
+						"Lost"    => "slip-border-lost",
+						"Pending" => "slip-border-pending",
+						"Voided"  => "slip-border-void",
+						_         => ""
+					};
 
-			        var badgeClass = betSlip.Status switch
-			        {
-				        "Pending" => "status-pending",
-				        "Won" => "status-won",
-				        "Lost" => "status-lost",
-				        "Voided" => "status-void",
-				        _ => "status-pending"
-			        };
+					var badgeClass = betSlip.Status switch
+					{
+						"Pending" => "status-pending",
+						"Won" => "status-won",
+						"Lost" => "status-lost",
+						"Voided" => "status-void",
+						_ => "status-pending"
+					};
 
-			        <div class="card shadow-sm slip-container @borderClass">
-						
-				        <div class="slip-enclosure">
+					<div class="card shadow-sm slip-container @borderClass">
+
+						<div class="slip-enclosure">
 
 							<!-- Header -->
-					        <div class="card-header card-header-bet-totals @statusClass d-flex justify-content-between align-items-center"
-					             data-bs-toggle="collapse" data-bs-target="#@collapseId"
-					             title="Click to view betslip details" data-bs-toggle="tooltip" data-bs-placement="top"
-					             style="cursor: pointer;">
-						        <div class="w-100 d-flex align-items-center">
-							        <div class="flex-grow-1"></div>
-							        <div class="text-center">
-								        @if (betSlip.Status == nameof(BetStatus.Won))
-								        {
-									        <span class="text-white">
-										        <i class="bi bi-check-circle me-1 text-white"></i>
-										        <strong>Won:</strong> €@(betSlip.WinAmount?.ToString("0.00") ?? "0.00")
-									        </span>
-								        }
-								        else if (betSlip.Status == nameof(BetStatus.Lost))
-								        {
-									        <span class="text-white">
-										        <i class="bi bi-x-circle me-1 text-tomato"></i>
-										        <strong>Lost:</strong> €@betSlip.Amount.ToString("0.00")
-									        </span>
-								        }
-								        else if (betSlip.Status == nameof(BetStatus.Pending))
-								        {
-									        var potentialWin = Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
-									        <span class="text-black text-white">
-										        <i class="bi bi-clock me-1 text-yellow"></i>
-										        <strong>Potential Win:</strong> €@potentialWin.ToString("0.00")
-									        </span>
-								        }
-								        else // nameof(BetStatus.Void)
-								        {
-									        <span class="text-black">
-										        <i class="bi bi-slash-circle me-1"></i>
-										        @betSlip.Status
-									        </span>
-								        }
-							        </div>
+							<div class="card-header card-header-bet-totals @statusClass d-flex justify-content-between align-items-center"
+								 data-bs-toggle="collapse" data-bs-target="#@collapseId"
+								 title="Click to view betslip details" data-bs-placement="top"
+								 style="cursor: pointer;">
+								<div class="w-100 d-flex align-items-center">
+									<div class="flex-grow-1"></div>
+									<div class="text-center">
+										@if (betSlip.Status == nameof(BetStatus.Won))
+										{
+											<span class="text-white">
+												<i class="bi bi-check-circle me-1 text-white"></i>
+												<strong>Won:</strong> €@(betSlip.WinAmount?.ToString("0.00") ?? "0.00")
+											</span>
+										}
+										else if (betSlip.Status == nameof(BetStatus.Lost))
+										{
+											<span class="text-white">
+												<i class="bi bi-x-circle me-1 text-tomato"></i>
+												<strong>Lost:</strong> €@betSlip.Amount.ToString("0.00")
+											</span>
+										}
+										else if (betSlip.Status == nameof(BetStatus.Pending))
+										{
+											var potentialWin = Math.Floor(betSlip.Amount * betSlip.TotalOdds * 100) / 100;
+											<span class="text-black text-white">
+												<i class="bi bi-clock me-1 text-yellow"></i>
+												<strong>Potential Win:</strong> €@potentialWin.ToString("0.00")
+											</span>
+										}
+										else // nameof(BetStatus.Void)
+										{
+											<span class="text-black">
+												<i class="bi bi-slash-circle me-1"></i>
+												@betSlip.Status
+											</span>
+										}
+									</div>
 
-							        <!-- Event count -->
-							        <div class="flex-grow-1 text-end pe-2">
-								        <span class="betslip-events-badge @badgeClass">
-									        @eventsCount event@(eventsCount == 1 ? "" : "s")
-								        </span>
-							        </div>
+									<!-- Event count -->
+									<div class="flex-grow-1 text-end pe-2">
+										<span class="betslip-events-badge @badgeClass">
+											@eventsCount event@(eventsCount == 1 ? "" : "s")
+										</span>
+									</div>
 
-						        </div>
+								</div>
 
-					        </div>
+							</div>
 
 							<!-- Body -->
 							<div id="@collapseId" class="collapse">
@@ -221,9 +270,9 @@ else
 																		break;
 
 																	default: // Pending
-							 												<i class="bi bi-question-circle"
-							 												   style="color:#ff6a00;"
-							 												   title="Bet is pending"></i>
+																		<i class="bi bi-question-circle"
+																		   style="color:#ff6a00;"
+																		   title="Bet is pending"></i>
 																		break;
 																}
 
@@ -239,80 +288,21 @@ else
 									}
 								</div>
 							</div>
-				        </div>
-
-				        
-			        </div>
-		        }
-	        </div>
-        </div>
-        <!-- Right Summary Column -->
-        <div class="col-md-4 mb-4 summary-col">
-	        <div class="card shadow-sm @summaryClass">
-		        <div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 120px;">
-			        <h5 class="card-title">@summaryTitle</h5>
-			        <h2 class="fw-bold @summaryClass">€@summaryAmount.ToString("0.00")</h2>
-		        </div>
-	        </div>
-        </div>
-    </div>
-}
+						</div>
 
 
-<script>
-		document.addEventListener('DOMContentLoaded', function () {
-		// Initialize tooltips
-		const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-		tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-			new bootstrap.Tooltip(tooltipTriggerEl);
-		});
-
-		// Handle collapse border radius
-		document.addEventListener('DOMContentLoaded', function () {
-
-			document.querySelectorAll('[data-bs-toggle="tooltip"]')
-				.forEach(el => new bootstrap.Tooltip(el));
-
-			document.querySelectorAll('.collapse').forEach(collapse => {
-
-				const enclosure = collapse.closest('.slip-enclosure');
-
-				if (collapse.classList.contains('show')) {
-					enclosure?.classList.add('open');
+					</div>
 				}
-
-				collapse.addEventListener('shown.bs.collapse', function () {
-					enclosure?.classList.add('open');
-				});
-
-				collapse.addEventListener('hidden.bs.collapse', function () {
-					enclosure?.classList.remove('open');
-				});
-			});
-
-			// Close open slips on tab change
-			document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-				tab.addEventListener('hide.bs.tab', () => {
-					document.querySelectorAll('.collapse.show').forEach(collapse => {
-						bootstrap.Collapse.getOrCreateInstance(collapse).hide();
-					});
-				});
-			});
-		});
-
-		// Collapse open betslips before tab switch
-		const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
-			tabButtons.forEach(tab => {
-				tab.addEventListener('hide.bs.tab', () => {
-					const openCollapses = document.querySelectorAll('.collapse.show');
-					openCollapses.forEach(collapse => {
-						const bsCollapse = bootstrap.Collapse.getInstance(collapse);
-						if (bsCollapse) {
-							bsCollapse.hide();
-						}
-					});
-				});
-			});
-	});
-
-</script>
+			</div>
+		</div>
+		<!-- Right Summary Column -->
+		<div class="col-md-4 mb-4 summary-col">
+			<div class="card shadow-sm @summaryClass">
+				<div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 120px;">
+					<h5 class="card-title">@summaryTitle</h5>
+					<h2 class="fw-bold @summaryClass">€@summaryAmount.ToString("0.00")</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+}
