@@ -267,7 +267,41 @@ public class BettingService : IBettingService
 	}
 
 
-	private static BetStatus ComputeSlipStatus(BetSlip slip)
+	public async Task<PagedBetSlipsDTO> GetBetSlipsPageAsync(Guid userId, string status, int page, int pageSize)
+		{
+			if (page < 1) page = 1;
+			if (pageSize < 1) pageSize = 15;
+
+			var all = (await GetBetsByUserAsync(userId))
+				.Where(x => x.Status == status)
+				.ToList();
+
+			var summary = status switch
+			{
+				"Pending" => all.Sum(x => x.Amount * x.TotalOdds),
+				"Won"     => all.Sum(x => x.WinAmount ?? 0),
+				"Lost"    => all.Sum(x => x.Amount),
+				"Voided"  => all.Sum(x => x.Amount),
+				_         => 0m
+			};
+
+			var pageItems = all
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToList();
+
+			return new PagedBetSlipsDTO
+			{
+				Status = status,
+				Slips = pageItems,
+				Page = page,
+				PageSize = pageSize,
+				TotalCount = all.Count,
+				SummaryAmount = summary
+			};
+		}
+
+		private static BetStatus ComputeSlipStatus(BetSlip slip)
 	{
 		var statuses = slip.Bets
 			.Select(ResolveBetStatus)

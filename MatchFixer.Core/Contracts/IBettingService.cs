@@ -8,6 +8,7 @@ namespace MatchFixer.Core.Contracts
 		Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default);
 
 		Task<IEnumerable<UserBetSlipDTO>> GetBetsByUserAsync(Guid userId);
+		Task<PagedBetSlipsDTO> GetBetSlipsPageAsync(Guid userId, string status, int page, int pageSize);
 		Task<bool> CancelBetsForMatchAsync(Guid matchEventId);
 		Task<bool> EvaluateBetSlipAsync(Guid betSlipId);
 	}
