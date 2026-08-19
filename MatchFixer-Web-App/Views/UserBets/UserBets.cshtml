@@ -1,12 +1,7 @@
-﻿@model IEnumerable<MatchFixer.Core.DTOs.Bets.UserBetSlipDTO>
+@model MatchFixer.Core.DTOs.Bets.PagedBetSlipsDTO
 
 @{
 	ViewData["Title"] = "My Betslips";
-
-	var pending = Model.Where(x => x.Status == "Pending").ToList();
-	var won = Model.Where(x => x.Status == "Won").ToList();
-	var lost = Model.Where(x => x.Status == "Lost").ToList();
-	var voided = Model.Where(x => x.Status == "Voided").ToList();
 }
 
 <div class="game-background"></div>
@@ -31,45 +26,26 @@
 
 	<ul class="nav nav-tabs mb-4" id="betSlipTabs" role="tablist">
 		<li class="nav-item" role="presentation">
-			<button class="nav-link active"
-					id="pending-tab"
-					data-bs-toggle="tab"
-					data-bs-target="#pending"
-					type="button"
-					role="tab">
+			<button class="nav-link active" id="pending-tab" data-bs-toggle="tab"
+					data-bs-target="#pending" type="button" role="tab">
 				Pending
 			</button>
 		</li>
-
 		<li class="nav-item" role="presentation">
-			<button class="nav-link"
-					id="won-tab"
-					data-bs-toggle="tab"
-					data-bs-target="#won"
-					type="button"
-					role="tab">
+			<button class="nav-link" id="won-tab" data-bs-toggle="tab"
+					data-bs-target="#won" type="button" role="tab">
 				Won
 			</button>
 		</li>
-
 		<li class="nav-item" role="presentation">
-			<button class="nav-link"
-					id="lost-tab"
-					data-bs-toggle="tab"
-					data-bs-target="#lost"
-					type="button"
-					role="tab">
+			<button class="nav-link" id="lost-tab" data-bs-toggle="tab"
+					data-bs-target="#lost" type="button" role="tab">
 				Lost
 			</button>
 		</li>
-
 		<li class="nav-item" role="presentation">
-			<button class="nav-link"
-					id="voided-tab"
-					data-bs-toggle="tab"
-					data-bs-target="#voided"
-					type="button"
-					role="tab">
+			<button class="nav-link" id="voided-tab" data-bs-toggle="tab"
+					data-bs-target="#voided" type="button" role="tab">
 				Voided
 			</button>
 		</li>
@@ -77,33 +53,112 @@
 
 	<div class="tab-content" id="betSlipTabContent">
 
-		<div class="tab-pane fade show active"
-			 id="pending"
-			 role="tabpanel"
-			 aria-labelledby="pending-tab">
-			@await Html.PartialAsync("_BetSlipList", pending)
+		<div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+			<div class="betslip-tab-body" data-status="Pending" data-loaded="true">
+				@await Html.PartialAsync("_BetSlipList", Model)
+			</div>
 		</div>
 
-		<div class="tab-pane fade"
-			 id="won"
-			 role="tabpanel"
-			 aria-labelledby="won-tab">
-			@await Html.PartialAsync("_BetSlipList", won)
+		<div class="tab-pane fade" id="won" role="tabpanel" aria-labelledby="won-tab">
+			<div class="betslip-tab-body" data-status="Won" data-loaded="false">
+				<div class="betslip-loading text-center py-5"><span class="spinner-border text-light"></span></div>
+			</div>
 		</div>
 
-		<div class="tab-pane fade"
-			 id="lost"
-			 role="tabpanel"
-			 aria-labelledby="lost-tab">
-			@await Html.PartialAsync("_BetSlipList", lost)
+		<div class="tab-pane fade" id="lost" role="tabpanel" aria-labelledby="lost-tab">
+			<div class="betslip-tab-body" data-status="Lost" data-loaded="false">
+				<div class="betslip-loading text-center py-5"><span class="spinner-border text-light"></span></div>
+			</div>
 		</div>
 
-		<div class="tab-pane fade"
-			 id="voided"
-			 role="tabpanel"
-			 aria-labelledby="voided-tab">
-			@await Html.PartialAsync("_BetSlipList", voided)
+		<div class="tab-pane fade" id="voided" role="tabpanel" aria-labelledby="voided-tab">
+			<div class="betslip-tab-body" data-status="Voided" data-loaded="false">
+				<div class="betslip-loading text-center py-5"><span class="spinner-border text-light"></span></div>
+			</div>
 		</div>
 
 	</div>
 </div>
+
+<script>
+	(function () {
+		let currentPageSize = 15;
+
+		// (Re)initialise tooltips + collapse behaviour for freshly rendered slips.
+		function initSlipInteractions(container) {
+			if (!container) return;
+
+			container.querySelectorAll('[data-bs-toggle="tooltip"]')
+				.forEach(el => new bootstrap.Tooltip(el));
+
+			container.querySelectorAll('.collapse').forEach(collapse => {
+				const enclosure = collapse.closest('.slip-enclosure');
+				collapse.addEventListener('shown.bs.collapse', () => enclosure?.classList.add('open'));
+				collapse.addEventListener('hidden.bs.collapse', () => enclosure?.classList.remove('open'));
+			});
+		}
+
+		async function loadPane(body, page, pageSize) {
+			if (!body) return;
+			const status = body.dataset.status;
+
+			body.innerHTML = '<div class="betslip-loading text-center py-5"><span class="spinner-border text-light"></span></div>';
+
+			try {
+				const res = await fetch(`/UserBets/Slips?status=${encodeURIComponent(status)}&page=${page}&pageSize=${pageSize}`);
+				body.innerHTML = await res.text();
+				body.dataset.loaded = "true";
+				initSlipInteractions(body);
+			} catch (err) {
+				body.innerHTML = '<div class="alert-custom-info-wrapper"><div class="alert-custom-info">Could not load bet slips. Please try again.</div></div>';
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
+			// Pending is server-rendered — just wire up its interactions.
+			initSlipInteractions(document.querySelector('.betslip-tab-body[data-status="Pending"]'));
+
+			// Lazy-load a tab the first time it is shown.
+			document.querySelectorAll('#betSlipTabs button[data-bs-toggle="tab"]').forEach(tabBtn => {
+				tabBtn.addEventListener('shown.bs.tab', function (e) {
+					const paneId = e.target.getAttribute('data-bs-target');
+					const body = document.querySelector(`${paneId} .betslip-tab-body`);
+					if (body && body.dataset.loaded === "false") {
+						loadPane(body, 1, currentPageSize);
+					}
+				});
+			});
+
+			// Page number clicks.
+			document.getElementById('betSlipTabContent').addEventListener('click', function (e) {
+				const btn = e.target.closest('.betslip-pagination button[data-page]');
+				if (!btn || btn.closest('.page-item')?.classList.contains('disabled')) return;
+
+				const body = btn.closest('.betslip-tab-body');
+				const page = parseInt(btn.dataset.page, 10);
+				if (isNaN(page) || page < 1) return;
+
+				loadPane(body, page, currentPageSize);
+			});
+
+			// Page-size dropdown changes.
+			document.getElementById('betSlipTabContent').addEventListener('change', function (e) {
+				const select = e.target.closest('.betslip-page-size-select');
+				if (!select) return;
+
+				currentPageSize = parseInt(select.value, 10) || 15;
+				const body = select.closest('.betslip-tab-body');
+				loadPane(body, 1, currentPageSize);
+			});
+
+			// Collapse any open slip when switching tabs.
+			document.querySelectorAll('#betSlipTabs button[data-bs-toggle="tab"]').forEach(tab => {
+				tab.addEventListener('hide.bs.tab', () => {
+					document.querySelectorAll('.collapse.show').forEach(collapse => {
+						bootstrap.Collapse.getInstance(collapse)?.hide();
+					});
+				});
+			});
+		});
+	})();
+</script>
