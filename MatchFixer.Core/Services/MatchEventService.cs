@@ -354,6 +354,7 @@ namespace MatchFixer.Core.Services
 				DrawOdds = model.DrawOdds,
 				AwayOdds = model.AwayOdds,
 				IsDerby = isDerby,
+				NoDraw = model.NoDraw, 
 				ApiFixtureId = apiFixtureId,
 				Status = MatchStatus.Scheduled, // on creation mark events as scheduled
 				CompetitionName = model.CompetitionName // European cups get tagged; domestic stays null
