@@ -39,6 +39,13 @@ namespace MatchFixer_Web_App.Controllers
 			Response.Headers["Pragma"] = "no-cache";
 			Response.Headers["Expires"] = "0";
 
+			// the Game Over screen was refreshed, which clears the session)
+			// — send the user back to the MatchFix landing page
+			if (_sessionService.GetSessionState() == null)
+			{
+				return RedirectToAction(nameof(Landing));
+			}
+
 			var (viewModel, isGameOver) = await _gameService.PrepareNextQuestionAsync(HttpContext.Session);
 
 			// for debugging purposes only ( and honest cheating  :D ) 
