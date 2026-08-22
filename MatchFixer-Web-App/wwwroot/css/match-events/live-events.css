@@ -336,8 +336,9 @@ body.live-events-no-scroll {
 .league-badge-tooltip {
     visibility: hidden;
     opacity: 0;
-    background-color: #f1d302;
-    color: black;
+    background-color: #3b82f6;
+    color: #fff;
+    text-shadow: 1px 1px 1px black !important;
     text-align: center;
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
