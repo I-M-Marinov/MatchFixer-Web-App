@@ -154,10 +154,6 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     <br/><br/>
     <img src="./assets/favorite-teams.gif" width="800px" />
     <br/><br/>
-    <img src="./assets/favorite-team-playing-email.png" width="300px" />
-    <img src="./assets/favorite-team-playing-email2.png" width="300px" />
-    <br/><br/>
-    <img src="./assets/favorite-team-playing-email3.png" width="700px" />
     <h4>Trophies</h4>
     <p>- Users unlock trophies based on their betting activity and milestones reached on the platform.</p>
     <img src="./assets/rigged-to-win-trophy.png" width="800px" />
@@ -294,6 +290,16 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <img src="./assets/manual-event-updated.png" align="center" border="10" width="600px"/>
 </p>
 
+<details>
+    <summary><h2>Emails when your favorite team is playing</h2></summary>
+  <div align="center">
+    <img src="./assets/favorite-team-playing-email4.png" width="900px" />
+    <img src="./assets/favorite-team-playing-email.png" width="300px" />
+    <img src="./assets/favorite-team-playing-email2.png" width="300px" />
+    <br/><br/>
+    <img src="./assets/favorite-team-playing-email3.png" width="700px" />
+  </div>
+</details>
 
 <details>
   <summary><h2>League Tables</h2></summary>
