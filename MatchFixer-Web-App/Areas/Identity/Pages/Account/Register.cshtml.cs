@@ -21,6 +21,7 @@ using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 using static MatchFixer.Common.EmailTemplates.EmailMessages;
 
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -197,7 +198,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
 					if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-	                    TempData["SuccessMessage"] = ConfirmationEmailSent; // Store success message
+	                    TempData[TempDataKeys.SuccessMessage] = ConfirmationEmailSent; // Store success message
 						return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
 					}
                     else

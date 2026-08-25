@@ -13,6 +13,7 @@ using MatchFixer.Infrastructure.Entities;
 
 using static MatchFixer.Common.GeneralConstants.LoginConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
@@ -103,7 +104,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
 	        if (sessionExpired)
 	        {
-		        TempData["ErrorMessage"] = "Your session has expired. Please log in again.";
+		        TempData[TempDataKeys.ErrorMessage] = "Your session has expired. Please log in again.";
 	        }
 
 			if (!string.IsNullOrEmpty(ErrorMessage))
@@ -160,7 +161,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
                 if (!user.IsActive && user.WasDeactivatedByAdmin)
                 {
-	                TempData["ErrorMessage"] = AccountDeactivatedByAdmin;
+	                TempData[TempDataKeys.ErrorMessage] = AccountDeactivatedByAdmin;
 	                return Page();
                 }
 
@@ -171,13 +172,13 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 	                var userUpdated = await _userManager.UpdateAsync(user);
 	                if (!userUpdated.Succeeded)
 	                {
-		                TempData["ErrorMessage"] = FailedToReactivateAccount;
+		                TempData[TempDataKeys.ErrorMessage] = FailedToReactivateAccount;
 		                return RedirectToAction("Index", "Home");
 	                }
 
 					await _signInManager.RefreshSignInAsync(user); 
 
-					TempData["SuccessMessage"] = $"Welcome back, {user.FullName}. Your account is active again !";
+					TempData[TempDataKeys.SuccessMessage] = $"Welcome back, {user.FullName}. Your account is active again !";
 					return RedirectToAction("Profile", "Profile"); // redirect to the Profile View 
 				}
 				// This doesn't count login failures towards account lockout
