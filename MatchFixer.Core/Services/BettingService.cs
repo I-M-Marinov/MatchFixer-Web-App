@@ -147,11 +147,11 @@ public class BettingService : IBettingService
 				matchEvent.AwayOdds
 			);
 
-			decimal? effectiveOdds = betDto.SelectedOption.ToLower() switch
+			decimal? effectiveOdds = parsedPick switch
 			{
-				"home" => home,
-				"draw" => draw,
-				"away" => away,
+				MatchPick.Home => home,
+				MatchPick.Draw => draw,
+				MatchPick.Away => away,
 				_ => betDto.Odds // fallback, shouldn't happen if validated
 			};
 
@@ -278,11 +278,11 @@ public class BettingService : IBettingService
 
 			var summary = status switch
 			{
-				"Pending" => all.Sum(x => x.Amount * x.TotalOdds),
-				"Won"     => all.Sum(x => x.WinAmount ?? 0),
-				"Lost"    => all.Sum(x => x.Amount),
-				"Voided"  => all.Sum(x => x.Amount),
-				_         => 0m
+				nameof(BetStatus.Pending) => all.Sum(x => x.Amount * x.TotalOdds),
+				nameof(BetStatus.Won)     => all.Sum(x => x.WinAmount ?? 0),
+				nameof(BetStatus.Lost)    => all.Sum(x => x.Amount),
+				nameof(BetStatus.Voided)  => all.Sum(x => x.Amount),
+				_                         => 0m
 			};
 
 			var pageItems = all
