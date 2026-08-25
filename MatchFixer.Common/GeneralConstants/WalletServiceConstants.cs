@@ -15,6 +15,7 @@
 		// <<-------------- Wallet Controller / Admin Wallet Service -------------------->>
 
 		public const string WalletCreatedSuccessfully = "Wallet created successfully.";
+		public const string DefaultCurrency = "EUR";
 		public const string InsufficientBalanceForWithdrawal = "Insufficient balance for this withdrawal.";
 		public static string SuccessfullyDeposited(decimal amount)
 		{
