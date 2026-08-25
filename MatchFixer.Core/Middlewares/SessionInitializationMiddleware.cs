@@ -40,11 +40,11 @@ namespace MatchFixer.Core.Middlewares
 				var user = await userManager.GetUserAsync(context.User);
 				if (user != null)
 				{
-					var currentSessionUserId = context.Session.GetString("UserId");
+					var currentSessionUserId = context.Session.GetString(UserId);
 
 					if (string.IsNullOrEmpty(currentSessionUserId) || currentSessionUserId != user.Id.ToString())
 					{
-						context.Session.SetString("UserId", user.Id.ToString());
+						context.Session.SetString(UserId, user.Id.ToString());
 					}
 
 					if (string.IsNullOrEmpty(context.Session.GetString(UserTimezoneKey)))
