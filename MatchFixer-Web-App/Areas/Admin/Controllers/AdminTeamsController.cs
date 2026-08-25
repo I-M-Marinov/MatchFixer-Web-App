@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.Admin.AdminTeamsConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
@@ -76,7 +77,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> Add(int apiTeamId, int leagueId, string name, string logoUrl, CancellationToken ct)
 		{
 			var ok = await _teamService.AddTeamFromSearchAsync(apiTeamId, name, logoUrl, leagueId, ct);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? TeamAddedSuccessfully : TeamAlreadyExists;
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = ok ? TeamAddedSuccessfully : TeamAlreadyExists;
 
 			return RedirectToAction(nameof(TeamsIndex));
 		}
@@ -124,12 +125,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(name))
 			{
-				TempData["ErrorMessage"] = "Team name is required.";
+				TempData[TempDataKeys.ErrorMessage] = "Team name is required.";
 				return RedirectToAction(nameof(TeamsIndex));
 			}
 
 			var ok = await _teamService.AddTeamManuallyAsync(name, leagueId, logoUrl, ct);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = ok
 				? ManualTeamAddedSuccessfully
 				: ManualTeamNameExists;
 
@@ -142,7 +143,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			var result = await _logoSyncService.SyncAllTeamLogosAsync(force, ct);
 
-			TempData["SuccessMessage"] =
+			TempData[TempDataKeys.SuccessMessage] =
 				$"Logo sync completed. Downloaded: {result.Downloaded}, " +
 				$"Skipped: {result.Skipped}, Failed: {result.Failed}.";
 
