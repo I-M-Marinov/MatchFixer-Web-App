@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailModel : PageModel
@@ -49,7 +50,7 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 				return RedirectToPage("/Account/Login");
 			}
 
-			TempData["SuccessMessage"] = "Your email has been successfully confirmed. You can now log in."; ; // Store success message
+			TempData[TempDataKeys.SuccessMessage] = "Your email has been successfully confirmed. You can now log in."; ; // Store success message
 			return RedirectToPage("/Account/Login");
 		}
 	}
