@@ -3,6 +3,7 @@ using MatchFixer.Core.ViewModels.MatchGuessGame;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	public class GameController : Controller
@@ -23,7 +24,7 @@ namespace MatchFixer_Web_App.Controllers
 		[HttpGet("/games/matchfix")]
 		public async Task<IActionResult> Landing()
 		{
-			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 
+			var userId = HttpContext.Session.GetString(SessionConstants.UserId); // get the userId from the session 
 			Console.WriteLine($"USER ID ________________________________________________________ {userId}");
 			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
 
@@ -77,7 +78,7 @@ namespace MatchFixer_Web_App.Controllers
 			// Clear the old GameSession
 			_sessionService.ClearSession();
 			// Re-initialize the GameSession state 
-			var userId = HttpContext.Session.GetString("UserId"); // get the userId from the session 
+			var userId = HttpContext.Session.GetString(SessionConstants.UserId); // get the userId from the session 
 			_sessionService.InitializeSessionState(userId); // use the userId to initialize the game session
 			return RedirectToAction("Start");
 		}

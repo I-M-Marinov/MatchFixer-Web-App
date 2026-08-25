@@ -1,10 +1,12 @@
-﻿using MatchFixer.Core.Contracts;
+﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 using static MatchFixer.Common.GeneralConstants.UserBetsConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	[Authorize]
@@ -27,13 +29,13 @@ namespace MatchFixer_Web_App.Controllers
 				return Unauthorized();
 			}
 
-			var model = await _bettingService.GetBetSlipsPageAsync(userId, "Pending", 1, 15);
+			var model = await _bettingService.GetBetSlipsPageAsync(userId, nameof(BetStatus.Pending), 1, 15);
 
 			return View(model);
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Slips(string status = "Pending", int page = 1, int pageSize = 15)
+		public async Task<IActionResult> Slips(string status = nameof(BetStatus.Pending), int page = 1, int pageSize = 15)
 		{
 			var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (!Guid.TryParse(userIdString, out var userId))
@@ -63,11 +65,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!success)
 			{
-				TempData["ErrorMessage"] = CouldNotEvaluateBetslip;
+				TempData[TempDataKeys.ErrorMessage] = CouldNotEvaluateBetslip;
 			}
 			else
 			{
-				TempData["SuccessMessage"] = BetSlipEvaluatedSuccessfully;
+				TempData[TempDataKeys.SuccessMessage] = BetSlipEvaluatedSuccessfully;
 			}
 
 			// Redirect back to where the request came from
