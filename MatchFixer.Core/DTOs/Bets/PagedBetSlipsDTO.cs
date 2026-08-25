@@ -1,8 +1,10 @@
+using MatchFixer.Common.Enums;
+
 namespace MatchFixer.Core.DTOs.Bets
 {
 	public class PagedBetSlipsDTO
 	{
-		public string Status { get; set; } = "Pending";
+		public string Status { get; set; } = nameof(BetStatus.Pending);
 
 		public List<UserBetSlipDTO> Slips { get; set; } = new();
 
