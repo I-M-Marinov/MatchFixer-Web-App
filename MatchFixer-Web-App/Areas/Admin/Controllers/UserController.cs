@@ -3,6 +3,8 @@ using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
+using MatchFixer.Common.GeneralConstants;
+using MatchFixer.Common.Admin;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
@@ -21,7 +23,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			// renders directly (no self-redirect that could mis-generate a URL).
 			if (string.IsNullOrWhiteSpace(status))
 			{
-				status = "active";
+				status = AdminUserServiceConstants.StatusActive;
 			}
 
 			var vm = await _svc.GetUsersAsync(query, status, page, pageSize);
@@ -36,12 +38,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			var me = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (!Guid.TryParse(me, out var actorId))
 			{
-				TempData["ErrorMessage"] = "Unable to resolve your user id.";
+				TempData[TempDataKeys.ErrorMessage] = "Unable to resolve your user id.";
 				return RedirectToAction(nameof(ShowUsers));
 			}
 
 			var (ok, msg) = await _svc.LockUserAsync(actorId, id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
@@ -52,12 +54,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			var me = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (!Guid.TryParse(me, out var actorId))
 			{
-				TempData["ErrorMessage"] = "Unable to resolve your user id.";
+				TempData[TempDataKeys.ErrorMessage] = "Unable to resolve your user id.";
 				return RedirectToAction(nameof(ShowUsers));
 			}
 
 			var (ok, msg) = await _svc.UnlockUserAsync(actorId, id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
@@ -66,7 +68,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> ConfirmEmail(Guid id)
 		{
 			var ok = await _svc.MarkEmailConfirmedAsync(id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? "Email confirmed." : "Failed to confirm email.";
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = ok ? "Email confirmed." : "Failed to confirm email.";
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
@@ -75,7 +77,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> ResetPasswordLink(Guid id)
 		{
 			var (ok, link) = await _svc.GenerateResetPasswordLinkAsync(id, Url);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? $"Reset link created: {link}" : "Failed to generate link.";
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = ok ? $"Reset link created: {link}" : "Failed to generate link.";
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
@@ -84,7 +86,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> AddRole(Guid id, string role)
 		{
 			var ok = await _svc.AddRoleAsync(id, role);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? $"Role '{role}' added." : "Failed to add role.";
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = ok ? $"Role '{role}' added." : "Failed to add role.";
 			return RedirectToAction(nameof(ShowUsers));
 		}
 
@@ -93,7 +95,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> RemoveRole(Guid id, string role)
 		{
 			var ok = await _svc.RemoveRoleAsync(id, role);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = ok ? $"Role '{role}' removed." : "Failed to remove role.";
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = ok ? $"Role '{role}' removed." : "Failed to remove role.";
 			return RedirectToAction(nameof(ShowUsers));
 		}
 	}

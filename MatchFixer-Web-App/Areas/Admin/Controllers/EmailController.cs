@@ -8,6 +8,7 @@ using static MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailBlastCommand;
 using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
@@ -46,7 +47,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(model.Subject) || string.IsNullOrWhiteSpace(model.BodyHtml))
 			{
-				TempData["ErrorMessage"] = "Subject and Body are required.";
+				TempData[TempDataKeys.ErrorMessage] = "Subject and Body are required.";
 				return RedirectToAction(nameof(Compose), new { userId = model.UserId });
 			}
 
@@ -64,12 +65,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(model.Subject) || string.IsNullOrWhiteSpace(model.BodyHtml))
 			{
-				TempData["ErrorMessage"] = "Subject and Body are required.";
+				TempData[TempDataKeys.ErrorMessage] = "Subject and Body are required.";
 				return RedirectToAction(nameof(Compose), new { userId = model.UserId });
 			}
 
 			var result = await _emailService.SendAsync(model);
-			TempData["SuccessMessage"] = $"Queued {result.Sent} of {result.TotalRecipients} (skipped {result.Skipped}).";
+			TempData[TempDataKeys.SuccessMessage] = $"Queued {result.Sent} of {result.TotalRecipients} (skipped {result.Skipped}).";
 
 			return RedirectToAction("ShowUsers", "Users", new { area = "Admin" });
 		}

@@ -5,6 +5,7 @@ using MatchFixer_Web_App.Areas.Admin.ViewModels.Wallet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
@@ -41,7 +42,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 					Email = user.Email,
 					HasWallet = false,
 					Balance = 0m,
-					Currency = "EUR",
+					Currency = WalletServiceConstants.DefaultCurrency,
 					Transactions = new()
 				};
 			}
@@ -54,7 +55,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> Create(Guid id)
 		{
 			var (ok, msg) = await _adminWalletService.CreateWalletForUserAsync(id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
 			return RedirectToAction(nameof(ByUser), new { id });
 		}
 
@@ -66,7 +67,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 				? await _adminWalletService.AdminWithdrawAsync(id, amount, note)
 				: await _adminWalletService.AdminDepositAsync(id, amount, note);
 
-			TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+			TempData[result.Success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = result.Message;
 			return RedirectToAction(nameof(ByUser), new { id });
 		}
 
@@ -75,7 +76,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		public async Task<IActionResult> ClearHistory(Guid id)
 		{
 			var (ok, msg) = await _adminWalletService.ClearTransactionHistoryAsync(id);
-			TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
 			return RedirectToAction(nameof(ByUser), new { id });
 		}
 
@@ -87,11 +88,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 
 			if (!success)
 			{
-				TempData["ErrorMessage"] = "Wallet not found.";
+				TempData[TempDataKeys.ErrorMessage] = "Wallet not found.";
 			}
 			else
 			{
-				TempData["SuccessMessage"] = "Wallet lock status updated successfully.";
+				TempData[TempDataKeys.SuccessMessage] = "Wallet lock status updated successfully.";
 			}
 
 			return RedirectToAction(nameof(ByUser), new { id });

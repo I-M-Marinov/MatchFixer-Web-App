@@ -3,6 +3,7 @@ using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Areas.Admin.Controllers
 {
 	[Area("Admin")]
@@ -20,7 +21,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			var vm = await _svc.GetColumnsAsync(userId, tzId, maxPerColumn: 200);
 			if (vm is null)
 			{
-				TempData["ErrorMessage"] = "User not found.";
+				TempData[TempDataKeys.ErrorMessage] = "User not found.";
 				return RedirectToAction("ShowUsers", "Users");
 			}
 			return View(vm);

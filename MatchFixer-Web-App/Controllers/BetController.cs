@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	[Authorize]
@@ -31,13 +32,13 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!success)
 			{
-				TempData["ErrorMessage"] = message;
+				TempData[TempDataKeys.ErrorMessage] = message;
 				return RedirectToAction("LiveEvents", "Event");
 			}
 
 			_sessionService.ClearBetSlip();
 
-			TempData["SuccessMessage"] = message;
+			TempData[TempDataKeys.SuccessMessage] = message;
 			return RedirectToAction("LiveEvents", "Event");
 		
 		}

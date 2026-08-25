@@ -14,6 +14,7 @@ using static MatchFixer.Common.GeneralConstants.OddsBoostConstants;
 using static MatchFixer.Common.GeneralConstants.MatchEventsApiConstants;
 using static MatchFixer.Common.GeneralConstants.CompetitionConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	public class EventController : Controller
@@ -99,7 +100,7 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (Exception e)
 			{
-				TempData["ErrorMessage"] = e.Message;
+				TempData[TempDataKeys.ErrorMessage] = e.Message;
 
 				model.TeamsByLeague = await _matchEventService.GetTeamsGroupedByLeagueAsync();
 				model.AvailableCompetitions = GetCompetitionSelectList();
@@ -107,7 +108,7 @@ namespace MatchFixer_Web_App.Controllers
 				return View(model);
 			}
 
-			TempData["SuccessMessage"] = MatchEventWasSuccessfullyAdded;
+			TempData[TempDataKeys.SuccessMessage] = MatchEventWasSuccessfullyAdded;
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
@@ -124,7 +125,7 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (Exception e)
 			{
-				TempData["ErrorMessage"] = FailedToGetLiveEvents;
+				TempData[TempDataKeys.ErrorMessage] = FailedToGetLiveEvents;
 			}
 
 			return View(events);
@@ -147,11 +148,11 @@ namespace MatchFixer_Web_App.Controllers
 			}
 			catch (Exception e)
 			{
-				TempData["ErrorMessage"] = e.Message;
+				TempData[TempDataKeys.ErrorMessage] = e.Message;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			TempData["SuccessMessage"] = MatchUpdateSuccessful;
+			TempData[TempDataKeys.SuccessMessage] = MatchUpdateSuccessful;
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
@@ -165,11 +166,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["ErrorMessage"] = FailedToUpdateCompetition;
+				TempData[TempDataKeys.ErrorMessage] = FailedToUpdateCompetition;
 			}
 			else
 			{
-				TempData["SuccessMessage"] = CompetitonUpdatedSuccessfully;
+				TempData[TempDataKeys.SuccessMessage] = CompetitonUpdatedSuccessfully;
 			}
 
 			return RedirectToAction("AddMatchEvent");
@@ -185,11 +186,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result)
 			{
-				TempData["ErrorMessage"] = EventCancellationUnsuccessful;
+				TempData[TempDataKeys.ErrorMessage] = EventCancellationUnsuccessful;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
-			TempData["SuccessMessage"] = EventCancellationSuccessful;
+			TempData[TempDataKeys.SuccessMessage] = EventCancellationSuccessful;
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
 
@@ -304,13 +305,13 @@ namespace MatchFixer_Web_App.Controllers
 				var errors = ModelState.Values
 					.SelectMany(v => v.Errors)
 					.Select(e => e.ErrorMessage);
-				TempData["ErrorMessage"] = string.Join(", ", errors);
+				TempData[TempDataKeys.ErrorMessage] = string.Join(", ", errors);
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
 			if (!model.Selected.Any(x => x.Selected))
 			{
-				TempData["ErrorMessage"] = NoMatchesWereSelected;
+				TempData[TempDataKeys.ErrorMessage] = NoMatchesWereSelected;
 				return RedirectToAction(nameof(AddMatchEvent));
 			}
 
@@ -326,12 +327,12 @@ namespace MatchFixer_Web_App.Controllers
 			var added = model.Selected.Count(x => x.Selected) - skipped.Count;
 
 			if (added > 0)
-				TempData["SuccessMessage"] = added == 1
+				TempData[TempDataKeys.SuccessMessage] = added == 1
 					? MatchEventWasAddedSuccessfully
 					: string.Format(MatchEventsWereAddedSuccessfully);
 
 			if (skipped.Any())
-				TempData["SkippedMatches"] = System.Text.Json.JsonSerializer.Serialize(skipped);
+				TempData[TempDataKeys.SkippedMatches] = System.Text.Json.JsonSerializer.Serialize(skipped);
 
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
@@ -373,11 +374,11 @@ namespace MatchFixer_Web_App.Controllers
 				var user = await _userContextService.GetCurrentUserAsync();
 				await _matchEventService.PostponeMatchAsync(id, user.Id);
 
-				TempData["SuccessMessage"] = MatchHasBeenPostponed;
+				TempData[TempDataKeys.SuccessMessage] = MatchHasBeenPostponed;
 			}
 			catch (Exception ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 
 			return RedirectToAction(nameof(AddMatchEvent));
@@ -392,7 +393,7 @@ namespace MatchFixer_Web_App.Controllers
 			var success = await _liveMatchResultService
 				.MarkMatchAsFullTimeAsync(id);
 
-			TempData[success ? "SuccessMessage" : "ErrorMessage"] = success
+			TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = success
 					? MatchMarkedAsFullTime
 					: UnableToMarkMatchAsFullTime;
 
@@ -405,7 +406,7 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				new SelectListItem
 				{
-					Text = "Domestic League Match",
+					Text = DomesticLeagueMatch,
 					Value = "" // maps to null → league match
 				},
 				new SelectListItem

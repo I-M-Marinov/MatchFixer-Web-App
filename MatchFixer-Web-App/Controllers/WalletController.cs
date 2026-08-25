@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 
@@ -25,7 +26,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			var wallet = await _walletService.CreateWalletAsync();
 
-			TempData["SuccessMessage"] = WalletCreatedSuccessfully;
+			TempData[TempDataKeys.SuccessMessage] = WalletCreatedSuccessfully;
 			return RedirectToAction("WalletDetails");
 		}
 
@@ -49,19 +50,19 @@ namespace MatchFixer_Web_App.Controllers
 			try
 			{
 				await _walletService.DepositAsync(amount, UserManualDeposit);
-				TempData["SuccessMessage"] = SuccessfullyDeposited(amount);
+				TempData[TempDataKeys.SuccessMessage] = SuccessfullyDeposited(amount);
 			}
 			catch (ArgumentException ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 			catch (InvalidOperationException ex)
 			{
-				TempData["ErrorMessage"] = WalletNotFound;
+				TempData[TempDataKeys.ErrorMessage] = WalletNotFound;
 			}
 			catch (WalletLockedException ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 
 			return RedirectToAction("WalletDetails");
@@ -77,24 +78,24 @@ namespace MatchFixer_Web_App.Controllers
 
 				if (success)
 				{
-					TempData["SuccessMessage"] = SuccessfullyWithdrew(amount);
+					TempData[TempDataKeys.SuccessMessage] = SuccessfullyWithdrew(amount);
 				}
 				else
 				{
-					TempData["ErrorMessage"] = InsufficientBalanceForWithdrawal;
+					TempData[TempDataKeys.ErrorMessage] = InsufficientBalanceForWithdrawal;
 				}
 			}
 			catch (ArgumentException ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 			catch (InvalidOperationException)
 			{
-				TempData["ErrorMessage"] = WalletNotFound;
+				TempData[TempDataKeys.ErrorMessage] = WalletNotFound;
 			}
 			catch (WalletLockedException ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 
 			return RedirectToAction("WalletDetails");
@@ -108,11 +109,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result.Success)
 			{
-				TempData["ErrorMessage"] = result.Message;
+				TempData[TempDataKeys.ErrorMessage] = result.Message;
 			}
 			else
 			{
-				TempData["SuccessMessage"] = result.Message;
+				TempData[TempDataKeys.SuccessMessage] = result.Message;
 			}
 
 			return RedirectToAction("WalletDetails");

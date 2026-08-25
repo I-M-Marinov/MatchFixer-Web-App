@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.GeneralConstants.MatchResultConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	[Authorize]
@@ -32,7 +33,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				TempData["ErrorMessage"] = InvalidResultSubmitted;
+				TempData[TempDataKeys.ErrorMessage] = InvalidResultSubmitted;
 				return RedirectToAction("AddMatchEvent", "Event");
 			}
 
@@ -45,9 +46,9 @@ namespace MatchFixer_Web_App.Controllers
 			);
 
 			if (success)
-				TempData["SuccessMessage"] = MatchResultSavedSuccessfully;
+				TempData[TempDataKeys.SuccessMessage] = MatchResultSavedSuccessfully;
 			else
-				TempData["ErrorMessage"] = MatchResultSaveFailed;
+				TempData[TempDataKeys.ErrorMessage] = MatchResultSaveFailed;
 
 			return RedirectToAction("AddMatchEvent", "Event");
 		}
