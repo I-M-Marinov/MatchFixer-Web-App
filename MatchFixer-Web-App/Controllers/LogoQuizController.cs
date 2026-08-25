@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.GeneralConstants.LogoQuizConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	public class LogoQuizController : Controller
@@ -24,7 +25,7 @@ namespace MatchFixer_Web_App.Controllers
 			if (skip)
 			{
 				currentScore = await _logoQuizService.DeductSkipPenaltyAsync(user.Id);
-				TempData["ErrorMessage"] = SkippedQuestion;
+				TempData[TempDataKeys.ErrorMessage] = SkippedQuestion;
 			}
 			else
 			{
@@ -46,8 +47,8 @@ namespace MatchFixer_Web_App.Controllers
 			model.CurrentScore = updatedScore;
 
 			TempData[model.IsCorrect == true
-				? "SuccessMessage"
-				: "ErrorMessage"] = pointsMessage;
+				? TempDataKeys.SuccessMessage
+				: TempDataKeys.ErrorMessage] = pointsMessage;
 
 			return View(model);
 		}

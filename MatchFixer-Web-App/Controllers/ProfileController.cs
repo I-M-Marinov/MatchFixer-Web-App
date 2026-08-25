@@ -11,6 +11,7 @@ using MatchFixer.Infrastructure.Entities;
 
 using static MatchFixer.Common.GeneralConstants.ProfileConstants;
 
+using MatchFixer.Common.GeneralConstants;
 namespace MatchFixer_Web_App.Controllers
 {
 	public class ProfileController : Controller
@@ -54,13 +55,13 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (teamId == Guid.Empty)
 			{
-				TempData["ErrorMessage"] = SelectATeamFirst;
+				TempData[TempDataKeys.ErrorMessage] = SelectATeamFirst;
 				return RedirectToAction(nameof(Profile)); // or Profile
 			}
 
 			var success = await _profileService.AddFavoriteTeamAsync(userId, teamId);
 
-			TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+			TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] =
 				success ? TeamAddedToFavoritesSuccessfully : TeamIsAlreadyInFavorites;
 
 			return RedirectToAction(nameof(Profile));
@@ -75,7 +76,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			var success = await _profileService.RemoveFavoriteTeamAsync(userId, teamId);
 
-			TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+			TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] =
 				success ? TeamRemovedFromFavoritesSuccessfully : TeamCouldNotBeRemovedFromFavorites;
 
 			return RedirectToAction(nameof(Profile));
@@ -113,7 +114,7 @@ namespace MatchFixer_Web_App.Controllers
 				{
 					// Retrieve the first error message for TimeZone and save it to TempData
 					var timeZoneErrorMessage = ModelState[nameof(model.TimeZone)].Errors.FirstOrDefault()?.ErrorMessage;
-					TempData["ErrorMessage"] = timeZoneErrorMessage ?? TimezoneMissingOrIncorrect;
+					TempData[TempDataKeys.ErrorMessage] = timeZoneErrorMessage ?? TimezoneMissingOrIncorrect;
 				}
 				else
 				{
@@ -122,7 +123,7 @@ namespace MatchFixer_Web_App.Controllers
 						.FirstOrDefault()?.ErrorMessage;
 
 					// If we find any error message, save it to TempData
-					TempData["ErrorMessage"] = firstErrorMessage ?? AnUnidentifiedErrorOccured;
+					TempData[TempDataKeys.ErrorMessage] = firstErrorMessage ?? AnUnidentifiedErrorOccured;
 				}
 
 				return RedirectToAction("Profile"); // Redirect back to the Profile view
@@ -132,7 +133,7 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				var (success, message) = await _profileService.UpdateProfileAsync(model);
 
-				TempData[success ? "SuccessMessage" : "ErrorMessage"] = message;
+				TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = message;
 
 				return RedirectToAction("Profile", "Profile");
 			}
@@ -180,7 +181,7 @@ namespace MatchFixer_Web_App.Controllers
 					.Select(e => e.ErrorMessage)
 					.ToList();
 
-				TempData["ErrorMessage"] = allErrors.Any()
+				TempData[TempDataKeys.ErrorMessage] = allErrors.Any()
 					? string.Join("<br/>", allErrors)
 					: ErrorUpdatingYourName;
 
@@ -192,11 +193,11 @@ namespace MatchFixer_Web_App.Controllers
 
 			if (!result.Success)
 			{
-				TempData["ErrorMessage"] = result.Message;
+				TempData[TempDataKeys.ErrorMessage] = result.Message;
 				return RedirectToAction("Profile");
 			}
 
-			TempData["SuccessMessage"] = result.Message;
+			TempData[TempDataKeys.SuccessMessage] = result.Message;
 			return RedirectToAction("Profile");
 		}
 
@@ -206,7 +207,7 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			var (success, message) = await _profileService.ConfirmEmailAsync(userId, code);
 
-			TempData[success ? "SuccessMessage" : "ErrorMessage"] = message;
+			TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = message;
 
 			return RedirectToAction("Profile", "Profile");
 		}
@@ -224,7 +225,7 @@ namespace MatchFixer_Web_App.Controllers
 			{
 				var result = await _profileService.UploadProfilePictureAsync(userId, imageFileUploadModel);
 
-				TempData[result.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+				TempData[result.IsSuccess ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = result.Message;
 			}
 			else
 			{
@@ -232,7 +233,7 @@ namespace MatchFixer_Web_App.Controllers
 					.SelectMany(v => v.Errors)
 					.FirstOrDefault()?.ErrorMessage;
 
-				TempData["ErrorMessage"] = firstErrorMessage;
+				TempData[TempDataKeys.ErrorMessage] = firstErrorMessage;
 			}
 
 			return RedirectToAction("Profile");
@@ -248,7 +249,7 @@ namespace MatchFixer_Web_App.Controllers
 
 			var result = await _profileService.RemoveProfilePictureAsync(userId);
 
-			TempData[result.IsSuccess ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+			TempData[result.IsSuccess ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = result.Message;
 
 			return RedirectToAction("Profile");
 		}
@@ -294,11 +295,11 @@ namespace MatchFixer_Web_App.Controllers
 			if (result)
 			{
 				LogoutUser();
-				TempData["SuccessMessage"] = AccountHasBeenDeleted;
+				TempData[TempDataKeys.SuccessMessage] = AccountHasBeenDeleted;
 			}
 			else
 			{
-				TempData["ErrorMessage"] = AccountDeletionWasUnsuccessful;
+				TempData[TempDataKeys.ErrorMessage] = AccountDeletionWasUnsuccessful;
 			}
 
 			return RedirectToAction("Index", "Home");
@@ -319,11 +320,11 @@ namespace MatchFixer_Web_App.Controllers
 			if (result)
 			{
 				LogoutUser();
-				TempData["SuccessMessage"] = AccountHasBeenDeactivated;
+				TempData[TempDataKeys.SuccessMessage] = AccountHasBeenDeactivated;
 			}
 			else
 			{
-				TempData["ErrorMessage"] = AccountDeactivationWasUnsuccessful;
+				TempData[TempDataKeys.ErrorMessage] = AccountDeactivationWasUnsuccessful;
 			}
 
 			return RedirectToAction("Index", "Home");
@@ -336,27 +337,27 @@ namespace MatchFixer_Web_App.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				TempData["ErrorMessage"] = CorrectTheFormErrors;
+				TempData[TempDataKeys.ErrorMessage] = CorrectTheFormErrors;
 				return RedirectToAction("DangerZone");
 			}
 
 			try
 			{
 				await _profileService.ChangePasswordAsync(User, model.CurrentPassword, model.NewPassword);
-				TempData["SuccessMessage"] = PasswordChangedSuccessfully;
+				TempData[TempDataKeys.SuccessMessage] = PasswordChangedSuccessfully;
 			}
 			catch (ArgumentException ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 			catch (InvalidOperationException ex)
 			{
-				TempData["ErrorMessage"] = ex.Message;
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, PasswordChangeErrorHeading);
-				TempData["ErrorMessage"] = AnUnexpectedErrorOccured;
+				TempData[TempDataKeys.ErrorMessage] = AnUnexpectedErrorOccured;
 			}
 
 			return RedirectToAction("Profile"); // redirect to Profile when the password change is successful
