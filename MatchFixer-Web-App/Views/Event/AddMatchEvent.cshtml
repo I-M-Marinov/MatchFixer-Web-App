@@ -612,6 +612,22 @@
 												</span>
 											}
 
+											@* Row 2 col 2: Search Google for a new date (postponed matches only) *@
+											@if (ev.MatchStatus == MatchStatus.Postponed)
+											{
+												var newDateQuery = Uri.EscapeDataString($"{ev.HomeTeam} vs {ev.AwayTeam} was postponed. Is there a new date yet ?");
+												<span class="custom-save-remove-tooltip-wrapper pos-r2c2">
+													<a href="https://www.google.com/search?q=@newDateQuery"
+													   target="_blank"
+													   rel="noopener noreferrer"
+													   class="btn btn-outline-info btn-sm search-new-date-btn"
+													   title="Search Google for a new date">
+														<i class="bi bi-google"></i>
+													</a>
+													<span class="custom-save-remove-tooltip">Search new date</span>
+												</span>
+											}
+
 											@* Row 2 col 1: NoDraw *@
 											@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
 											{
