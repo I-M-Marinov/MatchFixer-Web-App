@@ -98,13 +98,13 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
 
 <details>
   <summary><h2>Events Board</h2></summary>
+    <p>
+      - The Events Board surfaces different teams and leagues based on the user's favorites.<br/>
+      - All users are able to see any events from the Champions League, Europa League and the Conference League ( if any are available to be bet on ).<br/>
+    </p>
     <div align="center">
-        <p>
-          - The Events Board surfaces different teams and leagues based on the user's favorites.<br/>
-          - All users are able to see any events from the Champions League, Europa League and the Conference League ( if any are available to be bet on ).<br/>
-        </p>
-           <img src="./assets/‎revamped-events-board.png" width="700px"/>
-     </div>
+          <img src="./assets/‎updated-events-board.png" width="700px"/>
+    </div>
 </details>
 
 <details>
