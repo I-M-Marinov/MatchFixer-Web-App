@@ -103,7 +103,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
       - All users are able to see any events from the Champions League, Europa League and the Conference League ( if any are available to be bet on ).<br/>
     </p>
     <div align="center">
-          <img src="./assets/‎updated-events-board.png" width="700px"/>
+          <img src="./assets/‎revamped-events-board.png" width="700px"/>
     </div>
 </details>
 
