@@ -460,58 +460,33 @@
 		return Intl.DateTimeFormat('sv-SE', { timeZone: userTz }).format(date);
 	}
 
-	document.addEventListener('DOMContentLoaded', function() {
+	document.addEventListener('DOMContentLoaded', function () {
 
-		const allTableHeaders = document.querySelectorAll('.odds-table th');
+		function highlightColumn(cell, on) {
+			const parentTable = cell.closest('.odds-table');
+			if (!parentTable) return;
 
-		allTableHeaders.forEach(header => {
-			header.addEventListener('mouseover', function() {
+			const columnIndex = Array.from(cell.parentElement.children).indexOf(cell);
+			if (columnIndex === -1) return;
 
-				const parentTable = this.closest('.odds-table');
-				if (!parentTable) return;
+			const headerRow = parentTable.querySelector('thead tr');
+			if (headerRow && headerRow.children[columnIndex]) {
+				headerRow.children[columnIndex].classList.toggle('highlighted-column', on);
+			}
 
-				const headersInThisTable = parentTable.querySelectorAll('th');
-				const columnIndex = Array.from(headersInThisTable).indexOf(this);
-				if (columnIndex === -1) return;
-
-				this.classList.add('highlighted-column');
-
-				const rowsInThisTable = parentTable.querySelectorAll('tbody tr');
-
-				rowsInThisTable.forEach(row => {
-					// Skip boost-timer-row
-					if (row.classList.contains('boost-timer-row')) return;
-
-					const cells = row.querySelectorAll('td');
-					if (cells[columnIndex]) {
-						cells[columnIndex].classList.add('highlighted-column');
-					}
-				});
+			parentTable.querySelectorAll('tbody tr').forEach(row => {
+				if (row.classList.contains('boost-timer-row')) return;
+				const cells = row.querySelectorAll('td');
+				if (cells[columnIndex]) {
+					cells[columnIndex].classList.toggle('highlighted-column', on);
+				}
 			});
+		}
 
-			header.addEventListener('mouseout', function() {
-
-				const parentTable = this.closest('.odds-table');
-				if (!parentTable) return;
-
-				const headersInThisTable = parentTable.querySelectorAll('th');
-				const columnIndex = Array.from(headersInThisTable).indexOf(this);
-				if (columnIndex === -1) return;
-
-				this.classList.remove('highlighted-column');
-
-				const rowsInThisTable = parentTable.querySelectorAll('tbody tr');
-
-				rowsInThisTable.forEach(row => {
-					// Skip boost-timer-row
-					if (row.classList.contains('boost-timer-row')) return;
-
-					const cells = row.querySelectorAll('td');
-					if (cells[columnIndex]) {
-						cells[columnIndex].classList.remove('highlighted-column');
-					}
-				});
-			});
+		// Bind to every bet cell in the column: header label (th) AND odds cell (td).
+		document.querySelectorAll('.odds-table .bet-trigger').forEach(cell => {
+			cell.addEventListener('mouseenter', function () { highlightColumn(this, true); });
+			cell.addEventListener('mouseleave', function () { highlightColumn(this, false); });
 		});
 	});
 
