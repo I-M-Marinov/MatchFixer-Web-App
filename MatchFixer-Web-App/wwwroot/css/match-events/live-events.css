@@ -502,7 +502,7 @@ body.live-events-no-scroll {
     padding: 0;
     border: 2px solid red;
     border-radius: 0.5em;
-    background-color: tomato;
+    background-color: #ca4747;
     color: ghostwhite !important;
     text-shadow: 1px 1px 1px black !important;
     margin-top: -3em !important;
@@ -550,17 +550,20 @@ body.live-events-no-scroll {
     border-radius: 0.75em;
 }
 
-#home-header:hover .bet-option {
+#home-header:hover .bet-option,
+#home-header.highlighted-column .bet-option {
     background-color: #0a58ca;
     color: white;
 }
 
-#draw-header:hover .bet-option {
+#draw-header:hover .bet-option,
+#draw-header.highlighted-column .bet-option {
     background-color: #f1d302;
     color: black;
 }
 
-#away-header:hover .bet-option {
+#away-header:hover .bet-option,
+#away-header.highlighted-column .bet-option {
     background-color: #0DAB76;
     color: white;
 }
@@ -1277,7 +1280,10 @@ body.live-events-no-scroll {
 /* Hover state - revert to outline style */
 #home-header:hover .bet-option.boosted,
 #draw-header:hover .bet-option.boosted,
-#away-header:hover .bet-option.boosted {
+#away-header:hover .bet-option.boosted,
+#home-header.highlighted-column .bet-option.boosted,
+#draw-header.highlighted-column .bet-option.boosted,
+#away-header.highlighted-column .bet-option.boosted {
     background-color: white;
     color: inherit; /* keep text color appropriate */
     border-width: 2px;
