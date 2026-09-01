@@ -317,8 +317,14 @@
     opacity: 0;
     visibility: hidden;
     position: absolute;
-    transition: opacity 0.2s ease-in-out;
+    top: 4.5em;
+    right: 0.1em;
+    transition: none;
     z-index: 999;
+}
+
+.hover-dropdown-container:hover .dropdown-menu.profile {
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.22, 1, .36, 1);
 }
 
 .dropdown-menu h6{
