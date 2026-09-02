@@ -105,6 +105,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     </p>
     <div align="center">
           <img src="./assets/revamped-events-board.png" width="1000px"/>
+          <img src="./assets/updated-live-events-board.png" width="1000px"/>
     </div>
 </details>
 
