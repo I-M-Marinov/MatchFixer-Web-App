@@ -23,25 +23,33 @@ document.addEventListener('DOMContentLoaded', function () {
             panel.classList.remove('open');
         });
 
+        function resolveBetSource(cell) {
+            const table = cell.closest(".odds-table");
+            if (!table) return cell;
+            const columnIndex = Array.from(cell.parentElement.children).indexOf(cell);
+            const headerRow = table.querySelector("thead tr");
+            const header = headerRow ? headerRow.children[columnIndex] : null;
+            return header || cell;
+        }
+
         document.querySelectorAll(".bet-trigger").forEach(el => {
             el.addEventListener("click", () => {
-                const matchId = el.dataset.matchId;
-                const home = el.dataset.home;
-                const away = el.dataset.away;
-                const homeLogoUrl = el.dataset.homeLogoUrl;
-                const awayLogoUrl = el.dataset.awayLogoUrl;
-                const selectedOption = el.dataset.option;
-                const startTimeUtc = el.dataset.startTime;
-                console.log(startTimeUtc);
+                const source = resolveBetSource(el);
+                const matchId = source.dataset.matchId;
+                const home = source.dataset.home;
+                const away = source.dataset.away;
+                const homeLogoUrl = source.dataset.homeLogoUrl;
+                const awayLogoUrl = source.dataset.awayLogoUrl;
+                const selectedOption = source.dataset.option;
+                const startTimeUtc = source.dataset.startTime;
 
-
-                const odds = el.dataset.odds ? parseFloat(el.dataset.odds) : null;
+                const odds = source.dataset.odds ? parseFloat(source.dataset.odds) : null;
 
                 if (matchId && home && away && homeLogoUrl && awayLogoUrl && selectedOption && startTimeUtc &&
                     !isNaN(Date.parse(startTimeUtc)) && odds !== null && !isNaN(odds)) {
                     addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, selectedOption, odds, startTimeUtc);
                     updateBadge();
-                } 
+                }
             });
         });
     });
