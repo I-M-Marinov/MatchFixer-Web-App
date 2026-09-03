@@ -1602,6 +1602,14 @@
 			// ── League pills ────────────────────────────────────────────────────
 			const uniqueLeagues = [...new Set(rows.map(r => r.dataset.group).filter(Boolean))];
 
+			// Count games per league (all rows, independent of the active filter).
+			const leagueCounts = {};
+			rows.forEach(r => {
+				const g = r.dataset.group;
+				if (g) leagueCounts[g] = (leagueCounts[g] || 0) + 1;
+			});
+			const totalCount = rows.length;
+
 			// European competitions surface first, then domestic leagues (Events-Spread order).
 			const leaguePriority = [
 				"UEFA Champions League",
@@ -1633,18 +1641,23 @@
 
 				const allLeagueLi = document.createElement("li");
 				allLeagueLi.className = "nav-item";
-				allLeagueLi.innerHTML = `<button class="nav-link league-pill active" data-league="all">All</button>`;
+				allLeagueLi.innerHTML = `<button class="nav-link league-pill active" data-league="all">All <span class="league-pill-count league-pill-count--text${totalCount === 0 ? " league-pill-count--empty" : ""}">${totalCount}</span></button>`;
 				leagueTabs.appendChild(allLeagueLi);
 
 				uniqueLeagues.forEach(league => {
 					const logo = getCompetitionIcon(league) || getLeagueIcon(league) || "";
 					const li   = document.createElement("li");
 					li.className = "nav-item";
+					const count = leagueCounts[league] || 0;
+					const countLabel = count === 1 ? "1 game" : count + " games";
 					li.innerHTML = logo
-						? `<button class="nav-link league-pill" data-league="${league}" title="${league}">
-							<img src="${logo}" alt="${league}" class="league-pill-logo" />
+						? `<button class="nav-link league-pill" data-league="${league}" title="${league} - ${countLabel}">
+							<span class="league-pill-inner">
+								<img src="${logo}" alt="${league}" class="league-pill-logo" />
+								<span class="league-pill-count${count === 0 ? " league-pill-count--empty" : ""}">${count}</span>
+							</span>
 						   </button>`
-						: `<button class="nav-link league-pill" data-league="${league}" title="${league}">${league}</button>`;
+						: `<button class="nav-link league-pill" data-league="${league}" title="${league} - ${countLabel}">${league} <span class="league-pill-count league-pill-count--text${count === 0 ? " league-pill-count--empty" : ""}">${count}</span></button>`;
 					leagueTabs.appendChild(li);
 				});
 
