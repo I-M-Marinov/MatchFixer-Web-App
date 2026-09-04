@@ -163,6 +163,57 @@
     opacity: 1;
     transform: scale(1.12);
 }
+#eventLeagueTabs .league-pill-inner {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+}
+
+#eventLeagueTabs .league-pill-count {
+    position: absolute;
+    top: -12px;
+    right: 5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    z-index: 2;
+}
+
+
+#eventLeagueTabs .league-pill-count--text {
+    position: static;
+    margin-left: 1px;
+    vertical-align: middle;
+}
+
+#eventLeagueTabs .league-pill[data-league="all"] .league-pill-count {
+    background: linear-gradient(135deg, #0DAB76, #10b981);
+}
+
+#eventLeagueTabs .league-pill.active:not([data-league="all"]) .league-pill-count {
+    background: #f1d302;
+    color: #000;
+}
+
+#eventLeagueTabs .league-pill .league-pill-count--empty,
+#eventLeagueTabs .league-pill[data-league="all"] .league-pill-count--empty,
+#eventLeagueTabs .league-pill.active:not([data-league="all"]) .league-pill-count--empty {
+    background: linear-gradient(135deg, #e88c8c, #d9534f);
+    color: #fff;
+}
 
 
 /*----------------------------------------------------------------
