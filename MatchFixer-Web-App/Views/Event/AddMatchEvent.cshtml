@@ -374,6 +374,7 @@
 								               ? ev.KickoffTime.Value.ToLocalTime().ToString("yyyy-MM-dd") 
 								               : "tba")"
 							    data-postponed="@ev.IsPostponed"
+							    data-boosted="@((ev.BoostActive != null).ToString().ToLower())"
 				    data-league="@ev.LeagueName"
 				    data-competition="@ev.CompetitionName">
 								<td>
@@ -1554,7 +1555,10 @@
 
 			function applyFilters() {
 				rows.forEach(r => {
-					const dateOk   = activeDateFilter   === "all" || r.dataset.date   === activeDateFilter;
+					const dateOk =
+						activeDateFilter === "all" ? true
+						: activeDateFilter === "boosted" ? r.dataset.boosted === "true"
+						: r.dataset.date === activeDateFilter;
 					const leagueOk = activeLeagueFilter === "all" || r.dataset.group === activeLeagueFilter;
 					r.style.display = (dateOk && leagueOk) ? "" : "none";
 				});
@@ -1583,6 +1587,11 @@
 			postponedLi.className = "nav-item";
 			postponedLi.innerHTML = `<button class="nav-link" data-date="tba">Postponed</button>`;
 			dateTabs.appendChild(postponedLi);
+
+			const boostedLi = document.createElement("li");
+			boostedLi.className = "nav-item";
+			boostedLi.innerHTML = `<button class="nav-link" data-date="boosted"><i class="ri-fire-fill" style="pointer-events:none;"></i> Boosted</button>`;
+			dateTabs.appendChild(boostedLi);
 
 			uniqueDates.forEach(date => {
 				const li = document.createElement("li");
