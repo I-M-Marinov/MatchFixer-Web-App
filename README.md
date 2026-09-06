@@ -176,7 +176,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
 <details>
   <summary><h2>Admin Add Events Page</h2></summary>
   <div align="center">
-    <img src="./assets/admin-add-events-view.png" width="800px" />
+    <img src="./assets/updated-admin-add-event-view.png" width="1200px" />
   </div>
 </details>
 
