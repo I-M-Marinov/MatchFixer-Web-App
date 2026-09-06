@@ -129,7 +129,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     <h4>Derby Match</h4>
     <img src="./assets/updated-derby-event-card.png" width="700px" />
     <h4>Boosted Event</h4>
-    <img src="./assets/boosted-event-card.png" width="700px" />
+    <img src="./assets/updated-boosted-event.png" width="700px" />
   </div>
 </details>
 
