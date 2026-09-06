@@ -210,13 +210,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <img src="./assets/manutd-wiki-tooltip.gif" align="center" border="10" width="600px"/>
 </p>
 
-<h3 align="center">Derby and Boosted Events</h3>
-
-<h4 align="center">Boosted Events</h4>
-
-<p align="center">
-  <img src="./assets/boosted-event-card.png" align="center" border="10" width="600px"/>
-</p>
+<h3 align="center">Derby Events</h3>
 
 <h4 align="center">Derby Match Events</h4>
 
