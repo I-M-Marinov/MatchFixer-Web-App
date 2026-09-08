@@ -1,4 +1,5 @@
 ﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Events
+@using MatchFixer.Common.FootballLeagues
 @model PaginatedEventList<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminEventOverviewDto>
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -21,6 +22,7 @@
 		["Premier League"] = 39,
 		["Championship"] = 40,
 		["Parva Liga"] = 172,
+		["Vtora Liga"] = 173,
 		["Bundesliga"] = 78,
 		["La Liga"] = 140,
 		["Eredivisie"] = 88,
@@ -154,7 +156,9 @@
 										<!-- League Logo -->
 										@{
 											int logoId = leagueLogos.ContainsKey(league.League) ? leagueLogos[league.League] : 39;
-											string logoUrl = $"https://media.api-sports.io/football/leagues/{logoId}.png";
+											string logoUrl = SupportedApiLeagues.LogoOverrides.TryGetValue(logoId, out var overrideLogoUrl)
+											? overrideLogoUrl
+											: $"https://media.api-sports.io/football/leagues/{logoId}.png";
 										}
 										
 										@if (league.League == "Rest of World")
