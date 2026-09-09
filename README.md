@@ -129,7 +129,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     <h4>Derby Match</h4>
     <img src="./assets/updated-derby-event-card.png" width="700px" />
     <h4>Boosted Event</h4>
-    <img src="./assets/boosted-event-card.png" width="700px" />
+    <img src="./assets/updated-boosted-event.png" width="700px" />
   </div>
 </details>
 
@@ -176,7 +176,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
 <details>
   <summary><h2>Admin Add Events Page</h2></summary>
   <div align="center">
-    <img src="./assets/admin-add-events-view.png" width="800px" />
+    <img src="./assets/updated-admin-add-event-view.png" width="1200px" />
   </div>
 </details>
 
@@ -210,13 +210,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <img src="./assets/manutd-wiki-tooltip.gif" align="center" border="10" width="600px"/>
 </p>
 
-<h3 align="center">Derby and Boosted Events</h3>
-
-<h4 align="center">Boosted Events</h4>
-
-<p align="center">
-  <img src="./assets/boosted-event-card.png" align="center" border="10" width="600px"/>
-</p>
+<h3 align="center">Derby Events</h3>
 
 <h4 align="center">Derby Match Events</h4>
 
