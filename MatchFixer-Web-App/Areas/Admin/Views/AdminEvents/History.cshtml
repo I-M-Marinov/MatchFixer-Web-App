@@ -142,8 +142,6 @@
 										@{
 											string? leagueLogo = FootballCompetitionLogos.GetLeagueLogo(league.League);
 											string logoUrl = leagueLogo ?? FootballCompetitionLogos.GetCompetitionLogo(league.League);
-											// GetCompetitionLogo returns the generic "competition.png" (which isn't shipped) for
-											// anything it can't map - e.g. "Rest of World" / "Unknown". Show a globe in that case.
 											bool hasLogo = leagueLogo != null || !logoUrl.EndsWith("competition.png", StringComparison.OrdinalIgnoreCase);
 										}
 
