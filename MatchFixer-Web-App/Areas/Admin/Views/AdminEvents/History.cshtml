@@ -1,5 +1,5 @@
 ﻿@using MatchFixer_Web_App.Areas.Admin.ViewModels.Events
-@using MatchFixer.Common.FootballLeagues
+@using MatchFixer.Common.FootballCompetitions
 @model PaginatedEventList<MatchFixer_Web_App.Areas.Admin.ViewModels.Events.AdminEventOverviewDto>
 @{
 	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -17,21 +17,6 @@
 	var leagueStats = Model.AllEventsLeagueStats;
 
 
-	var leagueLogos = new Dictionary<string, int>
-	{
-		["Premier League"] = 39,
-		["Championship"] = 40,
-		["Parva Liga"] = 172,
-		["Vtora Liga"] = 173,
-		["Bundesliga"] = 78,
-		["La Liga"] = 140,
-		["Eredivisie"] = 88,
-		["Ligue 1"] = 61,
-		["Serie A"] = 135,
-		["Liga Portugal"] = 94,
-		["Swiss League"] = 207,
-		["Polish League Ekstraklasa"] = 106
-	};
 
 	var today = DateTime.Today.ToString("yyyy-MM-dd");
 	var fromDateVal = filters.FromDate?.ToString("yyyy-MM-dd") ?? today;
@@ -155,29 +140,23 @@
 
 										<!-- League Logo -->
 										@{
-											int logoId = leagueLogos.ContainsKey(league.League) ? leagueLogos[league.League] : 39;
-											string logoUrl = SupportedApiLeagues.LogoOverrides.TryGetValue(logoId, out var overrideLogoUrl)
-											? overrideLogoUrl
-											: $"https://media.api-sports.io/football/leagues/{logoId}.png";
+											string? leagueLogo = FootballCompetitionLogos.GetLeagueLogo(league.League);
+											string logoUrl = leagueLogo ?? FootballCompetitionLogos.GetCompetitionLogo(league.League);
+											// GetCompetitionLogo returns the generic "competition.png" (which isn't shipped) for
+											// anything it can't map - e.g. "Rest of World" / "Unknown". Show a globe in that case.
+											bool hasLogo = leagueLogo != null || !logoUrl.EndsWith("competition.png", StringComparison.OrdinalIgnoreCase);
 										}
-										
-										@if (league.League == "Rest of World")
-										{
-											<span style="font-size: 1.8rem;">🌍</span>
-										}
-										else if (league.League == "FIFA World Cup")
-										{
-											<img src="/images/live-events/fifa_world_cup.png"
-											     alt="FIFA World Cup"
-											     class="img-fluid mb-2"
-											     style="height:40px; width:auto; object-fit:contain;" />
-										}
-					else
+
+										@if (hasLogo)
 										{
 											<img src="@logoUrl"
 											     alt="@league.League logo"
 											     class="img-fluid mb-2"
 											     style="height:40px; width:auto; object-fit:contain;" />
+										}
+										else
+										{
+											<span style="font-size: 1.8rem;">🌍</span>
 										}
 										<!-- League name -->
 										<h6 class="mb-1">@league.League</h6>
