@@ -180,6 +180,13 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   </div>
 </details>
 
+<details>
+  <summary><h2>Admin History View Page</h2></summary>
+  <div align="center">
+    <img src="./assets/profit-by-league-history-view.png" width="1200px" />
+  </div>
+</details>
+
 <h3 align="center">Boost notifications</h3>
 
 <p align="center">
