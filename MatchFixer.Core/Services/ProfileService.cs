@@ -174,6 +174,23 @@ namespace MatchFixer.Core.Services
 
 			var userRank = await GetUserRankAsync(user.Id.ToString()) ?? 0;
 
+			// Preferred display order for the favourite-league dropdown.
+			var leagueDisplayOrder = new[]
+			{
+				"Premier League",
+				"Championship",
+				"Bundesliga",
+				"La Liga",
+				"Ligue 1",
+				"Serie A",
+				"Eredivisie",
+				"Parva Liga",
+				"Vtora Liga",
+				"Liga Portugal",
+				"Swiss League",
+				"Polish League Ekstraklasa"
+			};
+
 			return new ProfileViewModel
 			{
 				Id = user.Id.ToString(),
@@ -196,7 +213,12 @@ namespace MatchFixer.Core.Services
 					.Select(x => x.LeagueName)
 					.ToListAsync(),
 				AllLeagues = LeagueNameMap.Domestic
-					.OrderBy(kv => kv.Value)
+					.OrderBy(kv =>
+					{
+						var idx = Array.IndexOf(leagueDisplayOrder, kv.Value);
+						return idx < 0 ? int.MaxValue : idx;
+					})
+					.ThenBy(kv => kv.Value)
 					.Select(kv => new SelectListItem { Value = kv.Value, Text = kv.Value })
 					.ToList()
 			};
