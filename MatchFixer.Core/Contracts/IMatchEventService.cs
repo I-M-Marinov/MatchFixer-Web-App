@@ -22,5 +22,6 @@ namespace MatchFixer.Core.Contracts
 		/// <summary>Returns null on success, or a human-readable skip reason when the match cannot be imported.</summary>
 		Task<string?> AddEventFromUpcomingAsync(UpcomingMatchRowViewModel dto);
 		Task<bool> PostponeMatchAsync(Guid matchEventId, Guid userId);
+		Task<(bool Success, string Message)> RevertToUpcomingAsync(Guid matchEventId, DateTime? newKickoffLocal);
 	}
 }

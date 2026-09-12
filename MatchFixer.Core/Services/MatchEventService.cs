@@ -748,6 +748,52 @@ namespace MatchFixer.Core.Services
 			return true;
 		}
 
+		public async Task<(bool Success, string Message)> RevertToUpcomingAsync(Guid matchEventId, DateTime? newKickoffLocal)
+		{
+			var user = await _userContextService.GetCurrentUserAsync();
+
+			var match = await _dbContext.MatchEvents
+				.Include(m => m.LiveResult)
+				.FirstOrDefaultAsync(m => m.Id == matchEventId);
+
+			if (match == null)
+				return (false, MatchNotFound);
+
+			// Only a live or finished (full-time) event can be moved back to upcoming.
+			if (match.IsCancelled ||
+			    (match.Status != MatchStatus.FullTime && match.Status != MatchStatus.Live))
+				return (false, OnlyLiveOrFinishedCanBeReverted);
+
+			// A submitted result means bets were already settled/paid out - reverting would corrupt that.
+			if (match.LiveResult != null)
+				return (false, CannotRevertEventWithResult);
+
+			// A reverted live/finished match must be rescheduled to a real future kick-off.
+			if (!newKickoffLocal.HasValue)
+				return (false, RevertRequiresNewDate);
+
+			var utcKickoff = _timezoneService.ConvertFromUserTimeToUtc(newKickoffLocal.Value, user.TimeZone);
+
+			if (utcKickoff <= DateTime.UtcNow)
+				return (false, RevertDateMustBeInFuture);
+
+			var previousStatus = match.Status;
+
+			match.Status = MatchStatus.Scheduled;
+			match.FinishedAtUtc = null;
+			match.IsPostponed = false;
+			match.PrePostponeStatus = null;
+
+			LogChange(match.Id, nameof(match.MatchDate), match.MatchDate, utcKickoff, user.Id);
+			match.MatchDate = utcKickoff;
+
+			LogChange(match.Id, nameof(match.Status), previousStatus, match.Status, user.Id);
+
+			await _dbContext.SaveChangesAsync();
+
+			return (true, EventRevertedToUpcoming);
+		}
+
 
 
 	}
