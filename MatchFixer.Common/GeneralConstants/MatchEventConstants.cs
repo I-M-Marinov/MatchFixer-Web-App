@@ -21,5 +21,12 @@
 		public const string UnableToMarkMatchAsFullTime = "Unable to mark match as Full Time.";
 		public const string MatchMarkedAsFullTime = "Match successfully marked as Full Time.";
 
+		// Revert to upcoming
+		public const string EventRevertedToUpcoming = "The event was moved back to upcoming.";
+		public const string OnlyLiveOrFinishedCanBeReverted = "Only live or finished events can be moved back to upcoming.";
+		public const string CannotRevertEventWithResult = "This event already has a submitted result and settled bets, so it can't be moved back to upcoming.";
+		public const string RevertRequiresNewDate = "Please choose a new kick-off date and time to move the match back to upcoming.";
+		public const string RevertDateMustBeInFuture = "The new kick-off date and time must be in the future.";
+
 	}
 }
