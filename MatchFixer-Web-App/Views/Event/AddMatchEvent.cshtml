@@ -343,6 +343,39 @@
 		</div>
 	</div>
 
+	<div class="modal fade" id="revertToUpcomingModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form asp-action="RevertToUpcoming" asp-controller="Event" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="revertEventId" />
+					<div class="modal-header">
+						<h5 class="modal-title fw-bold text-white">
+							<i class="bi bi-arrow-counterclockwise me-2"></i>
+							Move match back to upcoming
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<p class="mb-3">
+							Set a new kick-off date &amp; time for <strong id="revertMatchName"></strong>.
+							The match will be moved back to upcoming with this start time.
+						</p>
+						<label for="revertNewKickoff" class="form-label">New kick-off (your local time)</label>
+						<input type="datetime-local" name="newKickoffLocal" id="revertNewKickoff" class="form-control" required />
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="submit" class="btn btn-success">
+							<i class="bi bi-arrow-counterclockwise me-1"></i>
+							Move to upcoming
+						</button>
+						<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 
 	<div class="live-events-section mx-auto" style="max-width: 1400px;">
 		<ul class="nav nav-pills justify-content-center mb-3" id="eventDateTabs"></ul>
@@ -597,6 +630,22 @@
 												</form>
 											}
 
+											@* Row 1 col 1: Move a live or finished (full-time) event back to upcoming *@
+											@if ((ev.MatchStatus == MatchStatus.FullTime || ev.MatchStatus == MatchStatus.Live) && !ev.HasResult)
+											{
+												<span class="custom-save-remove-tooltip-wrapper pos-r1c1">
+													<button type="button"
+													        class="btn btn-outline-success btn-sm revert-to-upcoming-btn open-revert-modal"
+													        data-bs-toggle="modal"
+													        data-bs-target="#revertToUpcomingModal"
+													        data-event-id="@ev.Id"
+													        data-match-name="@ev.HomeTeam vs @ev.AwayTeam">
+														<i class="bi bi-arrow-counterclockwise"></i>
+													</button>
+													<span class="custom-save-remove-tooltip">Move back to upcoming</span>
+												</span>
+											}
+
 											@* Row 1 col 2: Edit competition *@
 											@if (ev.MatchStatus != MatchStatus.Live && ev.MatchStatus != MatchStatus.FullTime)
 											{
@@ -613,19 +662,27 @@
 												</span>
 											}
 
-											@* Row 2 col 2: Search Google for a new date (postponed matches only) *@
-											@if (ev.MatchStatus == MatchStatus.Postponed)
+											@* Google search: new date (postponed) OR live score / date check (live & finished, no result) *@
+											@if (ev.MatchStatus == MatchStatus.Postponed
+											  || ev.MatchStatus == MatchStatus.Live
+											  || (ev.MatchStatus == MatchStatus.FullTime && !ev.HasResult))
 											{
-												var newDateQuery = Uri.EscapeDataString($"{ev.HomeTeam} vs {ev.AwayTeam} was postponed. Is there a new date yet ?");
-												<span class="custom-save-remove-tooltip-wrapper pos-r2c2">
+												var isPostponedSearch = ev.MatchStatus == MatchStatus.Postponed;
+												var searchText = isPostponedSearch
+													? $"{ev.HomeTeam} vs {ev.AwayTeam} was postponed. Is there a new date yet ?"
+													: $"{ev.HomeTeam} vs {ev.AwayTeam} score";
+												var newDateQuery = Uri.EscapeDataString(searchText);
+												var searchPos = isPostponedSearch ? "pos-r2c2" : "pos-r1c2";
+												var searchTooltip = isPostponedSearch ? "Search new date" : "Check score / date";
+												<span class="custom-save-remove-tooltip-wrapper @searchPos">
 													<a href="https://www.google.com/search?q=@newDateQuery"
 													   target="_blank"
 													   rel="noopener noreferrer"
 													   class="btn btn-outline-info btn-sm search-new-date-btn"
-													   title="Search Google for a new date">
+													   title="Search Google for the score or a new date">
 														<i class="bi bi-google"></i>
 													</a>
-													<span class="custom-save-remove-tooltip">Search new date</span>
+													<span class="custom-save-remove-tooltip">@searchTooltip</span>
 												</span>
 											}
 
@@ -2437,6 +2494,34 @@
 				btn.disabled = false;
 				btn.innerHTML = '<i class="bi bi-stars me-1"></i> Auto-generate odds';
 			}
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			const revertModal = document.getElementById("revertToUpcomingModal");
+
+			if (!revertModal) return;
+
+			revertModal.addEventListener("show.bs.modal", function (event) {
+
+				const button = event.relatedTarget;
+				if (!button) return;
+
+				document.getElementById("revertEventId").value = button.getAttribute("data-event-id");
+
+				const nameEl = document.getElementById("revertMatchName");
+				if (nameEl) nameEl.textContent = button.getAttribute("data-match-name") || "";
+
+				const input = document.getElementById("revertNewKickoff");
+				if (input) {
+					const now = new Date();
+					now.setSeconds(0, 0);
+					const pad = n => String(n).padStart(2, "0");
+					input.min = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+					input.value = "";
+				}
+			});
+
 		});
 	</script>
 }
