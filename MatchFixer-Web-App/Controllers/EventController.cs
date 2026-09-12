@@ -388,6 +388,26 @@ namespace MatchFixer_Web_App.Controllers
 		[AdminOnly]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RevertToUpcoming(Guid id, DateTime? newKickoffLocal)
+		{
+			try
+			{
+				var (success, message) = await _matchEventService.RevertToUpcomingAsync(id, newKickoffLocal);
+
+				TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = message;
+			}
+			catch (Exception ex)
+			{
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
+			}
+
+			return RedirectToAction(nameof(AddMatchEvent));
+		}
+
+		[Authorize]
+		[AdminOnly]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> MarkEventAsFullTime(Guid id)
 		{
 			var success = await _liveMatchResultService
