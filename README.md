@@ -180,6 +180,19 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   </div>
 </details>
 
+<details>
+  <summary><h2>Admin History View Page</h2></summary>
+  <div align="center">
+    <img src="./assets/profit-by-league-history-view.png" width="1200px" />
+  </div>
+</details>
+
+<details>
+  <summary><h2>Admin Teams Page</h2></summary>
+  <p align="center">
+    <img src="./assets/admin-teams-view.png" align="center" border="10" width="1200px"/>
+  </p>
+</details>
 <h3 align="center">Boost notifications</h3>
 
 <p align="center">
@@ -274,11 +287,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <img src="./assets/admin-area-events-bets.gif" align="center" border="10" width="700px"/>
 </p>
 
-<h3 align="center">Admin Teams View</h3>
 
-<p align="center">
-  <img src="./assets/admin-teams-view.png" align="center" border="10" width="600px"/>
-</p>
 <h4 align="center">Team View Modal</h4>
 
 <p align="center">
