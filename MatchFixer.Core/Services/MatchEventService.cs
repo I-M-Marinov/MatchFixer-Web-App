@@ -60,40 +60,6 @@ namespace MatchFixer.Core.Services
 			_cache = cache;
 		}
 
-		// Display order for the events board: European & international competitions first,
-		// then domestic first divisions, and finally domestic second divisions.
-		private static readonly string[] EventLeagueDisplayOrder =
-		{
-			"UEFA Champions League",
-			"UEFA Europa League",
-			"UEFA Europa Conference League",
-			"FIFA World Cup",
-			"UEFA Euro",
-			"International",
-			"Premier League",
-			"La Liga",
-			"Bundesliga",
-			"Serie A",
-			"Ligue 1",
-			"Liga Portugal",
-			"Eredivisie",
-			"Swiss League",
-			"Polish League Ekstraklasa",
-			"Parva Liga",
-			"Championship",
-			"Vtora Liga",
-		};
-
-		private static int LeagueDisplayIndex(MatchEvent e)
-		{
-			var key = string.IsNullOrWhiteSpace(e.CompetitionName)
-				? e.HomeTeam?.LeagueName
-				: e.CompetitionName;
-
-			var idx = Array.IndexOf(EventLeagueDisplayOrder, key);
-			return idx < 0 ? int.MaxValue : idx;
-		}
-
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
 		{
 			var now = DateTime.UtcNow;
@@ -110,14 +76,9 @@ namespace MatchFixer.Core.Services
 				)
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
-				.ToListAsync();
-
-			// Strict league order: first divisions before second divisions, then chronological.
-			events = events
 				.OrderBy(e => e.IsPostponed)
-				.ThenBy(LeagueDisplayIndex)
 				.ThenBy(e => e.MatchDate)
-				.ToList();
+				.ToListAsync();
 
 			var result = new List<LiveEventViewModel>();
 
