@@ -274,6 +274,7 @@
 		<button type="submit" class="btn btn-primary d-none" id="save-btn">Save</button>
 	</div>
 </form>
+
 </div>
 
 </div>
@@ -401,7 +402,8 @@
 		</div>
 	</div>
 
-	<div class="card shadow border-0 rounded-2 p-4 d-flex trophy-cabinet-container" style="min-width:300px;">
+	<div class="trophy-bets-row d-flex gap-3 flex-wrap align-items-start">
+	<div class="card shadow border-0 rounded-2 p-4 d-flex trophy-cabinet-container" style="min-width:300px; flex: 1 1 340px;">
 		<h5 class="fw-bold mb-3">Trophy Cabinet</h5>
 
 		<div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
@@ -441,6 +443,62 @@
 				<div class="text-muted">No trophies earned yet.</div>
 			}
 		</div>
+	</div>
+
+		<!-- Top Bets: most-backed leagues & teams (beside the Trophy Cabinet) -->
+		<div class="top-bets-container d-flex flex-column gap-3 flex-wrap">
+		<div class="card top-bets-box">
+			<h5 class="top-bets-title"><i class="bi bi-trophy-fill me-2"></i>Top 5 Leagues</h5>
+			@if (Model.TopBetLeagues.Any())
+			{
+				var rank = 0;
+				foreach (var item in Model.TopBetLeagues)
+				{
+					rank++;
+					<div class="top-bet-row">
+						<span class="top-bet-rank">@rank</span>
+						@if (!string.IsNullOrEmpty(item.LogoUrl))
+						{
+							<img class="top-bet-logo" src="@item.LogoUrl" alt="@item.Name" />
+						}
+						<span class="top-bet-name">@item.Name</span>
+						<span class="top-bet-count">@item.Count</span>
+					</div>
+				}
+			}
+			else
+			{
+				<p class="top-bets-empty">No bets placed yet.</p>
+			}
+		</div>
+
+		<div class="card top-bets-box">
+			<h5 class="top-bets-title"><i class="bi bi-shield-fill me-2"></i>Top 5 Teams</h5>
+			@if (Model.TopBetTeams.Any())
+			{
+				var rank = 0;
+				foreach (var item in Model.TopBetTeams)
+				{
+					rank++;
+					<div class="top-bet-row">
+						<span class="top-bet-rank">@rank</span>
+						@if (!string.IsNullOrEmpty(item.LogoUrl))
+						{
+							<img class="top-bet-logo" src="@item.LogoUrl" alt="@item.Name" />
+						}
+						<span class="top-bet-name">@item.Name</span>
+						<span class="top-bet-count">@item.Count</span>
+					</div>
+				}
+			}
+			else
+			{
+				<p class="top-bets-empty">No bets placed yet.</p>
+			}
+		</div>
+
+		</div>
+
 	</div>
 
 	<div class="modal fade" id="trophyModal" tabindex="-1" aria-labelledby="trophyModalLabel"
