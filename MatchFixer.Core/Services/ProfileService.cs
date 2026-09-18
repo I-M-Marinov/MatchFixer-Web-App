@@ -21,6 +21,8 @@ using static MatchFixer.Common.GeneralConstants.ProfilePictureConstants;
 using static MatchFixer.Common.ServiceConstants.PasswordRequirements;
 using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Common.FootballLeagues;
+using MatchFixer.Common.FootballCompetitions;
+using MatchFixer.Common.Enums;
 using Country = ISO3166.Country;
 
 
@@ -191,6 +193,65 @@ namespace MatchFixer.Core.Services
 				"Polish League Ekstraklasa"
 			};
 
+			// Top 5 leagues/competitions and top 5 backed teams from the user's bets.
+			var betRows = await _dbContext.Bets
+				.AsNoTracking()
+				.Where(b => b.BetSlip.UserId == user.Id)
+				.Select(b => new
+				{
+					b.Pick,
+					Competition = b.MatchEvent.CompetitionName,
+					League = b.MatchEvent.HomeTeam.LeagueName,
+					HomeId = b.MatchEvent.HomeTeamId,
+					HomeName = b.MatchEvent.HomeTeam.Name,
+					HomeLogo = b.MatchEvent.HomeTeam.LogoUrl,
+					HomeLocalLogo = b.MatchEvent.HomeTeam.LocalLogoUrl,
+					AwayId = b.MatchEvent.AwayTeamId,
+					AwayName = b.MatchEvent.AwayTeam.Name,
+					AwayLogo = b.MatchEvent.AwayTeam.LogoUrl,
+					AwayLocalLogo = b.MatchEvent.AwayTeam.LocalLogoUrl
+				})
+				.ToListAsync();
+
+			var topBetLeagues = betRows
+				.Select(b => string.IsNullOrWhiteSpace(b.Competition) ? b.League : b.Competition)
+				.Where(name => !string.IsNullOrWhiteSpace(name))
+				.GroupBy(name => name)
+				.Select(g => new TopBetItem
+				{
+					Name = g.Key,
+					Count = g.Count(),
+					LogoUrl = FootballCompetitionLogos.GetLeagueLogo(g.Key)
+						?? FootballCompetitionLogos.GetCompetitionLogo(g.Key)
+				})
+				.OrderByDescending(x => x.Count)
+				.ThenBy(x => x.Name)
+				.Take(5)
+				.ToList();
+
+			// A Home pick backs the home team, an Away pick backs the away team; Draw backs no team.
+			var backedTeams = new List<(Guid TeamId, string Name, string Logo)>();
+			foreach (var b in betRows)
+			{
+				if (b.Pick == MatchPick.Home)
+					backedTeams.Add((b.HomeId, b.HomeName, string.IsNullOrWhiteSpace(b.HomeLocalLogo) ? b.HomeLogo : b.HomeLocalLogo));
+				else if (b.Pick == MatchPick.Away)
+					backedTeams.Add((b.AwayId, b.AwayName, string.IsNullOrWhiteSpace(b.AwayLocalLogo) ? b.AwayLogo : b.AwayLocalLogo));
+			}
+
+			var topBetTeams = backedTeams
+				.GroupBy(t => t.TeamId)
+				.Select(g => new TopBetItem
+				{
+					Name = g.First().Name,
+					Count = g.Count(),
+					LogoUrl = g.First().Logo
+				})
+				.OrderByDescending(x => x.Count)
+				.ThenBy(x => x.Name)
+				.Take(5)
+				.ToList();
+
 			return new ProfileViewModel
 			{
 				Id = user.Id.ToString(),
@@ -208,6 +269,8 @@ namespace MatchFixer.Core.Services
 				Trophies = trophyViewModels,
 				FavoriteTeams = favoriteTeams,
 				AllTeams = allTeams,
+				TopBetLeagues = topBetLeagues,
+				TopBetTeams = topBetTeams,
 				FavoriteLeagues = await _dbContext.UserFavoriteLeagues
 					.Where(x => x.UserId == user.Id)
 					.Select(x => x.LeagueName)
