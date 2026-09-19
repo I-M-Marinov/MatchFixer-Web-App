@@ -28,5 +28,14 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public List<SelectListItem> AllTeams { get; set; } = new();
 		public List<string> FavoriteLeagues { get; set; } = new();
 		public List<SelectListItem> AllLeagues { get; set; } = new();
+		public List<TopBetItem> TopBetLeagues { get; set; } = new();
+		public List<TopBetItem> TopBetTeams { get; set; } = new();
+	}
+
+	public class TopBetItem
+	{
+		public string Name { get; set; } = null!;
+		public string? LogoUrl { get; set; }
+		public int Count { get; set; }
 	}
 }
