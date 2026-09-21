@@ -575,7 +575,17 @@
 
         fileInput.addEventListener("change", () => {
             if (fileInput.files.length > 0) {
+                // Auto-upload as soon as a picture is chosen (no separate click needed)
                 fileError.classList.add("d-none");
+                if (spinnerRing) spinnerRing.style.display = "block";
+                const uploadForm = fileInput.form;
+                if (uploadForm) {
+                    if (typeof uploadForm.requestSubmit === "function") {
+                        uploadForm.requestSubmit();
+                    } else {
+                        uploadForm.submit();
+                    }
+                }
             }
         });
 
