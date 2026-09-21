@@ -95,7 +95,16 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     <img src="./assets/matchfixer-started-events.png" width="800px" />
   </div>
 </details>
-
+<details>
+  <summary><h2>Trophy Catalog</h2></summary>
+  <div align="center">
+    <h4>Bronze Trophies</h4>
+    <img src="./assets/trophy-catalog-page2.png" width="1200px" />
+    <br/><br/>
+    <h4>Platinum Trophies</h4>
+    <img src="./assets/trophy-catalog-page1.png" width="1200px" />
+  </div>
+</details>
 <details>
   <summary><h2>Events Board</h2></summary>
     <p>
