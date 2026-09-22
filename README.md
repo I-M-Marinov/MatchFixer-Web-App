@@ -92,7 +92,6 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     </p>
     <img src="./assets/new-home-page-view.png" width="800px" />
     <br/><br/>
-    <img src="./assets/matchfixer-started-events.png" width="800px" />
   </div>
 </details>
 <details>
@@ -113,8 +112,12 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
                                     ( if any are available to be bet on ).<br/>
     </p>
     <div align="center">
-          <img src="./assets/revamped-events-board.png" width="1000px"/>
-          <img src="./assets/updated-live-events-board.png" width="1000px"/>
+        <h4> Events Board View # 1 </h4>
+          <img src="./assets/revamped-events-board.png" width="1200px"/>
+        <h4>Events Board View # 2</h4>
+          <img src="./assets/updated-live-events-board.png" width="1200px"/>
+        <h4>Already started events</h4>
+          <img src="./assets/matchfixer-started-events.png" width="1000px" />
     </div>
 </details>
 
