@@ -129,19 +129,21 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
       - Derby matches and boosted events receive additional visual treatment to stand out on the board.
     </p>
     <h4>UEFA Champions League</h4>
-    <img src="./assets/updated-ucl-event-cards.png" width="700px" />
+    <img src="./assets/updated-ucl-event-cards.png" width="900px" />
     <h4>UEFA Europa League</h4>
-    <img src="./assets/updated-uel-event-cards.png" width="700px" />
+    <img src="./assets/updated-uel-event-cards.png" width="900px" />
     <h4>UEFA Conference League</h4>
-    <img src="./assets/updated-uecl-event-cards.png" width="700px" />
+    <img src="./assets/updated-uecl-event-cards.png" width="900px" />
     <h4>FIFA World Cup</h4>
-    <img src="./assets/world-cup-event-cards.png" width="700px" />
+    <img src="./assets/world-cup-event-cards.png" width="900px" />
     <h4>International Friendlies</h4>
-    <img src="./assets/international-event-cards.png" width="700px" />
+    <img src="./assets/international-event-cards.png" width="900px" />
     <h4>Derby Match</h4>
-    <img src="./assets/updated-derby-event-card.png" width="700px" />
+    <img src="./assets/updated-derby-event-card.png" width="400px" />
     <h4>Boosted Event</h4>
-    <img src="./assets/updated-boosted-event.png" width="700px" />
+    <img src="./assets/updated-boosted-event.png" width="400px" />
+    <h4>Postponed Event</h4>
+    <img src="./assets/postponed-event.png" width="400px" />
   </div>
 </details>
 
