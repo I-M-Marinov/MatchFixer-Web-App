@@ -1,0 +1,233 @@
+﻿@using MatchFixer.Common.Enums
+@using MatchFixer.Infrastructure.Entities
+@model MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailQueueViewModel
+@{
+    Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+    ViewData["Title"] = "Email Review Queue";
+
+    var sections = new (string Title, string Icon, IReadOnlyList<QueuedEmail> Items)[]
+    {
+        ("Winning emails", "bi-trophy-fill", Model.Winning),
+        ("Other emails", "bi-envelope-paper-fill", Model.Other)
+    };
+}
+
+@functions {
+    string StatusClass(EmailQueueStatus st) => st switch
+    {
+        EmailQueueStatus.Pending  => "bg-warning text-dark",
+        EmailQueueStatus.Approved => "bg-info text-dark",
+        EmailQueueStatus.Failed   => "bg-danger",
+        EmailQueueStatus.Sent     => "bg-success",
+        _                         => "bg-secondary"
+    };
+}
+
+<div class="admin-users-background"></div>
+
+<div class="email-qa-wrapper">
+
+    @if (TempData["SuccessMessage"] is string sm)
+    {
+        <div class="alert success-message">@sm</div>
+    }
+    @if (TempData["ErrorMessage"] is string em)
+    {
+        <div class="alert error-message">@em</div>
+    }
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <h2 class="email-qa-title m-0"><i class="bi bi-inboxes-fill me-2"></i>Email Review Queue</h2>
+        <a class="btn btn-ocean btn-sm" asp-area="Admin" asp-controller="Users" asp-action="ShowUsers">
+            <i class="bi bi-arrow-left"></i> Back to users
+        </a>
+    </div>
+
+    <form id="qa-form" method="post" asp-area="Admin" asp-controller="EmailQueue" asp-action="SendNow">
+        @Html.AntiForgeryToken()
+
+        <!-- TOOLBAR -->
+        <div class="email-qa-toolbar d-flex flex-wrap align-items-center gap-2 mb-4">
+            <div class="form-check me-2 mb-0">
+                <input class="form-check-input" type="checkbox" id="qa-select-all" />
+                <label class="form-check-label" for="qa-select-all">Select all</label>
+            </div>
+
+            <button type="submit" class="btn btn-mint btn-sm" formaction="/Admin/EmailQueue/SendNow">
+                <i class="bi bi-send-fill"></i> Send now
+            </button>
+
+            <div class="d-flex align-items-center gap-2 ms-2">
+                <label class="mb-0 qa-interval-label" for="qa-interval">Interval:</label>
+                <select id="qa-interval" name="intervalSeconds" class="form-select form-select-sm qa-interval-select">
+                    <option value="0">No gap</option>
+                    <option value="15">15 seconds</option>
+                    <option value="30" selected>30 seconds</option>
+                    <option value="60">1 minute</option>
+                    <option value="120">2 minutes</option>
+                    <option value="300">5 minutes</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-ocean btn-sm" formaction="/Admin/EmailQueue/Schedule">
+                <i class="bi bi-clock-history"></i> Send with interval
+            </button>
+
+            <button type="submit" class="btn btn-outline-light btn-sm ms-auto qa-drop-btn"
+                    formaction="/Admin/EmailQueue/Drop"
+                    onclick="return confirm('Drop the selected emails? They will not be sent.');">
+                <i class="bi bi-trash"></i> Drop selected
+            </button>
+        </div>
+
+        @foreach (var sec in sections)
+        {
+            <div class="email-qa-section mb-4">
+                <h5 class="email-qa-section-title">
+                    <i class="bi @sec.Icon me-2"></i>@sec.Title
+                    <span class="badge rounded-pill qa-count-badge">@sec.Items.Count</span>
+                </h5>
+
+                @if (sec.Items.Count == 0)
+                {
+                    <div class="qa-empty">No emails in this section.</div>
+                }
+                else
+                {
+                    <div class="qa-card-list">
+                        @foreach (var e in sec.Items)
+                        {
+                            <div class="qa-card">
+                                <div class="qa-card-head">
+                                    <input class="form-check-input qa-check" type="checkbox" name="ids" value="@e.Id" />
+                                    <div class="qa-card-main">
+                                        <div class="qa-card-recipient"><i class="bi bi-person-fill me-1"></i>@e.Recipient</div>
+                                        <div class="qa-card-subject">@e.Subject</div>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(e.RelatedInfo))
+                                {
+                                    <div class="qa-card-context">
+                                        <span class="qa-card-label">Context</span> @e.RelatedInfo
+                                    </div>
+                                }
+
+                                <div class="qa-card-foot">
+                                    <span class="badge @StatusClass(e.Status)">@e.Status</span>
+                                    <span class="qa-card-date"><i class="bi bi-clock me-1"></i>@e.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm") UTC</span>
+                                    <button type="button" class="btn btn-ocean btn-sm qa-view-btn ms-auto" data-id="@e.Id">
+                                        <i class="bi bi-eye"></i> View / edit
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </form>
+</div>
+
+<!-- VIEW / EDIT MODAL -->
+<div class="modal fade" id="emailViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable qa-modal-wide">
+        <div class="modal-content email-qa-modal">
+            <form method="post" asp-area="Admin" asp-controller="EmailQueue" asp-action="Update">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="edit-id" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Review email <small class="ms-2 opacity-75" id="edit-recipient"></small></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="edit-subject">Subject</label>
+                        <input type="text" class="form-control" name="subject" id="edit-subject" maxlength="300" />
+                    </div>
+
+                    <div class="accordion qa-accordion" id="qaEditorAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#qaBodyPane" aria-expanded="true" aria-controls="qaBodyPane">
+                                    <i class="bi bi-code-slash me-2"></i> Body (HTML)
+                                </button>
+                            </h2>
+                            <div id="qaBodyPane" class="accordion-collapse collapse show" data-bs-parent="#qaEditorAccordion">
+                                <div class="accordion-body">
+                                    <textarea class="form-control qa-body-area" name="bodyHtml" id="edit-body" rows="16"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#qaPreviewPane" aria-expanded="false" aria-controls="qaPreviewPane">
+                                    <i class="bi bi-eye me-2"></i> Live preview
+                                </button>
+                            </h2>
+                            <div id="qaPreviewPane" class="accordion-collapse collapse" data-bs-parent="#qaEditorAccordion">
+                                <div class="accordion-body">
+                                    <iframe id="edit-preview" class="qa-preview" title="Email preview"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-mint"><i class="bi bi-save"></i> Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const modalEl = document.getElementById('emailViewModal');
+            const bsModal = (window.bootstrap && modalEl) ? new bootstrap.Modal(modalEl) : null;
+            const idInput = document.getElementById('edit-id');
+            const subjInput = document.getElementById('edit-subject');
+            const bodyInput = document.getElementById('edit-body');
+            const preview = document.getElementById('edit-preview');
+            const recipientLbl = document.getElementById('edit-recipient');
+
+            function refreshPreview() { if (preview) preview.srcdoc = bodyInput.value || ''; }
+
+            document.querySelectorAll('.qa-view-btn').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    const id = btn.getAttribute('data-id');
+                    try {
+                        const res = await fetch('/Admin/EmailQueue/Get?id=' + encodeURIComponent(id));
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        idInput.value = data.id;
+                        subjInput.value = data.subject || '';
+                        bodyInput.value = data.bodyHtml || '';
+                        if (recipientLbl) recipientLbl.textContent = data.recipient || '';
+                        refreshPreview();
+                        if (bsModal) bsModal.show();
+                    } catch (err) { console.error('Failed to load email', err); }
+                });
+            });
+
+            if (bodyInput) bodyInput.addEventListener('input', refreshPreview);
+
+            const previewPane = document.getElementById('qaPreviewPane');
+            if (previewPane) previewPane.addEventListener('shown.bs.collapse', refreshPreview);
+
+            const selectAll = document.getElementById('qa-select-all');
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    document.querySelectorAll('.qa-check').forEach(function (c) { c.checked = selectAll.checked; });
+                });
+            }
+        })();
+    </script>
+}
