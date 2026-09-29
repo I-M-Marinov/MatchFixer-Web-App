@@ -24,6 +24,7 @@ public class BettingService : IBettingService
 	private readonly IOddsBoostService _oddsBoostService;
 	private readonly IAdminInsightsNotifier _notifier;
 	private readonly IEmailSender _emailSender;
+	private readonly IEmailQueueService _emailQueue;
 
 
 	public BettingService(MatchFixerDbContext dbContext,
@@ -33,7 +34,8 @@ public class BettingService : IBettingService
 		ITrophyService trophyService,
 		IOddsBoostService oddsBoostService,
 		IAdminInsightsNotifier notifier,
-		IEmailSender emailSender
+		IEmailSender emailSender,
+		IEmailQueueService emailQueue
 		)
 	{
 		_dbContext = dbContext;
@@ -44,6 +46,7 @@ public class BettingService : IBettingService
 		_oddsBoostService = oddsBoostService;
 		_notifier = notifier;
 		_emailSender = emailSender;
+		_emailQueue = emailQueue;
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default)
@@ -596,7 +599,11 @@ public class BettingService : IBettingService
 				bets: betRows
 			);
 
-			await _emailSender.SendEmailAsync(user.Email, subject, body);
+			var category = outcome == "Won"
+				? EmailQueueCategory.Winning
+				: EmailQueueCategory.Voided;
+
+			await _emailQueue.EnqueueAsync(user.Email, subject, body, category, user.Id, $"Slip {betSlip.Id:N}");
 		}
 		catch
 		{
