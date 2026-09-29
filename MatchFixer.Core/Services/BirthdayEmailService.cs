@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.EmailTemplates;
+using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Infrastructure;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -32,7 +33,7 @@ public class BirthdayEmailService : BackgroundService
 				using (var scope = _services.CreateScope())
 				{
 					var dbContext = scope.ServiceProvider.GetRequiredService<MatchFixerDbContext>();
-					var emailService = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+					var emailQueue = scope.ServiceProvider.GetRequiredService<IEmailQueueService>();
 					var walletService = scope.ServiceProvider.GetRequiredService<IWalletService>();
 
 					var today = DateTime.Today;
@@ -55,10 +56,13 @@ public class BirthdayEmailService : BackgroundService
 						string emailBody =
 							EmailTemplates.BirthdayEmail(LogoUrl, user.FullName);
 
-						await emailService.SendEmailAsync(
+						await emailQueue.EnqueueAsync(
 							user.Email,
 							EmailTemplates.SubjectHappyBirthdayFromMatchFixer,
-							emailBody);
+							emailBody,
+							EmailQueueCategory.Birthday,
+							user.Id,
+							"Birthday");
 
 						_logger.LogInformation(
 							BirthdayEmailSent,
