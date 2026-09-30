@@ -35,6 +35,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<TeamWikiInfo> TeamWikiInfos { get; set; }
 		public virtual DbSet<WorldCupMatch> WorldCupMatches { get; set; }
 		public virtual DbSet<WorldCupGroupStanding> WorldCupGroupStandings { get; set; }
+		public virtual DbSet<QueuedEmail> QueuedEmails { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -177,6 +178,17 @@ namespace MatchFixer.Infrastructure
 				.HasOne(t => t.WikiInfo)
 				.WithOne(w => w.Team)
 				.HasForeignKey<TeamWikiInfo>(w => w.TeamId);
+
+			builder.Entity<QueuedEmail>(entity =>
+			{
+				entity.HasIndex(x => new { x.Status, x.Category });
+				entity.HasIndex(x => new { x.Status, x.SendAfterUtc });
+
+				entity.HasOne(x => x.RecipientUser)
+					.WithMany()
+					.HasForeignKey(x => x.RecipientUserId)
+					.OnDelete(DeleteBehavior.SetNull);
+			});
 		}
 	}
 }
