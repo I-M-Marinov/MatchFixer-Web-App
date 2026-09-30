@@ -471,6 +471,87 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.ToTable("ProfilePictures");
                 });
 
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.QueuedEmail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Unique identifier for a queued email");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int")
+                        .HasComment("Number of send attempts");
+
+                    b.Property<string>("BodyHtml")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Email body (HTML) - stored as nvarchar(max)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int")
+                        .HasComment("Which kind of email this is (Winning, Event, Voided, Birthday, Other)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2")
+                        .HasComment("When the email was enqueued (UTC)");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasComment("Last send error, if any");
+
+                    b.Property<string>("Recipient")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasComment("Recipient email address");
+
+                    b.Property<Guid?>("RecipientUserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Optional id of the recipient user");
+
+                    b.Property<string>("RelatedInfo")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
+                        .HasComment("Human-friendly context, e.g. teams or slip id");
+
+                    b.Property<DateTime?>("ReviewedAtUtc")
+                        .HasColumnType("datetime2")
+                        .HasComment("When an admin approved / dropped the email (UTC)");
+
+                    b.Property<Guid?>("ReviewedByUserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Admin who approved / dropped the email");
+
+                    b.Property<DateTime?>("SendAfterUtc")
+                        .HasColumnType("datetime2")
+                        .HasComment("Earliest time the dispatcher may send this (UTC) - used for interval sending");
+
+                    b.Property<DateTime?>("SentAtUtc")
+                        .HasColumnType("datetime2")
+                        .HasComment("When the email was actually sent (UTC)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasComment("Review / send status");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)")
+                        .HasComment("Email subject");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientUserId");
+
+                    b.HasIndex("Status", "Category");
+
+                    b.HasIndex("Status", "SendAfterUtc");
+
+                    b.ToTable("QueuedEmails");
+                });
+
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1161,6 +1242,16 @@ namespace MatchFixer.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MatchEvent");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.QueuedEmail", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "RecipientUser")
+                        .WithMany()
+                        .HasForeignKey("RecipientUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("RecipientUser");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TeamAlias", b =>
