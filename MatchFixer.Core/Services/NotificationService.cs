@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.EmailTemplates;
+using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.ViewModels.UserNotifications;
 using MatchFixer.Infrastructure;
@@ -15,7 +16,7 @@ namespace MatchFixer.Core.Services
 	public class NotificationService : INotificationService
 	{
 		private readonly MatchFixerDbContext _db;
-		private readonly IEmailSender _emailSender;
+		private readonly IEmailQueueService _emailQueue;
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly ITimezoneService _timezoneService;
 
@@ -23,10 +24,10 @@ namespace MatchFixer.Core.Services
 
 
 
-		public NotificationService(MatchFixerDbContext db, IEmailSender emailSender, IHttpContextAccessor httpContextAccessor, ITimezoneService timezoneService)
+		public NotificationService(MatchFixerDbContext db, IEmailQueueService emailQueue, IHttpContextAccessor httpContextAccessor, ITimezoneService timezoneService)
 		{
 			_db = db;
-			_emailSender = emailSender;
+			_emailQueue = emailQueue;
 			_httpContextAccessor = httpContextAccessor;
 			_timezoneService = timezoneService;
 		}
@@ -76,7 +77,7 @@ namespace MatchFixer.Core.Services
 				.Select(g => g.First())
 				.ToList();
 
-			var emailTasks = users.Select(u =>
+			foreach (var u in users)
 			{
 				var favoriteTeamName = match.HomeTeamId == u.TeamId
 					? match.HomeTeam.Name
@@ -90,34 +91,31 @@ namespace MatchFixer.Core.Services
 
 				var subject = EmailTemplates.GetMatchNotificationSubject(favoriteTeamName, opponent);
 
-				var homeLogo = match.HomeTeam.WikiInfo?.ImageUrl
-				               ?? match.HomeTeam.LogoUrl;
-
-				var awayLogo = match.AwayTeam.WikiInfo?.ImageUrl
-				               ?? match.AwayTeam.LogoUrl;
+				var homeLogo = match.HomeTeam.WikiInfo?.ImageUrl ?? match.HomeTeam.LogoUrl;
+				var awayLogo = match.AwayTeam.WikiInfo?.ImageUrl ?? match.AwayTeam.LogoUrl;
 
 				var formattedTime = _timezoneService.FormatForUserExact(
 					match.MatchDate,
 					u.TimeZone,
-					"dddd, MMM d, yyyy • HH:mm"
-				);
+					"dddd, MMM d, yyyy • HH:mm");
 
-				return _emailSender.SendEmailAsync(
+				var body = EmailTemplates.MatchAddedEmail(
+					logoUrl: LogoUrl,
+					homeTeam: match.HomeTeam.Name,
+					awayTeam: match.AwayTeam.Name,
+					homeLogo: homeLogo,
+					awayLogo: awayLogo,
+					matchTime: formattedTime,
+					link: callbackUrl);
+
+				await _emailQueue.EnqueueAsync(
 					u.Email,
 					subject,
-					EmailTemplates.MatchAddedEmail(
-						logoUrl: LogoUrl,
-						homeTeam: match.HomeTeam.Name,
-						awayTeam: match.AwayTeam.Name,
-						homeLogo: homeLogo,
-						awayLogo: awayLogo,
-						matchTime: formattedTime, 
-						link: callbackUrl
-					)
-				);
-			});
-
-			await Task.WhenAll(emailTasks);
+					body,
+					EmailQueueCategory.Event,
+					recipientUserId: null,
+					relatedInfo: $"{match.HomeTeam.Name} vs {match.AwayTeam.Name}");
+			}
 
 		}
 	}
