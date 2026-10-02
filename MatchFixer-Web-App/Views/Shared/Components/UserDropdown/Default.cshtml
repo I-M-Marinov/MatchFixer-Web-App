@@ -2,10 +2,20 @@
 @model UserDropdownViewModel
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
+@inject MatchFixer.Core.Contracts.IEmailQueueService EmailQueue
 <meta name="csrf-token" content="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
 
-<ul class="profile-dropdown-menu d-flex">
+@{
+	var isAdmin = User.IsInRole(MatchFixer.Common.Identity.Roles.Admin);
+	int pendingEmails = 0;
+	if (isAdmin)
+	{
+		try { pendingEmails = await EmailQueue.GetPendingCountAsync(); } catch { }
+	}
+}
+
+<ul class="profile-dropdown-menu d-flex align-items-center">
 	@if (User.Identity.IsAuthenticated)
 	{
 		<li id="betSlipButtonContainer" class="nav-item position-relative">
@@ -20,7 +30,15 @@
 	<li class="nav-item dropdown pe-3 position-relative hover-dropdown-container">
 
 		<a class="nav-link nav-profile d-flex align-items-center pe-0 hover-dropdown" href="#">
-			<img src="@Model.ProfileImageUrl" alt="User Image" class="rounded-circle">
+			<span class="position-relative d-inline-block">
+				<img src="@Model.ProfileImageUrl" alt="User Image" class="rounded-circle">
+				@if (isAdmin && pendingEmails > 0)
+				{
+					<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+					      style="background-color:#bfe030;color:#1b3b16;font-size:.6rem;font-weight:600;padding:.18em .4em;line-height:1;border:1px solid rgba(0,0,0,.25);"
+					      title="@pendingEmails email(s) awaiting review">@pendingEmails</span>
+				}
+			</span>
 			<span class="d-none d-md-block dropdown ps-2"></span>
 		</a>
 
@@ -32,6 +50,27 @@
 			<li>
 				<hr class="dropdown-divider">
 			</li>
+
+			@if (isAdmin)
+			{
+				<li>
+
+					<form method="get" asp-area="Admin" asp-controller="EmailQueue" asp-action="Index">
+						<button type="submit" class="dropdown-item d-flex  align-items-center justify-content-center">
+							<span>
+								<i class="bi bi-envelope-paper-fill" style="color:#ffc43d;"></i> Review Emails
+								@if (pendingEmails > 0)
+								{
+									<span class="badge rounded-pill bg-danger ms-1">@pendingEmails</span>
+								}
+							</span>
+						</button>
+					</form>
+				</li>
+				<li>
+					<hr class="dropdown-divider">
+				</li>
+			}
 
 			<li>
 
