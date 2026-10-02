@@ -1,4 +1,5 @@
 ﻿@model MatchFixer_Web_App.Areas.Admin.ViewModels.AdminUsersListViewModel
+@inject MatchFixer.Core.Contracts.IEmailQueueService EmailQueue
 
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
@@ -54,6 +55,20 @@
 		   asp-action="Compose" 
 		   title="Send email blast">
 			<i class="bi bi-megaphone"></i> Email blast
+		</a>
+	</div>
+	<div class="col-auto">
+		<a class="btn btn-info position-relative"
+		   asp-area="Admin"
+		   asp-controller="EmailQueue"
+		   asp-action="Index"
+		   title="Review queued emails before sending">
+			<i class="bi bi-envelope-paper"></i> Review emails
+			@{ var queuedPending = await EmailQueue.GetPendingCountAsync(); }
+			@if (queuedPending > 0)
+			{
+				<span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle">@queuedPending</span>
+			}
 		</a>
 	</div>
 
