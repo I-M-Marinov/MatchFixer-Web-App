@@ -1,0 +1,249 @@
+﻿/* ---- Admin Email Review Queue (QA) ---- */
+
+.email-qa-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1500px;
+    margin: 7em auto 2.5rem auto;
+    padding: 0 1rem;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.email-qa-title {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+.email-qa-title i {
+    font-size: 1.25rem;
+}
+
+.email-qa-toolbar {
+    background-color: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    font-size: 0.85rem;
+}
+
+.email-qa-toolbar .form-check-label,
+.qa-interval-label {
+    color: #ffffff;
+}
+
+.qa-interval-select {
+    width: auto;
+    min-width: 8rem;
+}
+
+.email-qa-section {
+    background-color: rgba(0, 0, 0, 0.30);
+    border-radius: 0.6rem;
+    padding: 0.9rem 1.1rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.email-qa-section-title {
+    font-family: "Orbitron", sans-serif;
+    font-size: 1.05rem;
+    color: #ffffff;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.8rem;
+}
+
+.qa-count-badge {
+    background-color: #0DAB76;
+    color: #ffffff;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+.qa-empty {
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+    padding: 0.4rem 0;
+}
+
+.qa-card-list {
+    display: flex;`
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.qa-card {
+    background-color: #ffffff;
+    color: #212529;
+    border-radius: 0.55rem;
+    padding: 0.65rem 0.85rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.qa-card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+}
+
+.qa-card-head .qa-check {
+    margin-top: 0.2rem;
+    flex: 0 0 auto;
+}
+
+.qa-card-main {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.qa-card-recipient {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #1f2d3d;
+    word-break: break-word;
+}
+
+.qa-card-recipient i {
+    color: #2b5f8b;
+}
+
+.qa-card-subject {
+    font-size: 0.82rem;
+    color: #495057;
+    margin-top: 0.1rem;
+    word-break: break-word;
+}
+
+.qa-card-context {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin: 0.4rem 0 0.5rem;
+    padding-left: 1.55rem;
+}
+
+.qa-card-label {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background-color: #2b5f8b;
+    border-radius: 0.3rem;
+    padding: 0.05rem 0.35rem;
+    margin-right: 0.3rem;
+}
+
+.qa-card-foot {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-left: 1.55rem;
+}
+
+.qa-card-foot .badge {
+    font-size: 0.72rem;
+}
+
+.qa-card-date {
+    font-size: 0.72rem;
+    color: #6c757d;
+}
+
+.qa-card-foot .qa-view-btn {
+    font-size: 0.75rem;
+}
+
+.qa-drop-btn {
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #dc3545;
+    --bs-btn-hover-border-color: #dc3545;
+}
+
+.email-qa-modal {
+    border: none;
+    border-radius: 0.8rem;
+    overflow: hidden;
+}
+
+.qa-modal-wide {
+    max-width: 1250px;
+    width: 94%;
+}
+
+.email-qa-modal .modal-header {
+    background: linear-gradient(71deg, rgba(50, 146, 184, 1) 0%, rgba(87, 199, 133, 1) 100%);
+    color: #ffffff;
+    border-bottom: none;
+    align-items: center;
+    padding: 0.85rem 1.1rem;
+}
+
+.email-qa-modal .modal-header .btn-close {
+    margin: 0;
+    padding: 0.5rem;
+    align-self: center;
+}
+
+.email-qa-modal .modal-title {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.email-qa-modal .modal-body {
+    background-color: #f4f6f8;
+}
+
+.qa-accordion {
+    --bs-accordion-border-color: #dce3ea;
+    --bs-accordion-border-radius: 0.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.qa-accordion .accordion-button {
+    font-weight: 600;
+    color: #1f2d3d;
+    background-color: #ffffff;
+}
+
+.qa-accordion .accordion-button:not(.collapsed) {
+    background-color: #e7f1f8;
+    color: #2b5f8b;
+    box-shadow: none;
+}
+
+.qa-accordion .accordion-button:focus {
+    box-shadow: 0 0 0 0.15rem rgba(43, 95, 139, 0.25);
+    border-color: rgba(43, 95, 139, 0.35);
+}
+
+.qa-accordion .accordion-button i {
+    color: #2b5f8b;
+}
+
+.qa-accordion .accordion-body {
+    background-color: #ffffff;
+    padding: 0.85rem;
+}
+
+.qa-preview {
+    width: 100%;
+    height: 30rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+    background: #ffffff;
+}
+
+.qa-body-area {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    height: 24rem;
+}
