@@ -6,5 +6,6 @@
 		public League League { get; set; }
 		public Teams Teams { get; set; }
 		public Goals Goals { get; set; }
+		public ScoreInfo Score { get; set; }
 	}
 }
