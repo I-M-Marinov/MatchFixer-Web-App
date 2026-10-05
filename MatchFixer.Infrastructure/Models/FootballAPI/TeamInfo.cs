@@ -10,5 +10,7 @@ namespace MatchFixer.Infrastructure.Models.FootballAPI
 	{
 		public string Name { get; set; }
 		public string Logo { get; set; }
+		// API-Football: true = this team won, false = lost, null = draw / undecided
+		public bool? Winner { get; set; }
 	}
 }
