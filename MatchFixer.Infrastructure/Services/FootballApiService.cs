@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using MatchFixer.Common.FootballLeagues;
+using MatchFixer.Common.ServiceConstants;
 using static MatchFixer.Common.ServiceConstants.FootballApiConstants;
 
 namespace MatchFixer.Infrastructure.Services
@@ -267,6 +268,75 @@ namespace MatchFixer.Infrastructure.Services
 					AwayOdds = 3.33m
 				})
 				.ToList();
+		}
+
+		public async Task<IReadOnlyList<FixtureResultDto>> GetFixtureResultsAsync(
+			IReadOnlyCollection<int> fixtureIds,
+			CancellationToken ct = default)
+		{
+			var results = new List<FixtureResultDto>();
+
+			if (fixtureIds == null || fixtureIds.Count == 0)
+				return results;
+
+			// De-dup and chunk into batches of 20 (API-Football allows up to 20 ids per /fixtures?ids= call).
+			var distinctIds = fixtureIds.Where(id => id > 0).Distinct().ToList();
+
+			const int batchSize = 20;
+			var batches = distinctIds
+				.Select((id, index) => new { id, index })
+				.GroupBy(x => x.index / batchSize)
+				.Select(g => g.Select(x => x.id).ToList())
+				.ToList();
+
+			for (int i = 0; i < batches.Count; i++)
+			{
+				var idsParam = string.Join("-", batches[i]);
+				var url = $"{BaseUrl}/fixtures?ids={idsParam}";
+
+				using var request = new HttpRequestMessage(HttpMethod.Get, url);
+				request.Headers.Add(ApiHeader, _apiKey);
+
+				var response = await _httpClient.SendAsync(request, ct);
+				response.EnsureSuccessStatusCode();
+
+				var json = await response.Content.ReadAsStringAsync(ct);
+
+				var data = JsonSerializer.Deserialize<FixtureApiResponse>(
+					json,
+					new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+				if (data?.Response != null)
+				{
+					foreach (var f in data.Response)
+					{
+						var statusShort = f.Fixture.Status?.Short;
+
+						var hasPenalties =
+							string.Equals(statusShort, FootballFixtureStatuses.Penalties, StringComparison.OrdinalIgnoreCase)
+							|| (f.Score?.Penalty != null &&
+								(f.Score.Penalty.Home != null || f.Score.Penalty.Away != null));
+
+						results.Add(new FixtureResultDto
+						{
+							ApiFixtureId = f.Fixture.Id,
+							StatusShort = statusShort,
+							StatusLong = f.Fixture.Status?.Long,
+							Elapsed = f.Fixture.Status?.Elapsed,
+							HomeGoals = f.Goals?.Home,
+							AwayGoals = f.Goals?.Away,
+							HomeIsWinner = f.Teams?.Home?.Winner,
+							HasPenalties = hasPenalties
+						});
+					}
+				}
+
+				// Respect the API rate limit (1 request / 6s) - only wait between batches.
+				if (i < batches.Count - 1)
+					await Task.Delay(6000, ct);
+			}
+
+			return results;
 		}
 
 
