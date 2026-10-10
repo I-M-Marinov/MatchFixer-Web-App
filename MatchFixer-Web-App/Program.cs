@@ -100,6 +100,7 @@ builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();                
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
+builder.Services.AddScoped<IAutoScoringService, AutoScoringService>();     // Add the Auto Scoring Service ( API-driven result settlement )
 builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      // Add the Events Results Service
 builder.Services.AddHttpClient<ITheSportsDbApiService, TheSportsDbApiService>();// Add the SportsDBApi Service
 builder.Services.AddScoped<ILiveMatchQueryService, LiveMatchQueryService>();	// Add the Live Match Query Service
