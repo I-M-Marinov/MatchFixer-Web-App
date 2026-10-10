@@ -26,6 +26,7 @@ namespace MatchFixer_Web_App.Controllers
 		private readonly IOddsBoostService _oddsBoostService;
 		private readonly ILiveMatchResultService _liveMatchResultService;
 		private readonly IOddsGeneratorService _oddsGeneratorService;
+		private readonly IAutoScoringService _autoScoringService;
 
 
 		public EventController(
@@ -35,7 +36,8 @@ namespace MatchFixer_Web_App.Controllers
 			IUserContextService userContextService,
 			IOddsBoostService oddsBoostService,
 			ILiveMatchResultService liveMatchResultService,
-			IOddsGeneratorService oddsGeneratorService)
+			IOddsGeneratorService oddsGeneratorService,
+			IAutoScoringService autoScoringService)
 		{
 			_matchEventService = matchEventService;
 			_upcomingMatchService = upcomingMatchService;
@@ -44,6 +46,7 @@ namespace MatchFixer_Web_App.Controllers
 			_oddsBoostService = oddsBoostService;
 			_liveMatchResultService = liveMatchResultService;
 			_oddsGeneratorService = oddsGeneratorService;
+			_autoScoringService = autoScoringService;
 		}
 
 		[HttpGet("/events/manage")]
@@ -416,6 +419,54 @@ namespace MatchFixer_Web_App.Controllers
 			TempData[success ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = success
 					? MatchMarkedAsFullTime
 					: UnableToMarkMatchAsFullTime;
+
+			return RedirectToAction(nameof(AddMatchEvent));
+		}
+
+		[HttpGet]
+		[Authorize]
+		[AdminOnly]
+		public async Task<IActionResult> AutoScorePreview()
+		{
+			try
+			{
+				var model = await _autoScoringService.GetAutoScoreCandidatesAsync();
+				return PartialView("_AutoScoreMatches", model);
+			}
+			catch (HttpRequestException ex)
+			{
+				return Content($"<div class=\"alert error-message\">\u26A0 Could not reach the football API: {ex.Message}</div>", "text/html");
+			}
+			catch (Exception ex)
+			{
+				return Content($"<div class=\"alert error-message\">\u26A0 Failed to load results: {ex.Message}</div>", "text/html");
+			}
+		}
+
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ConfirmAutoScores(Guid[] matchIds)
+		{
+			if (matchIds == null || matchIds.Length == 0)
+			{
+				TempData[TempDataKeys.ErrorMessage] = NoMatchesWereSelected;
+				return RedirectToAction(nameof(AddMatchEvent));
+			}
+
+			try
+			{
+				var result = await _autoScoringService.ConfirmAutoScoresAsync(matchIds);
+
+				// The Auto Scoring Summary modal (built from this payload) carries the full outcome,
+				// so no separate success/error banners are set for the scored path.
+				TempData[TempDataKeys.AutoScoreMessages] = System.Text.Json.JsonSerializer.Serialize(result);
+			}
+			catch (Exception ex)
+			{
+				TempData[TempDataKeys.ErrorMessage] = ex.Message;
+			}
 
 			return RedirectToAction(nameof(AddMatchEvent));
 		}
