@@ -1,0 +1,101 @@
+﻿@using MatchFixer.Common.Enums
+@model MatchFixer.Core.ViewModels.MatchResults.AutoScorePreviewViewModel
+
+@{
+	const string logoFallback = "/images/add-match/question-mark.png";
+}
+
+@if (Model.Rows == null || Model.Rows.Count == 0)
+{
+	<div class="auto-score-empty">
+		<i class="bi bi-inbox"></i>
+		<p>@(string.IsNullOrWhiteSpace(Model.Message) ? "No matches to score right now." : Model.Message)</p>
+	</div>
+}
+else
+{
+	<div class="auto-score-summary">
+		<span class="asm-chip asm-chip--finished"><i class="bi bi-check-circle-fill"></i> @Model.FinishedCount finished</span>
+		<span class="asm-chip asm-chip--live"><i class="bi bi-dot"></i> @Model.InProgressCount in progress</span>
+		<span class="asm-chip asm-chip--other"><i class="bi bi-dash-circle"></i> @Model.OtherCount other</span>
+	</div>
+
+	<div class="auto-score-table-wrap">
+		<table class="auto-score-table">
+			<thead>
+				<tr>
+					<th class="col-check"><input type="checkbox" id="autoScoreSelectAll" title="Select all finished" /></th>
+					<th class="col-match">Match</th>
+					<th class="col-kickoff">Kickoff</th>
+					<th class="col-status">Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var row in Model.Rows)
+				{
+					var stateClass = row.State.ToString().ToLowerInvariant();
+					var chip = row.State switch
+					{
+						AutoScoreState.Finished => "asm-badge--finished",
+						AutoScoreState.InProgress => "asm-badge--live",
+						AutoScoreState.Abandoned => "asm-badge--abandoned",
+						_ => "asm-badge--muted"
+					};
+					<tr class="auto-score-row auto-score-row--@stateClass">
+						<td class="col-check">
+							@if (row.CanScore)
+							{
+								<input class="form-check-input auto-score-check" type="checkbox" name="matchIds" value="@row.MatchId" />
+							}
+							else
+							{
+								<input class="form-check-input" type="checkbox" disabled />
+							}
+						</td>
+						<td class="col-match">
+							<div class="asm-fixture">
+								<span class="asm-team asm-team--home">
+									<span class="asm-name">@row.HomeTeam</span>
+									<img class="asm-logo" src="@(string.IsNullOrWhiteSpace(row.HomeLogo) ? logoFallback : row.HomeLogo)"
+										 alt="@row.HomeTeam" loading="lazy" onerror="this.src='@logoFallback'" />
+								</span>
+								<span class="asm-mid">
+									@if (row.HomeScore.HasValue && row.AwayScore.HasValue)
+									{
+										<span class="asm-score">@row.HomeScore<span class="asm-score-sep">&ndash;</span>@row.AwayScore</span>
+									}
+									else
+									{
+										<span class="asm-vs">vs</span>
+									}
+								</span>
+								<span class="asm-team asm-team--away">
+									<img class="asm-logo" src="@(string.IsNullOrWhiteSpace(row.AwayLogo) ? logoFallback : row.AwayLogo)"
+										 alt="@row.AwayTeam" loading="lazy" onerror="this.src='@logoFallback'" />
+									<span class="asm-name">@row.AwayTeam</span>
+								</span>
+							</div>
+							@if (row.HasPenalties && row.HomeWonOnPenalties.HasValue)
+							{
+								<div class="asm-pens">
+									<i class="bi bi-trophy-fill"></i> Penalties: @(row.HomeWonOnPenalties.Value ? row.HomeTeam : row.AwayTeam)
+								</div>
+							}
+						</td>
+						<td class="col-kickoff">@row.DisplayTime</td>
+						<td class="col-status">
+							<span class="asm-status">
+								<span class="asm-badge @chip">@row.StatusShort</span>
+								<span class="asm-status-label">@row.StatusLabel</span>
+								@if (row.State == AutoScoreState.InProgress && row.Elapsed.HasValue)
+								{
+									<span class="asm-elapsed">@row.Elapsed&#39;</span>
+								}
+							</span>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
