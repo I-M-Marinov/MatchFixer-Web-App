@@ -5,5 +5,6 @@
 		public const string SuccessMessage = "SuccessMessage";
 		public const string ErrorMessage = "ErrorMessage";
 		public const string SkippedMatches = "SkippedMatches";
+		public const string AutoScoreMessages = "AutoScoreMessages";
 	}
 }
