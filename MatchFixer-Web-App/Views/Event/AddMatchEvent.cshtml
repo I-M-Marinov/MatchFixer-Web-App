@@ -1,5 +1,6 @@
 ﻿@using MatchFixer.Common.Enums
 @using MatchFixer.Core.ViewModels.LiveEvents
+@using MatchFixer.Core.ViewModels.MatchResults
 @model MatchEventFormModel
 
 @{
@@ -37,6 +38,124 @@
 		</div>
 	}
 
+	@if (TempData["AutoScoreMessages"] != null)
+	{
+		var autoScoreSummary = System.Text.Json.JsonSerializer.Deserialize<AutoScoreConfirmResultViewModel>(TempData["AutoScoreMessages"]!.ToString()!);
+		var assLogoFallback = "/images/add-match/question-mark.png";
+
+		<style>
+			.ass-modal{ border:none; border-radius:.85rem; overflow:hidden; }
+			.ass-modal .modal-header{ background:linear-gradient(71deg, rgba(50,146,184,1) 0%, rgba(87,199,133,1) 100%); color:#fff; border-bottom:none; }
+			.ass-modal .modal-title{ font-weight:700; }
+			.ass-modal .modal-body{ background:#f6f8fa; }
+			.ass-counts{ display:flex; justify-content:center; gap:.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+			.ass-count{ font-size:.8rem; padding:.28rem .75rem; border-radius:999px; }
+			.ass-count--scored{ background:#e3f7ee; color:#0a8c60; }
+			.ass-count--skipped{ background:#fdecea; color:#b23c3c; }
+			.ass-list{ display:flex; flex-direction:column; gap:.6rem; }
+			.ass-row{ background:#fff; border:1px solid #e9eef3; border-left-width:4px; border-radius:.6rem; padding:.75rem .85rem; text-align:center; }
+			.ass-row--scored{ border-left-color:#0DAB76; }
+			.ass-row--skipped{ border-left-color:#e0a500; }
+			.ass-row--error{ border-left-color:#dc3545; }
+			.ass-fixture{ display:flex; align-items:center; justify-content:center; gap:.6rem; }
+			.ass-team{ display:inline-flex; align-items:center; gap:.45rem; min-width:0; flex:1 1 0; }
+			.ass-team--home{ justify-content:flex-end; }
+			.ass-team--away{ justify-content:flex-start; }
+			.ass-logo{ width:26px; height:26px; object-fit:contain; border-radius:4px; background:#fff; flex:0 0 auto; }
+			.ass-name{ font-weight:600; color:#1f2d3d; }
+			.ass-mid{ flex:0 0 auto; padding:0 .25rem; }
+			.ass-score{ font-weight:800; font-size:1.15rem; color:#1f2d3d; white-space:nowrap; }
+			.ass-score-sep{ color:#94a3b8; margin:0 .35rem; }
+			.ass-dash{ color:#cbd5e1; }
+			.ass-pens{ margin-top:.3rem; font-size:.75rem; color:#64748b; }
+			.ass-pens i{ color:#e0a500; }
+			.ass-badge{ display:inline-block; margin-top:.5rem; font-size:.72rem; font-weight:700; padding:.16rem .55rem; border-radius:.35rem; }
+			.ass-badge--scored{ background:#0DAB76; color:#fff; }
+			.ass-badge--skipped{ background:#fff4d6; color:#9a7400; }
+			.ass-badge--error{ background:#f8d7da; color:#842029; }
+			.ass-detail{ font-weight:500; }
+			@@media (max-width:560px){ .ass-team{ gap:.3rem; } .ass-name{ font-size:.85rem; } .ass-logo{ width:22px; height:22px; } }
+		</style>
+
+		<div class="modal fade" id="autoScoreSummaryModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+				<div class="modal-content ass-modal">
+					<div class="modal-header justify-content-center">
+						<h5 class="modal-title"><i class="bi bi-clipboard-check me-2"></i>Auto Scoring Summary</h5>
+					</div>
+					<div class="modal-body">
+						<div class="ass-counts">
+							<span class="ass-count ass-count--scored"><strong>@autoScoreSummary!.Scored</strong> scored &amp; settled</span>
+							@if (autoScoreSummary.Skipped > 0)
+							{
+								<span class="ass-count ass-count--skipped"><strong>@autoScoreSummary.Skipped</strong> skipped</span>
+							}
+						</div>
+
+						<div class="ass-list">
+							@foreach (var r in autoScoreSummary.Rows)
+							{
+								<div class="ass-row ass-row--@r.Outcome">
+									<div class="ass-fixture">
+										<span class="ass-team ass-team--home">
+											<span class="ass-name">@r.HomeTeam</span>
+											<img class="ass-logo" src="@(string.IsNullOrWhiteSpace(r.HomeLogo) ? assLogoFallback : r.HomeLogo)" alt="@r.HomeTeam" onerror="this.src='@assLogoFallback'" />
+										</span>
+										<span class="ass-mid">
+											@if (r.HomeScore.HasValue && r.AwayScore.HasValue)
+											{
+												<span class="ass-score">@r.HomeScore<span class="ass-score-sep">&ndash;</span>@r.AwayScore</span>
+											}
+											else
+											{
+												<span class="ass-dash">&mdash;</span>
+											}
+										</span>
+										<span class="ass-team ass-team--away">
+											<img class="ass-logo" src="@(string.IsNullOrWhiteSpace(r.AwayLogo) ? assLogoFallback : r.AwayLogo)" alt="@r.AwayTeam" onerror="this.src='@assLogoFallback'" />
+											<span class="ass-name">@r.AwayTeam</span>
+										</span>
+									</div>
+
+									@if (r.HasPenalties && r.HomeWonOnPenalties.HasValue)
+									{
+										<div class="ass-pens"><i class="bi bi-trophy-fill"></i> Penalties: @(r.HomeWonOnPenalties.Value ? r.HomeTeam : r.AwayTeam)</div>
+									}
+
+									<div class="ass-badge ass-badge--@r.Outcome">
+										@if (r.Outcome == "scored")
+										{
+											<text>Scored &amp; settled</text>
+										}
+										else if (r.Outcome == "error")
+										{
+											<text>Error</text>
+											@if (!string.IsNullOrWhiteSpace(r.Detail))
+											{
+												<span class="ass-detail"> &mdash; @r.Detail</span>
+											}
+										}
+										else
+										{
+											<text>Skipped</text>
+											@if (!string.IsNullOrWhiteSpace(r.Detail))
+											{
+												<span class="ass-detail"> &mdash; @r.Detail</span>
+											}
+										}
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+
 </div>
 
 
@@ -59,6 +178,16 @@
 			        type="button"
 			        role="tab">
 				Upcoming Matches
+			</button>
+		</li>
+
+		<li class="nav-item" role="presentation">
+			<button class="nav-link"
+			        data-bs-toggle="tab"
+			        data-bs-target="#autoScoreTab"
+			        type="button"
+			        role="tab">
+				Auto Scoring
 			</button>
 		</li>
 	</ul>
@@ -919,6 +1048,113 @@
 			</div>
 		</div>
 
+		<div class="tab-pane fade" id="autoScoreTab" role="tabpanel">
+
+			<style>
+				.auto-score-header{ display:flex; align-items:center; gap:1rem; justify-content:space-between; flex-wrap:wrap; padding-bottom:1rem; margin-bottom:1rem; border-bottom:1px solid #eef1f5; }
+				.auto-score-intro{ display:flex; align-items:flex-start; gap:.5rem; color:#475569; font-size:.9rem; max-width:46rem; line-height:1.45; }
+				.auto-score-intro i{ color:#0DAB76; font-size:1.1rem; margin-top:.1rem; }
+				.auto-score-fetch-btn{ flex:0 0 auto; display:inline-flex; align-items:center; gap:.4rem; background:#3370a8; color:#fff; border:none; border-radius:.5rem; padding:.5rem .95rem; font-weight:600; font-size:.88rem; white-space:nowrap; }
+				.auto-score-fetch-btn:hover{ background:#2b5f8b; }
+				.auto-score-fetch-btn:disabled{ opacity:.65; cursor:default; }
+				.auto-score-body{ min-height:4rem; }
+				.auto-score-empty{ text-align:center; color:#94a3b8; padding:2.2rem 1rem; }
+				.auto-score-empty i{ font-size:2rem; display:block; margin-bottom:.4rem; }
+				.auto-score-empty p{ margin:0; }
+				.auto-score-selected-count{ text-align:center; color:#64748b; font-size:.82rem; margin-top:.6rem; }
+				.review-btn:disabled{ opacity:.55; cursor:not-allowed; box-shadow:0 8px 0 #0f5132, 0 10px 20px rgba(0,0,0,.25); transform:translateY(0); }
+				.auto-score-summary{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.75rem; }
+				.asm-chip{ display:inline-flex; align-items:center; gap:.3rem; font-size:.74rem; font-weight:600; padding:.2rem .55rem; border-radius:999px; }
+				.asm-chip--finished{ background:#e3f7ee; color:#0a8c60; }
+				.asm-chip--live{ background:#fff4d6; color:#9a7400; }
+				.asm-chip--other{ background:#eef1f5; color:#64748b; }
+				.auto-score-table-wrap{ overflow-x:auto; border:1px solid #eef1f5; border-radius:.6rem; max-width:940px; }
+				.auto-score-table{ width:100%; border-collapse:collapse; font-size:.86rem; }
+				.auto-score-table thead th{ background:#f4f6f9; color:#334155; font-weight:600; text-align:left; padding:.6rem .8rem; border-bottom:1px solid #e4e9f0; white-space:nowrap; }
+				.auto-score-table tbody td{ padding:.6rem .8rem; border-bottom:1px solid #f0f2f6; vertical-align:middle; }
+				.auto-score-table tbody tr:last-child td{ border-bottom:none; }
+				.auto-score-table tbody tr:hover{ background:#f8fafc; }
+				.col-check{ width:2.4rem; text-align:center; }
+				.col-check .form-check-input{ cursor:pointer; }
+				.col-match{ width:100%; }
+				.col-kickoff{ white-space:nowrap; color:#475569; width:1%; }
+				.col-status .col-status{ }
+				.col-status{ white-space:nowrap; }
+				.col-score{ text-align:center; white-space:nowrap; }
+				.asm-fixture{ display:flex; align-items:center; justify-content:center; gap:.55rem; max-width:30rem; }
+				.asm-team{ display:inline-flex; align-items:center; gap:.4rem; min-width:0; flex:1 1 0; }
+				.asm-team--home{ justify-content:flex-end; text-align:right; }
+				.asm-team--away{ justify-content:flex-start; text-align:left; }
+				.asm-mid{ flex:0 0 auto; padding:0 .15rem; }
+				.asm-score-sep{ color:#94a3b8; margin:0 .3rem; }
+				.asm-logo{ width:24px; height:24px; object-fit:contain; border-radius:4px; background:#fff; flex:0 0 auto; }
+				.asm-name{ font-weight:600; color:#1f2d3d; }
+				.asm-vs{ color:#94a3b8; font-size:.78rem; font-weight:600; flex:0 0 auto; }
+				.asm-pens{ margin-top:.25rem; font-size:.74rem; color:#64748b; }
+				.asm-pens i{ color:#e0a500; }
+				.asm-badge{ display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.02em; padding:.12rem .45rem; border-radius:.3rem; color:#fff; }
+				.asm-badge--finished{ background:#0DAB76; }
+				.asm-badge--live{ background:#e0a500; }
+				.asm-badge--abandoned{ background:#dc3545; }
+				.asm-badge--muted{ background:#94a3b8; }
+				.asm-elapsed{ margin-left:.25rem; font-size:.74rem; color:#9a7400; font-weight:600; }
+				.asm-status{ display:inline-flex; align-items:center; gap:.4rem; white-space:nowrap; }
+				.asm-status-label{ font-size:.74rem; color:#64748b; }
+				.asm-score{ font-weight:700; font-size:1rem; color:#1f2d3d; }
+				.asm-score-sep{ color:#94a3b8; margin:0 .2rem; }
+				.asm-score--empty{ color:#cbd5e1; }
+				.auto-score-row--inprogress td{ background:rgba(224,165,0,.06); }
+				.auto-score-row--abandoned td{ background:rgba(220,53,69,.06); }
+				.auto-score-row--notstarted td, .auto-score-row--nodata td{ color:#94a3b8; }
+				@@media (max-width:640px){ .asm-name{ font-size:.82rem; } .asm-fixture{ gap:.35rem; } }
+			</style>
+
+			<div class="card shadow-sm p-3 add-match-auto-card">
+
+				<form id="autoScoreForm" asp-action="ConfirmAutoScores" asp-controller="Event" method="post">
+					@Html.AntiForgeryToken()
+
+					<div class="auto-score-header">
+						<div class="auto-score-intro">
+							<i class="bi bi-magic"></i>
+							<span>Pull live results from the football API for API-linked matches that have kicked off, review them, then score the finished ones in one click. Manual matches aren&rsquo;t shown here.</span>
+						</div>
+						<button type="button" id="loadAutoScoreBtn" class="auto-score-fetch-btn">
+							<i class="bi bi-cloud-download"></i> Fetch results
+						</button>
+					</div>
+
+					<div class="upcoming-layout">
+
+						<div class="upcoming-actions">
+							<button type="button"
+							        class="btn btn-success review-btn"
+							        id="confirmAutoScoreBtn"
+							        disabled
+							        data-bs-toggle="modal"
+							        data-bs-target="#confirmAutoScoreModal">
+								<i class="bi bi-check2-circle me-2"></i>
+								Confirm &amp; score selected
+							</button>
+							<div id="autoScoreSelectedCount" class="auto-score-selected-count"></div>
+						</div>
+
+						<div class="upcoming-table">
+							<div id="autoScoreBody" class="auto-score-body">
+								<div class="auto-score-empty">
+									<i class="bi bi-cloud-arrow-down"></i>
+									<p>Click &ldquo;Fetch results&rdquo; to check the API for finished matches.</p>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+				</form>
+
+			</div>
+		</div>
+
 	</div>
 	<div class="modal fade" id="reviewUpcomingModal" tabindex="-1">
 		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -994,6 +1230,31 @@
 					<button type="button" class="btn btn-secondary"
 					        data-bs-dismiss="modal">
 						No, go back
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="confirmAutoScoreModal" tabindex="-1">
+		<style>
+			#confirmAutoScoreModal .modal-content { border-radius:.6rem; }
+			#confirmAutoScoreModal .modal-header { align-items:center; padding:.85rem 1.1rem; }
+			#confirmAutoScoreModal .modal-header .btn-close { margin:0; padding:.5rem; align-self:center; }
+		</style>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"><i class="bi bi-check2-circle me-2"></i>Confirm auto-scoring</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					Score <strong id="confirmAutoScoreCount">the selected</strong> and settle their bets?
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, go back</button>
+					<button type="button" class="btn btn-success" id="confirmAutoScoreYes">
+						<i class="bi bi-check2-circle me-1"></i> Yes, score them
 					</button>
 				</div>
 			</div>
@@ -2413,6 +2674,84 @@
 				document.getElementById("postponeEventId").value = eventId;
 			});
 
+		});
+
+		// ── Auto Scoring tab ──────────────────────
+		(function () {
+			const loadBtn    = document.getElementById("loadAutoScoreBtn");
+			const body       = document.getElementById("autoScoreBody");
+			const confirmBtn = document.getElementById("confirmAutoScoreBtn");
+			const countEl    = document.getElementById("autoScoreSelectedCount");
+			if (!loadBtn || !body) return;
+
+			function refreshConfirmState() {
+				const checks   = body.querySelectorAll(".auto-score-check");
+				const checked  = body.querySelectorAll(".auto-score-check:checked").length;
+				if (confirmBtn) confirmBtn.disabled = checked === 0;
+				if (countEl) {
+					countEl.textContent = checked === 0
+						? (checks.length ? "No matches selected" : "")
+						: checked + " match" + (checked === 1 ? "" : "es") + " selected";
+				}
+				const selectAll = document.getElementById("autoScoreSelectAll");
+				if (selectAll) selectAll.checked = checks.length > 0 && checked === checks.length;
+			}
+
+			loadBtn.addEventListener("click", async () => {
+				const original = loadBtn.innerHTML;
+				loadBtn.disabled = true;
+				loadBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Fetching\u2026';
+				body.innerHTML = '<div class="auto-score-empty"><i class="bi bi-hourglass-split"></i><p>Contacting the football API\u2026 this can take a few seconds.</p></div>';
+				if (confirmBtn) confirmBtn.disabled = true;
+				if (countEl) countEl.textContent = "";
+				try {
+					const res = await fetch("/Event/AutoScorePreview");
+					body.innerHTML = await res.text();
+				} catch (e) {
+					body.innerHTML = '<div class="alert error-message">\u26A0 Failed to load results.</div>';
+				} finally {
+					loadBtn.disabled = false;
+					loadBtn.innerHTML = original;
+					refreshConfirmState();
+				}
+			});
+
+			body.addEventListener("change", (e) => {
+				if (e.target && e.target.id === "autoScoreSelectAll") {
+					body.querySelectorAll(".auto-score-check").forEach(c => c.checked = e.target.checked);
+				}
+				refreshConfirmState();
+			});
+
+			const confirmModalEl = document.getElementById("confirmAutoScoreModal");
+			const confirmYes     = document.getElementById("confirmAutoScoreYes");
+			const confirmCountEl = document.getElementById("confirmAutoScoreCount");
+			const autoScoreFormEl = document.getElementById("autoScoreForm");
+
+			if (confirmModalEl) {
+				confirmModalEl.addEventListener("show.bs.modal", () => {
+					const n = body.querySelectorAll(".auto-score-check:checked").length;
+					if (confirmCountEl) confirmCountEl.textContent = n + " finished match" + (n === 1 ? "" : "es");
+				});
+			}
+
+			if (confirmYes && autoScoreFormEl) {
+				confirmYes.addEventListener("click", () => {
+					if (confirmModalEl && window.bootstrap) {
+						const inst = bootstrap.Modal.getInstance(confirmModalEl);
+						if (inst) inst.hide();
+					}
+					if (autoScoreFormEl.requestSubmit) autoScoreFormEl.requestSubmit(); else autoScoreFormEl.submit();
+				});
+			}
+		})();
+
+		// Auto-open the Auto Scoring Summary modal after a confirm redirect.
+		document.addEventListener("DOMContentLoaded", function () {
+			const summaryEl = document.getElementById("autoScoreSummaryModal");
+			if (summaryEl && window.bootstrap) {
+				new bootstrap.Modal(summaryEl).show();
+			}
 		});
 
 	</script>
