@@ -12,14 +12,10 @@
 			container.querySelectorAll('.collapse').forEach(collapse => {
 				const enclosure = collapse.closest('.slip-enclosure');
 				const slipCard = collapse.closest('.slip-container');
-				collapse.addEventListener('shown.bs.collapse', () => {
-					enclosure?.classList.add('open');
-					slipCard?.classList.add('slip-open');
-				});
-				collapse.addEventListener('hidden.bs.collapse', () => {
-					enclosure?.classList.remove('open');
-					slipCard?.classList.remove('slip-open');
-				});
+				collapse.addEventListener('shown.bs.collapse', () => enclosure?.classList.add('open'));
+				collapse.addEventListener('hidden.bs.collapse', () => enclosure?.classList.remove('open'));
+				collapse.addEventListener('show.bs.collapse', () => slipCard?.classList.add('slip-open'));
+				collapse.addEventListener('hide.bs.collapse', () => slipCard?.classList.remove('slip-open'));
 			});
 		}
 
