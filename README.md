@@ -220,6 +220,13 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <img src="./assets/revamped-upcoming-matches-tab.png" align="center" border="10" width="800px"/>
 </p>
 
+<h3 align="center">Admin Auto Scoring View </h3>
+
+<p align="center">
+  <img src="./assets/auto-scoring-view.png" align="center" border="10" width="800px"/>
+  <img src="./assets/scoring-confirmation.png" align="center" border="10" width="450px"/>
+</p>
+
 <h3 align="center">Admin Events History View </h3>
 
 <p align="center">
