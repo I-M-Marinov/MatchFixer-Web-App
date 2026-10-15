@@ -218,6 +218,10 @@ namespace MatchFixer.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasComment("UTC timestamp when the bet slip was settled (Won, Lost, or Voided)");
 
+                    b.Property<Guid?>("TournamentEntryId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("If set, this slip is a tournament bet funded by the tournament entry's play bankroll, not the real wallet");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Id of the user who placed the bet slip");
@@ -228,6 +232,8 @@ namespace MatchFixer.Infrastructure.Migrations
                         .HasComment("The total win amount for the bet slip if successful");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TournamentEntryId");
 
                     b.HasIndex("UserId");
 
@@ -652,6 +658,146 @@ namespace MatchFixer.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("TeamWikiInfos");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Tournament", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EntryFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("MaxEntrants")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinBetLegs")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinEntrantsToRun")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("PrizePoolSettled")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("RakePercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime?>("SettledAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("StartingBankroll")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("Tournaments");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TournamentEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Bankroll")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EntryFeePaid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("FinalRank")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("JoinedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("PrizeAwarded")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TournamentId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("TournamentEntries");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TournamentMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PostedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TournamentId", "PostedAtUtc");
+
+                    b.ToTable("TournamentMessages");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Trophy", b =>
@@ -1156,11 +1302,18 @@ namespace MatchFixer.Infrastructure.Migrations
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.BetSlip", b =>
                 {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.TournamentEntry", "TournamentEntry")
+                        .WithMany("BetSlips")
+                        .HasForeignKey("TournamentEntryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "User")
                         .WithMany("BetSlips")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("TournamentEntry");
 
                     b.Navigation("User");
                 });
@@ -1274,6 +1427,55 @@ namespace MatchFixer.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Tournament", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TournamentEntry", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.Tournament", "Tournament")
+                        .WithMany("Entries")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tournament");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TournamentMessage", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.Tournament", "Tournament")
+                        .WithMany("Messages")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tournament");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.UpcomingMatchEvent", b =>
@@ -1460,6 +1662,18 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Navigation("HomeMatches");
 
                     b.Navigation("WikiInfo");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Tournament", b =>
+                {
+                    b.Navigation("Entries");
+
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.TournamentEntry", b =>
+                {
+                    b.Navigation("BetSlips");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.Trophy", b =>
