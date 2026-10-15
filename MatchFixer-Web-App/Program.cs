@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using static MatchFixer.Infrastructure.SeedData.SeedData;
 
@@ -101,6 +102,8 @@ builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// A
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IAutoScoringService, AutoScoringService>();     // Add the Auto Scoring Service ( API-driven result settlement )
+builder.Services.AddScoped<ITournamentService, TournamentService>();            // Add the Tournament Service
+builder.Services.AddHostedService<TournamentLifecycleService>();               // Opens/settles tournaments on schedule ( background service )
 builder.Services.AddScoped<IEventsResultsService, EventsResultsService>();      // Add the Events Results Service
 builder.Services.AddHttpClient<ITheSportsDbApiService, TheSportsDbApiService>();// Add the SportsDBApi Service
 builder.Services.AddScoped<ILiveMatchQueryService, LiveMatchQueryService>();	// Add the Live Match Query Service
@@ -171,6 +174,17 @@ builder.Services.AddAuthorization(options =>
 	options.AddPolicy(Permissions.ManageMatchEvents, p => p.RequireClaim("permission", Permissions.ManageMatchEvents));
 });
 
+// Persist Data Protection keys outside the container so login cookies and
+// antiforgery tokens survive redeploys (DP_KEYS_PATH is mounted to a volume in Docker).
+var dpKeysPath = builder.Configuration["DP_KEYS_PATH"];
+if (!string.IsNullOrWhiteSpace(dpKeysPath))
+{
+	Directory.CreateDirectory(dpKeysPath);
+	builder.Services.AddDataProtection()
+		.PersistKeysToFileSystem(new DirectoryInfo(dpKeysPath))
+		.SetApplicationName("MatchFixer");
+}
+
 var app = builder.Build();
 
 
@@ -180,6 +194,14 @@ using (var scope = app.Services.CreateScope())
 {
 
 	var services = scope.ServiceProvider;
+
+	// IMPORTANT: migrations are OFF by default so an existing, populated database
+	// is never altered on startup. The app just uses the database as-is.
+	// To apply pending EF migrations deliberately, set env var RUN_MIGRATIONS=true.
+	if (string.Equals(app.Configuration["RUN_MIGRATIONS"], "true", StringComparison.OrdinalIgnoreCase))
+	{
+		await services.GetRequiredService<MatchFixerDbContext>().Database.MigrateAsync();
+	}
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
 	// trophies
