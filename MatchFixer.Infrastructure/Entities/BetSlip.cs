@@ -38,6 +38,12 @@ namespace MatchFixer.Infrastructure.Entities
 		[Comment("The total win amount for the bet slip if successful")]
 		public decimal? WinAmount { get; set; }
 
+		[Comment("If set, this slip is a tournament bet funded by the tournament entry's play bankroll, not the real wallet")]
+		public Guid? TournamentEntryId { get; set; }
+
+		[ForeignKey(nameof(TournamentEntryId))]
+		public TournamentEntry? TournamentEntry { get; set; }
+
 		// Navigation property for all bets
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 	}
