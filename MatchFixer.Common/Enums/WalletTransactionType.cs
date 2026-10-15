@@ -10,6 +10,9 @@
 		BirthdayBonus = 5,
 		AdminWithdrawal = 6,
 		AdminDeposit = 7,
+		TournamentEntryFee = 8,   // real money charged to join a tournament
+		TournamentPrize = 9,      // real money paid out to a tournament winner
+		TournamentRefund = 10,    // real money refunded when a tournament is cancelled
 
 	}
 
