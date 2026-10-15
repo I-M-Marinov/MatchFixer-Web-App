@@ -274,7 +274,89 @@ namespace MatchFixer.Core.Services
 				);
 		}
 
+		// ---------------- Tournaments ----------------
 
+		// Charges the real-money entry fee when a user joins a tournament.
+		public async Task<(bool Success, string Message)> ChargeTournamentEntryAsync(Guid userId, decimal amount, Guid tournamentId)
+		{
+			if (amount < 0)
+				return (false, "Invalid entry fee.");
+
+			var wallet = await _dbContext.Wallets
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return (false, WalletNotFound);
+
+			if (wallet.IsLocked)
+				return (false, "Your wallet is locked.");
+
+			if (wallet.Balance < amount)
+				return (false, "Insufficient balance to join this tournament.");
+
+			wallet.Balance -= amount;
+			wallet.UpdatedAt = DateTime.UtcNow;
+
+			if (amount > 0)
+			{
+				var tx = WalletTransactionFactory.CreateTournamentEntryFeeTransaction(wallet.Id, userId, amount, tournamentId);
+				await _dbContext.WalletTransactions.AddAsync(tx);
+			}
+
+			await _dbContext.SaveChangesAsync();
+			return (true, "Entry fee charged.");
+		}
+
+		// Credits a tournament prize (real money) to a winner's wallet.
+		public async Task AwardTournamentPrizeAsync(Guid userId, decimal amount, Guid tournamentId, int rank)
+		{
+			if (amount <= 0)
+				return;
+
+			var wallet = await _dbContext.Wallets
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return;
+
+			wallet.Balance += amount;
+			wallet.UpdatedAt = DateTime.UtcNow;
+
+			var tx = WalletTransactionFactory.CreateTournamentPrizeTransaction(wallet.Id, userId, amount, tournamentId, rank);
+			await _dbContext.WalletTransactions.AddAsync(tx);
+			await _dbContext.SaveChangesAsync();
+		}
+
+		// Refunds a tournament entry fee (real money) when a tournament is cancelled.
+		public async Task RefundTournamentEntryAsync(Guid userId, decimal amount, Guid tournamentId)
+		{
+			if (amount <= 0)
+				return;
+
+			var wallet = await _dbContext.Wallets
+				.FirstOrDefaultAsync(w => w.UserId == userId);
+
+			if (wallet == null)
+				return;
+
+			wallet.Balance += amount;
+			wallet.UpdatedAt = DateTime.UtcNow;
+
+			var tx = WalletTransactionFactory.CreateTournamentRefundTransaction(wallet.Id, userId, amount, tournamentId);
+			await _dbContext.WalletTransactions.AddAsync(tx);
+			await _dbContext.SaveChangesAsync();
+		}
+
+		// Idempotency guard for prize/refund payouts.
+		public async Task<bool> HasTournamentTransactionAsync(Guid userId, WalletTransactionType type, Guid tournamentId)
+		{
+			return await _dbContext.WalletTransactions
+				.AnyAsync(t =>
+					t.TransactionType == type &&
+					t.Reference.Contains(tournamentId.ToString()) &&
+					t.Wallet.UserId == userId
+				);
+		}
 
 	}
 }

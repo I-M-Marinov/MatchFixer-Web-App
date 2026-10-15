@@ -100,9 +100,51 @@ namespace MatchFixer.Infrastructure.Factories
 				Id = Guid.NewGuid(),
 				WalletId = walletId,
 				Amount = amount,
-				TransactionType = WalletTransactionType.Refund, 
+				TransactionType = WalletTransactionType.Refund,
 				Reference = $"User: {userId} - Wallet: {walletId} - Refund for BetSlip: {betSlipId}",
 				Description = description ?? $"Refund for cancelled bet slip ({betSlipId})",
+				CreatedAt = DateTime.UtcNow
+			};
+		}
+
+		public static WalletTransaction CreateTournamentEntryFeeTransaction(Guid walletId, Guid userId, decimal amount, Guid tournamentId)
+		{
+			return new WalletTransaction
+			{
+				Id = Guid.NewGuid(),
+				WalletId = walletId,
+				Amount = -amount, // money leaves the wallet to join
+				TransactionType = WalletTransactionType.TournamentEntryFee,
+				Reference = $"User: {userId} - Wallet: {walletId} - Tournament: {tournamentId} - Entry Fee",
+				Description = "Tournament entry fee",
+				CreatedAt = DateTime.UtcNow
+			};
+		}
+
+		public static WalletTransaction CreateTournamentPrizeTransaction(Guid walletId, Guid userId, decimal amount, Guid tournamentId, int rank)
+		{
+			return new WalletTransaction
+			{
+				Id = Guid.NewGuid(),
+				WalletId = walletId,
+				Amount = amount,
+				TransactionType = WalletTransactionType.TournamentPrize,
+				Reference = $"User: {userId} - Wallet: {walletId} - Tournament: {tournamentId} - Prize",
+				Description = $"Tournament prize (rank #{rank})",
+				CreatedAt = DateTime.UtcNow
+			};
+		}
+
+		public static WalletTransaction CreateTournamentRefundTransaction(Guid walletId, Guid userId, decimal amount, Guid tournamentId)
+		{
+			return new WalletTransaction
+			{
+				Id = Guid.NewGuid(),
+				WalletId = walletId,
+				Amount = amount,
+				TransactionType = WalletTransactionType.TournamentRefund,
+				Reference = $"User: {userId} - Wallet: {walletId} - Tournament: {tournamentId} - Refund",
+				Description = "Tournament entry fee refund",
 				CreatedAt = DateTime.UtcNow
 			};
 		}

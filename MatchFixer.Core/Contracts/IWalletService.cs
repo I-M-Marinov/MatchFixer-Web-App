@@ -19,5 +19,11 @@ namespace MatchFixer.Core.Contracts
 		Task<bool> RefundBetAsync(Guid userId, decimal amount, Guid betSlipId);
 		Task<bool> HasTransactionForSlipAsync(Guid userId, WalletTransactionType type, Guid betSlipId);
 
+		// Tournaments (real-money entry fees and prize payouts)
+		Task<(bool Success, string Message)> ChargeTournamentEntryAsync(Guid userId, decimal amount, Guid tournamentId);
+		Task AwardTournamentPrizeAsync(Guid userId, decimal amount, Guid tournamentId, int rank);
+		Task RefundTournamentEntryAsync(Guid userId, decimal amount, Guid tournamentId);
+		Task<bool> HasTournamentTransactionAsync(Guid userId, WalletTransactionType type, Guid tournamentId);
+
 	}
 }
