@@ -36,6 +36,9 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<WorldCupMatch> WorldCupMatches { get; set; }
 		public virtual DbSet<WorldCupGroupStanding> WorldCupGroupStandings { get; set; }
 		public virtual DbSet<QueuedEmail> QueuedEmails { get; set; }
+		public virtual DbSet<Tournament> Tournaments { get; set; }
+		public virtual DbSet<TournamentEntry> TournamentEntries { get; set; }
+		public virtual DbSet<TournamentMessage> TournamentMessages { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -189,6 +192,68 @@ namespace MatchFixer.Infrastructure
 					.HasForeignKey(x => x.RecipientUserId)
 					.OnDelete(DeleteBehavior.SetNull);
 			});
+
+			// ---------------- Tournaments ----------------
+
+			builder.Entity<Tournament>(entity =>
+			{
+				entity.Property(e => e.EntryFee).HasPrecision(18, 2);
+				entity.Property(e => e.StartingBankroll).HasPrecision(18, 2);
+				entity.Property(e => e.RakePercent).HasPrecision(5, 2);
+
+				entity.HasOne(t => t.CreatedBy)
+					.WithMany()
+					.HasForeignKey(t => t.CreatedByUserId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasIndex(t => t.Status);
+				entity.HasIndex(t => new { t.StartDate, t.EndDate });
+			});
+
+			builder.Entity<TournamentEntry>(entity =>
+			{
+				entity.Property(e => e.Bankroll).HasPrecision(18, 2);
+				entity.Property(e => e.EntryFeePaid).HasPrecision(18, 2);
+				entity.Property(e => e.PrizeAwarded).HasPrecision(18, 2);
+
+				entity.HasOne(e => e.Tournament)
+					.WithMany(t => t.Entries)
+					.HasForeignKey(e => e.TournamentId)
+					.OnDelete(DeleteBehavior.Cascade); // deleting a tournament removes its entries
+
+				entity.HasOne(e => e.User)
+					.WithMany()
+					.HasForeignKey(e => e.UserId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				// One entry per user per tournament.
+				entity.HasIndex(e => new { e.TournamentId, e.UserId }).IsUnique();
+			});
+
+			builder.Entity<TournamentMessage>(entity =>
+			{
+				entity.HasOne(m => m.Tournament)
+					.WithMany(t => t.Messages)
+					.HasForeignKey(m => m.TournamentId)
+					.OnDelete(DeleteBehavior.Cascade);
+
+				entity.HasOne(m => m.User)
+					.WithMany()
+					.HasForeignKey(m => m.UserId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasIndex(m => new { m.TournamentId, m.PostedAtUtc });
+			});
+
+			// A bet slip may optionally belong to a tournament entry (restrict: keep slips if an entry row is ever removed manually).
+			builder.Entity<BetSlip>()
+				.HasOne(bs => bs.TournamentEntry)
+				.WithMany(te => te.BetSlips)
+				.HasForeignKey(bs => bs.TournamentEntryId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.Entity<BetSlip>()
+				.HasIndex(bs => bs.TournamentEntryId);
 		}
 	}
 }
