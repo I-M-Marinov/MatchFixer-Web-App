@@ -217,6 +217,7 @@ public class BettingService : IBettingService
 				.ThenInclude(b => b.MatchEvent)
 					.ThenInclude(me => me.LiveResult)
 			.Where(bs => bs.UserId == userId)
+			.Where(bs => bs.TournamentEntryId == null) // tournament bets live on the tournament page, not here
 			.OrderByDescending(bs => bs.BetTime)
 			.AsNoTracking()
 			.ToListAsync();
@@ -408,6 +409,17 @@ public class BettingService : IBettingService
 			return true;
 		}
 
+		// Tournament slips are funded by the entry's play bankroll, not the real wallet.
+		// When isTournament is true we move chips on the entry and skip wallet moves,
+		// settlement emails and trophy evaluation. The real-wallet path below is unchanged.
+		TournamentEntry? tournamentEntry = null;
+		if (betSlip.TournamentEntryId.HasValue)
+		{
+			tournamentEntry = await _dbContext.TournamentEntries
+				.FirstOrDefaultAsync(e => e.Id == betSlip.TournamentEntryId.Value);
+		}
+		bool isTournament = tournamentEntry != null;
+
 		bool anyLost = false;
 		bool anyPending = false;
 		bool anyVoided = false;
@@ -459,6 +471,14 @@ public class BettingService : IBettingService
 			betSlip.SettledAt = DateTime.UtcNow;
 			betSlip.WinAmount = 0;
 
+			if (isTournament)
+			{
+				// Return the stake to the play bankroll. No wallet, email or trophy.
+				tournamentEntry!.Bankroll += betSlip.Amount;
+				await _dbContext.SaveChangesAsync();
+				return true;
+			}
+
 			var alreadyRefunded =
 				await _walletService.HasTransactionForSlipAsync(
 					betSlip.UserId,
@@ -490,7 +510,10 @@ public class BettingService : IBettingService
 			betSlip.WinAmount = 0;
 
 			await _dbContext.SaveChangesAsync();
-			await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
+
+			// Tournament slips: stake already left the bankroll at placement, nothing to move.
+			if (!isTournament)
+				await _trophyService.EvaluateTrophiesAsync(betSlip.UserId);
 
 			return true;
 		}
@@ -503,6 +526,14 @@ public class BettingService : IBettingService
 			betSlip.IsSettled = true;
 			betSlip.SettledAt = DateTime.UtcNow;
 			betSlip.WinAmount = winnings;
+
+			if (isTournament)
+			{
+				// Credit winnings to the play bankroll. No wallet, email or trophy.
+				tournamentEntry!.Bankroll += winnings;
+				await _dbContext.SaveChangesAsync();
+				return true;
+			}
 
 			var alreadyPaid =
 				await _walletService.HasTransactionForSlipAsync(
@@ -617,7 +648,9 @@ public class BettingService : IBettingService
 		{
 			var q = _dbContext.Bets
 				.AsNoTracking()
-				.Where(b => b.MatchEventId == eventId && b.Status == BetStatus.Pending);
+				.Where(b => b.MatchEventId == eventId
+						 && b.Status == BetStatus.Pending
+						 && b.BetSlip.TournamentEntryId == null); // exclude tournament bankroll bets from the public mix
 
 			var perSlip = await q
 				.GroupBy(b => b.BetSlipId)
