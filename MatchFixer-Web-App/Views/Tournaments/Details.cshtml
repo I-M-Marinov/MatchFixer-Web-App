@@ -1,0 +1,813 @@
+﻿@using MatchFixer.Common.Enums
+@model MatchFixer.Core.ViewModels.Tournaments.TournamentDetailsViewModel
+@{
+	ViewData["Title"] = Model.Name;
+
+	string Money(decimal v) => "€" + v.ToString("0.##");
+	string Chips(decimal v) => v.ToString("0.##");
+
+	string Badge(TournamentStatus s) => s switch
+	{
+		TournamentStatus.Running => "badge-running",
+		TournamentStatus.Upcoming => "badge-upcoming",
+		TournamentStatus.Finished => "badge-finished",
+		TournamentStatus.Cancelled => "badge-cancelled",
+		_ => "badge-finished"
+	};
+
+	string BetBadge(string status) => status switch
+	{
+		"Won" => "b-won",
+		"Lost" => "b-lost",
+		"Voided" => "b-void",
+		_ => "b-pending"
+	};
+
+	string CompClass(string? comp, string? league)
+	{
+		var c = (comp ?? "").ToLowerInvariant();
+		if (c.Length > 0)
+		{
+			if (c.Contains("champions")) return "grad-cl";
+			if (c.Contains("conference")) return "grad-ecl";
+			if (c.Contains("europa")) return "grad-el";
+			if (c.Contains("world cup")) return "grad-wc";
+			if (c.Contains("euro")) return "grad-euro";
+			return "grad-comp";
+		}
+		var l = (league ?? "").ToLowerInvariant();
+		if (l.Contains("premier")) return "grad-epl";
+		if (l.Contains("liga")) return "grad-laliga";
+		if (l.Contains("bundes")) return "grad-bundes";
+		if (l.Contains("serie")) return "grad-seriea";
+		if (l.Contains("ligue")) return "grad-ligue";
+		return "grad-default";
+	}
+}
+
+<div class="background-profile"></div>
+
+<div class="tourney-wrap">
+
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert alert-success tourney-alert">@TempData["SuccessMessage"]</div>
+	}
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert alert-danger tourney-alert">@TempData["ErrorMessage"]</div>
+	}
+
+	<a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> All tournaments</a>
+
+	<div class="tourney-panel">
+
+		<!-- Header -->
+		<div class="t-card detail-head">
+			<div class="dh-left">
+				<div class="dh-top">
+					<span class="tc-badge @Badge(Model.Status)">@Model.StatusLabel</span>
+					<span class="dh-host">by @Model.CreatedByName</span>
+					@if (Model.MinBetLegs > 1)
+					{
+						<span class="parlay-chip"><i class="bi bi-link-45deg"></i> Parlay only · @Model.MinBetLegs+ legs</span>
+					}
+				</div>
+				<h1 class="detail-title">@Model.Name</h1>
+				@if (!string.IsNullOrWhiteSpace(Model.Description))
+				{
+					<p class="detail-desc">@Model.Description</p>
+				}
+				<div class="detail-dates">
+					<span><i class="bi bi-play-circle"></i> Starts @Model.StartDisplay</span>
+					<span><i class="bi bi-flag"></i> Ends @Model.EndDisplay</span>
+				</div>
+			</div>
+
+			<div class="dh-right">
+				@if (Model.MyEntry != null)
+				{
+					<div class="bankroll-box">
+						<span class="bankroll-label">Your bankroll</span>
+						<span class="bankroll-val">@Chips(Model.MyEntry.Bankroll) <small>chips</small></span>
+						<span class="bankroll-rank">Rank #@Model.MyEntry.Rank of @Model.EntrantsCount@(Model.MyEntry.PendingBets > 0 ? $" · {Model.MyEntry.PendingBets} in play" : "")</span>
+						@if (Model.Status == TournamentStatus.Finished && Model.MyEntry.PrizeAwarded.HasValue && Model.MyEntry.PrizeAwarded.Value > 0)
+						{
+							<span class="bankroll-prize"><i class="bi bi-cash-coin"></i> Won @Money(Model.MyEntry.PrizeAwarded.Value)</span>
+						}
+					</div>
+				}
+				else if (Model.CanJoin)
+				{
+					<form asp-action="Join" asp-route-id="@Model.Id" method="post" class="join-cta">
+						<div class="join-cta-fee">@(Model.EntryFee <= 0 ? "Free entry" : "Entry " + Money(Model.EntryFee))</div>
+						<button type="submit" class="btn btn-mint w-100"><i class="bi bi-box-arrow-in-right"></i> Join &amp; get @Chips(Model.StartingBankroll) chips</button>
+					</form>
+				}
+				else
+				{
+					<div class="bankroll-box muted-box">
+						<span class="bankroll-label">@(Model.Status == TournamentStatus.Upcoming ? "Opens soon" : "Closed to new players")</span>
+					</div>
+				}
+			</div>
+		</div>
+
+		<!-- Prize pool strip -->
+		<div class="t-card prize-strip">
+			<div class="ps-item"><span class="ps-label">Entry</span><span class="ps-val">@(Model.EntryFee <= 0 ? "Free" : Money(Model.EntryFee))</span></div>
+			<div class="ps-item"><span class="ps-label">Players</span><span class="ps-val">@Model.EntrantsCount@(Model.MaxEntrants.HasValue ? $" / {Model.MaxEntrants}" : "")</span></div>
+			<div class="ps-item"><span class="ps-label">Gross pool</span><span class="ps-val">@Money(Model.PrizePool)</span></div>
+			<div class="ps-item"><span class="ps-label">Rake @Model.RakePercent.ToString("0.##")%</span><span class="ps-val rake">-@Money(Model.RakeAmount)</span></div>
+			<div class="ps-item big"><span class="ps-label">Prize pool</span><span class="ps-val prize">@Money(Model.NetPrizePool)</span></div>
+		</div>
+
+		<div class="detail-grid">
+			<!-- Leaderboard -->
+			<div class="t-card">
+				<h3 class="section-h"><i class="bi bi-bar-chart-steps"></i> Leaderboard</h3>
+				@if (Model.Leaderboard.Any())
+				{
+					<div class="table-responsive">
+						<table class="table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle tourney-lb">
+							<thead class="table-dark">
+								<tr><th>#</th><th class="ta-l">Player</th><th>Bankroll</th><th>Prize</th></tr>
+							</thead>
+							<tbody>
+								@foreach (var row in Model.Leaderboard)
+								{
+									<tr class="@(row.IsCurrentUser ? "me" : "")">
+										<td class="lb-rank">
+											@if (row.Rank == 1) { <i class="bi bi-trophy-fill gold"></i> }
+											else if (row.Rank == 2) { <i class="bi bi-trophy-fill silver"></i> }
+											else if (row.Rank == 3) { <i class="bi bi-trophy-fill bronze"></i> }
+											else { <span>@row.Rank</span> }
+										</td>
+										<td class="ta-l">
+											<span class="lb-player">
+												<img src="@row.Picture" alt="" class="lb-avatar" onerror="this.onerror=null;this.src='/images/default-user-image.png'" />
+												<span class="lb-name">@row.UserName</span>
+												@if (row.IsCurrentUser) { <span class="you-tag">you</span> }
+												@if (row.PendingBets > 0) { <span class="pending-tag">@row.PendingBets in play</span> }
+											</span>
+										</td>
+										<td class="chips">@Chips(row.Bankroll)</td>
+										<td>
+											@if (Model.Status == TournamentStatus.Finished && row.PrizeAwarded.HasValue && row.PrizeAwarded.Value > 0)
+											{
+												<span class="prize">@Money(row.PrizeAwarded.Value)</span>
+											}
+											else { <span class="muted">—</span> }
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				}
+				else
+				{
+					<p class="muted">No players yet. Be the first to join!</p>
+				}
+
+				@if (Model.PrizeBreakdown.Any())
+				{
+					<div class="payout-note">
+						<span class="pn-title">Payouts if it ended now:</span>
+						@foreach (var p in Model.PrizeBreakdown)
+						{
+							<span class="pn-chip">#@p.Rank · @p.Percent.ToString("0.##")% · @Money(p.Amount)</span>
+						}
+					</div>
+				}
+				else
+				{
+					<div class="payout-note">
+						<span class="muted">Needs at least 2 players to pay out — otherwise entry fees are refunded.</span>
+					</div>
+				}
+			</div>
+
+			<!-- Side: my bets -->
+			<div class="t-card">
+				<h3 class="section-h"><i class="bi bi-ticket-detailed"></i> Your bets</h3>
+				@if (Model.MyBets.Any())
+				{
+					<div class="mybets">
+						@foreach (var b in Model.MyBets)
+						{
+							var meta = (b.Legs > 1 ? "" : (b.Pick + " ")) + "@ " + b.Odds.ToString("0.00") + " · " + Chips(b.Stake) + " chips";
+							var legsJson = System.Text.Json.JsonSerializer.Serialize(b.LegDetails);
+							var winText = (b.Status == "Won" && b.WinAmount.HasValue) ? $" +{Chips(b.WinAmount.Value)}" : "";
+							<div class="mybet-row clickable"
+								 role="button"
+								 tabindex="0"
+								 data-title="@b.Match"
+								 data-status="@b.Status"
+								 data-odds="@b.Odds.ToString("0.00")"
+								 data-stake="@Chips(b.Stake)"
+								 data-placed="@b.PlacedDisplay"
+								 data-win="@winText"
+								 data-potential="@Chips(Math.Round(b.Stake * b.Odds, 2))"
+								 data-legs="@legsJson">
+								<div class="mb-main">
+									<span class="mb-match">@b.Match @if (b.Legs > 1) { <i class="bi bi-eye mb-eye"></i> }</span>
+									<span class="mb-meta">@meta</span>
+								</div>
+								<span class="bet-badge @BetBadge(b.Status)">
+									@b.Status@winText
+								</span>
+							</div>
+						}
+					</div>
+				}
+				else
+				{
+					<p class="muted">You haven't placed any tournament bets yet.</p>
+				}
+			</div>
+		</div>
+
+		<!-- Betting area -->
+		@if (Model.CanBet)
+		{
+			<div class="t-card">
+				<h3 class="section-h">
+					<i class="bi bi-cash-stack"></i> Place a bet
+					<span class="section-sub">— @(Model.MinBetLegs > 1 ? $"parlays of {Model.MinBetLegs}+ matches · " : "")spend your @Chips(Model.MyEntry!.Bankroll) chips</span>
+				</h3>
+
+				@if (Model.BettableMatches.Any())
+				{
+					<form asp-action="PlaceBet" asp-route-id="@Model.Id" method="post" id="parlayForm">
+						<div id="parlayInputs"></div>
+
+						<div class="bet-layout">
+							<!-- Matches -->
+							<div class="bet-grid">
+								@foreach (var m in Model.BettableMatches)
+								{
+									<div class="tbet-card @CompClass(m.CompetitionName, m.LeagueName)" data-match-id="@m.MatchId" data-match-name="@m.HomeTeam vs @m.AwayTeam">
+										<div class="tbet-teams">
+											<div class="tbet-team">
+												<img src="@m.HomeLogo" alt="@m.HomeTeam" class="tbet-logo" />
+												<div class="event-team-name">@m.HomeTeam</div>
+											</div>
+											<img src="/images/live-events/versus.png" alt="vs" class="tbet-vs" />
+											<div class="tbet-team">
+												<img src="@m.AwayLogo" alt="@m.AwayTeam" class="tbet-logo" />
+												<div class="event-team-name">@m.AwayTeam</div>
+											</div>
+										</div>
+
+										<div class="tbet-date">@m.KickoffDisplay</div>
+
+										<div class="tbet-odds @(m.NoDraw ? "two" : "")">
+											<button type="button" class="tbet-odd" data-pick="Home" data-label="Home" data-odds="@(m.HomeOdds?.ToString(System.Globalization.CultureInfo.InvariantCulture))" @(m.HomeOdds == null ? "disabled" : "")>
+												<span class="tbet-odd-label">Home</span>
+												<span class="pill-brand-blue">@(m.HomeOdds?.ToString("0.00") ?? "–")</span>
+											</button>
+											@if (!m.NoDraw)
+											{
+												<button type="button" class="tbet-odd" data-pick="Draw" data-label="Draw" data-odds="@(m.DrawOdds?.ToString(System.Globalization.CultureInfo.InvariantCulture))" @(m.DrawOdds == null ? "disabled" : "")>
+													<span class="tbet-odd-label">Draw</span>
+													<span class="pill-brand-yellow">@(m.DrawOdds?.ToString("0.00") ?? "–")</span>
+												</button>
+											}
+											<button type="button" class="tbet-odd" data-pick="Away" data-label="Away" data-odds="@(m.AwayOdds?.ToString(System.Globalization.CultureInfo.InvariantCulture))" @(m.AwayOdds == null ? "disabled" : "")>
+												<span class="tbet-odd-label">Away</span>
+												<span class="pill-brand-green">@(m.AwayOdds?.ToString("0.00") ?? "–")</span>
+											</button>
+										</div>
+									</div>
+								}
+							</div>
+
+							<!-- Sticky slip -->
+							<aside class="slip-col">
+								<div class="slip-panel" id="slipPanel" data-min-legs="@Model.MinBetLegs" data-bankroll="@Model.MyEntry!.Bankroll">
+									<div class="slip-head">
+										<span class="slip-title"><i class="bi bi-receipt"></i> Your slip <span id="slipCount" class="slip-count">0</span></span>
+										<button type="button" id="slipClear" class="slip-clear">Clear</button>
+									</div>
+									<div id="slipLegs" class="slip-legs">
+										<div class="slip-empty">Tap odds on the matches to build your @(Model.MinBetLegs > 1 ? $"{Model.MinBetLegs}+ leg parlay" : "bet").</div>
+									</div>
+									<div class="slip-foot">
+										<div class="slip-line"><span class="sl-label">Combined odds</span><span id="slipOdds" class="slip-odds">—</span></div>
+										<div class="slip-line"><span class="sl-label">Potential return</span><span class="sl-return"><b id="slipReturn">—</b> chips</span></div>
+										<div class="slip-stake">
+											<label for="slipStake">Stake</label>
+											<div class="slip-stake-input">
+												<input type="number" name="stake" id="slipStake" min="1" step="1" value="50" max="@Model.MyEntry!.Bankroll" class="form-control form-control-sm" />
+												<span class="sl-unit">chips</span>
+											</div>
+										</div>
+										<div class="slip-actions">
+											<button type="submit" id="slipSubmit" class="btn btn-mint slip-place" disabled><i class="bi bi-check2-circle"></i> Place bet</button>
+										</div>
+										<div id="slipHint" class="slip-hint"></div>
+									</div>
+								</div>
+							</aside>
+						</div>
+					</form>
+				}
+				else
+				{
+					<p class="muted">No matches are open for betting right now. Check back when new fixtures go live.</p>
+				}
+			</div>
+		}
+		else if (Model.IsJoined && Model.Status == TournamentStatus.Upcoming)
+		{
+			<div class="t-card info-card"><i class="bi bi-hourglass-split"></i> Betting opens when the tournament starts (@Model.StartDisplay).</div>
+		}
+
+		<!-- Board -->
+		<div class="t-card">
+			<h3 class="section-h"><i class="bi bi-chat-left-text"></i> Tournament board</h3>
+			<div class="board">
+				@if (Model.Messages.Any())
+				{
+					@foreach (var msg in Model.Messages)
+					{
+						<div class="board-msg @(msg.IsMine ? "mine" : "")">
+							<div class="bmsg-head"><span class="bmsg-user"><img src="@msg.Picture" alt="" class="bmsg-avatar" onerror="this.onerror=null;this.src='/images/default-user-image.png'" />@msg.UserName</span><span class="bmsg-time">@msg.PostedDisplay</span></div>
+							<div class="bmsg-text">@msg.Text</div>
+						</div>
+					}
+				}
+				else
+				{
+					<p class="muted">No messages yet. Say hello and talk some trash. 👋</p>
+				}
+			</div>
+			@if (Model.IsJoined)
+			{
+				<form asp-action="PostMessage" asp-route-id="@Model.Id" method="post" class="board-form">
+					<input type="text" name="text" maxlength="1000" class="form-control board-input" placeholder="Write something to the other players..." required />
+					<button type="submit" class="btn btn-mint"><i class="bi bi-send"></i> Post</button>
+				</form>
+			}
+			else
+			{
+				<p class="muted small">Join the tournament to post on the board.</p>
+			}
+		</div>
+
+		<!-- Admin controls -->
+		@if (Model.IsAdmin && Model.Status != TournamentStatus.Finished && Model.Status != TournamentStatus.Cancelled)
+		{
+			<div class="t-card admin-card">
+				<h3 class="section-h"><i class="bi bi-shield-lock"></i> Admin controls</h3>
+				<div class="admin-actions">
+					<form asp-action="Settle" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('End this tournament now, rank players and pay out the prize pool?');">
+						<button type="submit" class="btn btn-mint"><i class="bi bi-flag-fill"></i> End &amp; pay out now</button>
+					</form>
+					<form asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Cancel this tournament and refund every entry fee? This cannot be undone.');">
+						<button type="submit" class="btn btn-outline-danger"><i class="bi bi-x-octagon"></i> Cancel &amp; refund</button>
+					</form>
+				</div>
+				<p class="muted small">Settling pays the current standings (voiding any bets still pending). Cancelling refunds all entry fees and pays nobody.</p>
+			</div>
+		}
+	</div>
+</div>
+
+<!-- Bet legs modal -->
+<div class="modal fade" id="betLegsModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content tourney-modal">
+			<div class="modal-header">
+				<h5 class="modal-title" id="betLegsTitle"><i class="bi bi-receipt"></i> Bet details</h5>
+				<button type="button" class="blm-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+			</div>
+			<div class="modal-body">
+				<div id="betLegsSummary" class="blm-summary"></div>
+				<div class="blm-legs-title">Matches</div>
+				<div id="betLegsBody" class="blm-legs"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.tourney-wrap { max-width:1140px; margin:0 auto; padding:14px 16px 64px; width:100%; }
+	.tourney-alert { border-radius:10px; }
+	.back-link { color:#fff; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-bottom:12px; text-shadow:0 1px 3px rgba(0,0,0,.25); }
+	.back-link:hover { color:#d8fff0; }
+
+	.tourney-panel { background:rgba(0,0,0,.34); border-radius:.6rem; padding:1.5rem 1.6rem; box-shadow:0 12px 34px rgba(0,0,0,.22); }
+
+	.t-card { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:18px; margin-bottom:16px !important; box-shadow:0 4px 14px rgba(0,0,0,.14); color:#223029; }
+	.t-card:last-child { margin-bottom:0; }
+	.section-h { color:#086b4a; font-size:1.05rem; margin:0 0 14px; display:flex; align-items:center; gap:8px; font-weight:700; flex-wrap:wrap; }
+	.section-sub { color:#9aa7a1; font-size:.85rem; font-weight:400; }
+	.muted { color:#5a6b63; }
+	.muted.small { font-size:.82rem; }
+	.ta-l { text-align:left; }
+	.prize { color:#0a8a5e; font-weight:700; }
+	.chips { font-weight:700; color:#223029; }
+
+	.tc-badge { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:4px 10px; border-radius:999px; }
+	.badge-running { background:rgba(13,171,118,.14); color:#0a8a5e; }
+	.badge-upcoming { background:rgba(37,140,251,.14); color:#1e6fd0; }
+	.badge-finished { background:rgba(120,135,128,.16); color:#5a6b63; }
+	.badge-cancelled { background:rgba(220,53,69,.12); color:#c0392b; }
+	.parlay-chip { font-size:.7rem; font-weight:700; color:#7a3ad6; background:rgba(122,58,214,.1); border:1px solid rgba(122,58,214,.25); padding:3px 9px; border-radius:999px; }
+
+	/* Header */
+	.detail-head { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+	.dh-left { flex:1; min-width:260px; }
+	.dh-top { display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
+	.dh-host { color:#9aa7a1; font-size:.85rem; }
+	.detail-title { font-size:1.5rem; font-weight:800; color:#0DAB76; margin:0 0 6px; }
+	.detail-desc { color:#5a6b63; margin:0 0 10px; font-size:.92rem; }
+	.detail-dates { display:flex; gap:18px; flex-wrap:wrap; font-size:.82rem; color:#5a6b63; }
+	.detail-dates i { color:#0DAB76; margin-right:4px; }
+
+	.dh-right { min-width:240px; }
+	.bankroll-box { background:rgba(13,171,118,.07); border:1px solid rgba(13,171,118,.2); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:4px; text-align:center; }
+	.muted-box { background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.06); justify-content:center; color:#5a6b63; }
+	.bankroll-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.8px; color:#9aa7a1; }
+	.bankroll-val { font-size:1.7rem; font-weight:800; color:#0a8a5e; }
+	.bankroll-val small { font-size:.85rem; color:#5a6b63; }
+	.bankroll-rank { font-size:.84rem; color:#5a6b63; }
+	.bankroll-prize { margin-top:4px; color:#0a8a5e; font-weight:700; }
+	.join-cta { background:rgba(13,171,118,.07); border:1px solid rgba(13,171,118,.25); border-radius:14px; padding:16px; text-align:center; display:flex; flex-direction:column; gap:10px; }
+	.join-cta-fee { font-weight:700; color:#0a8a5e; }
+
+	/* Prize strip */
+	.prize-strip { display:flex; gap:10px; flex-wrap:wrap; padding:14px 18px; }
+	.ps-item { flex:1; min-width:90px; display:flex; flex-direction:column; gap:3px; text-align:center; }
+	.ps-item.big .ps-val { font-size:1.3rem; }
+	.ps-label { font-size:.66rem; text-transform:uppercase; letter-spacing:.7px; color:#9aa7a1; }
+	.ps-val { font-size:1.05rem; font-weight:700; color:#223029; }
+	.ps-val.rake { color:#d9822b; }
+
+	.detail-grid { display:grid; grid-template-columns:1.3fr 1fr; gap:16px; }
+
+	/* Leaderboard */
+	.tourney-lb { margin:0; }
+	.tourney-lb tbody td { font-size:.9rem; vertical-align:middle; }
+	.tourney-lb tr.me td { background:rgba(13,171,118,.1); }
+	.lb-rank { width:46px; font-weight:700; }
+	.lb-player { display:inline-flex; align-items:center; gap:8px; }
+	.lb-avatar { width:26px; height:26px; border-radius:50%; object-fit:cover; flex:0 0 auto; box-shadow:0 0 0 1px rgba(0,0,0,.08); }
+	.lb-name { font-weight:600; }
+	.gold { color:#eab308; } .silver { color:#9aa7a1; } .bronze { color:#cd7f32; }
+	.you-tag { background:#0DAB76; color:#fff; font-size:.62rem; font-weight:700; padding:1px 6px; border-radius:999px; margin-left:6px; text-transform:uppercase; }
+	.pending-tag { color:#1e6fd0; font-size:.72rem; margin-left:6px; }
+	.payout-note { margin-top:14px; padding-top:12px; border-top:1px dashed rgba(0,0,0,.1); display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+	.pn-title { font-size:.8rem; color:#5a6b63; }
+	.pn-chip { background:rgba(0,0,0,.04); border:1px solid rgba(0,0,0,.06); border-radius:999px; padding:4px 10px; font-size:.78rem; color:#223029; }
+
+	/* My bets */
+	.mybets { display:flex; flex-direction:column; gap:8px; }
+	.mybet-row { display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,.03); border:1px solid rgba(0,0,0,.05); border-radius:10px; padding:10px 12px; gap:10px; }
+	.mb-main { display:flex; flex-direction:column; gap:2px; }
+	.mb-match { font-weight:600; font-size:.9rem; }
+	.mb-meta { font-size:.78rem; color:#5a6b63; }
+	.bet-badge { font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+	.b-won { background:rgba(13,171,118,.16); color:#0a8a5e; }
+	.b-lost { background:rgba(220,53,69,.12); color:#c0392b; }
+	.b-void { background:rgba(120,135,128,.16); color:#5a6b63; }
+	.b-pending { background:rgba(37,140,251,.14); color:#1e6fd0; }
+	.mybet-row.clickable { cursor:pointer; transition:all .12s ease; }
+	.mybet-row.clickable:hover { background:rgba(13,171,118,.07); border-color:rgba(13,171,118,.25); }
+	.mb-eye { color:#0DAB76; font-size:.8rem; margin-left:5px; }
+
+	/* Betting layout: matches left, sticky slip right */
+	.bet-layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start; }
+	.bet-grid { grid-column:1; grid-row:1; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+	.slip-col { grid-column:2; grid-row:1; position:sticky; top:80px; align-self:start; }
+
+	/* Betting cards */
+	.tbet-card { background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:16px; padding:16px 14px; display:flex; flex-direction:column; gap:12px; box-shadow:0 3px 10px rgba(0,0,0,.1); }
+	.tbet-teams { display:flex; align-items:flex-start; justify-content:space-around; gap:8px; }
+	.tbet-team { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; min-width:0; }
+	.tbet-logo { width:46px; height:46px; object-fit:contain; }
+	.tbet-card .event-team-name { font-size:.85rem; font-weight:800; color:#1f2d27; text-align:center; line-height:1.15; text-shadow:0 1px 2px rgba(255,255,255,.85); }
+	.tbet-vs { height:26px; width:auto; align-self:center; margin-top:8px; opacity:.9; }
+	.tbet-date { align-self:center; background:#0a58ca; color:#fff; font-size:.74rem; font-weight:600; padding:4px 14px; border-radius:50rem; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+	.tbet-odds { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+	.tbet-odds.two { grid-template-columns:repeat(2, 1fr); }
+	.tbet-odd { background:#fff; border:1px solid rgba(0,0,0,.1); border-radius:12px; padding:8px 4px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; transition:all .12s ease; }
+	.tbet-odd-label { font-size:.72rem; font-weight:700; color:#5a6b63; }
+	.tbet-odd:hover:not([disabled]) { border-color:#0DAB76; box-shadow:0 2px 8px rgba(13,171,118,.18); }
+	.tbet-odd[disabled] { opacity:.45; cursor:not-allowed; }
+	.tbet-odd.picked { border-color:#0DAB76; background:#eafaf2; box-shadow:0 0 0 2px rgba(13,171,118,.35); }
+	.tbet-odd .pill-brand-blue, .tbet-odd .pill-brand-yellow, .tbet-odd .pill-brand-green { min-width:46px; }
+
+	/* Competition gradients */
+	.grad-cl { background:linear-gradient(160deg,#e9f1ff,#bcd6ff); }
+	.grad-el { background:linear-gradient(160deg,#fff0e4,#ffcfa6); }
+	.grad-ecl { background:linear-gradient(160deg,#e7f8ef,#b6e6c8); }
+	.grad-wc { background:linear-gradient(160deg,#efe9ff,#cdbcff); }
+	.grad-euro { background:linear-gradient(160deg,#e6f6ff,#b8e2ff); }
+	.grad-comp { background:linear-gradient(160deg,#eef2f7,#d3deea); }
+	.grad-epl { background:linear-gradient(160deg,#f1eaff,#d8c6ff); }
+	.grad-laliga { background:linear-gradient(160deg,#ffeef0,#ffc9cf); }
+	.grad-bundes { background:linear-gradient(160deg,#edf0f3,#cfd7de); }
+	.grad-seriea { background:linear-gradient(160deg,#e9f1ff,#c3d6f5); }
+	.grad-ligue { background:linear-gradient(160deg,#eafaf1,#c3ead3); }
+	.grad-default { background:linear-gradient(160deg,#f5f8f7,#e4edeb); }
+
+	/* Slip */
+	.slip-panel { background:#fff; border:1px solid rgba(13,171,118,.25); border-radius:16px; overflow:hidden; box-shadow:0 8px 22px rgba(0,0,0,.16); }
+	.slip-head { display:flex; justify-content:space-between; align-items:center; padding:11px 14px; background:linear-gradient(135deg,#0DAB76,#0a6b4a); color:#fff; }
+	.slip-title { font-weight:800; display:flex; align-items:center; gap:7px; font-size:.96rem; }
+	.slip-count { background:rgba(255,255,255,.28); color:#fff; border-radius:999px; font-size:.72rem; padding:0 8px; min-width:20px; text-align:center; font-weight:700; }
+	.slip-clear { background:transparent; border:none; color:rgba(255,255,255,.9); font-size:.78rem; font-weight:700; cursor:pointer; }
+	.slip-clear:hover { color:#fff; text-decoration:underline; }
+	.slip-legs { display:flex; flex-direction:column; gap:7px; padding:12px 13px; max-height:38vh; overflow-y:auto; }
+	.slip-empty { color:#5a6b63; font-size:.83rem; font-style:italic; }
+	.slip-leg { display:flex; justify-content:space-between; align-items:center; background:rgba(13,171,118,.06); border:1px solid rgba(13,171,118,.16); border-radius:9px; padding:7px 9px; gap:6px; }
+	.sl-main { display:flex; flex-direction:column; min-width:0; }
+	.sl-match { font-size:.8rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+	.sl-pick { font-size:.74rem; color:#086b4a; font-weight:700; }
+	.sl-remove { background:transparent; border:none; color:#c0392b; font-size:1.05rem; line-height:1; cursor:pointer; padding:0 2px; }
+	.slip-foot { padding:12px 14px 14px; border-top:1px solid rgba(0,0,0,.06); display:flex; flex-direction:column; gap:9px; background:rgba(13,171,118,.03); }
+	.slip-line { display:flex; justify-content:space-between; align-items:center; font-size:.84rem; color:#5a6b63; }
+	.slip-odds { font-weight:800; color:#0a8a5e; font-size:1.05rem; }
+	.sl-return b { color:#0a8a5e; font-weight:800; }
+	.slip-stake { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+	.slip-stake > label { font-size:.82rem; color:#5a6b63; font-weight:600; margin:0; }
+	.slip-stake-input { display:flex; align-items:center; gap:6px; }
+	.slip-stake-input input { width:86px; text-align:center; }
+	.sl-unit { font-size:.76rem; color:#9aa7a1; }
+	.slip-actions { display:flex; justify-content:center; margin-top:2px; }
+	.slip-place { font-weight:700; border-radius:10px; padding:7px 28px; }
+	.slip-hint { font-size:.76rem; color:#c0392b; min-height:1em; text-align:center; }
+
+	/* Board */
+	.board { display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto; margin-bottom:14px; }
+	.board-msg { background:rgba(0,0,0,.03); border:1px solid rgba(0,0,0,.05); border-radius:10px; padding:10px 12px; }
+	.board-msg.mine { border-color:rgba(13,171,118,.3); background:rgba(13,171,118,.06); }
+	.bmsg-head { display:flex; justify-content:space-between; margin-bottom:4px; }
+	.bmsg-user { font-weight:700; color:#0a8a5e; font-size:.85rem; }
+	.bmsg-avatar { width:20px; height:20px; border-radius:50%; object-fit:cover; margin-right:6px; vertical-align:middle; box-shadow:0 0 0 1px rgba(0,0,0,.08); }
+	.bmsg-time { font-size:.72rem; color:#9aa7a1; }
+	.bmsg-text { color:#223029; font-size:.9rem; word-break:break-word; }
+	.board-form { display:flex; gap:10px; }
+	.board-input { flex:1; }
+
+	.info-card { color:#1e6fd0; display:flex; align-items:center; gap:10px; }
+
+	/* Admin */
+	.admin-card { border-color:rgba(220,53,69,.2); }
+	.admin-actions { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+	.admin-actions .btn { font-weight:700; }
+
+	/* Legs modal */
+	.tourney-modal { border:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.4); }
+	.tourney-modal .modal-header { background:linear-gradient(135deg,#0DAB76,#0a6b4a); color:#fff; border-bottom:none; padding:16px 20px; }
+	.tourney-modal .modal-title { font-weight:800; display:flex; align-items:center; gap:9px; font-size:1.1rem; }
+	.tourney-modal .modal-body { padding:18px 20px 20px; }
+	.blm-close { width:34px; height:34px; border-radius:50%; border:none; background:rgba(255,255,255,.18); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:.95rem; transition:all .12s ease; padding:0; }
+	.blm-close:hover { background:rgba(255,255,255,.32); transform:rotate(90deg); }
+	.blm-summary { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+	.blm-sumrow { display:flex; justify-content:space-between; font-size:.88rem; color:#5a6b63; }
+	.blm-sumrow span:last-child { color:#223029; font-weight:600; }
+	.blm-odds { color:#0a8a5e !important; font-weight:800 !important; }
+	.blm-badge { font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:999px; }
+	.blm-legs-title { font-size:.72rem; text-transform:uppercase; letter-spacing:.7px; color:#9aa7a1; font-weight:700; border-top:1px dashed rgba(0,0,0,.1); padding-top:10px; margin-bottom:8px; }
+	.blm-legs { display:flex; flex-direction:column; gap:10px; }
+	.blm-leg { display:grid; grid-template-columns:28px 1fr auto 1fr 28px; align-items:center; gap:8px; border:1px solid rgba(0,0,0,.08); border-radius:12px; padding:11px 13px; box-shadow:0 2px 7px rgba(0,0,0,.07); }
+	.blm-logo { width:28px; height:28px; object-fit:contain; }
+	.blm-team { font-size:.86rem; font-weight:700; color:#1f2d27; text-shadow:0 1px 2px rgba(255,255,255,.8); }
+	.blm-team-away { text-align:right; }
+	.blm-vs { font-size:.7rem; color:#5a6b63; font-weight:700; }
+	.blm-pick { grid-column:1 / 4; font-size:.78rem; color:#086b4a; font-weight:800; text-shadow:0 1px 2px rgba(255,255,255,.8); }
+	.blm-legbadge { grid-column:4 / 6; justify-self:end; font-size:.68rem; font-weight:700; padding:3px 9px; border-radius:999px; box-shadow:0 1px 3px rgba(0,0,0,.12); }
+
+	/* Wide screens: float the slip in the right gutter, next to the panel, vertically centered in the viewport */
+	@@media (min-width: 1760px) {
+		.bet-layout { grid-template-columns:1fr; }
+		.slip-col { position:fixed; right:24px; top:50%; transform:translateY(-50%); width:284px; z-index:1500; grid-column:auto; grid-row:auto; }
+		.slip-col .slip-panel { box-shadow:0 18px 44px rgba(0,0,0,.34); }
+		.slip-col .slip-legs { max-height:46vh; }
+	}
+	@@media (max-width: 900px) {
+		.bet-layout { grid-template-columns:1fr; }
+		.slip-col { grid-column:1; grid-row:1; position:static; margin-bottom:14px; }
+		.bet-grid { grid-column:1; grid-row:2; }
+	}
+	@@media (max-width: 820px) {
+		.detail-grid { grid-template-columns:1fr; }
+	}
+</style>
+
+<script>
+	(function () {
+		var panel = document.getElementById('slipPanel');
+		if (!panel) return;
+
+		var minLegs = parseInt(panel.dataset.minLegs || '1', 10);
+		var bankroll = parseFloat(panel.dataset.bankroll || '0');
+		var form = document.getElementById('parlayForm');
+		var inputsBox = document.getElementById('parlayInputs');
+		var legsBox = document.getElementById('slipLegs');
+		var countEl = document.getElementById('slipCount');
+		var oddsEl = document.getElementById('slipOdds');
+		var stakeEl = document.getElementById('slipStake');
+		var returnEl = document.getElementById('slipReturn');
+		var submitEl = document.getElementById('slipSubmit');
+		var hintEl = document.getElementById('slipHint');
+		var clearEl = document.getElementById('slipClear');
+
+		var sel = new Map();
+
+		function emptyText() {
+			return 'Tap odds on the matches to build your ' + (minLegs > 1 ? (minLegs + '+ leg parlay') : 'bet') + '.';
+		}
+
+		function render() {
+			legsBox.innerHTML = '';
+			if (sel.size === 0) {
+				var e = document.createElement('div');
+				e.className = 'slip-empty';
+				e.textContent = emptyText();
+				legsBox.appendChild(e);
+			} else {
+				sel.forEach(function (v, k) {
+					var row = document.createElement('div');
+					row.className = 'slip-leg';
+					var main = document.createElement('div');
+					main.className = 'sl-main';
+					var mn = document.createElement('span'); mn.className = 'sl-match'; mn.textContent = v.matchName;
+					var pk = document.createElement('span'); pk.className = 'sl-pick'; pk.textContent = v.label + ' @@ ' + v.odds.toFixed(2);
+					main.appendChild(mn); main.appendChild(pk);
+					var x = document.createElement('button');
+					x.type = 'button'; x.className = 'sl-remove'; x.innerHTML = '&times;';
+					x.addEventListener('click', function () { removeSel(k); });
+					row.appendChild(main); row.appendChild(x);
+					legsBox.appendChild(row);
+				});
+			}
+
+			var combined = 1; sel.forEach(function (v) { combined *= v.odds; });
+			countEl.textContent = sel.size;
+			oddsEl.textContent = sel.size ? combined.toFixed(2) : '—';
+			var stake = parseFloat(stakeEl.value || '0');
+			returnEl.textContent = (sel.size && stake > 0) ? (stake * combined).toFixed(2) : '—';
+
+			var ok = true, hint = '';
+			if (sel.size < minLegs) {
+				ok = false;
+				hint = minLegs > 1
+					? ('Add ' + (minLegs - sel.size) + ' more leg' + ((minLegs - sel.size) > 1 ? 's' : '') + ' (minimum ' + minLegs + ').')
+					: 'Pick at least one match.';
+			} else if (!(stake >= 1)) {
+				ok = false; hint = 'Enter a stake of at least 1 chip.';
+			} else if (stake > bankroll) {
+				ok = false; hint = 'Stake exceeds your bankroll (' + bankroll + ' chips).';
+			}
+			submitEl.disabled = !ok;
+			hintEl.textContent = hint;
+		}
+
+		function removeSel(matchId) {
+			var v = sel.get(matchId);
+			if (v && v.btn) v.btn.classList.remove('picked');
+			sel.delete(matchId);
+			render();
+		}
+
+		function onPick(btn) {
+			var card = btn.closest('.tbet-card');
+			var matchId = card.dataset.matchId;
+			var matchName = card.dataset.matchName;
+			var pick = btn.dataset.pick;
+			var odds = parseFloat(btn.dataset.odds);
+			if (isNaN(odds)) return;
+
+			var existing = sel.get(matchId);
+			card.querySelectorAll('.tbet-odd').forEach(function (b) { b.classList.remove('picked'); });
+
+			if (existing && existing.pick === pick) {
+				sel.delete(matchId);
+			} else {
+				sel.set(matchId, { pick: pick, odds: odds, label: btn.dataset.label, matchName: matchName, btn: btn });
+				btn.classList.add('picked');
+			}
+			render();
+		}
+
+		document.querySelectorAll('.tbet-odd').forEach(function (btn) {
+			if (btn.disabled) return;
+			btn.addEventListener('click', function () { onPick(btn); });
+		});
+
+		stakeEl.addEventListener('input', render);
+		clearEl.addEventListener('click', function () {
+			sel.forEach(function (v) { if (v.btn) v.btn.classList.remove('picked'); });
+			sel.clear(); render();
+		});
+
+		form.addEventListener('submit', function (e) {
+			if (sel.size < minLegs || submitEl.disabled) { e.preventDefault(); return; }
+			inputsBox.innerHTML = '';
+			sel.forEach(function (v, k) {
+				var mi = document.createElement('input'); mi.type = 'hidden'; mi.name = 'matchIds'; mi.value = k; inputsBox.appendChild(mi);
+				var pkk = document.createElement('input'); pkk.type = 'hidden'; pkk.name = 'picks'; pkk.value = v.pick; inputsBox.appendChild(pkk);
+			});
+		});
+
+		render();
+	})();
+</script>
+
+<script>
+	(function () {
+		var rows = document.querySelectorAll('.mybet-row.clickable');
+		if (!rows.length) return;
+
+		var modalEl = document.getElementById('betLegsModal');
+		var titleEl = document.getElementById('betLegsTitle');
+		var sumEl = document.getElementById('betLegsSummary');
+		var bodyEl = document.getElementById('betLegsBody');
+
+		function badgeClass(st) {
+			if (st === 'Won') return 'b-won';
+			if (st === 'Lost') return 'b-lost';
+			if (st === 'Voided') return 'b-void';
+			return 'b-pending';
+		}
+		function gradClass(comp, league) {
+			var c = (comp || '').toLowerCase();
+			if (c) {
+				if (c.indexOf('champions') >= 0) return 'grad-cl';
+				if (c.indexOf('conference') >= 0) return 'grad-ecl';
+				if (c.indexOf('europa') >= 0) return 'grad-el';
+				if (c.indexOf('world cup') >= 0) return 'grad-wc';
+				if (c.indexOf('euro') >= 0) return 'grad-euro';
+				return 'grad-comp';
+			}
+			var l = (league || '').toLowerCase();
+			if (l.indexOf('premier') >= 0) return 'grad-epl';
+			if (l.indexOf('liga') >= 0) return 'grad-laliga';
+			if (l.indexOf('bundes') >= 0) return 'grad-bundes';
+			if (l.indexOf('serie') >= 0) return 'grad-seriea';
+			if (l.indexOf('ligue') >= 0) return 'grad-ligue';
+			return 'grad-default';
+		}
+		function esc(s) {
+			return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+				return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+			});
+		}
+
+		function open(row) {
+			var title = row.dataset.title || 'Bet details';
+			var status = row.dataset.status || '';
+			var odds = row.dataset.odds || '';
+			var stake = row.dataset.stake || '';
+			var placed = row.dataset.placed || '';
+			var win = row.dataset.win || '';
+			var potential = row.dataset.potential || '';
+			var legs = [];
+			try { legs = JSON.parse(row.dataset.legs || '[]'); } catch (e) { legs = []; }
+
+			titleEl.innerHTML = '<i class="bi bi-receipt"></i> ' + esc(title);
+
+			var settled = (status === 'Won' || status === 'Lost' || status === 'Voided');
+			var resultCell = settled
+				? ('<span class="blm-badge ' + badgeClass(status) + '">' + esc(status + win) + '</span>')
+				: ('<span class="blm-badge b-pending">Pending</span>');
+
+			sumEl.innerHTML =
+				'<div class="blm-sumrow"><span>Stake</span><span>' + esc(stake) + ' chips</span></div>' +
+				'<div class="blm-sumrow"><span>Combined odds</span><span class="blm-odds">' + esc(odds) + '</span></div>' +
+				(settled ? '' : '<div class="blm-sumrow"><span>Potential return</span><span>' + esc(potential) + ' chips</span></div>') +
+				'<div class="blm-sumrow"><span>Placed</span><span>' + esc(placed) + '</span></div>' +
+				'<div class="blm-sumrow"><span>Result</span><span>' + resultCell + '</span></div>';
+
+			var html = '';
+			legs.forEach(function (l) {
+				html += '<div class="blm-leg ' + gradClass(l.CompetitionName, l.LeagueName) + '">' +
+					'<img src="' + esc(l.HomeLogo) + '" class="blm-logo" alt=""/>' +
+					'<span class="blm-team">' + esc(l.HomeTeam) + '</span>' +
+					'<span class="blm-vs">v</span>' +
+					'<span class="blm-team blm-team-away">' + esc(l.AwayTeam) + '</span>' +
+					'<img src="' + esc(l.AwayLogo) + '" class="blm-logo" alt=""/>' +
+					'<span class="blm-pick">' + esc(l.Pick) + ' @@ ' + Number(l.Odds).toFixed(2) + '</span>' +
+					'<span class="blm-legbadge ' + badgeClass(l.Status) + '">' + esc(l.Status) + '</span>' +
+					'</div>';
+			});
+			bodyEl.innerHTML = html;
+
+			if (window.bootstrap && bootstrap.Modal) {
+				bootstrap.Modal.getOrCreateInstance(modalEl).show();
+			}
+		}
+
+		rows.forEach(function (row) {
+			row.addEventListener('click', function () { open(row); });
+			row.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(row); }
+			});
+		});
+	})();
+</script>

@@ -1,0 +1,64 @@
+﻿@using MatchFixer.Common.Enums
+@model MatchFixer.Core.ViewModels.Tournaments.TournamentListItemViewModel
+@{
+	string Money(decimal v) => "€" + v.ToString("0.##");
+	string Badge(TournamentStatus s) => s switch
+	{
+		TournamentStatus.Running => "badge-running",
+		TournamentStatus.Upcoming => "badge-upcoming",
+		TournamentStatus.Finished => "badge-finished",
+		TournamentStatus.Cancelled => "badge-cancelled",
+		_ => "badge-finished"
+	};
+}
+
+<div class="tc">
+	<div class="tc-top">
+		<span class="tc-badge @Badge(Model.Status)">@Model.StatusLabel</span>
+		@if (Model.IsJoined)
+		{
+			<span class="tc-pill"><i class="bi bi-check-circle-fill"></i> Joined</span>
+		}
+	</div>
+
+	<a asp-action="Details" asp-route-id="@Model.Id" class="tc-name">@Model.Name</a>
+
+	@if (!string.IsNullOrWhiteSpace(Model.Description))
+	{
+		<p class="tc-desc">@Model.Description</p>
+	}
+
+	<div class="tc-stats">
+		<div class="tc-stat">
+			<span class="tc-stat-label">Entry</span>
+			<span class="tc-stat-val">@(Model.EntryFee <= 0 ? "Free" : Money(Model.EntryFee))</span>
+		</div>
+		<div class="tc-stat">
+			<span class="tc-stat-label">Prize pool</span>
+			<span class="tc-stat-val prize">@Money(Model.NetPrizePool)</span>
+		</div>
+		<div class="tc-stat">
+			<span class="tc-stat-label">Players</span>
+			<span class="tc-stat-val">@Model.EntrantsCount@(Model.MaxEntrants.HasValue ? $" / {Model.MaxEntrants}" : "")</span>
+		</div>
+	</div>
+
+	<div class="tc-dates">
+		<span><i class="bi bi-play-circle"></i> @Model.StartDisplay</span>
+		<span><i class="bi bi-flag"></i> @Model.EndDisplay</span>
+	</div>
+
+	<div class="tc-actions">
+		<a asp-action="Details" asp-route-id="@Model.Id" class="btn tc-view">
+			<i class="bi bi-eye-fill"></i>@(Model.Status == TournamentStatus.Finished || Model.Status == TournamentStatus.Cancelled ? "View results" : "View")
+		</a>
+		@if (Model.CanJoin)
+		{
+			<form asp-action="Join" asp-route-id="@Model.Id" method="post" class="join-form">
+				<button type="submit" class="btn btn-mint">
+					<i class="bi bi-box-arrow-in-right"></i> Join @(Model.EntryFee <= 0 ? "" : "· " + Money(Model.EntryFee))
+				</button>
+			</form>
+		}
+	</div>
+</div>

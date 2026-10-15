@@ -1,0 +1,338 @@
+﻿@using MatchFixer.Common.Enums
+@model MatchFixer.Core.ViewModels.Tournaments.TournamentListViewModel
+@{
+	ViewData["Title"] = "Tournaments";
+}
+
+<div class="background-profile"></div>
+
+<div class="tourney-wrap">
+
+	@if (TempData["SuccessMessage"] != null)
+	{
+		<div class="alert alert-success tourney-alert">@TempData["SuccessMessage"]</div>
+	}
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<div class="alert alert-danger tourney-alert">@TempData["ErrorMessage"]</div>
+	}
+
+	<div class="tourney-topbar">
+		<div>
+			<h1 class="tourney-title"><i class="bi bi-trophy-fill"></i> Tournaments</h1>
+			<p class="tourney-sub">Pay in, get a fresh €1000 play bankroll, and climb the leaderboard. Top finishers split the real prize pool.</p>
+		</div>
+		<button class="btn btn-mint tourney-create-btn" type="button" data-bs-toggle="collapse" data-bs-target="#createPanel">
+			<i class="bi bi-plus-circle"></i> Create tournament
+		</button>
+	</div>
+
+	<div class="tourney-panel">
+
+		<!-- Create form -->
+		<div class="collapse" id="createPanel">
+			<div class="t-card create-card">
+				<h3 class="section-h"><i class="bi bi-trophy"></i> New tournament</h3>
+				<form asp-action="Create" method="post" class="create-grid">
+					<div class="fld fld-wide">
+						<label>Tournament name</label>
+						<input name="Name" class="form-control" maxlength="100" required placeholder="Friday Night Cup" />
+					</div>
+					<div class="fld fld-wide">
+						<label>Description <span class="muted">(optional)</span></label>
+						<input name="Description" class="form-control" maxlength="1000" placeholder="Anyone welcome. Good luck!" />
+					</div>
+					<div class="fld">
+						<label>Entry fee (€)</label>
+						<input name="EntryFee" type="number" step="0.01" min="0" value="10" class="form-control" required />
+					</div>
+					<div class="fld">
+						<label>Starting bankroll</label>
+						<input class="form-control" value="€1000 (fixed)" disabled />
+					</div>
+					<div class="fld">
+						<label>Starts</label>
+						<input name="StartDate" type="datetime-local" value="@Model.CreateForm.StartDate.ToString("yyyy-MM-ddTHH:mm")" class="form-control" required />
+					</div>
+					<div class="fld">
+						<label>Ends</label>
+						<input name="EndDate" type="datetime-local" value="@Model.CreateForm.EndDate.ToString("yyyy-MM-ddTHH:mm")" class="form-control" required />
+					</div>
+					<div class="fld">
+						<label>Min entrants to run</label>
+						<input name="MinEntrantsToRun" type="number" min="2" value="2" class="form-control" required />
+					</div>
+					<div class="fld">
+						<label>Max entrants <span class="muted">(optional)</span></label>
+						<input name="MaxEntrants" type="number" min="2" class="form-control" placeholder="Unlimited" />
+					</div>
+					<div class="fld">
+						<label>Min matches per bet</label>
+						<input name="MinBetLegs" type="number" min="1" max="12" value="1" class="form-control" required />
+						<span class="muted" style="font-size:.76rem;">1 = singles allowed · 2+ forces parlays</span>
+					</div>
+					<div class="fld fld-wide note-row">
+						<i class="bi bi-clock-history"></i>
+						Times are in <strong>your local time</strong> (@Model.UserTimeZoneLabel). The house keeps a 10% rake — with 4+ entrants the top 3 split 60/30/10 of the pool; with 2–3 entrants the top 2 split 70/30. You'll be entered automatically when you create it.
+					</div>
+					<div class="fld fld-wide">
+						<button type="submit" class="btn btn-mint"><i class="bi bi-check2-circle"></i> Create &amp; join</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Tabs -->
+		<div class="t-tabs" id="tourneyTabs" role="tablist">
+			<button type="button" class="t-tab" data-tab="running" data-count="@Model.Running.Count">
+				<span class="dot live"></span> Running <span class="t-count">@Model.Running.Count</span>
+			</button>
+			<button type="button" class="t-tab" data-tab="upcoming" data-count="@Model.Upcoming.Count">
+				<span class="dot soon"></span> Upcoming <span class="t-count">@Model.Upcoming.Count</span>
+			</button>
+			<button type="button" class="t-tab" data-tab="finished" data-count="@Model.Finished.Count">
+				<span class="dot done"></span> Finished <span class="t-count">@Model.Finished.Count</span>
+			</button>
+			@if (Model.Cancelled.Any())
+			{
+				<button type="button" class="t-tab" data-tab="cancelled" data-count="@Model.Cancelled.Count">
+					<span class="dot cancel"></span> Cancelled <span class="t-count">@Model.Cancelled.Count</span>
+				</button>
+			}
+			<button type="button" class="t-tab t-tab-lb" data-tab="leaderboard" data-count="@Model.Leaderboard.Count">
+				<i class="bi bi-bar-chart-steps"></i> Leaderboard
+			</button>
+		</div>
+
+		<div class="t-panels">
+
+			<div class="t-panel" data-panel="running">
+				@if (Model.Running.Any())
+				{
+					<div class="tourney-grid">
+						@foreach (var t in Model.Running) { @await Html.PartialAsync("_TournamentCard", t) }
+					</div>
+				}
+				else { <div class="t-empty"><i class="bi bi-hourglass-split"></i> Nothing running right now.</div> }
+			</div>
+
+			<div class="t-panel" data-panel="upcoming">
+				@if (Model.Upcoming.Any())
+				{
+					<div class="tourney-grid">
+						@foreach (var t in Model.Upcoming) { @await Html.PartialAsync("_TournamentCard", t) }
+					</div>
+				}
+				else { <div class="t-empty"><i class="bi bi-calendar-plus"></i> No upcoming tournaments — create one!</div> }
+			</div>
+
+			<div class="t-panel" data-panel="finished">
+				@if (Model.Finished.Any())
+				{
+					<div class="tourney-grid">
+						@foreach (var t in Model.Finished) { @await Html.PartialAsync("_TournamentCard", t) }
+					</div>
+				}
+				else { <div class="t-empty"><i class="bi bi-flag"></i> No finished tournaments yet.</div> }
+			</div>
+
+			@if (Model.Cancelled.Any())
+			{
+				<div class="t-panel" data-panel="cancelled">
+					<div class="tourney-grid">
+						@foreach (var t in Model.Cancelled) { @await Html.PartialAsync("_TournamentCard", t) }
+					</div>
+				</div>
+			}
+
+			<div class="t-panel" data-panel="leaderboard">
+				<div class="t-card lb-card">
+					<h3 class="section-h"><i class="bi bi-bar-chart-steps"></i> Hall of Fame — all-time tournament prizes</h3>
+					@if (Model.Leaderboard.Any())
+					{
+						<div class="table-responsive">
+							<table class="lb-table">
+								<thead>
+									<tr>
+										<th class="lb-rank-h">#</th>
+										<th class="ta-l">Player</th>
+										<th>Prize won</th>
+										<th>Wins</th>
+										<th>Podiums</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var r in Model.Leaderboard)
+									{
+										<tr class="@(r.IsCurrentUser ? "me" : "")">
+											<td class="lb-rank">
+												@if (r.Rank == 1) { <i class="bi bi-trophy-fill gold"></i> }
+												else if (r.Rank == 2) { <i class="bi bi-trophy-fill silver"></i> }
+												else if (r.Rank == 3) { <i class="bi bi-trophy-fill bronze"></i> }
+												else { <span>@r.Rank</span> }
+											</td>
+											<td class="ta-l">
+												<span class="lb-player">
+													<img src="@r.Picture" alt="" class="lb-avatar" onerror="this.onerror=null;this.src='/images/default-user-image.png'" />
+													<span class="lb-name">@r.UserName</span>
+													@if (r.IsCurrentUser) { <span class="you-tag">you</span> }
+												</span>
+											</td>
+											<td class="lb-prize">€@r.TotalPrize.ToString("0.##")</td>
+											<td class="lb-num">@(r.Wins > 0 ? r.Wins.ToString() : "—")</td>
+											<td class="lb-num">@(r.Podiums > 0 ? r.Podiums.ToString() : "—")</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
+					}
+					else
+					{
+						<div class="t-empty inner"><i class="bi bi-trophy"></i> No finished tournaments yet — the hall of fame is waiting for its first champion.</div>
+					}
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<style>
+	.tourney-wrap { max-width:1140px; margin:0 auto; padding:16px 16px 64px; width:100%; }
+	.tourney-alert { border-radius:10px; }
+	.tourney-topbar { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+	.tourney-title { font-size:1.6rem; font-weight:800; color:#fff; margin:0; text-shadow:0 1px 4px rgba(0,0,0,.25); }
+	.tourney-title i { color:#ffd23f; }
+	.tourney-sub { color:rgba(255,255,255,.9); margin:4px 0 0; max-width:640px; font-size:.9rem; text-shadow:0 1px 3px rgba(0,0,0,.2); }
+	.tourney-create-btn { font-weight:700; border-radius:10px; }
+
+	/* Faded-black admin-style panel */
+	.tourney-panel { background:rgba(0,0,0,.34); border-radius:.6rem; padding:1.5rem 1.6rem; box-shadow:0 12px 34px rgba(0,0,0,.22); }
+
+	.muted { color:#9aa7a1; font-weight:400; }
+	.dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+	.dot.live { background:#2ee59d; box-shadow:0 0 0 4px rgba(46,229,157,.25); }
+	.dot.soon { background:#4aa8ff; }
+	.dot.done { background:#b9c6c0; }
+	.dot.cancel { background:#e0566b; }
+
+	.t-card { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:18px; box-shadow:0 4px 14px rgba(0,0,0,.14); color:#223029; }
+	.create-card { margin-bottom:18px; }
+	.section-h { color:#086b4a; font-size:1.05rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; font-weight:700; }
+	.create-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+	.fld { display:flex; flex-direction:column; gap:6px; }
+	.fld-wide { grid-column:1 / -1; }
+	.fld label { font-size:.82rem; color:#5a6b63; font-weight:600; }
+	.note-row { flex-direction:row; align-items:flex-start; gap:8px; color:#5a6b63; font-size:.85rem; background:rgba(13,171,118,.07); border:1px solid rgba(13,171,118,.2); border-radius:10px; padding:10px 12px; }
+	.note-row i { color:#0DAB76; margin-top:2px; }
+
+	/* Tabs */
+	.t-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+	.t-tab { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); color:#e4efe9; padding:9px 15px; border-radius:999px; font-size:.86rem; font-weight:600; cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease; }
+	.t-tab:hover { background:rgba(255,255,255,.14); border-color:rgba(46,229,157,.55); color:#fff; }
+	.t-tab:active { transform:translateY(1px); }
+	.t-tab.active { background:linear-gradient(135deg,#0DAB76,#2ee59d); border-color:transparent; color:#04231a; box-shadow:0 5px 16px rgba(13,171,118,.42); }
+	.t-tab .t-count { background:rgba(0,0,0,.22); color:inherit; font-size:.72rem; font-weight:800; padding:1px 8px; border-radius:999px; min-width:20px; text-align:center; }
+	.t-tab.active .t-count { background:rgba(4,35,26,.2); }
+	.t-tab .dot { width:8px; height:8px; }
+	.t-tab-lb i { color:#ffd23f; font-size:.95rem; }
+	.t-tab-lb.active i { color:#04231a; }
+
+	.t-panel { display:none; }
+	.t-panel.active { display:block; animation:tfade .22s ease; }
+	@@keyframes tfade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+	.t-empty { text-align:center; color:#d4ded8; padding:44px 16px; background:rgba(255,255,255,.04); border:1px dashed rgba(255,255,255,.16); border-radius:12px; font-size:.92rem; }
+	.t-empty i { display:block; font-size:2rem; margin-bottom:8px; color:rgba(255,255,255,.4); }
+	.t-empty.inner { color:#5a6b63; background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.08); }
+	.t-empty.inner i { color:#cdd8d2; }
+
+	.tourney-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+
+	/* Cards */
+	.tc { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 14px rgba(0,0,0,.14); color:#223029; transition:transform .15s ease, box-shadow .15s ease; }
+	.tc:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.2); }
+	.tc-top { display:flex; justify-content:space-between; align-items:center; }
+	.tc-badge { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:4px 10px; border-radius:999px; }
+	.badge-running { background:rgba(13,171,118,.14); color:#0a8a5e; }
+	.badge-upcoming { background:rgba(37,140,251,.14); color:#1e6fd0; }
+	.badge-finished { background:rgba(120,135,128,.16); color:#5a6b63; }
+	.badge-cancelled { background:rgba(220,53,69,.12); color:#c0392b; }
+	.tc-pill { font-size:.72rem; font-weight:700; color:#0a8a5e; display:inline-flex; align-items:center; gap:4px; }
+	.tc-name { font-size:1.15rem; font-weight:800; color:#223029; text-decoration:none; }
+	.tc-name:hover { color:#0DAB76; }
+	.tc-desc { color:#5a6b63; font-size:.86rem; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+	.tc-stats { display:flex; gap:10px; background:rgba(0,0,0,.03); border-radius:12px; padding:12px; }
+	.tc-stat { flex:1; display:flex; flex-direction:column; gap:3px; text-align:center; }
+	.tc-stat-label { font-size:.66rem; text-transform:uppercase; letter-spacing:.7px; color:#9aa7a1; }
+	.tc-stat-val { font-size:1.02rem; font-weight:700; color:#223029; }
+	.tc-stat-val.prize { color:#0a8a5e; }
+	.tc-dates { display:flex; justify-content:space-between; font-size:.78rem; color:#5a6b63; }
+	.tc-dates i { color:#0DAB76; margin-right:4px; }
+	.tc-actions { display:flex; gap:10px; margin-top:4px; }
+	.tc-actions .btn { flex:1; font-weight:700; border-radius:10px; }
+	.join-form { flex:1; display:flex; }
+	.join-form .btn { flex:1; }
+
+	/* View button — gradient + lift + shine */
+	.tc-view { position:relative; overflow:hidden; background:linear-gradient(135deg,#0DAB76,#13c589); color:#fff; border:0; font-weight:700; border-radius:10px; box-shadow:0 3px 10px rgba(13,171,118,.3); transition:transform .12s ease, box-shadow .15s ease, filter .15s ease; }
+	.tc-view:hover { transform:translateY(-2px); box-shadow:0 9px 22px rgba(13,171,118,.45); filter:brightness(1.05); color:#fff; }
+	.tc-view:active { transform:translateY(0); box-shadow:0 3px 10px rgba(13,171,118,.3); }
+	.tc-view i { margin-right:5px; }
+	.tc-view::after { content:""; position:absolute; top:0; left:-130%; width:55%; height:100%; background:linear-gradient(120deg, transparent, rgba(255,255,255,.4), transparent); transform:skewX(-20deg); transition:left .55s ease; pointer-events:none; }
+	.tc-view:hover::after { left:150%; }
+
+	/* Tournaments leaderboard (Hall of Fame) */
+	.lb-card { padding:16px 16px 10px; }
+	.lb-table { width:100%; border-collapse:separate; border-spacing:0; }
+	.lb-table thead th { font-size:.72rem; text-transform:uppercase; letter-spacing:.6px; color:#5a6b63; font-weight:700; padding:8px 10px; border-bottom:2px solid rgba(0,0,0,.08); text-align:center; }
+	.lb-table thead th.ta-l { text-align:left; }
+	.lb-table tbody td { padding:9px 10px; font-size:.9rem; vertical-align:middle; text-align:center; border-bottom:1px solid rgba(0,0,0,.05); }
+	.lb-table tbody td.ta-l { text-align:left; }
+	.lb-table tbody tr:hover td { background:rgba(13,171,118,.05); }
+	.lb-table tbody tr.me td { background:rgba(13,171,118,.1); }
+	.lb-rank-h { width:52px; }
+	.lb-rank { width:52px; font-weight:800; color:#223029; }
+	.lb-rank .gold { color:#eab308; } .lb-rank .silver { color:#9aa7a1; } .lb-rank .bronze { color:#cd7f32; }
+	.lb-player { display:inline-flex; align-items:center; gap:10px; }
+	.lb-avatar { width:30px; height:30px; border-radius:50%; object-fit:cover; flex:0 0 auto; box-shadow:0 0 0 1px rgba(0,0,0,.1); }
+	.lb-name { font-weight:600; color:#223029; }
+	.lb-prize { font-weight:800; color:#0a8a5e; }
+	.lb-num { color:#5a6b63; font-weight:600; }
+	.you-tag { background:#0DAB76; color:#fff; font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:999px; margin-left:4px; text-transform:uppercase; vertical-align:middle; }
+
+	@@media (max-width: 640px) {
+		.create-grid { grid-template-columns:1fr; }
+		.t-tab { padding:8px 12px; font-size:.82rem; }
+	}
+</style>
+
+<script>
+	(function () {
+		var root = document.getElementById('tourneyTabs');
+		if (!root) return;
+		var tabs = root.querySelectorAll('.t-tab');
+		var panels = document.querySelectorAll('.t-panels .t-panel');
+
+		function activate(name) {
+			tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-tab') === name); });
+			panels.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-panel') === name); });
+			try { history.replaceState(null, '', '#' + name); } catch (e) {}
+		}
+
+		tabs.forEach(function (t) {
+			t.addEventListener('click', function () { activate(t.getAttribute('data-tab')); });
+		});
+
+		var names = Array.prototype.map.call(tabs, function (t) { return t.getAttribute('data-tab'); });
+		var initial = (location.hash || '').replace('#', '');
+		if (names.indexOf(initial) === -1) {
+			var firstWithItems = Array.prototype.find.call(tabs, function (t) {
+				return parseInt(t.getAttribute('data-count') || '0', 10) > 0;
+			});
+			initial = firstWithItems ? firstWithItems.getAttribute('data-tab') : names[0];
+		}
+		if (initial) activate(initial);
+	})();
+</script>
