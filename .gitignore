@@ -361,3 +361,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ---- Deployment / local secrets (do NOT commit) ----
+.env
+*.tar
+keys/
+**/DataProtection-Keys/
+env.deploy.txt
+# ---- Build artifacts & local tooling (do NOT commit) ----
+matchfixer.zip
+*.zip
+Claude outputs/
