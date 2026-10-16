@@ -49,10 +49,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				   BETS
 				----------------------------- */
 
-				var totalBets = await _dbContext.Bets.CountAsync();
-				var pendingBets = await _dbContext.Bets.CountAsync(b => b.Status == BetStatus.Pending);
-				var wonBets = await _dbContext.Bets.CountAsync(b => b.Status == BetStatus.Won);
-				var lostBets = await _dbContext.Bets.CountAsync(b => b.Status == BetStatus.Lost);
+				var totalBets = await _dbContext.Bets.CountAsync(b => b.BetSlip.TournamentEntryId == null);
+				var pendingBets = await _dbContext.Bets.CountAsync(b => b.BetSlip.TournamentEntryId == null && b.Status == BetStatus.Pending);
+				var wonBets = await _dbContext.Bets.CountAsync(b => b.BetSlip.TournamentEntryId == null && b.Status == BetStatus.Won);
+				var lostBets = await _dbContext.Bets.CountAsync(b => b.BetSlip.TournamentEntryId == null && b.Status == BetStatus.Lost);
 
 				/* -----------------------------
 				   PLATFORM EXPOSURE
@@ -60,6 +60,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var slips = await _dbContext.BetSlips
 					.Where(s =>
+						s.TournamentEntryId == null &&
 						!s.IsSettled &&
 						s.Bets.Any(b =>
 							b.MatchEvent.MatchDate >= todayStart &&
@@ -72,7 +73,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					.ToListAsync();
 
 				var stakesToday = await _dbContext.BetSlips
-					.Where(s => s.Bets.Any(b =>
+					.Where(s => s.TournamentEntryId == null && s.Bets.Any(b =>
 						b.MatchEvent.MatchDate >= todayStart &&
 						b.MatchEvent.MatchDate < todayStart.AddDays(1)))
 					.SumAsync(s => (decimal?)s.Amount) ?? 0m;
@@ -94,13 +95,13 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				----------------------------- */
 
 				var betsToday = await _dbContext.Bets
-					.CountAsync(b => b.BetTime >= todayStart);
+					.CountAsync(b => b.BetSlip.TournamentEntryId == null && b.BetTime >= todayStart);
 
 				var betsYesterday = await _dbContext.Bets
-					.CountAsync(b => b.BetTime >= yesterdayStart && b.BetTime < todayStart);
+					.CountAsync(b => b.BetSlip.TournamentEntryId == null && b.BetTime >= yesterdayStart && b.BetTime < todayStart);
 
 				var betsThisWeek = await _dbContext.Bets
-					.CountAsync(b => b.BetTime >= weekStart);
+					.CountAsync(b => b.BetSlip.TournamentEntryId == null && b.BetTime >= weekStart);
 
 				var betsActivity = new BetsActivityViewModel
 				{
@@ -137,7 +138,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var topWinners = await _dbContext.BetSlips
 					.Where(s => s.SettledAt >= twoDaysAgo
 						&& s.IsSettled
-						&& s.WinAmount > s.Amount)
+						&& s.WinAmount > s.Amount
+						&& s.TournamentEntryId == null)
 					.GroupBy(s => new
 					{
 						s.UserId,
@@ -164,7 +166,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				var topLosers = await _dbContext.BetSlips
 					.Where(s => s.SettledAt >= twoDaysAgo
 						&& s.IsSettled
-						&& s.WinAmount == 0)
+						&& s.WinAmount == 0
+						&& s.TournamentEntryId == null)
 					.GroupBy(s => new
 					{
 						s.UserId,
@@ -188,7 +191,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				----------------------------- */
 
 				var hotMatches = await _dbContext.Bets
-					.Where(b => b.MatchEvent.MatchDate >= last7)
+					.Where(b => b.MatchEvent.MatchDate >= last7 && b.BetSlip.TournamentEntryId == null)
 					.GroupBy(b => b.MatchEventId)
 					.Select(g => new
 					{
@@ -219,21 +222,21 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				var avgBetToday = await _dbContext.BetSlips
 					.AsNoTracking()
-					.Where(s => s.Bets.Any(b =>
+					.Where(s => s.TournamentEntryId == null && s.Bets.Any(b =>
 						b.MatchEvent.MatchDate >= todayStart &&
 						b.MatchEvent.MatchDate < todayStart.AddDays(1)))
 					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
 
 				var avgBetYesterday = await _dbContext.BetSlips
 					.AsNoTracking()
-					.Where(s => s.Bets.Any(b =>
+					.Where(s => s.TournamentEntryId == null && s.Bets.Any(b =>
 						b.MatchEvent.MatchDate >= yesterdayStart &&
 						b.MatchEvent.MatchDate < todayStart))
 					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
 
 				var avgBetWeek = await _dbContext.BetSlips
 					.AsNoTracking()
-					.Where(s => s.Bets.Any(b =>
+					.Where(s => s.TournamentEntryId == null && s.Bets.Any(b =>
 						b.MatchEvent.MatchDate >= weekStart))
 					.AverageAsync(s => (decimal?)s.Amount) ?? 0;
 
@@ -320,7 +323,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 				// Events with any voided bets
 				var eventsWithVoidedBets = await _dbContext.Bets
-					.Where(b => b.Status == BetStatus.Voided)
+					.Where(b => b.Status == BetStatus.Voided && b.BetSlip.TournamentEntryId == null)
 					.Select(b => b.MatchEventId)
 					.Distinct()
 					.CountAsync();
