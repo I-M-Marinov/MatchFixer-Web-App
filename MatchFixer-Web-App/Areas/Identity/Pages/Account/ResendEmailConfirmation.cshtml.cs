@@ -85,7 +85,15 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
 			var emailBody = EmailTemplates.EmailConfirmation(logoUrl, callbackUrl);
 
-			await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPleaseConfirmEmail, emailBody);
+			try
+			{
+				await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPleaseConfirmEmail, emailBody);
+			}
+			catch (Exception ex)
+			{
+				// Email delivery must never 500 this page. Log and continue.
+				Console.Error.WriteLine($"[EMAIL] Failed to send to {Input.Email}: {ex.Message}");
+			}
 
             ModelState.AddModelError(string.Empty, VerificationEmailResent);
             return Page();

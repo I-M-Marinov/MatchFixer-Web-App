@@ -77,7 +77,15 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
                 var emailBody = EmailTemplates.PasswordResetEmail(logoUrl, callbackUrl);
 
-				await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPasswordResetRequested, emailBody);
+				try
+				{
+					await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPasswordResetRequested, emailBody);
+				}
+				catch (Exception ex)
+				{
+					// Email delivery must never 500 this page. Log and continue.
+					Console.Error.WriteLine($"[EMAIL] Failed to send to {Input.Email}: {ex.Message}");
+				}
 
 				ModelState.AddModelError(string.Empty, PasswordLinkSentToSpecifiedEmail);
 
