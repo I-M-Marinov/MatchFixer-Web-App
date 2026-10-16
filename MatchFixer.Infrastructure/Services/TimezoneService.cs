@@ -25,32 +25,17 @@ namespace MatchFixer.Infrastructure.Services
 			return zones;
 		}
 
-		public async Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
+		public Task<bool> IsValidTimezoneAsync(string countryCode, string timezone)
 		{
-			try
-			{
-				_httpClient.BaseAddress = new Uri("https://localhost:7190/");
+			// Validate in-process against the same timezone database the API uses.
+			// (Previously this made an HTTP call to a hardcoded https://localhost:7190/
+			//  which does not exist in the deployed container, so every timezone change
+			//  was rejected with "Time Zone is missing or incorrect".)
+			if (string.IsNullOrWhiteSpace(countryCode) || string.IsNullOrWhiteSpace(timezone))
+				return Task.FromResult(false);
 
-				// Call the API to get valid timezones for the country
-				var response = await _httpClient.GetAsync($"api/timezones/{countryCode}");
-
-				if (response.IsSuccessStatusCode)
-				{
-					// Deserialize the JSON response into an array of strings (timezones)
-					var jsonResponse = await response.Content.ReadAsStringAsync();
-					var validTimezones = JsonSerializer.Deserialize<string[]>(jsonResponse);
-
-					// Check if the selected timezone is in the list of valid timezones
-					return validTimezones != null && validTimezones.Contains(timezone);
-				}
-
-				// Log or throw an exception if the response is not successful
-				return false;
-			}
-			catch (Exception ex)
-			{
-				return false;
-			}
+			var isValid = GetTimezonesForCountry(countryCode).Contains(timezone);
+			return Task.FromResult(isValid);
 		}
 
 		public DateTime? ConvertToUserTime(DateTime? utcTime, string timeZoneId)
