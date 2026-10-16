@@ -23,6 +23,7 @@ namespace MatchFixer.Core.Services
 			var query = _dbContext.BetSlips
 				.AsNoTracking()
 				.Where(bs =>
+					bs.TournamentEntryId == null &&
 					bs.IsSettled &&
 					bs.WinAmount != null &&
 					bs.WinAmount > 0 &&
