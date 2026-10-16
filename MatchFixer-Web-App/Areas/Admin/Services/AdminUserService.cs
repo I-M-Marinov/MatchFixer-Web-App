@@ -113,7 +113,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					.ToDictionaryAsync(x => x.UserId);
 
 				var betsCount = await _db.Bets
-					.Where(b => userIds.Contains(b.BetSlip.UserId))
+					.Where(b => userIds.Contains(b.BetSlip.UserId) && b.BetSlip.TournamentEntryId == null)
 					.GroupBy(b => b.BetSlip.UserId)
 					.Select(g => new { UserId = g.Key, Count = g.Count() })
 					.ToDictionaryAsync(x => x.UserId, x => x.Count);

@@ -75,7 +75,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			// slipLegs only for the current page's bet slips 
 			var pageSlipIds = events
-				.SelectMany(e => e.Bets.Select(b => b.BetSlipId))
+				.SelectMany(e => e.Bets.Where(b => b.BetSlip.TournamentEntryId == null).Select(b => b.BetSlipId))
 				.Distinct()
 				.ToList();
 
@@ -87,13 +87,14 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			var result = events.Select(e =>
 			{
-				decimal totalStake = e.Bets.Sum(b =>
+				var bets = e.Bets.Where(b => b.BetSlip.TournamentEntryId == null).ToList();
+				decimal totalStake = bets.Sum(b =>
 				{
 					var legs = slipLegs.TryGetValue(b.BetSlipId, out var l) ? l : 1;
 					return b.BetSlip.Amount / legs;
 				});
 
-				decimal totalPayout = e.Bets
+				decimal totalPayout = bets
 					.Where(b =>
 						b.BetSlip.IsSettled &&
 						b.BetSlip.WinAmount.HasValue &&
@@ -125,11 +126,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					HomeWonOnPenalties = matchResult?.HomeWonOnPenalties,
 					IsCancelled = e.IsCancelled,
 
-					TotalBets = e.Bets.Count,
+					TotalBets = bets.Count,
 					TotalStake = totalStake,
 					TotalPayout = totalPayout,
 
-					Bets = e.Bets.Select(b =>
+					Bets = bets.Select(b =>
 					{
 						string computedStatus;
 
@@ -226,6 +227,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					join bs in _db.BetSlips.AsNoTracking() on b.BetSlipId    equals bs.Id
 					join lc in legCountSubquery            on b.BetSlipId    equals lc.BetSlipId
 					join ht in _db.Teams.AsNoTracking()    on m.HomeTeamId   equals ht.Id
+					where bs.TournamentEntryId == null
 					select new
 					{
 						b.MatchEventId,
@@ -298,6 +300,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			var betsQuery = _db.Bets
 				.AsNoTracking()
 				.Where(b =>
+					b.BetSlip.TournamentEntryId == null &&
 					!b.MatchEvent.IsPostponed &&
 					(b.MatchEvent.LiveResult != null || b.MatchEvent.IsCancelled) &&
 					(b.Status == BetStatus.Won || b.Status == BetStatus.Lost) && 

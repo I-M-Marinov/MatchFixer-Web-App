@@ -80,7 +80,7 @@ namespace MatchFixer.Core.Services.Admin
 			var userBets = await _dbContext.Bets
 				.Include(b => b.BetSlip)
 				.Include(b => b.MatchEvent)
-				.Where(b => b.BetSlip.UserId == userId)
+				.Where(b => b.BetSlip.UserId == userId && b.BetSlip.TournamentEntryId == null)
 				.OrderBy(b => b.BetTime)
 				.ToListAsync();
 

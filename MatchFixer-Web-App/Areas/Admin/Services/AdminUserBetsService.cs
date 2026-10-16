@@ -34,7 +34,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			// Load slips 
 			var slips = await _dbContext.BetSlips
 				.AsNoTracking()
-				.Where(s => s.UserId == userId)
+				.Where(s => s.UserId == userId && s.TournamentEntryId == null)
 				.Include(s => s.Bets)
 				.OrderByDescending(s => s.BetTime)
 				.ToListAsync();
