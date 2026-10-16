@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.git/
+.git/
+.github/
+**/*.user
+**/node_modules/
+Dockerfile
+.dockerignore
+docker-compose.yml
+.env
+.env.example
+*.tar

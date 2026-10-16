@@ -1,0 +1,31 @@
+services:
+  matchfixer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: matchfixer
+    restart: unless-stopped
+
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_HTTP_PORTS: "8080"
+      DP_KEYS_PATH: "/app/keys"
+
+    ports:
+      - "8090:8080"        # browse at  http://<your-nas-ip>:8090
+
+    volumes:
+      - ./keys:/app/keys                       # keeps logins + antiforgery working across redeploys
+      - ./team-logos:/app/wwwroot/images/teams # admin-synced team logos persist on the NAS
+
+    # Join the SQL Server container's network so the app reaches it by name "mssql".
+    networks:
+      - mssql-db
+
+networks:
+  mssql-db:
+    external: true
+    name: mssql-matchfixer-db_default
