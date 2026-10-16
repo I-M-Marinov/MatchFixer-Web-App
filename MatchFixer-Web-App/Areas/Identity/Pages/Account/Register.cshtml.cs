@@ -193,7 +193,19 @@ namespace MatchFixer_Web_App.Areas.Identity.Pages.Account
 
                     var emailBody = EmailTemplates.WelcomeEmail(logoUrl, callbackUrl);
 
-					await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPleaseConfirmEmail, emailBody);
+					// The account has already been created at this point. Sending the confirmation
+					// email must NOT be allowed to fail the whole request - otherwise a transient
+					// SMTP problem (blocked outbound port, Gmail refusing the connection, etc.)
+					// throws an unhandled exception and the user gets a 500 even though their
+					// account exists. Swallow and log instead; the user can resend confirmation.
+					try
+					{
+						await _emailSender.SendEmailAsync(Input.Email, EmailTemplates.SubjectPleaseConfirmEmail, emailBody);
+					}
+					catch (Exception ex)
+					{
+						_logger.LogError(ex, "Failed to send confirmation email to {Email}. Registration will continue; the user can request a new confirmation link.", Input.Email);
+					}
 
 
 					if (_userManager.Options.SignIn.RequireConfirmedAccount)
