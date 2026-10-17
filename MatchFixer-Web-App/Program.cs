@@ -20,6 +20,13 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using static MatchFixer.Infrastructure.SeedData.SeedData;
 
@@ -50,6 +57,43 @@ builder.Services.AddDbContext<MatchFixerDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddMemoryCache();
+
+// Behind the Synology reverse proxy: trust its forwarded headers so the real
+// client IP + https scheme are seen (needed for secure cookies, rate limiting,
+// logging). Only valid because the app port is reachable only via the proxy.
+builder.Services.Configure<ForwardedHeadersOptions>(o =>
+{
+	o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+	o.KnownNetworks.Clear();
+	o.KnownProxies.Clear();
+});
+
+// Throttle auth endpoints per client IP to blunt brute force / credential stuffing.
+builder.Services.AddRateLimiter(options =>
+{
+	options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+	options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+	{
+		var path = httpContext.Request.Path.Value ?? string.Empty;
+		var isAuth =
+			path.Contains("/Account/Login", StringComparison.OrdinalIgnoreCase) ||
+			path.Contains("/Account/Register", StringComparison.OrdinalIgnoreCase) ||
+			path.Contains("/Account/ForgotPassword", StringComparison.OrdinalIgnoreCase) ||
+			path.Contains("/Account/ResendEmailConfirmation", StringComparison.OrdinalIgnoreCase) ||
+			path.Contains("/Account/ResetPassword", StringComparison.OrdinalIgnoreCase);
+
+		if (!isAuth)
+			return RateLimitPartition.GetNoLimiter("open");
+
+		var key = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+		return RateLimitPartition.GetFixedWindowLimiter("auth:" + key, _ => new FixedWindowRateLimiterOptions
+		{
+			PermitLimit = 10,
+			Window = TimeSpan.FromMinutes(1),
+			QueueLimit = 0
+		});
+	});
+});
 
 
 builder.Configuration.AddUserSecrets<Program>();								// Add User Secrets
@@ -120,6 +164,23 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 	.AddEntityFrameworkStores<MatchFixerDbContext>()
 	.AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.Cookie.HttpOnly = true;
+	options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+	options.Cookie.SameSite = SameSiteMode.Lax;
+	options.ExpireTimeSpan = TimeSpan.FromHours(8);
+	options.SlidingExpiration = true;
+	options.LoginPath = "/Identity/Account/Login";
+	options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+	options.Events.OnSignedIn = ctx =>
+	{
+		var log = ctx.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Auth");
+		log.LogInformation("User signed in: {User} from {IP}", ctx.Principal?.Identity?.Name, ctx.HttpContext.Connection.RemoteIpAddress);
+		return Task.CompletedTask;
+	};
+});
+
 builder.Services.AddDistributedMemoryCache(); // In-memory session store
 builder.Services.AddSession(options =>
 {
@@ -132,8 +193,18 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
 	options.JsonSerializerOptions.PropertyNamingPolicy = null; // disables camelCase conversion
 });
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews(options =>
+{
+	// Lock the whole Admin area behind the Admin role so no admin endpoint
+	// can be reached anonymously (defence in depth over per-controller attributes).
+	options.Conventions.Add(new AdminAreaAuthorizeConvention());
+});
+builder.Services.AddRazorPages(options =>
+{
+	// Identity auth-flow pages stay anonymous; profile management requires auth.
+	options.Conventions.AllowAnonymousToAreaFolder("Identity", "/Account");
+	options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+});
 
 // Generate all outgoing URLs in lowercase (path only; query-string values untouched).
 builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteOptions>(options =>
@@ -144,19 +215,24 @@ builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteOptions>(options =>
 // SignalR (single registration, with detailed errors)
 builder.Services.AddSignalR(o =>
 {
-	o.EnableDetailedErrors = true;
+	o.EnableDetailedErrors = builder.Environment.IsDevelopment();
 	o.KeepAliveInterval = TimeSpan.FromSeconds(15);
 	o.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
 });
 
-// CORS (for SignalR)
+// CORS: same-origin SignalR needs NO CORS. Only allow the explicit origins in
+// configuration (AllowedOrigins, comma-separated); never reflect arbitrary
+// origins together with AllowCredentials.
+var allowedOrigins = (builder.Configuration["AllowedOrigins"] ?? "")
+	.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(o =>
 {
-	o.AddPolicy("SignalRCors", p => p
-		.AllowAnyHeader()
-		.AllowAnyMethod()
-		.AllowCredentials()
-		.SetIsOriginAllowed(_ => true));
+	o.AddPolicy("SignalRCors", p =>
+	{
+		if (allowedOrigins.Length > 0)
+			p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+	});
 });
 
 // Admin Insights Notifier 
@@ -166,6 +242,12 @@ builder.Services.AddScoped<IBoostQueryService, BoostQueryService>();
 
 builder.Services.AddAuthorization(options =>
 {
+	// Deny by default: every endpoint needs an authenticated user unless it
+	// explicitly opts out with [AllowAnonymous].
+	options.FallbackPolicy = new AuthorizationPolicyBuilder()
+		.RequireAuthenticatedUser()
+		.Build();
+
 	options.AddPolicy("AdminOnly", p => p.RequireRole(Roles.Admin));
 
 	// One policy per permission
@@ -187,6 +269,8 @@ if (!string.IsNullOrWhiteSpace(dpKeysPath))
 
 var app = builder.Build();
 
+// Must run before anything that inspects the request scheme or client IP.
+app.UseForwardedHeaders();
 
 app.UseResponseCaching();
 
@@ -241,19 +325,29 @@ else
     app.UseHsts();
 }
 
+// Baseline security headers (no CSP yet - the app relies on inline scripts/styles).
+app.Use(async (ctx, next) =>
+{
+	ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+	ctx.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+	ctx.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+	await next();
+});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseSession();
 
 app.UseRouting();
+app.UseRateLimiter();
 app.UseCors("SignalRCors");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHub<MatchEventHub>("/matchEventHub");
-app.MapHub<AdminInsightsHub>("/hubs/admin-insights");
+app.MapHub<AdminInsightsHub>("/hubs/admin-insights").RequireAuthorization("AdminOnly");
 
 // custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
@@ -297,5 +391,23 @@ static async Task RefreshKnockoutBracketIfStaleAsync(IServiceProvider services)
 	{
 		var worldCupService = services.GetRequiredService<IWorldCupService>();
 		await worldCupService.ReclassifyAndRefreshAsync();
+	}
+}
+
+// Applies an Admin-role authorization filter to every controller in the Admin area.
+public sealed class AdminAreaAuthorizeConvention : IApplicationModelConvention
+{
+	public void Apply(ApplicationModel application)
+	{
+		var adminPolicy = new AuthorizationPolicyBuilder()
+			.RequireRole(Roles.Admin)
+			.Build();
+
+		foreach (var controller in application.Controllers)
+		{
+			var ns = controller.ControllerType.Namespace ?? string.Empty;
+			if (ns.Contains(".Areas.Admin."))
+				controller.Filters.Add(new AuthorizeFilter(adminPolicy));
+		}
 	}
 }
