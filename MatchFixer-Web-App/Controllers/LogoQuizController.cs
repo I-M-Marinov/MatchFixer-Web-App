@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using static MatchFixer.Common.GeneralConstants.LogoQuizConstants;
 
 using MatchFixer.Common.GeneralConstants;
+using Microsoft.AspNetCore.Authorization;
 namespace MatchFixer_Web_App.Controllers
 {
+	[AllowAnonymous]
 	public class LogoQuizController : Controller
 	{
 		private readonly ILogoQuizService _logoQuizService;

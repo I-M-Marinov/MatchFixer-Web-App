@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using static MatchFixer.Common.GeneralConstants.WorldCupApiConstants;
 
+using Microsoft.AspNetCore.Authorization;
 namespace MatchFixer_Web_App.Controllers
 {
+	[AllowAnonymous]
 	public class WorldCupController : Controller
 	{
 		private readonly IWorldCupService _worldCupService;

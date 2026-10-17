@@ -1,10 +1,12 @@
 ﻿using MatchFixer.Infrastructure.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.AspNetCore.Authorization;
 namespace MatchFixer_Web_App.Controllers.Api
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[AllowAnonymous]
 	public class TimezonesController : ControllerBase
 	{
 		private readonly ITimezoneService _timezoneService;

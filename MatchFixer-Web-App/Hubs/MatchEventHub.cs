@@ -2,8 +2,10 @@
 using MatchFixer.Core.ViewModels.DTO;
 using Microsoft.AspNetCore.SignalR;
 
+using Microsoft.AspNetCore.Authorization;
 namespace MatchFixer_Web_App.Hubs
 {
+	[AllowAnonymous]
 	public class MatchEventHub : Hub
 	{
 		private readonly IBoostQueryService _boosts;

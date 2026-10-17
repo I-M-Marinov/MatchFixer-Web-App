@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using static MatchFixer.Common.FootballClubNames.FootballClubNames;
 
+using Microsoft.AspNetCore.Authorization;
 namespace MatchFixer_Web_App.Controllers.Api
 {
 	[Route("api/wiki")]
 	[ApiController]
+	[AllowAnonymous]
 	public class WikiController : ControllerBase
 	{
 		private readonly IWikipediaService _wikipediaService;

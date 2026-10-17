@@ -2,8 +2,10 @@
 using MatchFixer.Core.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.AspNetCore.Authorization;
 namespace MatchFixer_Web_App.Controllers
 {
+	[AllowAnonymous]
 	public class LeagueTableController : Controller
 	{
 		private readonly ILeagueTableService _leagueTableService;
