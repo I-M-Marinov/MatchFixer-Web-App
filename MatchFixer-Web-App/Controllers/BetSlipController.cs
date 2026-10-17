@@ -4,12 +4,14 @@ using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 
 namespace MatchFixer_Web_App.Controllers
 {
+	[Authorize]
 	[ApiController]
 	[Route("[controller]/[action]")]
 	public class BetSlipController : ControllerBase

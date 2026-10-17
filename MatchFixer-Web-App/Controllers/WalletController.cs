@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Core.Contracts;
 using MatchFixer.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using static MatchFixer.Common.GeneralConstants.WalletServiceConstants;
 
@@ -9,6 +10,7 @@ namespace MatchFixer_Web_App.Controllers
 {
 
 	
+	[Authorize]
 	public class WalletController : Controller
 	{
 		private readonly IWalletService _walletService;
