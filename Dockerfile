@@ -30,4 +30,7 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
 
 EXPOSE 8080
 VOLUME /app/keys
+# Run as the image's non-root 'app' user (uid 1654). The bind-mounted host
+# folders (keys, team-logos) MUST be writable by uid 1654 - see deploy notes.
+USER $APP_UID
 ENTRYPOINT ["dotnet", "MatchFixer-Web-App.dll"]
