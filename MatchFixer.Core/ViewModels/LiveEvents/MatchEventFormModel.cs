@@ -19,7 +19,7 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 
 		[Required(ErrorMessage = ChooseAValidDateAndTime)]
 		[DataType(DataType.DateTime)]
-		public DateTime MatchDate { get; set; } = DateTime.UtcNow;
+		public DateTime MatchDate { get; set; } = DateTime.Now;
 
 		[Required(ErrorMessage = ChooseValidHomeTeamOdds)]
 		[Range(1.01, 100)]

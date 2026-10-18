@@ -13,6 +13,7 @@ services:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_HTTP_PORTS: "8080"
       DP_KEYS_PATH: "/app/keys"
+      TZ: "Europe/Sofia"          # <-- timezone for the container, so logs and timestamps are correct
 
     ports:
       - "8090:8080"        # browse at  http://<your-nas-ip>:8090
