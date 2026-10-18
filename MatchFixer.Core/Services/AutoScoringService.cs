@@ -5,6 +5,8 @@ using MatchFixer.Core.ViewModels.MatchResults;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using MatchFixer.Infrastructure.Models.FootballAPI;
 
 namespace MatchFixer.Core.Services
 {
@@ -15,19 +17,27 @@ namespace MatchFixer.Core.Services
 		private readonly ILiveMatchResultService _liveMatchResultService;
 		private readonly ITimezoneService _timezoneService;
 		private readonly ISessionService _sessionService;
+		private readonly IMemoryCache _cache;
+
+		// Results fetched during Preview are cached briefly so Confirm can reuse them
+		// instead of re-calling the rate-limited football API for every fixture.
+		private static readonly TimeSpan ResultCacheTtl = TimeSpan.FromMinutes(3);
+		private static string ResultCacheKey(int fixtureId) => $"autoscore:fixture:{fixtureId}";
 
 		public AutoScoringService(
 			MatchFixerDbContext dbContext,
 			IFootballApiService footballApi,
 			ILiveMatchResultService liveMatchResultService,
 			ITimezoneService timezoneService,
-			ISessionService sessionService)
+			ISessionService sessionService,
+			IMemoryCache cache)
 		{
 			_dbContext = dbContext;
 			_footballApi = footballApi;
 			_liveMatchResultService = liveMatchResultService;
 			_timezoneService = timezoneService;
 			_sessionService = sessionService;
+			_cache = cache;
 		}
 
 		public async Task<AutoScorePreviewViewModel> GetAutoScoreCandidatesAsync()
@@ -56,6 +66,10 @@ namespace MatchFixer.Core.Services
 			var fixtureIds = candidates.Select(m => m.ApiFixtureId!.Value).ToList();
 			var apiResults = await _footballApi.GetFixtureResultsAsync(fixtureIds);
 			var byId = apiResults.ToDictionary(r => r.ApiFixtureId);
+
+			// Cache each fresh result so Confirm can reuse it without hitting the API again.
+			foreach (var r in apiResults)
+				_cache.Set(ResultCacheKey(r.ApiFixtureId), r, ResultCacheTtl);
 
 			var timeZoneId = _sessionService.GetUserTimezone();
 
@@ -153,8 +167,24 @@ namespace MatchFixer.Core.Services
 				.Select(m => m.ApiFixtureId!.Value)
 				.ToList();
 
-			var apiResults = await _footballApi.GetFixtureResultsAsync(fixtureIds);
-			var byId = apiResults.ToDictionary(r => r.ApiFixtureId);
+			// Reuse the results cached during Preview; only call the rate-limited API for
+			// any fixtures that aren't cached (e.g. the 3-minute cache window expired).
+			var byId = new Dictionary<int, FixtureResultDto>();
+			var missing = new List<int>();
+			foreach (var fid in fixtureIds)
+			{
+				if (_cache.TryGetValue(ResultCacheKey(fid), out FixtureResultDto? cached) && cached != null)
+					byId[fid] = cached;
+				else
+					missing.Add(fid);
+			}
+
+			if (missing.Count > 0)
+			{
+				var fresh = await _footballApi.GetFixtureResultsAsync(missing);
+				foreach (var r in fresh)
+					byId[r.ApiFixtureId] = r;
+			}
 
 			foreach (var m in events)
 			{
