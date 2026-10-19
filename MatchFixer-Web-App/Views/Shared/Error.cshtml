@@ -1,25 +1,59 @@
-﻿@model ErrorViewModel
+@model ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    Layout = null;
+    var code = ViewData["StatusCode"] as int?;
+    var is404 = code == 404;
+    var title = is404 ? "Page not found" : "Something went wrong";
+    ViewData["Title"] = title;
 }
-
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
-
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
-
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MatchFixer — @title</title>
+    <style>
+        *{box-sizing:border-box}
+        html,body{height:100%;margin:0}
+        body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+             background:linear-gradient(135deg,#0DAB76 0%,#2a7f8f 100%);
+             display:flex;align-items:center;justify-content:center;padding:24px;color:#13201a}
+        .err-card{background:#fff;max-width:460px;width:100%;border-radius:18px;
+                  box-shadow:0 18px 50px rgba(0,0,0,.28);padding:38px 30px;text-align:center}
+        .err-logo{font-weight:800;font-size:1.1rem;letter-spacing:.3px;color:#0a8a5e;margin-bottom:18px}
+        .err-logo .b{color:#223029}
+        .err-code{font-size:3.4rem;font-weight:800;line-height:1;color:#0DAB76;margin:6px 0 2px}
+        .err-emoji{font-size:2.6rem;margin-bottom:6px}
+        h1{font-size:1.25rem;margin:10px 0 8px;color:#223029}
+        p{color:#5a6b63;font-size:.95rem;line-height:1.55;margin:0 0 22px}
+        .err-btn{display:inline-block;background:linear-gradient(135deg,#0DAB76,#13c589);color:#fff;
+                 font-weight:700;text-decoration:none;padding:11px 26px;border-radius:10px;
+                 box-shadow:0 6px 16px rgba(13,171,118,.4);transition:transform .12s ease,filter .15s ease}
+        .err-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+        .err-ref{margin-top:22px;font-size:.72rem;color:#9aa7a1}
+        .err-ref code{background:#f0f4f1;padding:2px 7px;border-radius:5px}
+    </style>
+</head>
+<body>
+    <div class="err-card">
+        <div class="err-logo">⚽ Match<span class="b">Fixer</span></div>
+        @if (is404)
+        {
+            <div class="err-code">404</div>
+            <h1>We couldn't find that page</h1>
+            <p>The page you're looking for doesn't exist, moved, or you don't have access to it.</p>
+        }
+        else
+        {
+            <div class="err-emoji">😬</div>
+            <h1>Something went wrong</h1>
+            <p>An unexpected error occurred while handling your request. Please try again — if it keeps happening, let the admin know.</p>
+        }
+        <a class="err-btn" href="/">Back to home</a>
+        @if (Model != null && Model.ShowRequestId)
+        {
+            <p class="err-ref">Reference: <code>@Model.RequestId</code></p>
+        }
+    </div>
+</body>
+</html>
