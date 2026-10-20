@@ -198,7 +198,8 @@ builder.Services.AddControllersWithViews(options =>
 	// Lock the whole Admin area behind the Admin role so no admin endpoint
 	// can be reached anonymously (defence in depth over per-controller attributes).
 	options.Conventions.Add(new AdminAreaAuthorizeConvention());
-});
+})
+.AddRazorRuntimeCompilation();
 builder.Services.AddRazorPages(options =>
 {
 	// Identity auth-flow pages stay anonymous; profile management requires auth.
@@ -324,6 +325,10 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+// Serve the app's own branded page for 404 / 403 / other status codes
+// (otherwise the reverse proxy dresses a bare 404 up as its own page).
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
 
 // Baseline security headers (no CSP yet - the app relies on inline scripts/styles).
 app.Use(async (ctx, next) =>
