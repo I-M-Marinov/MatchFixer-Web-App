@@ -70,6 +70,30 @@ namespace MatchFixer_Web_App.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[Authorize(Policy = "AdminOnly")]
+		public async Task<IActionResult> CreatePot(CreatePotInputModel input)
+		{
+			var userId = _userContext.GetUserId();
+
+			if (!ModelState.IsValid)
+			{
+				TempData[TempDataKeys.ErrorMessage] = "Please check the Pot details and try again.";
+				return RedirectToAction(nameof(Index));
+			}
+
+			var (success, message, tournamentId) = await _tournaments.CreatePotAsync(userId, input);
+			if (!success || tournamentId == null)
+			{
+				TempData[TempDataKeys.ErrorMessage] = message;
+				return RedirectToAction(nameof(Index));
+			}
+
+			TempData[TempDataKeys.SuccessMessage] = message;
+			return RedirectToAction(nameof(Details), new { id = tournamentId });
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Join(Guid id)
 		{
 			var userId = _userContext.GetUserId();

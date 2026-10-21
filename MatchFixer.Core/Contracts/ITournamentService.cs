@@ -10,6 +10,9 @@ namespace MatchFixer.Core.Contracts
 
 		Task<(bool Success, string Message, Guid? TournamentId)> CreateAsync(Guid currentUserId, CreateTournamentInputModel input, bool isAdmin);
 
+		// Admin: create "The Pot" - a free-to-enter, admin-funded special tournament.
+		Task<(bool Success, string Message, Guid? TournamentId)> CreatePotAsync(Guid currentUserId, CreatePotInputModel input);
+
 		Task<(bool Success, string Message)> JoinAsync(Guid tournamentId, Guid currentUserId);
 
 		Task<(bool Success, string Message)> PlaceBetAsync(Guid tournamentId, Guid currentUserId, IReadOnlyList<(Guid MatchId, string Pick)> legs, decimal stake);

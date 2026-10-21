@@ -42,13 +42,29 @@ namespace MatchFixer.Core.Services
 				.OrderByDescending(t => t.StartDate)
 				.ToListAsync();
 
-			var vm = new TournamentListViewModel();
+			var vm = new TournamentListViewModel { IsAdmin = isAdmin };
 
 			// Pre-fill the create form with the user's LOCAL time (converted back to UTC on save).
 			var localNow = _timezone.ConvertToUserTime(now, tz) ?? now;
 			vm.CreateForm.StartDate = localNow;
 			vm.CreateForm.EndDate = localNow.AddDays(7);
 			vm.UserTimeZoneLabel = string.IsNullOrWhiteSpace(tz) ? "UTC" : tz;
+
+			// House-rake ledger: total rake kept on finished, non-Pot tournaments, minus
+			// whatever has already been seeded into Pots. Shown to admins as a funding guide.
+			decimal totalRake = 0m;
+			foreach (var ft in tournaments.Where(x => !x.IsPot && x.Status == TournamentStatus.Finished))
+			{
+				var ftPool = ft.Entries.Count * ft.EntryFee;
+				totalRake += Math.Round(ftPool * ft.RakePercent / 100m, 2, MidpointRounding.AwayFromZero);
+			}
+			var allocatedToPots = tournaments
+				.Where(x => x.IsPot && x.Status != TournamentStatus.Cancelled)
+				.Sum(x => x.PotPrizePool ?? 0m);
+			vm.TotalRakeCollected = totalRake;
+			vm.RakeAllocatedToPots = allocatedToPots;
+			vm.AvailableRake = Math.Max(0m, totalRake - allocatedToPots);
+			vm.CreatePotForm.PrizePool = vm.AvailableRake > 0m ? Math.Round(vm.AvailableRake, 2) : 100m;
 
 			foreach (var t in tournaments)
 			{
@@ -81,8 +97,24 @@ namespace MatchFixer.Core.Services
 						&& (eff == TournamentStatus.Upcoming || eff == TournamentStatus.Running)
 						&& now < t.EndDate
 						&& (t.MaxEntrants == null || entrants < t.MaxEntrants.Value),
-					CreatedByName = DisplayName(t.CreatedBy)
+					CreatedByName = DisplayName(t.CreatedBy),
+					IsPot = t.IsPot,
+					PotPrizePool = t.PotPrizePool,
+					DurationWeeks = t.DurationWeeks
 				};
+
+				// The Pot is admin-funded: its prize pool is the designated amount, not entry fees.
+				if (t.IsPot)
+				{
+					item.PrizePool = t.PotPrizePool ?? 0m;
+					item.NetPrizePool = t.PotPrizePool ?? 0m;
+
+					// Cancelled Pots stay private to the people who joined them (and admins).
+					if (eff != TournamentStatus.Cancelled || isAdmin || joined)
+						vm.Pots.Add(item);
+
+					continue;
+				}
 
 				switch (eff)
 				{
@@ -216,9 +248,26 @@ namespace MatchFixer.Core.Services
 				return null;
 			}
 			var entrants = entries.Count;
-			var pool = entrants * t.EntryFee;
-			var rake = Math.Round(pool * t.RakePercent / 100m, 2, MidpointRounding.AwayFromZero);
-			var net = pool - rake;
+
+			// The viewer may see bankrolls and the board ONLY if they are in the tournament
+			// (or an admin). Non-participants get leaderboard POSITIONS and nothing else.
+			var joinedThis = entries.Any(e => e.UserId == currentUserId);
+			var canSeePrivate = isAdmin || joinedThis;
+
+			decimal pool, rake, net;
+			if (t.IsPot)
+			{
+				// Admin-funded: the pool is the designated prize, no rake, no entry fees.
+				pool = t.PotPrizePool ?? 0m;
+				rake = 0m;
+				net = pool;
+			}
+			else
+			{
+				pool = entrants * t.EntryFee;
+				rake = Math.Round(pool * t.RakePercent / 100m, 2, MidpointRounding.AwayFromZero);
+				net = pool - rake;
+			}
 
 			var entryIds = entries.Select(e => e.Id).ToList();
 
@@ -240,7 +289,9 @@ namespace MatchFixer.Core.Services
 				.ThenBy(e => e.JoinedAtUtc)
 				.ToList();
 
-			var breakdown = BuildPrizeBreakdown(net, entrants);
+			var breakdown = t.IsPot
+				? BuildPotBreakdown(net, entrants, t.PotFirstPct, t.PotSecondPct, t.PotThirdPct)
+				: BuildPrizeBreakdown(net, entrants);
 			var paidRanks = breakdown.Select(b => b.Rank).ToHashSet();
 
 			var leaderboard = new List<LeaderboardRowViewModel>();
@@ -253,8 +304,9 @@ namespace MatchFixer.Core.Services
 					Rank = rank,
 					UserName = DisplayName(e.User),
 					Picture = AvatarUrl(e.User),
-					Bankroll = e.Bankroll,
-					PendingBets = pendingByEntry.TryGetValue(e.Id, out var pc) ? pc : 0,
+					// Hide other players' bankrolls / in-play counts from non-participants.
+					Bankroll = canSeePrivate ? e.Bankroll : 0m,
+					PendingBets = canSeePrivate ? (pendingByEntry.TryGetValue(e.Id, out var pc) ? pc : 0) : 0,
 					IsCurrentUser = e.UserId == currentUserId,
 					PrizeAwarded = e.PrizeAwarded,
 					InPrizes = paidRanks.Contains(rank)
@@ -373,19 +425,22 @@ namespace MatchFixer.Core.Services
 				}
 			}
 
-			var messages = t.Messages
-				.Where(mm => !mm.IsDeleted)
-				.OrderBy(mm => mm.PostedAtUtc)
-				.Select(mm => new TournamentMessageViewModel
-				{
-					UserName = DisplayName(mm.User),
-					Picture = AvatarUrl(mm.User),
-					Text = mm.Text,
-					PostedAtUtc = mm.PostedAtUtc,
-					PostedDisplay = _timezone.FormatForUserBets(mm.PostedAtUtc, tz),
-					IsMine = mm.UserId == currentUserId
-				})
-				.ToList();
+			// The board is private to participants (and admins); non-participants get nothing.
+			var messages = canSeePrivate
+				? t.Messages
+					.Where(mm => !mm.IsDeleted)
+					.OrderBy(mm => mm.PostedAtUtc)
+					.Select(mm => new TournamentMessageViewModel
+					{
+						UserName = DisplayName(mm.User),
+						Picture = AvatarUrl(mm.User),
+						Text = mm.Text,
+						PostedAtUtc = mm.PostedAtUtc,
+						PostedDisplay = _timezone.FormatForUserBets(mm.PostedAtUtc, tz),
+						IsMine = mm.UserId == currentUserId
+					})
+					.ToList()
+				: new List<TournamentMessageViewModel>();
 
 			return new TournamentDetailsViewModel
 			{
@@ -412,6 +467,11 @@ namespace MatchFixer.Core.Services
 				IsJoined = joined,
 				CanJoin = canJoin,
 				CanBet = canBet,
+				IsPot = t.IsPot,
+				PotPrizePool = t.PotPrizePool,
+				DurationWeeks = t.DurationWeeks,
+				CanSeeBankrolls = canSeePrivate,
+				CanSeeBoard = canSeePrivate,
 				MyEntry = myVm,
 				Leaderboard = leaderboard,
 				PrizeBreakdown = breakdown,
@@ -489,6 +549,64 @@ namespace MatchFixer.Core.Services
 				: $"Tournament created, but you weren't entered: {joinMsg}";
 
 			return (true, resultMsg, t.Id);
+		}
+
+		// ---------------- Create The Pot (admin) ----------------
+
+		public async Task<(bool Success, string Message, Guid? TournamentId)> CreatePotAsync(Guid currentUserId, CreatePotInputModel input)
+		{
+			var now = DateTime.UtcNow;
+
+			if (input == null || string.IsNullOrWhiteSpace(input.Name))
+				return (false, "Pot name is required.", null);
+			if (input.PrizePool <= 0m)
+				return (false, "The prize pool must be greater than zero.", null);
+
+			// Pots run for 2, 4 or 6 weeks.
+			var weeks = input.DurationWeeks;
+			if (weeks != 2 && weeks != 4 && weeks != 6)
+				weeks = 2;
+
+			var first = input.FirstPct < 0 ? 0m : input.FirstPct;
+			var second = input.SecondPct < 0 ? 0m : input.SecondPct;
+			var third = input.ThirdPct < 0 ? 0m : input.ThirdPct;
+			if (first + second + third <= 0m)
+			{
+				first = 60m; second = 30m; third = 10m;
+			}
+
+			var minBetLegs = input.MinBetLegs < 1 ? 1 : (input.MinBetLegs > 12 ? 12 : input.MinBetLegs);
+			var startingBankroll = input.StartingBankroll <= 0m ? 1000m : input.StartingBankroll;
+			var minEntrants = input.MinEntrantsToRun < 1 ? 1 : input.MinEntrantsToRun;
+
+			var t = new Tournament
+			{
+				Id = Guid.NewGuid(),
+				Name = input.Name.Trim(),
+				Description = string.IsNullOrWhiteSpace(input.Description) ? null : input.Description.Trim(),
+				EntryFee = 0m,                 // free to enter
+				StartingBankroll = startingBankroll,
+				RakePercent = 0m,              // admin-funded; no rake taken
+				StartDate = now,               // opens immediately
+				EndDate = now.AddDays(weeks * 7),
+				Status = TournamentStatus.Upcoming,
+				MinEntrantsToRun = minEntrants,
+				MaxEntrants = null,
+				MinBetLegs = minBetLegs,
+				CreatedByUserId = currentUserId,
+				CreatedAtUtc = now,
+				IsPot = true,
+				PotPrizePool = Math.Round(input.PrizePool, 2, MidpointRounding.AwayFromZero),
+				PotFirstPct = first,
+				PotSecondPct = second,
+				PotThirdPct = third,
+				DurationWeeks = weeks
+			};
+
+			_db.Tournaments.Add(t);
+			await _db.SaveChangesAsync();
+
+			return (true, $"The Pot \"{t.Name}\" is live — €{t.PotPrizePool:0.##} prize, running {weeks} weeks.", t.Id);
 		}
 
 		// ---------------- Join ----------------
@@ -758,14 +876,27 @@ namespace MatchFixer.Core.Services
 				t.PrizePoolSettled = true;
 				t.SettledAtUtc = now;
 				await _db.SaveChangesAsync();
-				return (true, "Tournament cancelled (not enough entrants) - entry fees refunded.");
+				return (true, t.IsPot
+					? "The Pot was cancelled — not enough players joined."
+					: "Tournament cancelled (not enough entrants) - entry fees refunded.");
 			}
 
 			// 3) Rank and pay out the net pool.
-			var pool = entrants * t.EntryFee;
-			var rake = Math.Round(pool * t.RakePercent / 100m, 2, MidpointRounding.AwayFromZero);
-			var net = pool - rake;
-			var breakdown = BuildPrizeBreakdown(net, entrants);
+			decimal net;
+			List<PrizeBreakdownRow> breakdown;
+			if (t.IsPot)
+			{
+				// Admin-funded prize, no rake / entry fees.
+				net = t.PotPrizePool ?? 0m;
+				breakdown = BuildPotBreakdown(net, entrants, t.PotFirstPct, t.PotSecondPct, t.PotThirdPct);
+			}
+			else
+			{
+				var pool = entrants * t.EntryFee;
+				var rake = Math.Round(pool * t.RakePercent / 100m, 2, MidpointRounding.AwayFromZero);
+				net = pool - rake;
+				breakdown = BuildPrizeBreakdown(net, entrants);
+			}
 
 			var ranked = t.Entries
 				.OrderByDescending(e => e.Bankroll)
@@ -798,7 +929,9 @@ namespace MatchFixer.Core.Services
 			t.SettledAtUtc = now;
 			await _db.SaveChangesAsync();
 
-			return (true, "Tournament settled and prizes paid.");
+			return (true, t.IsPot
+				? "The Pot is settled — prizes paid to the top finishers."
+				: "Tournament settled and prizes paid.");
 		}
 
 		public async Task RunLifecycleAsync(CancellationToken ct)
@@ -934,6 +1067,43 @@ namespace MatchFixer.Core.Services
 				if (remainder != 0m)
 					rows[0].Amount += remainder;
 			}
+
+			return rows;
+		}
+
+		// The Pot pays its top 3 by an admin-set split. If fewer than 3 players joined,
+		// the present ranks' shares are normalised so the whole prize is still paid out.
+		private static List<PrizeBreakdownRow> BuildPotBreakdown(decimal netPool, int entrants, decimal? p1, decimal? p2, decimal? p3)
+		{
+			var raw = new List<(int Rank, decimal Pct)>();
+			if (entrants >= 1 && (p1 ?? 0m) > 0m) raw.Add((1, (p1 ?? 0m) / 100m));
+			if (entrants >= 2 && (p2 ?? 0m) > 0m) raw.Add((2, (p2 ?? 0m) / 100m));
+			if (entrants >= 3 && (p3 ?? 0m) > 0m) raw.Add((3, (p3 ?? 0m) / 100m));
+
+			var rows = new List<PrizeBreakdownRow>();
+			if (raw.Count == 0 || netPool <= 0m)
+				return rows;
+
+			var totalPct = raw.Sum(x => x.Pct);
+			decimal allocated = 0m;
+
+			foreach (var tier in raw)
+			{
+				var share = totalPct > 0m ? tier.Pct / totalPct : 0m;
+				var amt = Math.Round(netPool * share, 2, MidpointRounding.AwayFromZero);
+				rows.Add(new PrizeBreakdownRow
+				{
+					Rank = tier.Rank,
+					Percent = Math.Round(share * 100m, 2, MidpointRounding.AwayFromZero),
+					Amount = amt
+				});
+				allocated += amt;
+			}
+
+			// Rounding remainder to 1st so the shares sum to the whole prize.
+			var remainder = netPool - allocated;
+			if (remainder != 0m)
+				rows[0].Amount += remainder;
 
 			return rows;
 		}

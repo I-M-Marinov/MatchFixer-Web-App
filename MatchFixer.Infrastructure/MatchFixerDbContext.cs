@@ -200,6 +200,10 @@ namespace MatchFixer.Infrastructure
 				entity.Property(e => e.EntryFee).HasPrecision(18, 2);
 				entity.Property(e => e.StartingBankroll).HasPrecision(18, 2);
 				entity.Property(e => e.RakePercent).HasPrecision(5, 2);
+				entity.Property(e => e.PotPrizePool).HasPrecision(18, 2);
+				entity.Property(e => e.PotFirstPct).HasPrecision(5, 2);
+				entity.Property(e => e.PotSecondPct).HasPrecision(5, 2);
+				entity.Property(e => e.PotThirdPct).HasPrecision(5, 2);
 
 				entity.HasOne(t => t.CreatedBy)
 					.WithMany()

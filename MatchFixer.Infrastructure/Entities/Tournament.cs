@@ -55,6 +55,29 @@ namespace MatchFixer.Infrastructure.Entities
 		public bool PrizePoolSettled { get; set; }
 		public DateTime? SettledAtUtc { get; set; }
 
+		// ---------------- The Pot ----------------
+		// A Pot is a special, admin-funded tournament: free to enter, prize seeded by the
+		// admin (guided by the house rake accumulated on finished tournaments), top 3 split
+		// by an admin-set percentage. It otherwise plays exactly like a normal tournament.
+		public bool IsPot { get; set; }
+
+		// Admin-set total prize for a Pot (null for ordinary tournaments, whose pool = entries * fee).
+		[Column(TypeName = "decimal(18,2)")]
+		public decimal? PotPrizePool { get; set; }
+
+		// Admin-set payout split for a Pot's top 3 (percentages, e.g. 60 / 30 / 10). Null => default tiers.
+		[Column(TypeName = "decimal(5,2)")]
+		public decimal? PotFirstPct { get; set; }
+
+		[Column(TypeName = "decimal(5,2)")]
+		public decimal? PotSecondPct { get; set; }
+
+		[Column(TypeName = "decimal(5,2)")]
+		public decimal? PotThirdPct { get; set; }
+
+		// How long the Pot runs (2, 4 or 6 weeks). Informational; StartDate/EndDate drive the lifecycle.
+		public int? DurationWeeks { get; set; }
+
 		public ICollection<TournamentEntry> Entries { get; set; } = new List<TournamentEntry>();
 		public ICollection<TournamentMessage> Messages { get; set; } = new List<TournamentMessage>();
 	}
