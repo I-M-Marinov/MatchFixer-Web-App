@@ -2,11 +2,12 @@
 @model MatchFixer.Core.ViewModels.Tournaments.TournamentListViewModel
 @{
 	ViewData["Title"] = "Tournaments";
+	string Money(decimal v) => "€" + v.ToString("0.##");
 }
 
 <div class="background-profile"></div>
 
-<div class="tourney-wrap">
+<div class="tourney-page">
 
 	@if (TempData["SuccessMessage"] != null)
 	{
@@ -17,322 +18,569 @@
 		<div class="alert alert-danger tourney-alert">@TempData["ErrorMessage"]</div>
 	}
 
-	<div class="tourney-topbar">
-		<div>
-			<h1 class="tourney-title"><i class="bi bi-trophy-fill"></i> Tournaments</h1>
-			<p class="tourney-sub">Pay in, get a fresh €1000 play bankroll, and climb the leaderboard. Top finishers split the real prize pool.</p>
+	<!-- ===== Header ===== -->
+	<div class="tourney-hero">
+		<div class="hero-left">
+			<div class="hero-eyebrow"><i class="bi bi-trophy-fill"></i> Play-money tournaments</div>
+			<h1 class="hero-title">Tournaments</h1>
+			<p class="hero-sub">Join a tournament, get a fresh <strong>@Money(1000) chip</strong> bankroll, and climb the board. Top finishers split a real prize pool — no deposit at risk, just bragging rights and the payout.</p>
 		</div>
-		<button class="btn btn-mint tourney-create-btn" type="button" data-bs-toggle="collapse" data-bs-target="#createPanel">
-			<i class="bi bi-plus-circle"></i> Create tournament
-		</button>
+		<div class="hero-actions">
+			<button type="button" class="hero-btn ghost" data-bs-toggle="modal" data-bs-target="#rulesModal">
+				<i class="bi bi-info-circle"></i> How it works
+			</button>
+			<button type="button" class="hero-btn solid" id="railToggle">
+				<i class="bi bi-plus-circle"></i> Create
+			</button>
+		</div>
 	</div>
 
-	<div class="tourney-panel">
+	<div class="tourney-layout">
 
-		<!-- Create form -->
-		<div class="collapse" id="createPanel">
-			<div class="t-card create-card">
-				<h3 class="section-h"><i class="bi bi-trophy"></i> New tournament</h3>
-				<form asp-action="Create" method="post" class="create-grid">
-					<div class="fld fld-wide">
-						<label>Tournament name</label>
-						<input name="Name" class="form-control" maxlength="100" required placeholder="Friday Night Cup" />
-					</div>
-					<div class="fld fld-wide">
-						<label>Description <span class="muted">(optional)</span></label>
-						<input name="Description" class="form-control" maxlength="1000" placeholder="Anyone welcome. Good luck!" />
-					</div>
-					<div class="fld">
-						<label>Entry fee (€)</label>
-						<input name="EntryFee" type="number" step="0.01" min="0" value="10" class="form-control" required />
-					</div>
-					<div class="fld">
-						<label>Starting bankroll</label>
-						<input class="form-control" value="€1000 (fixed)" disabled />
-					</div>
-					<div class="fld">
-						<label>Starts</label>
-						<input name="StartDate" type="datetime-local" value="@Model.CreateForm.StartDate.ToString("yyyy-MM-ddTHH:mm")" class="form-control" required />
-					</div>
-					<div class="fld">
-						<label>Ends</label>
-						<input name="EndDate" type="datetime-local" value="@Model.CreateForm.EndDate.ToString("yyyy-MM-ddTHH:mm")" class="form-control" required />
-					</div>
-					<div class="fld">
-						<label>Min entrants to run</label>
-						<input name="MinEntrantsToRun" type="number" min="2" value="2" class="form-control" required />
-					</div>
-					<div class="fld">
-						<label>Max entrants <span class="muted">(optional)</span></label>
-						<input name="MaxEntrants" type="number" min="2" class="form-control" placeholder="Unlimited" />
-					</div>
-					<div class="fld">
-						<label>Min matches per bet</label>
-						<input name="MinBetLegs" type="number" min="1" max="12" value="1" class="form-control" required />
-						<span class="muted" style="font-size:.76rem;">1 = singles allowed · 2+ forces parlays</span>
-					</div>
-					<div class="fld fld-wide note-row">
-						<i class="bi bi-clock-history"></i>
-						Times are in <strong>your local time</strong> (@Model.UserTimeZoneLabel). The house keeps a 10% rake — with 4+ entrants the top 3 split 60/30/10 of the pool; with 2–3 entrants the top 2 split 70/30. You'll be entered automatically when you create it.
-					</div>
-					<div class="fld fld-wide">
-						<button type="submit" class="btn btn-mint"><i class="bi bi-check2-circle"></i> Create &amp; join</button>
-					</div>
-				</form>
-			</div>
-		</div>
+		<!-- ===== Main column ===== -->
+		<div class="tourney-main">
 
-		<!-- Tabs -->
-		<div class="t-tabs" id="tourneyTabs" role="tablist">
-			<button type="button" class="t-tab" data-tab="running" data-count="@Model.Running.Count">
-				<span class="dot live"></span> Running <span class="t-count">@Model.Running.Count</span>
-			</button>
-			<button type="button" class="t-tab" data-tab="upcoming" data-count="@Model.Upcoming.Count">
-				<span class="dot soon"></span> Upcoming <span class="t-count">@Model.Upcoming.Count</span>
-			</button>
-			<button type="button" class="t-tab" data-tab="finished" data-count="@Model.Finished.Count">
-				<span class="dot done"></span> Finished <span class="t-count">@Model.Finished.Count</span>
-			</button>
-			@if (Model.Cancelled.Any())
+			<!-- The Pot -->
+			@if (Model.Pots.Any())
 			{
-				<button type="button" class="t-tab" data-tab="cancelled" data-count="@Model.Cancelled.Count">
-					<span class="dot cancel"></span> Cancelled <span class="t-count">@Model.Cancelled.Count</span>
-				</button>
-			}
-			<button type="button" class="t-tab t-tab-lb" data-tab="leaderboard" data-count="@Model.Leaderboard.Count">
-				<i class="bi bi-bar-chart-steps"></i> Leaderboard
-			</button>
-		</div>
-
-		<div class="t-panels">
-
-			<div class="t-panel" data-panel="running">
-				@if (Model.Running.Any())
-				{
-					<div class="tourney-grid">
-						@foreach (var t in Model.Running) { @await Html.PartialAsync("_TournamentCard", t) }
+				<div class="pot-section">
+					<div class="pot-head">
+						<span class="pot-head-title"><i class="bi bi-coin"></i> The Pot</span>
+						<span class="pot-head-sub">Special house-funded events — free to enter, top 3 split the prize.</span>
 					</div>
-				}
-				else { <div class="t-empty"><i class="bi bi-hourglass-split"></i> Nothing running right now.</div> }
-			</div>
-
-			<div class="t-panel" data-panel="upcoming">
-				@if (Model.Upcoming.Any())
-				{
 					<div class="tourney-grid">
-						@foreach (var t in Model.Upcoming) { @await Html.PartialAsync("_TournamentCard", t) }
-					</div>
-				}
-				else { <div class="t-empty"><i class="bi bi-calendar-plus"></i> No upcoming tournaments — create one!</div> }
-			</div>
-
-			<div class="t-panel" data-panel="finished">
-				@if (Model.Finished.Any())
-				{
-					<div class="tourney-grid">
-						@foreach (var t in Model.Finished) { @await Html.PartialAsync("_TournamentCard", t) }
-					</div>
-				}
-				else { <div class="t-empty"><i class="bi bi-flag"></i> No finished tournaments yet.</div> }
-			</div>
-
-			@if (Model.Cancelled.Any())
-			{
-				<div class="t-panel" data-panel="cancelled">
-					<div class="tourney-grid">
-						@foreach (var t in Model.Cancelled) { @await Html.PartialAsync("_TournamentCard", t) }
+						@foreach (var t in Model.Pots) { @await Html.PartialAsync("_TournamentCard", t) }
 					</div>
 				</div>
 			}
 
-			<div class="t-panel" data-panel="leaderboard">
-				<div class="t-card lb-card">
-					<h3 class="section-h"><i class="bi bi-bar-chart-steps"></i> Hall of Fame — all-time tournament prizes</h3>
-					@if (Model.Leaderboard.Any())
+			<div class="tourney-panel">
+
+				<!-- Tabs -->
+				<div class="t-tabs" id="tourneyTabs" role="tablist">
+					<button type="button" class="t-tab" data-tab="running" data-count="@Model.Running.Count">
+						<span class="dot live"></span> Running <span class="t-count">@Model.Running.Count</span>
+					</button>
+					<button type="button" class="t-tab" data-tab="upcoming" data-count="@Model.Upcoming.Count">
+						<span class="dot soon"></span> Upcoming <span class="t-count">@Model.Upcoming.Count</span>
+					</button>
+					<button type="button" class="t-tab" data-tab="finished" data-count="@Model.Finished.Count">
+						<span class="dot done"></span> Finished <span class="t-count">@Model.Finished.Count</span>
+					</button>
+					@if (Model.Cancelled.Any())
 					{
-						<div class="table-responsive">
-							<table class="lb-table">
-								<thead>
-									<tr>
-										<th class="lb-rank-h">#</th>
-										<th class="ta-l">Player</th>
-										<th>Prize won</th>
-										<th>Wins</th>
-										<th>Podiums</th>
-									</tr>
-								</thead>
-								<tbody>
-									@foreach (var r in Model.Leaderboard)
-									{
-										<tr class="@(r.IsCurrentUser ? "me" : "")">
-											<td class="lb-rank">
-												@if (r.Rank == 1) { <i class="bi bi-trophy-fill gold"></i> }
-												else if (r.Rank == 2) { <i class="bi bi-trophy-fill silver"></i> }
-												else if (r.Rank == 3) { <i class="bi bi-trophy-fill bronze"></i> }
-												else { <span>@r.Rank</span> }
-											</td>
-											<td class="ta-l">
-												<span class="lb-player">
-													<img src="@r.Picture" alt="" class="lb-avatar" onerror="this.onerror=null;this.src='/images/default-user-image.png'" />
-													<span class="lb-name">@r.UserName</span>
-													@if (r.IsCurrentUser) { <span class="you-tag">you</span> }
-												</span>
-											</td>
-											<td class="lb-prize">€@r.TotalPrize.ToString("0.##")</td>
-											<td class="lb-num">@(r.Wins > 0 ? r.Wins.ToString() : "—")</td>
-											<td class="lb-num">@(r.Podiums > 0 ? r.Podiums.ToString() : "—")</td>
-										</tr>
-									}
-								</tbody>
-							</table>
+						<button type="button" class="t-tab" data-tab="cancelled" data-count="@Model.Cancelled.Count">
+							<span class="dot cancel"></span> Cancelled <span class="t-count">@Model.Cancelled.Count</span>
+						</button>
+					}
+					<button type="button" class="t-tab t-tab-lb" data-tab="leaderboard" data-count="@Model.Leaderboard.Count">
+						<i class="bi bi-bar-chart-steps"></i> Hall of Fame
+					</button>
+				</div>
+
+				<div class="t-panels">
+
+					<div class="t-panel" data-panel="running">
+						@if (Model.Running.Any())
+						{
+							<div class="tourney-grid">
+								@foreach (var t in Model.Running) { @await Html.PartialAsync("_TournamentCard", t) }
+							</div>
+						}
+						else { <div class="t-empty"><i class="bi bi-hourglass-split"></i> Nothing running right now.</div> }
+					</div>
+
+					<div class="t-panel" data-panel="upcoming">
+						@if (Model.Upcoming.Any())
+						{
+							<div class="tourney-grid">
+								@foreach (var t in Model.Upcoming) { @await Html.PartialAsync("_TournamentCard", t) }
+							</div>
+						}
+						else { <div class="t-empty"><i class="bi bi-calendar-plus"></i> No upcoming tournaments — create one!</div> }
+					</div>
+
+					<div class="t-panel" data-panel="finished">
+						@if (Model.Finished.Any())
+						{
+							<div class="tourney-grid">
+								@foreach (var t in Model.Finished) { @await Html.PartialAsync("_TournamentCard", t) }
+							</div>
+						}
+						else { <div class="t-empty"><i class="bi bi-flag"></i> No finished tournaments yet.</div> }
+					</div>
+
+					@if (Model.Cancelled.Any())
+					{
+						<div class="t-panel" data-panel="cancelled">
+							<div class="tourney-grid">
+								@foreach (var t in Model.Cancelled) { @await Html.PartialAsync("_TournamentCard", t) }
+							</div>
 						</div>
 					}
-					else
-					{
-						<div class="t-empty inner"><i class="bi bi-trophy"></i> No finished tournaments yet — the hall of fame is waiting for its first champion.</div>
-					}
+
+					<div class="t-panel" data-panel="leaderboard">
+						<div class="lb-card">
+							<h3 class="section-h"><i class="bi bi-bar-chart-steps"></i> Hall of Fame — all-time tournament prizes</h3>
+							@if (Model.Leaderboard.Any())
+							{
+								<div class="table-responsive">
+									<table class="lb-table">
+										<thead>
+											<tr>
+												<th class="lb-rank-h">#</th>
+												<th class="ta-l">Player</th>
+												<th>Prize won</th>
+												<th>Wins</th>
+												<th>Podiums</th>
+											</tr>
+										</thead>
+										<tbody>
+											@foreach (var r in Model.Leaderboard)
+											{
+												<tr class="@(r.IsCurrentUser ? "me" : "")">
+													<td class="lb-rank">
+														@if (r.Rank == 1) { <i class="bi bi-trophy-fill gold"></i> }
+														else if (r.Rank == 2) { <i class="bi bi-trophy-fill silver"></i> }
+														else if (r.Rank == 3) { <i class="bi bi-trophy-fill bronze"></i> }
+														else { <span>@r.Rank</span> }
+													</td>
+													<td class="ta-l">
+														<span class="lb-player">
+															<img src="@r.Picture" alt="" class="lb-avatar" onerror="this.onerror=null;this.src='/images/default-user-image.png'" />
+															<span class="lb-name">@r.UserName</span>
+															@if (r.IsCurrentUser) { <span class="you-tag">you</span> }
+														</span>
+													</td>
+													<td class="lb-prize">€@r.TotalPrize.ToString("0.##")</td>
+													<td class="lb-num">@(r.Wins > 0 ? r.Wins.ToString() : "—")</td>
+													<td class="lb-num">@(r.Podiums > 0 ? r.Podiums.ToString() : "—")</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								</div>
+							}
+							else
+							{
+								<div class="t-empty inner"><i class="bi bi-trophy"></i> No finished tournaments yet — the hall of fame is waiting for its first champion.</div>
+							}
+						</div>
+					</div>
+
 				</div>
 			</div>
+		</div>
 
+		<!-- ===== Create rail (sticky / floats on wide screens) ===== -->
+		<aside class="create-rail" id="createRail">
+			<div class="create-float" id="railAccordion">
+
+				<!-- Create tournament -->
+				<div class="rail-card">
+					<div class="rail-card-head" data-bs-toggle="collapse" data-bs-target="#railCreate" role="button" aria-expanded="true">
+						<span><i class="bi bi-trophy"></i> Create a tournament</span>
+						<i class="bi bi-chevron-down rc-chev"></i>
+					</div>
+					<div class="collapse show" id="railCreate" data-bs-parent="#railAccordion">
+						<form asp-action="Create" method="post" class="rail-form">
+							<div class="fld">
+								<label>Name</label>
+								<input name="Name" class="form-control form-control-sm" maxlength="100" required placeholder="Friday Night Cup" />
+							</div>
+							<div class="fld">
+								<label>Description <span class="muted">(optional)</span></label>
+								<input name="Description" class="form-control form-control-sm" maxlength="1000" placeholder="Anyone welcome. Good luck!" />
+							</div>
+							<div class="fld">
+								<label>Entry fee (€)</label>
+								<input name="EntryFee" type="number" step="0.01" min="0" value="10" class="form-control form-control-sm" required />
+							</div>
+							<div class="fld">
+								<label>Starts</label>
+								<input name="StartDate" type="datetime-local" value="@Model.CreateForm.StartDate.ToString("yyyy-MM-ddTHH:mm")" class="form-control form-control-sm" required />
+							</div>
+							<div class="fld">
+								<label>Ends</label>
+								<input name="EndDate" type="datetime-local" value="@Model.CreateForm.EndDate.ToString("yyyy-MM-ddTHH:mm")" class="form-control form-control-sm" required />
+							</div>
+							<div class="fld-2">
+								<div class="fld">
+									<label>Min entrants</label>
+									<input name="MinEntrantsToRun" type="number" min="2" value="2" class="form-control form-control-sm" required />
+								</div>
+								<div class="fld">
+									<label>Max <span class="muted">(opt.)</span></label>
+									<input name="MaxEntrants" type="number" min="2" class="form-control form-control-sm" placeholder="∞" />
+								</div>
+							</div>
+							<div class="fld">
+								<label>Min matches per bet</label>
+								<input name="MinBetLegs" type="number" min="1" max="12" value="1" class="form-control form-control-sm" required />
+								<span class="muted tiny">1 = singles · 2+ forces parlays</span>
+							</div>
+							<div class="rail-note">
+								<i class="bi bi-clock-history"></i> Times are in your local zone (@Model.UserTimeZoneLabel). House keeps 10% rake. You're entered automatically.
+							</div>
+							<button type="submit" class="btn btn-mint w-100"><i class="bi bi-check2-circle"></i> Create &amp; join</button>
+						</form>
+					</div>
+				</div>
+
+				@if (Model.IsAdmin)
+				{
+					<!-- Create The Pot (admin) -->
+					<div class="rail-card rail-card-pot">
+						<div class="rail-card-head" data-bs-toggle="collapse" data-bs-target="#railPot" role="button" aria-expanded="false">
+							<span><i class="bi bi-coin"></i> Create The Pot <span class="admin-tag">admin</span></span>
+							<i class="bi bi-chevron-down rc-chev"></i>
+						</div>
+						<div class="collapse" id="railPot" data-bs-parent="#railAccordion">
+							<div class="rake-guide">
+								<div class="rake-row"><span>Rake collected</span><span>@Money(Model.TotalRakeCollected)</span></div>
+								<div class="rake-row"><span>Already in Pots</span><span>−@Money(Model.RakeAllocatedToPots)</span></div>
+								<div class="rake-row total"><span>Available to seed</span><span>@Money(Model.AvailableRake)</span></div>
+							</div>
+							<form asp-action="CreatePot" method="post" class="rail-form">
+								<div class="fld">
+									<label>Pot name</label>
+									<input name="Name" class="form-control form-control-sm" maxlength="100" required value="The Pot" />
+								</div>
+								<div class="fld">
+									<label>Description <span class="muted">(optional)</span></label>
+									<input name="Description" class="form-control form-control-sm" maxlength="1000" placeholder="Biggest pot of the month!" />
+								</div>
+								<div class="fld">
+									<label>Prize pool (€)</label>
+									<input name="PrizePool" type="number" step="0.01" min="1" value="@Model.CreatePotForm.PrizePool.ToString("0.##")" class="form-control form-control-sm" required />
+									<span class="muted tiny">Seed from the rake above, or set any amount.</span>
+								</div>
+								<div class="fld">
+									<label>Duration</label>
+									<select name="DurationWeeks" class="form-select form-select-sm">
+										<option value="2">2 weeks</option>
+										<option value="4">4 weeks</option>
+										<option value="6">6 weeks</option>
+									</select>
+								</div>
+								<div class="fld">
+									<label>Top-3 split (%)</label>
+									<div class="split-row">
+										<input name="FirstPct" type="number" step="1" min="0" max="100" value="60" class="form-control form-control-sm" title="1st %" />
+										<input name="SecondPct" type="number" step="1" min="0" max="100" value="30" class="form-control form-control-sm" title="2nd %" />
+										<input name="ThirdPct" type="number" step="1" min="0" max="100" value="10" class="form-control form-control-sm" title="3rd %" />
+									</div>
+									<span class="muted tiny">1st · 2nd · 3rd</span>
+								</div>
+								<div class="fld-2">
+									<div class="fld">
+										<label>Min entrants</label>
+										<input name="MinEntrantsToRun" type="number" min="1" value="3" class="form-control form-control-sm" required />
+									</div>
+									<div class="fld">
+										<label>Bankroll</label>
+										<input name="StartingBankroll" type="number" min="1" value="1000" class="form-control form-control-sm" required />
+									</div>
+								</div>
+								<div class="fld">
+									<label>Min matches per bet</label>
+									<input name="MinBetLegs" type="number" min="1" max="12" value="1" class="form-control form-control-sm" required />
+								</div>
+								<div class="rail-note pot">
+									<i class="bi bi-stars"></i> Free to enter. Starts now, runs the chosen weeks, then the top 3 split the prize.
+								</div>
+								<button type="submit" class="btn btn-gold w-100"><i class="bi bi-coin"></i> Launch The Pot</button>
+							</form>
+						</div>
+					</div>
+				}
+
+			</div>
+		</aside>
+
+	</div>
+</div>
+
+<!-- ===== Rules modal ===== -->
+<div class="modal fade" id="rulesModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+		<div class="modal-content rules-modal">
+			<div class="modal-header">
+				<h5 class="modal-title"><i class="bi bi-info-circle"></i> How tournaments work</h5>
+				<button type="button" class="rules-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+			</div>
+			<div class="modal-body">
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-box-arrow-in-right"></i></div>
+					<div>
+						<h6>Join &amp; get a bankroll</h6>
+						<p>Pay the entry fee (real money, from your wallet) and you're in with a fresh <strong>1000-chip</strong> play-money bankroll. Chips are for ranking only — they're never cashed out.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-cash-stack"></i></div>
+					<div>
+						<h6>Bet your chips</h6>
+						<p>While a tournament is running, spend your chips on upcoming matches. Some tournaments require parlays (a minimum number of matches per bet). Winning bets grow your bankroll; the leaderboard ranks everyone by chips.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-trophy"></i></div>
+					<div>
+						<h6>Prize pool &amp; payouts</h6>
+						<p>All entry fees form the prize pool. The house keeps a <strong>10% rake</strong>; the rest is paid in real money. With 4+ players the top 3 split <strong>60 / 30 / 10</strong>; with 2–3 players the top 2 split <strong>70 / 30</strong>.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-coin"></i></div>
+					<div>
+						<h6>The Pot</h6>
+						<p>The Pot is a special, <strong>free-to-enter</strong> event funded by the house. It plays just like a normal tournament, runs for 2, 4 or 6 weeks, and the <strong>top 3 split the prize</strong> by the posted split. Jump in — there's nothing to pay.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-shield-lock"></i></div>
+					<div>
+						<h6>Who sees what</h6>
+						<p>Everyone can see a tournament's standings (the <em>positions</em>). Only players who've joined can see other players' <strong>bankrolls</strong> and the <strong>tournament board</strong>. Jump in to unlock the full picture and the trash talk.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
+					<div>
+						<h6>If it doesn't fill</h6>
+						<p>If a tournament doesn't reach its minimum number of players by the end, it's cancelled and <strong>every entry fee is refunded</strong> automatically. Any bets still pending at settlement are voided and the chips returned.</p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-mint" data-bs-dismiss="modal">Got it</button>
+			</div>
 		</div>
 	</div>
 </div>
 
 <style>
-	.tourney-wrap { max-width:1140px; margin:0 auto; padding:16px 16px 64px; width:100%; }
+	/* Break out of the Bootstrap .container so the panel gets real width even with the rail. */
+	.tourney-page { position:relative; left:50%; transform:translateX(-50%); width:96vw; max-width:1480px; padding:16px 16px 64px; }
 	.tourney-alert { border-radius:10px; }
-	.tourney-topbar { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
-	.tourney-title { font-size:1.6rem; font-weight:800; color:#fff; margin:0; text-shadow:0 1px 4px rgba(0,0,0,.25); }
-	.tourney-title i { color:#ffd23f; }
-	.tourney-sub { color:rgba(255,255,255,.9); margin:4px 0 0; max-width:640px; font-size:.9rem; text-shadow:0 1px 3px rgba(0,0,0,.2); }
-	.tourney-create-btn { font-weight:700; border-radius:10px; }
+	.muted { color:#94a3b8; font-weight:400; }
+	.tiny { font-size:.72rem; display:block; margin-top:3px; }
+	.ta-l { text-align:left; }
+	.section-h { color:#e2e8f0; font-size:1.05rem; margin:0 0 14px; display:flex; align-items:center; gap:8px; font-weight:700; }
+	.section-h i { color:#2ee59d; }
 
-	/* Faded-black admin-style panel */
-	.tourney-panel { background:rgba(0,0,0,.34); border-radius:.6rem; padding:1.5rem 1.6rem; box-shadow:0 12px 34px rgba(0,0,0,.22); }
+	/* ===== Header hero ===== */
+	.tourney-hero { background:linear-gradient(135deg,#0f172a 0%,#132a3e 100%); border:1px solid rgba(148,163,184,.16); border-top:3px solid #2ee59d; border-radius:16px; padding:22px 24px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; box-shadow:0 12px 30px rgba(0,0,0,.35); }
+	.hero-eyebrow { font-size:.72rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:#2ee59d; display:flex; align-items:center; gap:7px; }
+	.hero-eyebrow i { color:#ffd23f; }
+	.hero-title { font-size:1.9rem; font-weight:800; color:#fff; margin:6px 0 6px; }
+	.hero-sub { color:#94a3b8; margin:0; max-width:640px; font-size:.9rem; line-height:1.5; }
+	.hero-sub strong { color:#cfe9df; }
+	.hero-actions { display:flex; gap:10px; flex-wrap:wrap; }
+	.hero-btn { border-radius:10px; font-weight:700; font-size:.88rem; padding:10px 18px; border:1px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:transform .12s ease, filter .15s ease, background .15s ease; }
+	.hero-btn.ghost { background:rgba(148,163,184,.12); border-color:rgba(148,163,184,.28); color:#e2e8f0; }
+	.hero-btn.ghost:hover { background:rgba(148,163,184,.2); }
+	.hero-btn.solid { background:linear-gradient(135deg,#0DAB76,#2ee59d); color:#04231a; }
+	.hero-btn.solid:hover { transform:translateY(-2px); filter:brightness(1.05); }
 
-	.muted { color:#9aa7a1; font-weight:400; }
+	/* ===== Layout ===== */
+	.tourney-layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:20px; align-items:start; }
+	.tourney-main { order:1; min-width:0; }
+	.create-rail { order:2; }
+
+	/* ===== Panels ===== */
+	.tourney-panel { background:rgba(15,23,42,.55); border:1px solid rgba(148,163,184,.14); border-radius:16px; padding:18px; box-shadow:0 12px 30px rgba(0,0,0,.28); }
+
+	.pot-section { margin-bottom:20px; }
+	.pot-head { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+	.pot-head-title { font-size:1.15rem; font-weight:800; color:#ffd23f; display:inline-flex; align-items:center; gap:8px; text-shadow:0 1px 6px rgba(245,158,11,.3); }
+	.pot-head-sub { color:#eafff7; font-size:.85rem; font-weight:500; text-shadow:0 1px 3px rgba(0,0,0,.4); }
+
+	/* ===== Tabs ===== */
+	.t-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+	.t-tab { display:inline-flex; align-items:center; gap:8px; background:rgba(148,163,184,.1); border:1px solid rgba(148,163,184,.18); color:#cbd5e1; padding:9px 15px; border-radius:999px; font-size:.86rem; font-weight:600; cursor:pointer; transition:all .15s ease; }
+	.t-tab:hover { background:rgba(148,163,184,.18); border-color:rgba(46,229,157,.5); color:#fff; }
+	.t-tab.active { background:linear-gradient(135deg,#0DAB76,#2ee59d); border-color:transparent; color:#04231a; box-shadow:0 5px 16px rgba(13,171,118,.4); }
+	.t-tab .t-count { background:rgba(0,0,0,.25); color:inherit; font-size:.72rem; font-weight:800; padding:1px 8px; border-radius:999px; min-width:20px; text-align:center; }
+	.t-tab.active .t-count { background:rgba(4,35,26,.22); }
 	.dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
-	.dot.live { background:#2ee59d; box-shadow:0 0 0 4px rgba(46,229,157,.25); }
+	.dot.live { background:#2ee59d; box-shadow:0 0 0 4px rgba(46,229,157,.22); }
 	.dot.soon { background:#4aa8ff; }
-	.dot.done { background:#b9c6c0; }
-	.dot.cancel { background:#e0566b; }
-
-	.t-card { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:18px; box-shadow:0 4px 14px rgba(0,0,0,.14); color:#223029; }
-	.create-card { margin-bottom:18px; }
-	.section-h { color:#086b4a; font-size:1.05rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; font-weight:700; }
-	.create-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-	.fld { display:flex; flex-direction:column; gap:6px; }
-	.fld-wide { grid-column:1 / -1; }
-	.fld label { font-size:.82rem; color:#5a6b63; font-weight:600; }
-	.note-row { flex-direction:row; align-items:flex-start; gap:8px; color:#5a6b63; font-size:.85rem; background:rgba(13,171,118,.07); border:1px solid rgba(13,171,118,.2); border-radius:10px; padding:10px 12px; }
-	.note-row i { color:#0DAB76; margin-top:2px; }
-
-	/* Tabs */
-	.t-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
-	.t-tab { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); color:#e4efe9; padding:9px 15px; border-radius:999px; font-size:.86rem; font-weight:600; cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease; }
-	.t-tab:hover { background:rgba(255,255,255,.14); border-color:rgba(46,229,157,.55); color:#fff; }
-	.t-tab:active { transform:translateY(1px); }
-	.t-tab.active { background:linear-gradient(135deg,#0DAB76,#2ee59d); border-color:transparent; color:#04231a; box-shadow:0 5px 16px rgba(13,171,118,.42); }
-	.t-tab .t-count { background:rgba(0,0,0,.22); color:inherit; font-size:.72rem; font-weight:800; padding:1px 8px; border-radius:999px; min-width:20px; text-align:center; }
-	.t-tab.active .t-count { background:rgba(4,35,26,.2); }
-	.t-tab .dot { width:8px; height:8px; }
-	.t-tab-lb i { color:#ffd23f; font-size:.95rem; }
+	.dot.done { background:#94a3b8; }
+	.dot.cancel { background:#ef4444; }
+	.t-tab-lb i { color:#ffd23f; }
 	.t-tab-lb.active i { color:#04231a; }
 
 	.t-panel { display:none; }
 	.t-panel.active { display:block; animation:tfade .22s ease; }
 	@@keyframes tfade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
 
-	.t-empty { text-align:center; color:#d4ded8; padding:44px 16px; background:rgba(255,255,255,.04); border:1px dashed rgba(255,255,255,.16); border-radius:12px; font-size:.92rem; }
-	.t-empty i { display:block; font-size:2rem; margin-bottom:8px; color:rgba(255,255,255,.4); }
-	.t-empty.inner { color:#5a6b63; background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.08); }
-	.t-empty.inner i { color:#cdd8d2; }
+	.t-empty { text-align:center; color:#cbd5e1; padding:44px 16px; background:rgba(148,163,184,.05); border:1px dashed rgba(148,163,184,.2); border-radius:12px; font-size:.92rem; }
+	.t-empty i { display:block; font-size:2rem; margin-bottom:8px; color:rgba(148,163,184,.5); }
+	.t-empty.inner { color:#94a3b8; }
 
-	.tourney-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+	.tourney-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; }
 
-	/* Cards */
-	.tc { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 14px rgba(0,0,0,.14); color:#223029; transition:transform .15s ease, box-shadow .15s ease; }
-	.tc:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.2); }
+	/* ===== Tournament cards (navy, dashboard-matched) ===== */
+	.tc { position:relative; background:#0f172a; border:1px solid rgba(148,163,184,.16); border-top:3px solid #64748b; border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 12px 28px rgba(0,0,0,.35); color:#e2e8f0; transition:transform .18s ease, box-shadow .18s ease; overflow:hidden; }
+	.tc:hover { transform:translateY(-4px); box-shadow:0 16px 36px rgba(0,0,0,.45); }
+	.tc-pot { border-top-color:#f59e0b; background:linear-gradient(160deg,#1a1708 0%,#0f172a 55%); }
+	.tc-pot-ribbon { position:absolute; top:12px; right:-34px; transform:rotate(45deg); background:linear-gradient(135deg,#f59e0b,#ffd23f); color:#2a1d00; font-size:.6rem; font-weight:800; letter-spacing:.08em; padding:4px 40px; box-shadow:0 2px 8px rgba(0,0,0,.4); }
 	.tc-top { display:flex; justify-content:space-between; align-items:center; }
 	.tc-badge { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:4px 10px; border-radius:999px; }
-	.badge-running { background:rgba(13,171,118,.14); color:#0a8a5e; }
-	.badge-upcoming { background:rgba(37,140,251,.14); color:#1e6fd0; }
-	.badge-finished { background:rgba(120,135,128,.16); color:#5a6b63; }
-	.badge-cancelled { background:rgba(220,53,69,.12); color:#c0392b; }
-	.tc-pill { font-size:.72rem; font-weight:700; color:#0a8a5e; display:inline-flex; align-items:center; gap:4px; }
-	.tc-name { font-size:1.15rem; font-weight:800; color:#223029; text-decoration:none; }
-	.tc-name:hover { color:#0DAB76; }
-	.tc-desc { color:#5a6b63; font-size:.86rem; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-	.tc-stats { display:flex; gap:10px; background:rgba(0,0,0,.03); border-radius:12px; padding:12px; }
+	.badge-running { background:rgba(16,185,129,.18); color:#34d399; }
+	.badge-upcoming { background:rgba(59,130,246,.18); color:#60a5fa; }
+	.badge-finished { background:rgba(148,163,184,.18); color:#cbd5e1; }
+	.badge-cancelled { background:rgba(239,68,68,.16); color:#f87171; }
+	.tc-pill { font-size:.72rem; font-weight:700; color:#34d399; display:inline-flex; align-items:center; gap:4px; }
+	.tc-name { font-size:1.15rem; font-weight:800; color:#fff; text-decoration:none; }
+	.tc-name:hover { color:#2ee59d; }
+	.tc-desc { color:#94a3b8; font-size:.86rem; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+	.tc-stats { display:flex; gap:10px; background:rgba(148,163,184,.08); border-radius:12px; padding:12px; }
 	.tc-stat { flex:1; display:flex; flex-direction:column; gap:3px; text-align:center; }
-	.tc-stat-label { font-size:.66rem; text-transform:uppercase; letter-spacing:.7px; color:#9aa7a1; }
-	.tc-stat-val { font-size:1.02rem; font-weight:700; color:#223029; }
-	.tc-stat-val.prize { color:#0a8a5e; }
-	.tc-dates { display:flex; justify-content:space-between; font-size:.78rem; color:#5a6b63; }
-	.tc-dates i { color:#0DAB76; margin-right:4px; }
+	.tc-stat-label { font-size:.64rem; text-transform:uppercase; letter-spacing:.7px; color:#94a3b8; }
+	.tc-stat-val { font-size:1.02rem; font-weight:700; color:#e2e8f0; }
+	.tc-stat-val.prize { color:#34d399; }
+	.tc-pot .tc-stat-val.prize { color:#ffd23f; }
+	.tc-dates { display:flex; justify-content:space-between; font-size:.78rem; color:#94a3b8; }
+	.tc-dates i { color:#2ee59d; margin-right:4px; }
+	.tc-pot .tc-dates i { color:#ffd23f; }
 	.tc-actions { display:flex; gap:10px; margin-top:4px; }
 	.tc-actions .btn { flex:1; font-weight:700; border-radius:10px; }
 	.join-form { flex:1; display:flex; }
 	.join-form .btn { flex:1; }
-
-	/* View button — gradient + lift + shine */
 	.tc-view { position:relative; overflow:hidden; background:linear-gradient(135deg,#0DAB76,#13c589); color:#fff; border:0; font-weight:700; border-radius:10px; box-shadow:0 3px 10px rgba(13,171,118,.3); transition:transform .12s ease, box-shadow .15s ease, filter .15s ease; }
 	.tc-view:hover { transform:translateY(-2px); box-shadow:0 9px 22px rgba(13,171,118,.45); filter:brightness(1.05); color:#fff; }
-	.tc-view:active { transform:translateY(0); box-shadow:0 3px 10px rgba(13,171,118,.3); }
 	.tc-view i { margin-right:5px; }
-	.tc-view::after { content:""; position:absolute; top:0; left:-130%; width:55%; height:100%; background:linear-gradient(120deg, transparent, rgba(255,255,255,.4), transparent); transform:skewX(-20deg); transition:left .55s ease; pointer-events:none; }
-	.tc-view:hover::after { left:150%; }
 
-	/* Tournaments leaderboard (Hall of Fame) */
-	.lb-card { padding:16px 16px 10px; }
+	/* ===== Hall of Fame ===== */
+	.lb-card { padding:4px 2px; }
 	.lb-table { width:100%; border-collapse:separate; border-spacing:0; }
-	.lb-table thead th { font-size:.72rem; text-transform:uppercase; letter-spacing:.6px; color:#5a6b63; font-weight:700; padding:8px 10px; border-bottom:2px solid rgba(0,0,0,.08); text-align:center; }
+	.lb-table thead th { font-size:.72rem; text-transform:uppercase; letter-spacing:.6px; color:#94a3b8; font-weight:700; padding:8px 10px; border-bottom:2px solid rgba(148,163,184,.18); text-align:center; }
 	.lb-table thead th.ta-l { text-align:left; }
-	.lb-table tbody td { padding:9px 10px; font-size:.9rem; vertical-align:middle; text-align:center; border-bottom:1px solid rgba(0,0,0,.05); }
+	.lb-table tbody td { padding:9px 10px; font-size:.9rem; vertical-align:middle; text-align:center; border-bottom:1px solid rgba(148,163,184,.1); color:#e2e8f0; }
 	.lb-table tbody td.ta-l { text-align:left; }
-	.lb-table tbody tr:hover td { background:rgba(13,171,118,.05); }
-	.lb-table tbody tr.me td { background:rgba(13,171,118,.1); }
+	.lb-table tbody tr:hover td { background:rgba(46,229,157,.06); }
+	.lb-table tbody tr.me td { background:rgba(46,229,157,.1); }
 	.lb-rank-h { width:52px; }
-	.lb-rank { width:52px; font-weight:800; color:#223029; }
-	.lb-rank .gold { color:#eab308; } .lb-rank .silver { color:#9aa7a1; } .lb-rank .bronze { color:#cd7f32; }
+	.lb-rank { width:52px; font-weight:800; }
+	.lb-rank .gold { color:#eab308; } .lb-rank .silver { color:#cbd5e1; } .lb-rank .bronze { color:#cd7f32; }
 	.lb-player { display:inline-flex; align-items:center; gap:10px; }
-	.lb-avatar { width:30px; height:30px; border-radius:50%; object-fit:cover; flex:0 0 auto; box-shadow:0 0 0 1px rgba(0,0,0,.1); }
-	.lb-name { font-weight:600; color:#223029; }
-	.lb-prize { font-weight:800; color:#0a8a5e; }
-	.lb-num { color:#5a6b63; font-weight:600; }
+	.lb-avatar { width:30px; height:30px; border-radius:50%; object-fit:cover; flex:0 0 auto; box-shadow:0 0 0 1px rgba(148,163,184,.25); }
+	.lb-name { font-weight:600; color:#e2e8f0; }
+	.lb-prize { font-weight:800; color:#34d399; }
+	.lb-num { color:#94a3b8; font-weight:600; }
 	.you-tag { background:#0DAB76; color:#fff; font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:999px; margin-left:4px; text-transform:uppercase; vertical-align:middle; }
 
-	@@media (max-width: 640px) {
-		.create-grid { grid-template-columns:1fr; }
-		.t-tab { padding:8px 12px; font-size:.82rem; }
+	/* ===== Create rail ===== */
+	.create-float { display:flex; flex-direction:column; gap:14px; }
+	.rail-card { background:#0f172a; border:1px solid rgba(148,163,184,.16); border-top:3px solid #2ee59d; border-radius:16px; overflow:hidden; box-shadow:0 12px 28px rgba(0,0,0,.35); }
+	.rail-card-pot { border-top-color:#f59e0b; }
+	.rail-card-head { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; font-weight:800; color:#fff; font-size:.95rem; cursor:pointer; user-select:none; }
+	.rail-card-head span { display:inline-flex; align-items:center; gap:8px; }
+	.rail-card-head i:first-child, .rail-card-head span i { color:#2ee59d; }
+	.rail-card-pot .rail-card-head span i { color:#ffd23f; }
+	.rc-chev { color:#94a3b8 !important; transition:transform .2s ease; font-size:.85rem; }
+	.rail-card-head[aria-expanded="false"] .rc-chev { transform:rotate(-90deg); }
+	.admin-tag { background:rgba(245,158,11,.2); color:#ffd23f; font-size:.58rem; font-weight:800; padding:2px 7px; border-radius:999px; text-transform:uppercase; letter-spacing:.05em; }
+	.rail-form { display:flex; flex-direction:column; gap:10px; padding:4px 16px 16px; }
+	.fld { display:flex; flex-direction:column; gap:4px; min-width:0; }
+	.fld-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+	.fld-2 > .fld { min-width:0; }
+	.rail-form label { font-size:.76rem; color:#94a3b8; font-weight:600; }
+	.rail-form .form-control, .rail-form .form-select { background:#0b1220; border:1px solid rgba(148,163,184,.2); color:#e2e8f0; width:100%; min-width:0; max-width:100%; box-sizing:border-box; }
+	.rail-form .form-control:focus, .rail-form .form-select:focus { background:#0b1220; color:#fff; border-color:#2ee59d; box-shadow:0 0 0 .2rem rgba(46,229,157,.15); }
+	.rail-form .form-control::placeholder { color:#64748b; }
+	.split-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+	.rail-note { font-size:.76rem; color:#94a3b8; background:rgba(46,229,157,.08); border:1px solid rgba(46,229,157,.18); border-radius:10px; padding:9px 11px; }
+	.rail-note i { color:#2ee59d; margin-right:4px; }
+	.rail-note.pot { background:rgba(245,158,11,.08); border-color:rgba(245,158,11,.2); }
+	.rail-note.pot i { color:#ffd23f; }
+	.rake-guide { margin:2px 16px 12px; background:rgba(245,158,11,.07); border:1px solid rgba(245,158,11,.2); border-radius:12px; padding:10px 12px; }
+	.rake-row { display:flex; justify-content:space-between; font-size:.82rem; color:#cbd5e1; padding:2px 0; }
+	.rake-row.total { border-top:1px dashed rgba(245,158,11,.3); margin-top:4px; padding-top:6px; font-weight:800; color:#ffd23f; }
+	.btn-gold { background:linear-gradient(135deg,#f59e0b,#ffd23f); color:#2a1d00; font-weight:800; border:0; border-radius:10px; }
+	.btn-gold:hover { filter:brightness(1.05); color:#2a1d00; }
+
+	/* ===== Rules modal ===== */
+	.rules-modal { border:none; border-radius:18px; overflow:hidden; background:#0f172a; color:#e2e8f0; box-shadow:0 24px 60px rgba(0,0,0,.5); }
+	.rules-modal .modal-header { background:linear-gradient(135deg,#0DAB76,#0a6b4a); color:#fff; border-bottom:none; padding:16px 20px; }
+	.rules-modal .modal-title { font-weight:800; display:flex; align-items:center; gap:9px; font-size:1.15rem; }
+	.rules-modal .modal-body { padding:18px 20px; }
+	.rules-modal .modal-footer { border-top:1px solid rgba(148,163,184,.14); padding:12px 20px; }
+	.rules-close { width:34px; height:34px; border-radius:50%; border:none; background:rgba(255,255,255,.18); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; transition:all .12s ease; }
+	.rules-close:hover { background:rgba(255,255,255,.32); transform:rotate(90deg); }
+	.rule-block { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(148,163,184,.1); }
+	.rule-block:last-child { border-bottom:none; }
+	.rule-icon { flex:0 0 42px; width:42px; height:42px; border-radius:12px; background:rgba(46,229,157,.12); color:#2ee59d; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+	.rule-block h6 { margin:2px 0 4px; color:#fff; font-weight:800; font-size:.98rem; }
+	.rule-block p { margin:0; color:#94a3b8; font-size:.88rem; line-height:1.5; }
+	.rule-block strong { color:#cfe9df; }
+
+	/* ===== Responsive ===== */
+	@@media (min-width:1101px) {
+		/* Sticky inside the content column — never floats into the right gutter,
+		   which belongs to the global bet slip. z-index stays below the slip (1050)
+		   so an opened bet slip always covers the rail instead of the rail poking through. */
+		.create-rail { position:sticky; top:80px; align-self:start; max-height:calc(100vh - 96px); overflow:auto; z-index:500; }
+		.create-rail::-webkit-scrollbar { width:8px; }
+		.create-rail::-webkit-scrollbar-thumb { background:rgba(148,163,184,.3); border-radius:8px; }
+		#railToggle { display:none; }
 	}
+	@@media (max-width:1100px) {
+		.tourney-layout { grid-template-columns:1fr; }
+		.create-rail { order:-1; display:none; }
+		body.rail-open .create-rail { display:block; margin-bottom:4px; }
+	}
+	@@media (max-width:640px) {
+		.hero-title { font-size:1.5rem; }
+		.fld-2 { grid-template-columns:1fr; }
+	}
+
+	/* ===== Black text-shadows to make text pop ===== */
+	.hero-eyebrow, .hero-sub, .section-h, .tc-name, .tc-stat-val, .tc-stat-label,
+	.t-tab, .t-empty, .lb-name, .lb-prize, .lb-num, .pot-head-sub,
+	.rail-card-head, .rake-row, .rake-row.total { text-shadow:0 1px 2px rgba(0,0,0,.5); }
+	.hero-title { text-shadow:0 2px 5px rgba(0,0,0,.55); }
+	.pot-head-title { text-shadow:0 2px 5px rgba(0,0,0,.45), 0 1px 6px rgba(245,158,11,.3); }
+	.tc-pot-ribbon { text-shadow:0 1px 1px rgba(0,0,0,.3); }
 </style>
 
 <script>
 	(function () {
+		// Tabs
 		var root = document.getElementById('tourneyTabs');
-		if (!root) return;
-		var tabs = root.querySelectorAll('.t-tab');
-		var panels = document.querySelectorAll('.t-panels .t-panel');
-
-		function activate(name) {
-			tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-tab') === name); });
-			panels.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-panel') === name); });
-			try { history.replaceState(null, '', '#' + name); } catch (e) {}
+		if (root) {
+			var tabs = root.querySelectorAll('.t-tab');
+			var panels = document.querySelectorAll('.t-panels .t-panel');
+			function activate(name) {
+				tabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-tab') === name); });
+				panels.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-panel') === name); });
+				try { history.replaceState(null, '', '#' + name); } catch (e) {}
+			}
+			tabs.forEach(function (t) { t.addEventListener('click', function () { activate(t.getAttribute('data-tab')); }); });
+			var names = Array.prototype.map.call(tabs, function (t) { return t.getAttribute('data-tab'); });
+			var initial = (location.hash || '').replace('#', '');
+			if (names.indexOf(initial) === -1) {
+				var firstWithItems = Array.prototype.find.call(tabs, function (t) {
+					return parseInt(t.getAttribute('data-count') || '0', 10) > 0;
+				});
+				initial = firstWithItems ? firstWithItems.getAttribute('data-tab') : names[0];
+			}
+			if (initial) activate(initial);
 		}
 
-		tabs.forEach(function (t) {
-			t.addEventListener('click', function () { activate(t.getAttribute('data-tab')); });
-		});
-
-		var names = Array.prototype.map.call(tabs, function (t) { return t.getAttribute('data-tab'); });
-		var initial = (location.hash || '').replace('#', '');
-		if (names.indexOf(initial) === -1) {
-			var firstWithItems = Array.prototype.find.call(tabs, function (t) {
-				return parseInt(t.getAttribute('data-count') || '0', 10) > 0;
+		// Mobile create-rail toggle
+		var toggle = document.getElementById('railToggle');
+		if (toggle) {
+			toggle.addEventListener('click', function () {
+				document.body.classList.toggle('rail-open');
+				if (document.body.classList.contains('rail-open')) {
+					var rail = document.getElementById('createRail');
+					if (rail) rail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
 			});
-			initial = firstWithItems ? firstWithItems.getAttribute('data-tab') : names[0];
 		}
-		if (initial) activate(initial);
 	})();
 </script>

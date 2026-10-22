@@ -12,7 +12,11 @@
 	};
 }
 
-<div class="tc">
+<div class="tc @(Model.IsPot ? "tc-pot" : "")">
+	@if (Model.IsPot)
+	{
+		<div class="tc-pot-ribbon"><i class="bi bi-coin"></i> THE POT</div>
+	}
 	<div class="tc-top">
 		<span class="tc-badge @Badge(Model.Status)">@Model.StatusLabel</span>
 		@if (Model.IsJoined)
@@ -34,8 +38,8 @@
 			<span class="tc-stat-val">@(Model.EntryFee <= 0 ? "Free" : Money(Model.EntryFee))</span>
 		</div>
 		<div class="tc-stat">
-			<span class="tc-stat-label">Prize pool</span>
-			<span class="tc-stat-val prize">@Money(Model.NetPrizePool)</span>
+			<span class="tc-stat-label">@(Model.IsPot ? "The Pot" : "Prize pool")</span>
+			<span class="tc-stat-val prize">@Money(Model.IsPot ? (Model.PotPrizePool ?? 0m) : Model.NetPrizePool)</span>
 		</div>
 		<div class="tc-stat">
 			<span class="tc-stat-label">Players</span>
@@ -44,8 +48,16 @@
 	</div>
 
 	<div class="tc-dates">
-		<span><i class="bi bi-play-circle"></i> @Model.StartDisplay</span>
-		<span><i class="bi bi-flag"></i> @Model.EndDisplay</span>
+		@if (Model.IsPot && Model.DurationWeeks.HasValue)
+		{
+			<span><i class="bi bi-stopwatch"></i> @Model.DurationWeeks-week run</span>
+			<span><i class="bi bi-flag"></i> @Model.EndDisplay</span>
+		}
+		else
+		{
+			<span><i class="bi bi-play-circle"></i> @Model.StartDisplay</span>
+			<span><i class="bi bi-flag"></i> @Model.EndDisplay</span>
+		}
 	</div>
 
 	<div class="tc-actions">

@@ -58,7 +58,9 @@
 		<div class="alert alert-danger tourney-alert">@TempData["ErrorMessage"]</div>
 	}
 
-	<a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> All tournaments</a>
+	<div class="detail-topbar"><a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> All tournaments</a>
+		<button type="button" class="rules-btn" data-bs-toggle="modal" data-bs-target="#rulesModal"><i class="bi bi-info-circle"></i> How it works</button>
+	</div>
 
 	<div class="tourney-panel">
 
@@ -67,6 +69,10 @@
 			<div class="dh-left">
 				<div class="dh-top">
 					<span class="tc-badge @Badge(Model.Status)">@Model.StatusLabel</span>
+					@if (Model.IsPot)
+					{
+						<span class="pot-chip"><i class="bi bi-coin"></i> The Pot@(Model.DurationWeeks.HasValue ? $" · {Model.DurationWeeks}wk" : "")</span>
+					}
 					<span class="dh-host">by @Model.CreatedByName</span>
 					@if (Model.MinBetLegs > 1)
 					{
@@ -117,9 +123,21 @@
 		<div class="t-card prize-strip">
 			<div class="ps-item"><span class="ps-label">Entry</span><span class="ps-val">@(Model.EntryFee <= 0 ? "Free" : Money(Model.EntryFee))</span></div>
 			<div class="ps-item"><span class="ps-label">Players</span><span class="ps-val">@Model.EntrantsCount@(Model.MaxEntrants.HasValue ? $" / {Model.MaxEntrants}" : "")</span></div>
-			<div class="ps-item"><span class="ps-label">Gross pool</span><span class="ps-val">@Money(Model.PrizePool)</span></div>
-			<div class="ps-item"><span class="ps-label">Rake @Model.RakePercent.ToString("0.##")%</span><span class="ps-val rake">-@Money(Model.RakeAmount)</span></div>
-			<div class="ps-item big"><span class="ps-label">Prize pool</span><span class="ps-val prize">@Money(Model.NetPrizePool)</span></div>
+			@if (Model.IsPot)
+			{
+				<div class="ps-item"><span class="ps-label">Funded by</span><span class="ps-val">The house</span></div>
+				@if (Model.DurationWeeks.HasValue)
+				{
+					<div class="ps-item"><span class="ps-label">Runs for</span><span class="ps-val">@Model.DurationWeeks weeks</span></div>
+				}
+				<div class="ps-item big"><span class="ps-label">The Pot</span><span class="ps-val prize">@Money(Model.PotPrizePool ?? Model.NetPrizePool)</span></div>
+			}
+			else
+			{
+				<div class="ps-item"><span class="ps-label">Gross pool</span><span class="ps-val">@Money(Model.PrizePool)</span></div>
+				<div class="ps-item"><span class="ps-label">Rake @Model.RakePercent.ToString("0.##")%</span><span class="ps-val rake">-@Money(Model.RakeAmount)</span></div>
+				<div class="ps-item big"><span class="ps-label">Prize pool</span><span class="ps-val prize">@Money(Model.NetPrizePool)</span></div>
+			}
 		</div>
 
 		<div class="detail-grid">
@@ -131,7 +149,7 @@
 					<div class="table-responsive">
 						<table class="table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle tourney-lb">
 							<thead class="table-dark">
-								<tr><th>#</th><th class="ta-l">Player</th><th>Bankroll</th><th>Prize</th></tr>
+								<tr><th>#</th><th class="ta-l">Player</th>@if (Model.CanSeeBankrolls) {<th>Bankroll</th>}<th>Prize</th></tr>
 							</thead>
 							<tbody>
 								@foreach (var row in Model.Leaderboard)
@@ -148,10 +166,13 @@
 												<img src="@row.Picture" alt="" class="lb-avatar" onerror="this.onerror=null;this.src='/images/default-user-image.png'" />
 												<span class="lb-name">@row.UserName</span>
 												@if (row.IsCurrentUser) { <span class="you-tag">you</span> }
-												@if (row.PendingBets > 0) { <span class="pending-tag">@row.PendingBets in play</span> }
+												@if (Model.CanSeeBankrolls && row.PendingBets > 0) { <span class="pending-tag">@row.PendingBets in play</span> }
 											</span>
 										</td>
-										<td class="chips">@Chips(row.Bankroll)</td>
+										@if (Model.CanSeeBankrolls)
+										{
+											<td class="chips">@Chips(row.Bankroll)</td>
+										}
 										<td>
 											@if (Model.Status == TournamentStatus.Finished && row.PrizeAwarded.HasValue && row.PrizeAwarded.Value > 0)
 											{
@@ -168,6 +189,11 @@
 				else
 				{
 					<p class="muted">No players yet. Be the first to join!</p>
+				}
+
+				@if (!Model.CanSeeBankrolls)
+				{
+					<p class="muted small lb-locked-note"><i class="bi bi-lock"></i> You're viewing positions only — join this tournament to see every player's bankroll and the board.</p>
 				}
 
 				@if (Model.PrizeBreakdown.Any())
@@ -324,7 +350,9 @@
 			<div class="t-card info-card"><i class="bi bi-hourglass-split"></i> Betting opens when the tournament starts (@Model.StartDisplay).</div>
 		}
 
-		<!-- Board -->
+		@if (Model.CanSeeBoard)
+			{
+			<!-- Board -->
 		<div class="t-card">
 			<h3 class="section-h"><i class="bi bi-chat-left-text"></i> Tournament board</h3>
 			<div class="board">
@@ -356,7 +384,17 @@
 			}
 		</div>
 
-		<!-- Admin controls -->
+		@* --- board gate close --- *@
+			}
+			else
+			{
+				<div class="t-card board-locked">
+					<h3 class="section-h"><i class="bi bi-chat-left-text"></i> Tournament board</h3>
+					<p class="muted"><i class="bi bi-lock"></i> The board is for players only. Join the tournament to unlock the chat and talk some trash.</p>
+				</div>
+			}
+
+			<!-- Admin controls -->
 		@if (Model.IsAdmin && Model.Status != TournamentStatus.Finished && Model.Status != TournamentStatus.Cancelled)
 		{
 			<div class="t-card admin-card">
@@ -387,6 +425,65 @@
 				<div id="betLegsSummary" class="blm-summary"></div>
 				<div class="blm-legs-title">Matches</div>
 				<div id="betLegsBody" class="blm-legs"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Rules modal -->
+<div class="modal fade" id="rulesModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+		<div class="modal-content rules-modal">
+			<div class="modal-header">
+				<h5 class="modal-title"><i class="bi bi-info-circle"></i> How tournaments work</h5>
+				<button type="button" class="rules-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+			</div>
+			<div class="modal-body">
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-box-arrow-in-right"></i></div>
+					<div>
+						<h6>Join &amp; get a bankroll</h6>
+						<p>Pay the entry fee (real money, from your wallet) and you're in with a fresh <strong>@Chips(Model.StartingBankroll)-chip</strong> play-money bankroll. Chips are for ranking only — they're never cashed out.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-cash-stack"></i></div>
+					<div>
+						<h6>Bet your chips</h6>
+						<p>While a tournament is running, spend chips on upcoming matches@(Model.MinBetLegs > 1 ? $" (this one requires parlays of {Model.MinBetLegs}+ matches)" : ""). Winning bets grow your bankroll; the leaderboard ranks everyone by chips.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-trophy"></i></div>
+					<div>
+						<h6>Prize pool &amp; payouts</h6>
+						<p>All entry fees form the prize pool. The house keeps a <strong>10% rake</strong>; the rest is paid in real money. With 4+ players the top 3 split <strong>60 / 30 / 10</strong>; with 2–3 players the top 2 split <strong>70 / 30</strong>.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-coin"></i></div>
+					<div>
+						<h6>The Pot</h6>
+						<p>The Pot is a special, <strong>free-to-enter</strong> event funded by the house. It plays just like a normal tournament, runs for 2, 4 or 6 weeks, and the <strong>top 3 split the prize</strong> by the posted split.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-shield-lock"></i></div>
+					<div>
+						<h6>Who sees what</h6>
+						<p>Everyone can see the standings (the <em>positions</em>). Only players who've joined can see other players' <strong>bankrolls</strong> and the <strong>tournament board</strong>.</p>
+					</div>
+				</div>
+				<div class="rule-block">
+					<div class="rule-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
+					<div>
+						<h6>If it doesn't fill</h6>
+						<p>If a tournament doesn't reach its minimum number of players, it's cancelled and <strong>every entry fee is refunded</strong>. Bets still pending at settlement are voided and the chips returned.</p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-mint" data-bs-dismiss="modal">Got it</button>
 			</div>
 		</div>
 	</div>
@@ -597,6 +694,75 @@
 	@@media (max-width: 820px) {
 		.detail-grid { grid-template-columns:1fr; }
 	}
+
+	/* ===== Dashboard-matched dark theme (overrides) ===== */
+	.detail-topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+	.rules-btn { background:rgba(148,163,184,.12); border:1px solid rgba(148,163,184,.28); color:#e2e8f0; border-radius:10px; font-weight:700; font-size:.82rem; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:all .12s ease; }
+	.rules-btn:hover { background:rgba(148,163,184,.2); }
+	.rules-btn i { color:#2ee59d; }
+	.pot-chip { font-size:.7rem; font-weight:800; color:#2a1d00; background:linear-gradient(135deg,#f59e0b,#ffd23f); padding:3px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:5px; }
+
+	.tourney-panel { background:rgba(15,23,42,.55); border:1px solid rgba(148,163,184,.14); }
+	.t-card { background:#0f172a; border:1px solid rgba(148,163,184,.16); color:#e2e8f0; box-shadow:0 12px 28px rgba(0,0,0,.32); }
+	.section-h { color:#e2e8f0; }
+	.section-h i { color:#2ee59d; }
+	.section-sub { color:#94a3b8; }
+	.muted { color:#94a3b8; }
+	.chips { color:#e2e8f0; }
+	.detail-title { color:#2ee59d; }
+	.detail-desc, .detail-dates, .dh-host { color:#94a3b8; }
+	.detail-dates i { color:#2ee59d; }
+
+	.prize-strip .ps-val { color:#e2e8f0; }
+	.ps-label { color:#94a3b8; }
+
+	/* Leaderboard table on navy */
+	.tourney-lb { --bs-table-bg:transparent; --bs-table-color:#e2e8f0; --bs-table-border-color:rgba(148,163,184,.14); color:#e2e8f0; }
+	.tourney-lb tbody td { color:#e2e8f0; }
+	.tourney-lb tr.me td { background:rgba(46,229,157,.12); }
+	.tourney-lb tbody tr:hover td { background:rgba(46,229,157,.06); }
+	.lb-name { color:#e2e8f0; }
+	.lb-locked-note { margin-top:12px; }
+
+	/* My bets on navy */
+	.mybet-row { background:rgba(148,163,184,.08); border-color:rgba(148,163,184,.14); }
+	.mybet-row.clickable:hover { background:rgba(46,229,157,.08); border-color:rgba(46,229,157,.25); }
+	.mb-match { color:#e2e8f0; }
+	.mb-meta { color:#94a3b8; }
+
+	/* Payout note + board on navy */
+	.payout-note { border-top-color:rgba(148,163,184,.18); }
+	.pn-title { color:#94a3b8; }
+	.pn-chip { background:rgba(148,163,184,.1); border-color:rgba(148,163,184,.16); color:#e2e8f0; }
+	.board-msg { background:rgba(148,163,184,.07); border-color:rgba(148,163,184,.12); }
+	.board-msg.mine { background:rgba(46,229,157,.08); border-color:rgba(46,229,157,.25); }
+	.bmsg-text { color:#e2e8f0; }
+	.board-input { background:#0b1220; border:1px solid rgba(148,163,184,.2); color:#e2e8f0; }
+	.board-input:focus { background:#0b1220; color:#fff; border-color:#2ee59d; box-shadow:0 0 0 .2rem rgba(46,229,157,.15); }
+	.board-input::placeholder { color:#64748b; }
+	.info-card { background:rgba(59,130,246,.1); border-color:rgba(59,130,246,.25); color:#93c5fd; }
+
+	/* Rules modal (shared look) */
+	.rules-modal { border:none; border-radius:18px; overflow:hidden; background:#0f172a; color:#e2e8f0; box-shadow:0 24px 60px rgba(0,0,0,.5); }
+	.rules-modal .modal-header { background:linear-gradient(135deg,#0DAB76,#0a6b4a); color:#fff; border-bottom:none; padding:16px 20px; }
+	.rules-modal .modal-title { font-weight:800; display:flex; align-items:center; gap:9px; font-size:1.15rem; }
+	.rules-modal .modal-body { padding:18px 20px; }
+	.rules-modal .modal-footer { border-top:1px solid rgba(148,163,184,.14); padding:12px 20px; }
+	.rules-close { width:34px; height:34px; border-radius:50%; border:none; background:rgba(255,255,255,.18); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; transition:all .12s ease; }
+	.rules-close:hover { background:rgba(255,255,255,.32); transform:rotate(90deg); }
+	.rule-block { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid rgba(148,163,184,.1); }
+	.rule-block:last-child { border-bottom:none; }
+	.rule-icon { flex:0 0 42px; width:42px; height:42px; border-radius:12px; background:rgba(46,229,157,.12); color:#2ee59d; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+	.rule-block h6 { margin:2px 0 4px; color:#fff; font-weight:800; font-size:.98rem; }
+	.rule-block p { margin:0; color:#94a3b8; font-size:.88rem; line-height:1.5; }
+	.rule-block strong { color:#cfe9df; }
+
+	/* ===== Black text-shadows to make text pop ===== */
+	.back-link, .rules-btn, .detail-desc, .detail-dates, .dh-host,
+	.section-h, .ps-val, .ps-label, .bankroll-val, .bankroll-label, .bankroll-rank,
+	.chips, .lb-name, .mb-match, .mb-meta, .bmsg-text, .pn-chip, .tc-badge,
+	.parlay-chip, .pot-chip { text-shadow:0 1px 2px rgba(0,0,0,.5); }
+	.detail-title { text-shadow:0 2px 5px rgba(0,0,0,.55); }
 </style>
 
 <script>
