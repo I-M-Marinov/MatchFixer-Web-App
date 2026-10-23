@@ -50,7 +50,7 @@
 
 <div class="responsive-profile-container">
 	<!-- MatchFix Score Card -->
-	<div id="scoreAndDangerContainer" class="d-flex justify-content-between flex-wrap flex-column">
+	<div id="scoreAndDangerContainer" class="profile-stats-grid">
 		<div class="card shadow border-0 rounded-2 p-2 profile-matchfix-score" style="width: 145px; height: 145px;">
 			@if (Model.UserRank != null)
 			{
@@ -78,6 +78,36 @@
 					{
 						<span class="animate-digit">@digit</span>
 					}
+				</div>
+			</div>
+		</div>
+		<!-- LogoQuiz Score Card -->
+		<div class="card shadow border-0 rounded-2 p-2 profile-matchfix-score profile-stat-tile" style="width: 145px; height: 145px;">
+			<a href="@Url.Action("LogoQuiz", "LogoQuiz")" style="text-decoration: none;">
+				<div class="d-flex justify-content-center align-items-center">
+					<span class="d-flex justify-content-center align-items-center fs-5 badge bg-primary mb-2 mt-2"><i class="bi bi-patch-question-fill"></i></span>
+				</div>
+			</a>
+			<div class="d-flex flex-column justify-content-center align-items-center badge">
+				<span class="pb-1">LogoQuiz Score:</span>
+				<div class="score-digits">
+					@foreach (var digit in Model.LogoQuizScore.ToString())
+					{
+						<span class="animate-digit">@digit</span>
+					}
+				</div>
+			</div>
+		</div>
+		<!-- Tournaments Honours Card -->
+		<div class="card shadow border-0 rounded-2 p-2 profile-matchfix-score profile-stat-tile profile-tourney-tile" style="width: 145px; height: 145px;">
+			<a href="@Url.Action("Index", "Tournaments")" style="text-decoration: none;">
+				<div class="tourney-tile-head"><i class="bi bi-trophy-fill"></i> Tournaments</div>
+			</a>
+			<div class="tourney-tile-body">
+				<span class="tt-prize">€@Model.TournamentPrizeTotal.ToString("0.##")</span>
+				<div class="tt-sub">
+					<span><b>@Model.TournamentWins</b> Wins</span>
+					<span><b>@Model.TournamentPodiums</b> Top 3</span>
 				</div>
 			</div>
 		</div>

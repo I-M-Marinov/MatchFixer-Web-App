@@ -930,3 +930,67 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 }
 
 .top-bets-empty { text-align: center; opacity: 0.7; font-style: italic; margin: 0.5rem 0; }
+
+/* Top 5 - small screens */
+@media (max-width: 768px) {
+    .top-bets-container {
+        width: 100%;
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+        align-items: center;
+    }
+    .top-bets-box { width: 100%; }
+}
+
+/* Profile stat tiles */
+#scoreAndDangerContainer.profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 145px);
+    gap: 1rem;
+    min-height: 0;
+    padding: 0;
+    justify-content: center;
+    align-content: start;
+}
+
+.profile-tourney-tile { color: #FAF3DD; }
+
+.tourney-tile-head {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #FAF3DD;
+    text-shadow: 1px 1px 2px #000;
+    margin-top: 0.25rem;
+    font-family: "Orbitron", sans-serif;
+}
+.tourney-tile-head i { color: #ffd23f; }
+
+.tourney-tile-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+.tt-prize {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #2ee59d;
+    text-shadow: 1px 1px 2px #000;
+    line-height: 1;
+    white-space: nowrap;
+}
+.tt-sub {
+    display: flex;
+    gap: 0.55rem;
+    font-size: 0.62rem;
+    color: #e2e8f0;
+    text-shadow: 1px 1px 2px #000;
+    font-family: "Orbitron", sans-serif;
+}
+.tt-sub b { color: #ffd23f; }
+

@@ -252,6 +252,17 @@ namespace MatchFixer.Core.Services
 				.Take(5)
 				.ToList();
 
+			// Tournament honours for this user (finished tournaments only).
+			var tourEntries = await _dbContext.TournamentEntries
+				.AsNoTracking()
+				.Where(e => e.UserId == user.Id && e.Tournament.Status == TournamentStatus.Finished && e.FinalRank != null)
+				.Select(e => new { e.PrizeAwarded, e.FinalRank })
+				.ToListAsync();
+			var tourPrize = tourEntries.Sum(x => x.PrizeAwarded ?? 0m);
+			var tourWins = tourEntries.Count(x => x.FinalRank == 1);
+			var tourPodiums = tourEntries.Count(x => x.FinalRank <= 3);
+			var tourPlayed = tourEntries.Count;
+
 			return new ProfileViewModel
 			{
 				Id = user.Id.ToString(),
@@ -264,6 +275,11 @@ namespace MatchFixer.Core.Services
 				CreatedOn = user.CreatedOn,
 				MatchFixScore = user.MatchFixScore,
 				UserRank = userRank,
+				LogoQuizScore = user.LogoQuizScore,
+				TournamentPrizeTotal = tourPrize,
+				TournamentWins = tourWins,
+				TournamentPodiums = tourPodiums,
+				TournamentsPlayed = tourPlayed,
 				ProfileImageUrl = user.ProfilePicture?.ImageUrl,
 				CountryOptions = countryOptions,
 				Trophies = trophyViewModels,

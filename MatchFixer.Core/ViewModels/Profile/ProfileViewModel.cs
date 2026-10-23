@@ -22,6 +22,11 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public DateTime CreatedOn { get; set; }
 		public int MatchFixScore { get; set; }
 		public int UserRank { get; set; }
+		public int LogoQuizScore { get; set; }
+		public decimal TournamentPrizeTotal { get; set; }
+		public int TournamentWins { get; set; }
+		public int TournamentPodiums { get; set; }
+		public int TournamentsPlayed { get; set; }
 		public List<SelectListItem> CountryOptions { get; set; } = new();
 		public List<TrophyViewModel> Trophies { get; set; } = new();
 		public List<TeamDto> FavoriteTeams { get; set; } = new();
