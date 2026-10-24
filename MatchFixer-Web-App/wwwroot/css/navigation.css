@@ -116,11 +116,11 @@
 }
 
 .navbar-nav {
-    gap: 2em;
+    gap: 1.4em;
 }
 
 .navbar-nav {
-    gap: 2em;
+    gap: 1.4em;
 }
 
 .navbar-nav .nav-item a,
@@ -176,7 +176,7 @@
     color: #f1d302;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1200px) {
     .navbar-collapse {
         display: flex !important;
         flex-direction: row;
@@ -187,7 +187,7 @@
 }
 
 
-@media (max-width: 770px) {
+@media (max-width: 1199.98px) {
 
     .navbar-nav {
         display: flex !important;
@@ -458,7 +458,7 @@
     background-color: #3370A8 !important;
 }
 
-@media (max-width: 770px) {
+@media (max-width: 1199.98px) {
 
     /* ====================================
        NAVBAR TOP BAR
