@@ -126,9 +126,6 @@
 					</ul>
 				</li>
 
-				<li class="nav-item">
-					<a class="nav-link text-dark" asp-area="" asp-controller="Tournaments" asp-action="Index">Tournaments</a>
-				</li>
 
 				<!-- Events Dropdown -->
 				<li class="nav-item dropdown">
@@ -162,6 +159,11 @@
 								<span class="events-board-text">Events Board</span>
 							</a>
 						</li>
+						<li>
+							<a class="dropdown-item text-dark" asp-area="" asp-controller="Tournaments" asp-action="Index">
+								<span class="events-board-text">Tournaments</span>
+							</a>
+						</li>
 					</ul>
 				</li>
 
@@ -174,8 +176,8 @@
 						<ul class="dropdown-menu events-dropdown-menu" aria-labelledby="eventsDropdown">
 
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Result" asp-action="EventsResults">
-									<span class="add-match-results-text text-center">Latest Results</span>
+								<a class="dropdown-item text-dark" asp-area="" asp-controller="Result" asp-action="EventsResults">
+									<span class="events-board-text">Latest Results</span>
 								</a>
 							</li>
 						<li class="nav-item">
