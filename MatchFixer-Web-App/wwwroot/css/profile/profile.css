@@ -994,3 +994,31 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 }
 .tt-sub b { color: #ffd23f; }
 
+/* Favourite teams */
+.favorite-teams-container {
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1250px) {
+    .profile-card { justify-content: center; }
+    #scoreAndDangerContainer.profile-stats-grid { margin: 0 auto; }
+}
+
+.profile-card {
+    max-width: 1400px !important;
+    width: 100%;
+}
+#profile-form {
+    flex: 1 1 520px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.profile-info-container {
+    flex: 1 1 auto;
+    max-width: none !important;
+    width: 100%;
+}
+
