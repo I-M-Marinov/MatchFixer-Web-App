@@ -1022,3 +1022,77 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     width: 100%;
 }
 
+/* Equal-height top row */
+.profile-card { align-items: flex-start; }
+.responsive-profile-container { align-items: stretch; }
+
+#scoreAndDangerContainer.profile-stats-grid {
+    height: 320px;
+    min-height: 320px;
+    grid-auto-rows: 145px;
+    align-content: center;
+}
+.profile-stats-grid > .card {
+    height: 145px !important;
+    width: 145px !important;
+    min-height: 145px;
+}
+
+.name-image-container {
+    height: 320px !important;
+    min-height: 320px !important;
+    justify-content: center;
+    align-items: center;
+}
+#profileImage,
+.profile-image {
+    max-width: 200px !important;
+    min-width: 150px !important;
+}
+
+#profile-form { display: flex; flex-direction: column; }
+.profile-info-container {
+    height: 320px !important;
+    min-height: 320px !important;
+    padding-top: 1rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile-card { width: auto !important; flex: 1 1 auto; min-width: 0; max-width: 1400px !important; }
+#profile-form { flex: 1 1 auto; min-width: 0; }
+.profile-info-container { width: auto !important; min-width: 0 !important; flex: 1 1 auto; max-width: none !important; }
+
+.trophy-cabinet-container { width: auto !important; }
+.top-bets-container { margin-left: auto; }
+
+.profile-card { justify-content: space-between; }
+#profile-form { flex: 0 1 700px; max-width: 700px; min-width: 0; }
+.profile-info-container {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 700px !important;
+    min-width: 0 !important;
+}
+
+.profile-card { justify-content: flex-start !important; gap: 1rem; }
+#profile-form { flex: 1 1 auto !important; max-width: none !important; min-width: 0; }
+.profile-info-container {
+    flex: 1 1 auto;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
+
+.profile-wrapper, .cabinet-wrapper { max-width: 1080px !important; }
+
+.profile-card { max-width: none !important; width: 100%; flex: 1 1 auto; justify-content: flex-start !important; gap: 1rem; }
+#profile-form { flex: 1 1 auto !important; max-width: none !important; min-width: 0; }
+.profile-info-container { flex: 1 1 auto; width: auto !important; max-width: none !important; min-width: 0 !important; }
+
+.trophy-cabinet-container { flex: 1 1 auto !important; width: auto !important; }
+.top-bets-container { margin-left: 0 !important; }
+
+.trophy-card { width: 130px !important; }
+
