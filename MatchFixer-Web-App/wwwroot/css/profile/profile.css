@@ -1096,3 +1096,55 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 
 .trophy-card { width: 130px !important; }
 
+/* Trophy Cabinet + Top 5 */
+.trophy-bets-row {
+    display: flex;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 1rem;
+    width: 100%;
+}
+.trophy-cabinet-container {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+}
+.top-bets-container {
+    flex: 0 0 260px;
+    width: 260px;
+    min-width: 0;
+    margin-left: 0 !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+}
+.top-bets-box {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+}
+.trophy-card { width: 120px !important; }
+#scoreAndDangerContainer.profile-stats-grid { margin-left: 0; }
+
+@media (max-width: 992px) {
+    .trophy-bets-row { flex-wrap: wrap !important; }
+    .trophy-cabinet-container { flex: 1 1 100% !important; }
+    .top-bets-container {
+        flex: 1 1 100%;
+        width: 100%;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+    }
+    .top-bets-box { flex: 1 1 220px; width: auto; }
+}
+
+/* Shared row width */
+.profile-wrapper, .cabinet-wrapper {
+    max-width: 1320px !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+@media (min-width: 993px) {
+    .top-bets-container { flex: 0 0 300px; width: 300px; }
+}
+
