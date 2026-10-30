@@ -1148,3 +1148,40 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
     .top-bets-container { flex: 0 0 300px; width: 300px; }
 }
 
+/* Top row sizing */
+@media (min-width: 1251px) {
+    #scoreAndDangerContainer.profile-stats-grid {
+        grid-template-columns: repeat(2, 180px);
+        grid-auto-rows: 180px;
+        height: 376px;
+        min-height: 376px;
+    }
+    .profile-stats-grid > .card {
+        width: 180px !important;
+        height: 180px !important;
+        min-height: 180px;
+        font-size: 1.15em;
+    }
+    .profile-stats-grid .tt-prize { font-size: 1.6rem; }
+    .profile-stats-grid .tourney-tile-head { font-size: 0.85rem; }
+    .profile-stats-grid .tt-sub { font-size: 0.72rem; }
+
+    .name-image-container {
+        flex: 0 0 360px !important;
+        width: 360px !important;
+        min-width: 360px !important;
+        max-width: 360px !important;
+        height: 376px !important;
+        min-height: 376px !important;
+    }
+    #profileImage, .profile-image {
+        max-width: 240px !important;
+        min-width: 200px !important;
+    }
+
+    .profile-info-container {
+        height: 376px !important;
+        min-height: 376px !important;
+    }
+}
+
