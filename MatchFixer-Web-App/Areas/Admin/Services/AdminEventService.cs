@@ -50,7 +50,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			if (filters.FromDate.HasValue)
 				baseQuery = baseQuery.Where(m => m.MatchDate >= filters.FromDate.Value);
 			if (filters.ToDate.HasValue)
-				baseQuery = baseQuery.Where(m => m.MatchDate <= filters.ToDate.Value);
+			{
+				var toExclusive = filters.ToDate.Value.Date.AddDays(1);
+				baseQuery = baseQuery.Where(m => m.MatchDate < toExclusive);
+			}
 			if (!string.IsNullOrWhiteSpace(filters.League))
 				baseQuery = baseQuery.Where(m => m.HomeTeam.LeagueName == filters.League);
 			if (filters.TeamId.HasValue)
@@ -312,8 +315,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					b.MatchEvent.MatchDate >= filters.FromDate.Value);
 
 			if (filters.ToDate.HasValue)
+			{
+				var toExclusive = filters.ToDate.Value.Date.AddDays(1);
 				betsQuery = betsQuery.Where(b =>
-					b.MatchEvent.MatchDate <= filters.ToDate.Value);
+					b.MatchEvent.MatchDate < toExclusive);
+			}
 
 			if (!string.IsNullOrWhiteSpace(filters.League))
 				betsQuery = betsQuery.Where(b =>
