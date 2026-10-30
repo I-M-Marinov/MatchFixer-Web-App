@@ -330,6 +330,13 @@
 			</button>
 		</div>
 		
+		@{
+				var leagueLogoMap = LeagueNameMap.Domestic
+					.ToDictionary(
+						kv => kv.Value,
+						kv => FootballCompetitionLogos.GetLeagueLogo(kv.Value) ?? $"https://media.api-sports.io/football/leagues/{kv.Key}.png",
+						StringComparer.OrdinalIgnoreCase);
+			}
 		<!-- ADD ROW (shown on + click) -->
 		<div id="addFavoritesRow" class="d-none mt-2 flex-wrap gap-3 justify-content-center">
 
@@ -343,7 +350,8 @@
 					<option value="">Select a team...</option>
 					@foreach (var team in Model.AllTeams)
 					{
-						<option value="@team.Value">@team.Text.Split('|').First()</option>
+						var teamParts = team.Text.Split('|');
+						<option value="@team.Value" data-logo="@(teamParts.Length > 1 ? teamParts[1] : "")">@teamParts[0]</option>
 					}
 				</select>
 				<button type="submit" class="favorite-add-btn">
@@ -356,8 +364,12 @@
 			      method="post"
 			      class="favorite-add-row">
 				@Html.AntiForgeryToken()
-				<select name="leagueName" id="favoriteLeagueSelect" class="form-control" asp-items="Model.AllLeagues">
+				<select name="leagueName" id="favoriteLeagueSelect" class="form-control">
 					<option value="">Select a league...</option>
+					@foreach (var lg in Model.AllLeagues.Where(l => !Model.FavoriteLeagues.Contains(l.Value, StringComparer.OrdinalIgnoreCase)))
+					{
+						<option value="@lg.Value" data-logo="@(leagueLogoMap.TryGetValue(lg.Value, out var lgLogo) ? lgLogo : "")">@lg.Text</option>
+					}
 				</select>
 				<button type="submit" class="favorite-add-btn">
 					<i class="bi bi-check-lg"></i>
@@ -399,13 +411,6 @@
 			}
 
 
-			@{
-				var leagueLogoMap = LeagueNameMap.Domestic
-					.ToDictionary(
-						kv => kv.Value,
-						kv => FootballCompetitionLogos.GetLeagueLogo(kv.Value) ?? $"https://media.api-sports.io/football/leagues/{kv.Key}.png",
-						StringComparer.OrdinalIgnoreCase);
-			}
 			@foreach (var league in Model.FavoriteLeagues)
 			{
 				var leagueLogo = leagueLogoMap.TryGetValue(league, out var logoUrl) ? logoUrl : null;
@@ -896,6 +901,39 @@
 			}
 		});
 	});
+
+	// Favourite pickers (Select2)
+	(function () {
+		if (!window.jQuery || !$.fn.select2) return;
+
+		function withLogo(opt) {
+			if (!opt.id) return opt.text;
+			const logo = opt.element ? opt.element.getAttribute('data-logo') : null;
+			const $row = $('<span class="fav-opt"></span>');
+			if (logo) {
+				$row.append($('<img class="fav-opt-logo" alt="">').attr('src', logo));
+			} else {
+				$row.append('<span class="fav-opt-logo fav-opt-logo--empty">🏆</span>');
+			}
+			$row.append($('<span class="fav-opt-name"></span>').text(opt.text));
+			return $row;
+		}
+
+		$('#favoriteTeamsSelect, #favoriteLeagueSelect').each(function () {
+			const $sel = $(this);
+			$sel.select2({
+				width: '260px',
+				placeholder: $sel.find('option[value=""]').text(),
+				templateResult: withLogo,
+				templateSelection: withLogo,
+				selectionCssClass: 'fav-select2',
+				dropdownCssClass: 'fav-select2-dropdown'
+			});
+			$sel.on('select2:open', function () {
+				$('.select2-container--open .select2-dropdown').addClass('fav-select2-dropdown');
+			});
+		});
+	})();
 
 	const toggleBtn = document.getElementById("toggleAddTeam");
 	const addRow = document.getElementById("addFavoritesRow");
