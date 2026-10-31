@@ -171,6 +171,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     </p>
     <h4>Profile Overview</h4>
     <img src="./assets/profile-page-final.png" width="800px" />
+    <img src="./assets/profile-page-final2.png" width="800px" />
     <h4>Favourite Teams</h4>
     <p>
       - Users can set their favourite teams from the profile page.<br/>
