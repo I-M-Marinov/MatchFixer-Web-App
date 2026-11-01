@@ -192,6 +192,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
   <summary><h2>Tournaments Page</h2></summary>
   <div align="center">
     <img src="./assets/tournaments-page.png" width="800px" />
+    <img src="./assets/the-pot.png" width="600px" />
   </div>
 </details>
 
