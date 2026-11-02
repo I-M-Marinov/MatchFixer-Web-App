@@ -138,6 +138,7 @@ builder.Services.AddScoped<IWorldCupService, WorldCupService>();		// Add the Wor
 builder.Services.AddScoped<IMatchEventNotifier, MatchEventNotifier>();          // Add the Match Event Notifier  	
 builder.Services.AddScoped<INotificationService, NotificationService>();        // Add the Favorite Teams User Notification Service   	
 builder.Services.AddScoped<IEmailQueueService, EmailQueueService>();            // Add the Email Queue (approval) Service
+builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();        // Add the Change Request (approvals) Service
 builder.Services.AddHostedService<EmailDispatchService>();                      // Add the Email Dispatch background Service
 builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// Add the Match Guess Game Service
 builder.Services.AddScoped<IOddsGeneratorService, OddsGeneratorService>();		// Add the Odds Generator Service
