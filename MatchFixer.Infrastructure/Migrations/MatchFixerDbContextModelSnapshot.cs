@@ -240,6 +240,56 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.ToTable("BetSlips");
                 });
 
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.ChangeRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("RequestedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReviewNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReviewedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ReviewedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestedAtUtc");
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Status", "Type");
+
+                    b.ToTable("ChangeRequests");
+                });
+
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.LiveMatchResult", b =>
                 {
                     b.Property<Guid>("MatchEventId")
@@ -1336,6 +1386,24 @@ namespace MatchFixer.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("TournamentEntry");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.ChangeRequest", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "ReviewedBy")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("MatchFixer.Infrastructure.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedBy");
 
                     b.Navigation("User");
                 });

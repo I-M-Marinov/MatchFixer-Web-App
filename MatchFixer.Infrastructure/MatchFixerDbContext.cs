@@ -39,6 +39,7 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<Tournament> Tournaments { get; set; }
 		public virtual DbSet<TournamentEntry> TournamentEntries { get; set; }
 		public virtual DbSet<TournamentMessage> TournamentMessages { get; set; }
+		public virtual DbSet<ChangeRequest> ChangeRequests { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -258,6 +259,22 @@ namespace MatchFixer.Infrastructure
 
 			builder.Entity<BetSlip>()
 				.HasIndex(bs => bs.TournamentEntryId);
+
+			builder.Entity<ChangeRequest>(entity =>
+			{
+				entity.HasIndex(x => new { x.Status, x.Type });
+				entity.HasIndex(x => x.RequestedAtUtc);
+
+				entity.HasOne(x => x.User)
+					.WithMany()
+					.HasForeignKey(x => x.UserId)
+					.OnDelete(DeleteBehavior.Cascade);
+
+				entity.HasOne(x => x.ReviewedBy)
+					.WithMany()
+					.HasForeignKey(x => x.ReviewedByUserId)
+					.OnDelete(DeleteBehavior.NoAction);
+			});
 		}
 	}
 }
