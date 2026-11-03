@@ -13,10 +13,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 	public class EmailQueueController : Controller
 	{
 		private readonly IEmailQueueService _queue;
+		private readonly IChangeRequestService _changeRequests;
 
-		public EmailQueueController(IEmailQueueService queue)
+		public EmailQueueController(IEmailQueueService queue, IChangeRequestService changeRequests)
 		{
 			_queue = queue;
+			_changeRequests = changeRequests;
 		}
 
 		private Guid AdminId =>
@@ -27,11 +29,15 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			var all = await _queue.GetReviewQueueAsync();
 
-			var model = new EmailQueueViewModel
+			var pendingChanges = await _changeRequests.GetPendingAsync();
+
+			var model = new ReviewCenterViewModel
 			{
 				Winning = all.Where(x => x.Category == EmailQueueCategory.Winning).ToList(),
 				Other = all.Where(x => x.Category != EmailQueueCategory.Winning).ToList(),
-				PendingCount = await _queue.GetPendingCountAsync()
+				PendingCount = await _queue.GetPendingCountAsync(),
+				ChangeRequests = pendingChanges,
+				ChangeRequestsPendingCount = pendingChanges.Count
 			};
 
 			return View(model);
