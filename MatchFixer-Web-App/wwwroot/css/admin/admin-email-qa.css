@@ -39,7 +39,25 @@
 
 .qa-interval-select {
     width: auto;
-    min-width: 8rem;
+    min-width: 8.5rem;
+    background-color: #0b2740;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.qa-interval-select:focus {
+    background-color: #0b2740;
+    color: #ffffff;
+    border-color: #3370a8;
+    box-shadow: 0 0 0 0.2rem rgba(51, 112, 168, 0.35);
+}
+
+.qa-interval-select option {
+    color: #000000;
+    background-color: #ffffff;
 }
 
 .email-qa-section {

@@ -3,16 +3,20 @@
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
 @inject MatchFixer.Core.Contracts.IEmailQueueService EmailQueue
+@inject MatchFixer.Core.Contracts.IChangeRequestService ChangeRequests
 <meta name="csrf-token" content="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
 
 @{
 	var isAdmin = User.IsInRole(MatchFixer.Common.Identity.Roles.Admin);
 	int pendingEmails = 0;
+	int pendingChanges = 0;
 	if (isAdmin)
 	{
 		try { pendingEmails = await EmailQueue.GetPendingCountAsync(); } catch { }
+		try { pendingChanges = await ChangeRequests.GetPendingCountAsync(); } catch { }
 	}
+	var pendingTotal = pendingEmails + pendingChanges;
 }
 
 <ul class="profile-dropdown-menu d-flex align-items-center">
@@ -32,11 +36,11 @@
 		<a class="nav-link nav-profile d-flex align-items-center pe-0 hover-dropdown" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
 			<span class="position-relative d-inline-block">
 				<img src="@Model.ProfileImageUrl" alt="User Image" class="rounded-circle">
-				@if (isAdmin && pendingEmails > 0)
+				@if (isAdmin && pendingTotal > 0)
 				{
 					<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
 					      style="background-color:#bfe030;color:#1b3b16;font-size:.6rem;font-weight:600;padding:.18em .4em;line-height:1;border:1px solid rgba(0,0,0,.25);"
-					      title="@pendingEmails email(s) awaiting review">@pendingEmails</span>
+					      title="@pendingTotal item(s) awaiting review">@pendingTotal</span>
 				}
 			</span>
 			<span class="d-none d-md-block dropdown ps-2"></span>
@@ -58,10 +62,10 @@
 					<form method="get" asp-area="Admin" asp-controller="EmailQueue" asp-action="Index">
 						<button type="submit" class="dropdown-item d-flex  align-items-center justify-content-center">
 							<span>
-								<i class="bi bi-envelope-paper-fill" style="color:#ffc43d;"></i> Review Emails
-								@if (pendingEmails > 0)
+								<i class="bi bi-clipboard-check-fill" style="color:#ffc43d;"></i> Review Center
+								@if (pendingTotal > 0)
 								{
-									<span class="badge rounded-pill bg-danger ms-1">@pendingEmails</span>
+									<span class="badge rounded-pill bg-danger ms-1">@pendingTotal</span>
 								}
 							</span>
 						</button>

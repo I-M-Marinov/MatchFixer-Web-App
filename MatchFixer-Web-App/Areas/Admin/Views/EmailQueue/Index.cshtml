@@ -1,15 +1,17 @@
 ﻿@using MatchFixer.Common.Enums
 @using MatchFixer.Infrastructure.Entities
-@model MatchFixer_Web_App.Areas.Admin.ViewModels.Email.EmailQueueViewModel
+@model MatchFixer_Web_App.Areas.Admin.ViewModels.Email.ReviewCenterViewModel
 @{
     Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
-    ViewData["Title"] = "Email Review Queue";
+    ViewData["Title"] = "Review Center";
 
     var sections = new (string Title, string Icon, IReadOnlyList<QueuedEmail> Items)[]
     {
         ("Winning emails", "bi-trophy-fill", Model.Winning),
         ("Other emails", "bi-envelope-paper-fill", Model.Other)
     };
+
+    var approvalsActive = Context.Request.Query["tab"] == "approvals";
 }
 
 @functions {
@@ -37,22 +39,40 @@
     }
 
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-        <h2 class="email-qa-title m-0"><i class="bi bi-inboxes-fill me-2"></i>Email Review Queue</h2>
+        <h2 class="email-qa-title m-0"><i class="bi bi-clipboard-check-fill me-2"></i>Review Center</h2>
         <a class="btn btn-ocean btn-sm" asp-area="Admin" asp-controller="Users" asp-action="ShowUsers">
             <i class="bi bi-arrow-left"></i> Back to users
         </a>
     </div>
+
+<style>
+    .review-tabs { list-style:none; display:flex; gap:8px; padding:0; margin:0 0 1rem; flex-wrap:wrap; }
+    .review-tab { background:rgba(148,163,184,.12); border:1px solid rgba(148,163,184,.25); color:#e2e8f0; border-radius:10px; padding:8px 16px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+    .review-tab.active { background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(37,99,235,.4); }
+    .review-tab-badge { background:rgba(0,0,0,.25); color:inherit; border-radius:999px; font-size:.72rem; padding:1px 8px; font-weight:800; }
+    .cr-card .cr-email { color:#94a3b8; font-size:.82rem; margin-left:.4rem; }
+    .cr-form { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+    .cr-note { flex:1 1 220px; min-width:180px; }
+    .cr-actions { display:flex; gap:8px; }
+    .qa-interval-label { color:#fff !important; font-weight:600; margin-bottom:0; }
+    select.qa-interval-select.form-select, select#qa-interval { width:auto !important; min-width:9rem; background-color:#0b2740 !important; color:#fff !important; border:1px solid rgba(255,255,255,.25) !important; border-radius:.5rem !important; font-weight:600 !important; background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important; }
+    select.qa-interval-select.form-select:focus, select#qa-interval:focus { background-color:#0b2740 !important; color:#fff !important; border-color:#3370a8 !important; box-shadow:0 0 0 .2rem rgba(51,112,168,.35) !important; }
+    select.qa-interval-select.form-select option, select#qa-interval option { color:#0f172a !important; background-color:#fff !important; font-weight:600; }
+</style>
+
+    <ul class="review-tabs" role="tablist">
+        <li><button type="button" class="review-tab @(approvalsActive ? "" : "active")" data-bs-toggle="tab" data-bs-target="#tab-emails"><i class="bi bi-envelope-paper-fill"></i> Emails <span class="review-tab-badge">@Model.PendingCount</span></button></li>
+        <li><button type="button" class="review-tab @(approvalsActive ? "active" : "")" data-bs-toggle="tab" data-bs-target="#tab-approvals"><i class="bi bi-person-check-fill"></i> Approvals <span class="review-tab-badge">@Model.ChangeRequestsPendingCount</span></button></li>
+    </ul>
+
+    <div class="tab-content">
+    <div class="tab-pane fade @(approvalsActive ? "" : "show active")" id="tab-emails" role="tabpanel">
 
     <form id="qa-form" method="post" asp-area="Admin" asp-controller="EmailQueue" asp-action="SendNow">
         @Html.AntiForgeryToken()
 
         <!-- TOOLBAR -->
         <div class="email-qa-toolbar d-flex flex-wrap align-items-center gap-2 mb-4">
-            <div class="form-check me-2 mb-0">
-                <input class="form-check-input" type="checkbox" id="qa-select-all" />
-                <label class="form-check-label" for="qa-select-all">Select all</label>
-            </div>
-
             <button type="submit" class="btn btn-mint btn-sm" formaction="/Admin/EmailQueue/SendNow">
                 <i class="bi bi-send-fill"></i> Send now
             </button>
@@ -83,9 +103,15 @@
         @foreach (var sec in sections)
         {
             <div class="email-qa-section mb-4">
-                <h5 class="email-qa-section-title">
-                    <i class="bi @sec.Icon me-2"></i>@sec.Title
+                <h5 class="email-qa-section-title d-flex align-items-center flex-wrap gap-2">
+                    <span><i class="bi @sec.Icon me-2"></i>@sec.Title</span>
                     <span class="badge rounded-pill qa-count-badge">@sec.Items.Count</span>
+                    @if (sec.Items.Count > 0)
+                    {
+                        <button type="button" class="btn btn-ocean btn-sm qa-section-selectall ms-auto">
+                            <i class="bi bi-check2-square"></i> <span class="qa-selectall-text">Select all</span>
+                        </button>
+                    }
                 </h5>
 
                 @if (sec.Items.Count == 0)
@@ -127,6 +153,41 @@
             </div>
         }
     </form>
+
+    </div><!-- /tab-emails -->
+
+    <div class="tab-pane fade @(approvalsActive ? "show active" : "")" id="tab-approvals" role="tabpanel">
+        @if (!Model.ChangeRequests.Any())
+        {
+            <div class="qa-empty">No change requests awaiting approval.</div>
+        }
+        else
+        {
+            <div class="qa-card-list">
+                @foreach (var r in Model.ChangeRequests)
+                {
+                    <div class="qa-card cr-card">
+                        <div class="qa-card-main">
+                            <div class="qa-card-recipient"><i class="bi bi-person-fill me-1"></i>@r.UserName<span class="cr-email">@r.UserEmail</span></div>
+                            <div class="qa-card-subject"><span class="badge bg-info text-dark me-1">@r.TypeLabel</span> @r.Summary</div>
+                        </div>
+                        <div class="qa-card-foot">
+                            <span class="qa-card-date"><i class="bi bi-clock me-1"></i>@r.RequestedAtUtc.ToString("dd MMM yyyy, HH:mm") UTC</span>
+                        </div>
+                        <form method="post" asp-area="Admin" asp-controller="ChangeRequest" asp-action="Approve" class="cr-form">
+                            <input type="hidden" name="id" value="@r.Id" />
+                            <input type="text" name="note" maxlength="1000" class="form-control form-control-sm cr-note" placeholder="Optional note (kept in the log)" />
+                            <div class="cr-actions">
+                                <button type="submit" class="btn btn-mint btn-sm" formaction="/Admin/ChangeRequest/Approve"><i class="bi bi-check2-circle"></i> Approve</button>
+                                <button type="submit" class="btn btn-outline-danger btn-sm" formaction="/Admin/ChangeRequest/Reject" onclick="return confirm('Reject this request?');"><i class="bi bi-x-octagon"></i> Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+    </div><!-- /tab-approvals -->
+    </div><!-- /tab-content -->
 </div>
 
 <!-- VIEW / EDIT MODAL -->
@@ -222,12 +283,17 @@
             const previewPane = document.getElementById('qaPreviewPane');
             if (previewPane) previewPane.addEventListener('shown.bs.collapse', refreshPreview);
 
-            const selectAll = document.getElementById('qa-select-all');
-            if (selectAll) {
-                selectAll.addEventListener('change', function () {
-                    document.querySelectorAll('.qa-check').forEach(function (c) { c.checked = selectAll.checked; });
+            document.querySelectorAll('.qa-section-selectall').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const section = btn.closest('.email-qa-section');
+                    if (!section) return;
+                    const checks = section.querySelectorAll('.qa-check');
+                    const target = !(checks.length > 0 && Array.prototype.every.call(checks, function (c) { return c.checked; }));
+                    checks.forEach(function (c) { c.checked = target; });
+                    const txt = btn.querySelector('.qa-selectall-text');
+                    if (txt) txt.textContent = target ? 'Deselect all' : 'Select all';
                 });
-            }
+            });
         })();
     </script>
 }
