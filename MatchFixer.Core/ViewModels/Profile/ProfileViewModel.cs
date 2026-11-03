@@ -23,6 +23,8 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public int MatchFixScore { get; set; }
 		public int UserRank { get; set; }
 		public int LogoQuizScore { get; set; }
+		public bool HasPendingNameChange { get; set; }
+		public string? PendingNameChangeText { get; set; }
 		public decimal TournamentPrizeTotal { get; set; }
 		public int TournamentWins { get; set; }
 		public int TournamentPodiums { get; set; }

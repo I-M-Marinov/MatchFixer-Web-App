@@ -39,6 +39,7 @@ namespace MatchFixer.Core.Services
 		private readonly IImageService _imageService;
 		private readonly SignInManager<ApplicationUser> _signInManager;
 		private readonly ISessionService _sessionService;
+		private readonly IChangeRequestService _changeRequests;
 
 
 
@@ -51,7 +52,8 @@ namespace MatchFixer.Core.Services
 			MatchFixerDbContext dbContext,
 			IImageService imageService,
 			SignInManager<ApplicationUser> signInManager,
-			ISessionService sessionService)
+			ISessionService sessionService,
+			IChangeRequestService changeRequests)
 		{
 			_userManager = userManager;
 			_emailSender = emailSender;
@@ -72,6 +74,7 @@ namespace MatchFixer.Core.Services
 			_imageService = imageService;
 			_signInManager = signInManager;
 			_sessionService = sessionService;
+			_changeRequests = changeRequests;
 		}
 
 		public async Task<ApplicationUser> GetCurrentUser(string userId)
@@ -263,6 +266,8 @@ namespace MatchFixer.Core.Services
 			var tourPodiums = tourEntries.Count(x => x.FinalRank <= 3);
 			var tourPlayed = tourEntries.Count;
 
+			var pendingName = await _changeRequests.GetPendingNameChangeAsync(user.Id);
+
 			return new ProfileViewModel
 			{
 				Id = user.Id.ToString(),
@@ -276,6 +281,8 @@ namespace MatchFixer.Core.Services
 				MatchFixScore = user.MatchFixScore,
 				UserRank = userRank,
 				LogoQuizScore = user.LogoQuizScore,
+				HasPendingNameChange = pendingName != null,
+				PendingNameChangeText = pendingName?.ProposedValue,
 				TournamentPrizeTotal = tourPrize,
 				TournamentWins = tourWins,
 				TournamentPodiums = tourPodiums,
@@ -373,49 +380,19 @@ namespace MatchFixer.Core.Services
 
 		public async Task<(bool Success, string Message)> UpdateNamesAsync(ProfileViewModel model)
 		{
-
 			if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName))
 			{
 				return (false, FirstAndLastNameAreRequired);
 			}
 
-			var user = await _userManager.FindByIdAsync(model.Id);
-
-			if (user == null)
+			if (!Guid.TryParse(model.Id, out var userId))
 			{
 				return (false, UserNotFound);
 			}
 
-			var trimmedFirstName = model.FirstName?.Trim();
-			var trimmedLastName = model.LastName?.Trim();
-
-			var isFirstNameChanged = !string.Equals(user.FirstName, trimmedFirstName, StringComparison.Ordinal);
-			var isLastNameChanged = !string.Equals(user.LastName, trimmedLastName, StringComparison.Ordinal);
-
-			if (!isFirstNameChanged && !isLastNameChanged)
-			{
-				return (false, NoChangesMadeToProfile);
-			}
-
-			if (isFirstNameChanged)
-			{
-				user.FirstName = trimmedFirstName!;
-			}
-
-			if (isLastNameChanged)
-			{
-				user.LastName = trimmedLastName!;
-			}
-
-			var result = await _userManager.UpdateAsync(user);
-
-			if (!result.Succeeded)
-			{
-				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-				return (false, $"Failed to update user: {errors}");
-			}
-
-			return (true, NameUpdatedSuccessfully);
+			// Name changes are gated behind admin approval: create a pending request
+			// instead of applying the change directly.
+			return await _changeRequests.SubmitNameChangeAsync(userId, model.FirstName, model.LastName);
 		}
 
 		public async Task<(bool Success, string ErrorMessage)> UpdateEmailAsync(string userId, string newEmail,
