@@ -208,7 +208,8 @@
 							     alt="@match.HomeTeam"
 							     class="live-events-team-logo hoverable-logo mb-2 @(match.IsInternational ? "team-logo-international" : "")"
 							     data-team-name="@match.HomeTeam"
-							     data-team-side="home"/>
+							     data-team-side="home"
+							     onerror="this.onerror=null;this.src='/images/add-match/question-mark.png'" />
 							<div class="event-team-name">@match.HomeTeam</div>
 						</div>
 					</div>
@@ -222,7 +223,8 @@
 							     alt="@match.AwayTeam"
 							     class="live-events-team-logo hoverable-logo mb-2 @(match.IsInternational ? "team-logo-international" : "")"
 							     data-team-name="@match.AwayTeam"
-							     data-team-side="away"/>
+							     data-team-side="away"
+							     onerror="this.onerror=null;this.src='/images/add-match/question-mark.png'" />
 							<div class="event-team-name">@match.AwayTeam</div>
 						</div>
 					</div>
