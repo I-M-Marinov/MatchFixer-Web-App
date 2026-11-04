@@ -1264,3 +1264,56 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 .fav-select2-dropdown .select2-results__option[aria-selected="true"] {
     background: rgba(8, 172, 147, 0.35);
 }
+
+.name-pending-note { margin-top:0.4rem; font-size:0.78rem; color:#ffd23f; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.3); border-radius:8px; padding:5px 10px; text-align:center; font-weight:600; }
+
+/* --- Keep profile info card beside the avatar (view AND edit) -------------
+   The top row is a single non-wrapping line on desktop, so showing an edit
+   control can never bump the info card onto its own row underneath. The info
+   column simply shrinks to share the row; its controls shrink with it. */
+@media (min-width: 992px) {
+    .profile-container {
+        flex-wrap: nowrap !important;
+        align-items: flex-start !important;
+    }
+    .profile-card {
+        flex: 0 1 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+    }
+    #profile-form {
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+    .profile-info-container {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+}
+/* Compact edit controls: keep the card's original size when a field is opened
+   for editing. The dropdown/input stay small with slightly smaller text so the
+   row footprint stays close to the static value it replaces. */
+.profile-info-container .profile-detail .form-control,
+.profile-info-container .profile-detail select {
+    min-width: 0;
+    font-size: 0.82rem;
+    padding: 0.15rem 0.5rem;
+    height: auto;
+    line-height: 1.35;
+    background-size: 14px 12px;
+}
+.profile-info-container .profile-detail select {
+    max-width: 190px;
+    flex: 0 1 190px;
+    text-overflow: ellipsis;
+}
+.profile-info-container .profile-detail input.form-control {
+    max-width: 230px;
+    flex: 0 1 230px;
+}
+.profile-info-container .profile-detail select option {
+    font-size: 0.82rem;
+}
