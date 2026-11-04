@@ -171,6 +171,7 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     </p>
     <h4>Profile Overview</h4>
     <img src="./assets/profile-page-final.png" width="800px" />
+    <img src="./assets/profile-page-final2.png" width="800px" />
     <h4>Favourite Teams</h4>
     <p>
       - Users can set their favourite teams from the profile page.<br/>
@@ -184,6 +185,14 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
     <h4>Trophies</h4>
     <p>- Users unlock trophies based on their betting activity and milestones reached on the platform.</p>
     <img src="./assets/rigged-to-win-trophy.png" width="800px" />
+  </div>
+</details>
+
+<details>
+  <summary><h2>Tournaments Page</h2></summary>
+  <div align="center">
+    <img src="./assets/tournaments-page.png" width="800px" />
+    <img src="./assets/the-pot.png" width="600px" />
   </div>
 </details>
 
