@@ -179,6 +179,15 @@
 			<!-- Display Full Name -->
 			<h4 class="mt-3 fw-bold text-shadow profile-name-text">@Model.FullName</h4>
 
+			@if (Model.HasPendingNameChange)
+			{
+				<div class="name-pending-note">
+					<i class="bi bi-hourglass-split"></i> Name change pending approval@(string.IsNullOrWhiteSpace(Model.PendingNameChangeText) ? "" : " \u2192 " + Model.PendingNameChangeText)
+				</div>
+			}
+
+			@if (!Model.HasPendingNameChange)
+			{
 			<!-- Editable First Name and Last Name Inputs (hidden initially) -->
 			<div class="d-none name-edit-inputs">
 				<input type="text" class="form-control mb-2" id="first-name" name="FirstName" value="@Model.FirstName" placeholder="First Name"/>
@@ -202,6 +211,7 @@
 				</button>
 			</div>
 
+			}
 		</form>
 	</div>
 </div>
@@ -215,7 +225,7 @@
 	<input type="hidden" name="CreatedOn" value="@Model.CreatedOn"/>
 
 	<!-- Profile Info Card -->
-	<div class="card shadow border-0 rounded-2 p-4 flex-fill profile-info-container" style="min-width: 550px;">
+	<div class="card shadow border-0 rounded-2 p-4 flex-fill profile-info-container" style="min-width: 520px !important;">
 		<div id="live-clock"></div>
 
 		<div class="profile-info">
