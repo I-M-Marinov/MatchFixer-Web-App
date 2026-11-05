@@ -52,7 +52,7 @@
 }
 
 .admin-users-filter{
-    width: 9.5em !important;
+    width: 11.5em !important;
     height: 3em !important;
     text-align: start;
 }
@@ -152,4 +152,250 @@
     background-color: transparent;
     border-color: #7700e1;
     opacity: .65;
+}
+
+
+/*----------------------------------------------------------------
+|      WIDE LAYOUT – break out of the 1320px .container           |
+-----------------------------------------------------------------*/
+
+.admin-users-page {
+    --users-page-width: min(1720px, calc(100vw - 2rem));
+    width: var(--users-page-width);
+    max-width: none;
+    margin-left: calc(50% - var(--users-page-width) / 2);
+    margin-right: 0;
+}
+
+.admin-users-table-section {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 1.5em 1.5em;
+    border-radius: 0.35em;
+}
+
+.admin-user-table table {
+    font-size: 0.95rem;
+}
+
+.admin-user-table th {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.admin-user-table .col-userid {
+    max-width: 150px;
+}
+
+.admin-user-table .user-id-text {
+    font-size: 0.68em;
+    word-break: break-all;
+    line-height: 1.35;
+}
+
+.admin-user-table .user-email-cell {
+    font-size: 0.72em;
+    max-width: 220px;
+}
+
+.admin-user-table .col-dob {
+    min-width: 120px;
+    font-size: 0.75em;
+}
+
+.admin-user-table .dob-date { font-weight: 600; }
+.admin-user-table .dob-age  { color: #6c757d; margin-bottom: 0.2rem; }
+.admin-user-table .dob-missing { color: #6c757d; font-style: italic; margin-bottom: 0.2rem; }
+
+.admin-user-table .col-actions {
+    min-width: 330px;
+    white-space: nowrap;
+}
+
+.badge-betting-on {
+    background-color: #0DAB76;
+    color: #fff;
+}
+
+/* Betting access action button */
+.btn-betting-on {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #198754;
+    --bs-btn-border-color: #198754;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #146c43;
+    --bs-btn-hover-border-color: #146c43;
+}
+
+.btn-betting-off {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #fd7e14;
+    --bs-btn-border-color: #fd7e14;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #dc6a0b;
+    --bs-btn-hover-border-color: #dc6a0b;
+}
+
+/* Betting access modal */
+#bettingAccessModal .modal-dialog { max-width: 440px; }
+
+.betting-access-modal {
+    background: #1d2125;
+    color: #e9ecef;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: left;
+    overflow: hidden;
+}
+
+.betting-access-modal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: left;
+}
+
+.betting-access-modal .ba-heading { min-width: 0; }
+
+.betting-access-modal .modal-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-align: left;
+}
+
+.betting-access-modal .ba-user {
+    font-size: 12.5px;
+    color: rgba(233, 236, 239, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Override the global .btn-close from start-game-screen.css */
+.betting-access-modal .modal-header .btn-close {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    width: 1em !important;
+    height: 1em !important;
+    box-sizing: content-box;
+    margin: 0 !important;
+    padding: 0.4rem;
+    flex-shrink: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.betting-access-modal .modal-header .btn-close:hover { opacity: 1; }
+
+.betting-access-modal .modal-body { padding: 1rem 1.1rem 1.1rem; }
+
+.betting-access-facts {
+    margin: 0 0 1rem;
+    padding: 0.25rem 0.85rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+.betting-access-facts .ba-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.45rem 0;
+}
+
+.betting-access-facts .ba-row + .ba-row { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+
+.betting-access-facts dt {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: rgba(233, 236, 239, 0.6);
+    margin: 0;
+}
+
+.betting-access-facts dd {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.ba-pill {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ba-pill.is-yes { background: rgba(13, 171, 118, 0.18); color: #3ddc9c; }
+.ba-pill.is-no  { background: rgba(220, 53, 69, 0.18); color: #ff7b86; }
+
+.betting-access-modal .ba-reason {
+    margin: -0.4rem 0 1rem;
+    font-size: 12.5px;
+    color: #ff9aa2;
+}
+
+.betting-access-modal .ba-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba(233, 236, 239, 0.85);
+}
+
+.betting-access-modal .input-group .form-control,
+.betting-access-modal .input-group .btn {
+    font-size: 13.5px;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+}
+
+.betting-access-modal .ba-hint {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 12px;
+    color: rgba(233, 236, 239, 0.5);
+}
+
+.betting-access-modal .ba-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.betting-access-modal .ba-actions form { margin: 0; }
+.betting-access-modal .ba-actions .btn { font-size: 13px; }
+
+@media (max-width: 768px) {
+    .admin-users-page {
+        width: auto;
+        margin-left: 0;
+    }
+
+    .admin-user-table .col-actions,
+    .admin-user-table .col-userid,
+    .admin-user-table .user-email-cell {
+        min-width: 0;
+        max-width: none;
+        white-space: normal;
+    }
+
+    .admin-user-table .col-actions .d-flex {
+        flex-wrap: wrap !important;
+    }
 }

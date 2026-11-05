@@ -8,6 +8,8 @@
 		public const string StatusLocked = "locked";
 		public const string StatusDeleted = "deleted";
 		public const string StatusAll = "all";
+		public const string StatusAgeUnverified = "age-unverified";
+		public const string StatusBettingBlocked = "betting-blocked";
 
 		public const string CannotLockOwnAccount = "You cannot lock your own account.";
 		public const string UserWasNotFound = "The user was not found.";

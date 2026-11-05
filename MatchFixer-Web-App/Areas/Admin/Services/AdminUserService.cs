@@ -66,6 +66,10 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 					StatusDeleted => usersQ.Where(u => u.IsDeleted),
 
+					StatusAgeUnverified => usersQ.Where(u => !u.IsAgeVerified && !u.IsDeleted),
+
+					StatusBettingBlocked => usersQ.Where(u => u.IsBettingBlocked && !u.IsDeleted),
+
 					StatusAll or _ => usersQ.Where(u => !u.IsDeleted) // fallback
 				};
 
@@ -87,7 +91,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						u.LockoutEnd,
 						u.LockoutEnabled,
 						u.IsActive,
-						u.IsDeleted
+						u.IsDeleted,
+						u.DateOfBirth,
+						u.IsAgeVerified,
+						u.AgeVerifiedOnUtc,
+						u.IsBettingBlocked
 					})
 					.ToListAsync();
 
@@ -144,7 +152,11 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						                 && info2.IsLocked,
 						BetsCount = betsCount.TryGetValue(u.Id, out var cnt) ? cnt : 0,
 						IsActive = u.IsActive,
-						IsDeleted = u.IsDeleted
+						IsDeleted = u.IsDeleted,
+						DateOfBirth = u.DateOfBirth,
+						IsAgeVerified = u.IsAgeVerified,
+						AgeVerifiedOnUtc = u.AgeVerifiedOnUtc,
+						IsBettingBlocked = u.IsBettingBlocked
 					}).ToList()
 				};
 

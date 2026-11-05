@@ -8,9 +8,11 @@
 
 	// Default to "active" if nothing is specified
 	var currentStatus = string.IsNullOrWhiteSpace(Model.Status) ? "active" : Model.Status;
+
+	var listReturnUrl = Context.Request.Path + Context.Request.QueryString;
 }
 
-<div class="border-0 rounded-4 p-3 mt-4 ">
+<div class="border-0 rounded-4 p-3 mt-4 admin-users-page">
 @if (TempData["SuccessMessage"] is string s)
 {
 	<div class="alert success-message" id="success-message" >@s</div>
@@ -41,6 +43,8 @@
 			<option value="unconfirmed"selected="@(currentStatus == "unconfirmed" ? "selected" : null)">Unconfirmed</option>
 			<option value="locked"     selected="@(currentStatus == "locked" ? "selected" : null)">Locked</option>
 			<option value="deleted"    selected="@(currentStatus == "deleted" ? "selected" : null)">Deleted</option>
+			<option value="age-unverified"  selected="@(currentStatus == "age-unverified" ? "selected" : null)">Age unverified</option>
+			<option value="betting-blocked" selected="@(currentStatus == "betting-blocked" ? "selected" : null)">Betting blocked</option>
 		</select>
 	</div>
 
@@ -74,28 +78,29 @@
 
 </form>
 
-<div class="table-section d-flex flex-column" style="background-color: rgba(0, 0, 0, 0.3); padding: 1.5em 2em; border-radius: 0.35em;">
+<div class="table-section d-flex flex-column admin-users-table-section">
 	<div class="table-holder flex-grow-1">
 		<div class="table-responsive admin-user-table">
 			<table class="responsive-stack table table-bordered table-hover text-center shadow-sm rounded-3 table-sm align-middle">
 				<thead class="table-dark">
 				<tr>
-					<th>User Id</th>
+					<th class="col-userid">User Id</th>
 					<th>User</th>
 					<th>Avatar</th>
 					<th>Email</th>
+					<th class="col-dob">Date of Birth</th>
 					<th>Status</th>
 					<th>Role</th>
 					<th>Wallet</th>
 					<th>Bets</th>
-					<th style="min-width:260px;">Actions</th>
+					<th class="col-actions">Actions</th>
 				</tr>
 				</thead>
 				<tbody>
 				@if (Model.Users.Count == 0)
 				{
 					<tr>
-						<td colspan="9" class="text-muted">
+						<td colspan="10" class="text-muted">
 							No users with status '@(string.IsNullOrEmpty(Model.Status) ? "any" : Model.Status)' were found!
 						</td>
 					</tr>                    }
@@ -108,8 +113,8 @@
 
 						<tr>
 
-							<td class="text-center">
-								<div style="font-size: 0.65em;">@u.Id</div>
+							<td class="text-center col-userid" data-label="User Id">
+								<div class="user-id-text">@u.Id</div>
 							</td>
 
 							<td class="text-center" style="font-size: 0.75em;">
@@ -134,8 +139,33 @@
 								</div>
 							</td>
 
-							<td class="text-break" style="font-size: 0.50em;">
+							<td class="text-break user-email-cell" data-label="Email">
 								@u.Email
+							</td>
+
+							<td class="col-dob" data-label="Date of Birth">
+								@if (u.HasDateOfBirth)
+								{
+									<div class="dob-date">@u.DateOfBirth.ToString("dd MMM yyyy")</div>
+									<div class="dob-age">@u.Age yrs</div>
+								}
+								else
+								{
+									<div class="dob-missing">Not provided</div>
+								}
+
+								@if (u.IsAgeVerified && u.Age >= MatchFixer.Common.GeneralConstants.AgeVerificationConstants.MinimumBettingAge)
+								{
+									<span class="badge bg-success" title="@(u.AgeVerifiedOnUtc is { } v ? $"Verified {v.ToLocalTime():dd MMM yyyy HH:mm}" : "Verified")">Verified ✓</span>
+								}
+								else if (u.HasDateOfBirth && u.Age < MatchFixer.Common.GeneralConstants.AgeVerificationConstants.MinimumBettingAge)
+								{
+									<span class="badge bg-danger">Under 18</span>
+								}
+								else
+								{
+									<span class="badge bg-warning text-dark">Unverified</span>
+								}
 							</td>
 
 							<td style="font-size: 0.65em;">
@@ -167,6 +197,22 @@
 								{
 									<div><span class="badge bg-info text-dark">Active</span></div>
 								}
+
+								@if (!u.IsDeleted)
+								{
+									@if (u.IsBettingBlocked)
+									{
+										<div><span class="badge bg-danger mt-1" title="Blocked by admin">Betting off</span></div>
+									}
+									else if (u.Betting.CanBet)
+									{
+										<div><span class="badge badge-betting-on mt-1">Betting ✓</span></div>
+									}
+									else
+									{
+										<div><span class="badge bg-secondary mt-1" title="@u.Betting.Message">No betting</span></div>
+									}
+								}
 							</td>
 							<td>
 								@if (u.Roles?.Length > 0)
@@ -183,8 +229,8 @@
 							</td>
 							<td style="font-size: 0.75em;">€@(u.WalletBalance?.ToString() ?? "0")</td>
 							<td style="font-size: 0.75em;">@u.BetsCount</td>
-							<td class="text-nowrap">
-								<div class="d-flex gap-1 justify-content-center">
+							<td class="text-nowrap col-actions" data-label="Actions">
+								<div class="d-flex gap-1 justify-content-center flex-nowrap">
 									@if (!u.IsDeleted)
 									{
 										@* Confirm email *@
@@ -263,8 +309,26 @@
 										   title="Email this user">
 											<i class="bi bi-envelope"></i>
 										</a>
+
+										@* Betting access *@
+										<button type="button"
+										        class="btn btn-sm betting-access-btn @(u.Betting.CanBet ? "btn-betting-on" : "btn-betting-off")"
+										        title="Betting access & age verification"
+										        data-bs-toggle="modal"
+										        data-bs-target="#bettingAccessModal"
+										        data-user-id="@u.Id"
+										        data-user-name="@($"{u.FirstName} {u.LastName}".Trim())"
+										        data-dob="@(u.HasDateOfBirth ? u.DateOfBirth.ToString("yyyy-MM-dd") : "")"
+										        data-dob-display="@(u.HasDateOfBirth ? $"{u.DateOfBirth:dd MMM yyyy} ({u.Age} yrs)" : "Not provided")"
+										        data-verified="@(u.IsAgeVerified ? "true" : "false")"
+										        data-verified-on="@(u.AgeVerifiedOnUtc?.ToLocalTime().ToString("dd MMM yyyy HH:mm") ?? "")"
+										        data-blocked="@(u.IsBettingBlocked ? "true" : "false")"
+										        data-can-bet="@(u.Betting.CanBet ? "true" : "false")"
+										        data-reason="@u.Betting.Message">
+											<i class="bi @(u.Betting.CanBet ? "bi-shield-check" : "bi-shield-slash")"></i>
+										</button>
 									}
-									<div class="d-flex gap-1 justify-content-center">
+									<div class="d-flex gap-1 justify-content-center flex-nowrap">
 										<a class="btn btn-sm @(u.IsWalletLocked ? "btn-wallet-locked" : "btn-mint")"
 										   asp-area="Admin"
 										   asp-controller="Wallet"
@@ -322,3 +386,108 @@
 </div>
 </div>
 
+<!-- Betting access modal -->
+<div class="modal fade" id="bettingAccessModal" tabindex="-1" aria-labelledby="bettingAccessTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content betting-access-modal">
+			<div class="modal-header">
+				<div class="ba-heading">
+					<h5 class="modal-title" id="bettingAccessTitle">
+						<i class="bi bi-shield-lock"></i> Betting access
+					</h5>
+					<div class="ba-user" data-ba="name"></div>
+				</div>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+
+			<div class="modal-body">
+				<dl class="betting-access-facts">
+					<div class="ba-row"><dt>Date of birth</dt><dd data-ba="dob"></dd></div>
+					<div class="ba-row"><dt>Age verified</dt><dd data-ba="verified"></dd></div>
+					<div class="ba-row"><dt>Can bet</dt><dd data-ba="canbet"></dd></div>
+				</dl>
+				<div class="ba-reason" data-ba="reason"></div>
+
+				<!-- Verify age -->
+				<form asp-area="Admin" asp-controller="Users" asp-action="VerifyAge" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" data-ba-id />
+					<input type="hidden" name="returnUrl" value="@listReturnUrl" />
+					<label class="ba-label" for="baDob">Set / confirm date of birth</label>
+					<div class="input-group">
+						<input type="date" class="form-control" id="baDob" name="dateOfBirth"
+						       min="1901-01-01" max="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+						<button class="btn btn-success" type="submit">
+							<i class="bi bi-patch-check me-1"></i> Verify age
+						</button>
+					</div>
+					<small class="ba-hint">Only works if the date makes the user 18 or older.</small>
+				</form>
+
+				<div class="ba-actions">
+					<!-- Reset verification -->
+					<form asp-area="Admin" asp-controller="Users" asp-action="ResetAgeVerification" method="post" data-ba="reset-form">
+						@Html.AntiForgeryToken()
+						<input type="hidden" name="id" data-ba-id />
+						<input type="hidden" name="returnUrl" value="@listReturnUrl" />
+						<button class="btn btn-outline-warning btn-sm" type="submit">
+							<i class="bi bi-arrow-counterclockwise me-1"></i> Reset verification
+						</button>
+					</form>
+
+					<!-- Block / allow betting -->
+					<form asp-area="Admin" asp-controller="Users" asp-action="SetBettingBlocked" method="post" class="ms-auto">
+						@Html.AntiForgeryToken()
+						<input type="hidden" name="id" data-ba-id />
+						<input type="hidden" name="returnUrl" value="@listReturnUrl" />
+						<input type="hidden" name="blocked" data-ba="blocked-value" />
+						<button class="btn btn-sm" type="submit" data-ba="block-btn"></button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	(() => {
+		const modal = document.getElementById('bettingAccessModal');
+		if (!modal) return;
+
+		modal.addEventListener('show.bs.modal', e => {
+			const d = e.relatedTarget?.dataset;
+			if (!d) return;
+
+			const q = k => modal.querySelector(`[data-ba="${k}"]`);
+			const verified = d.verified === 'true';
+			const blocked = d.blocked === 'true';
+			const canBet = d.canBet === 'true';
+
+			const pill = (yes, text) => {
+				const span = document.createElement('span');
+				span.className = `ba-pill ${yes ? 'is-yes' : 'is-no'}`;
+				span.textContent = text;
+				return span;
+			};
+
+			q('name').textContent = d.userName || 'User';
+			q('dob').textContent = d.dobDisplay;
+			q('verified').replaceChildren(pill(verified, verified ? `Yes${d.verifiedOn ? ' · ' + d.verifiedOn : ''}` : 'No'));
+			q('canbet').replaceChildren(pill(canBet, canBet ? 'Yes' : 'No'));
+			q('reason').textContent = canBet ? '' : d.reason;
+			q('reason').style.display = canBet ? 'none' : '';
+
+			modal.querySelectorAll('[data-ba-id]').forEach(i => i.value = d.userId);
+			document.getElementById('baDob').value = d.dob || '';
+
+			q('reset-form').style.display = verified ? '' : 'none';
+
+			q('blocked-value').value = blocked ? 'false' : 'true';
+			const btn = q('block-btn');
+			btn.className = `btn btn-sm ${blocked ? 'btn-success' : 'btn-danger'}`;
+			btn.innerHTML = blocked
+				? '<i class="bi bi-play-circle me-1"></i> Allow betting'
+				: '<i class="bi bi-slash-circle me-1"></i> Block betting';
+		});
+	})();
+</script>

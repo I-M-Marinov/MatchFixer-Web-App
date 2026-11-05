@@ -1,4 +1,5 @@
-﻿using MatchFixer.Infrastructure.Security; 
+﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Infrastructure.Security; 
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,7 +14,47 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 	public class UsersController : Controller
 	{
 		private readonly IAdminUserService _svc;
-		public UsersController(IAdminUserService svc) => _svc = svc;
+		private readonly IBettingEligibilityService _eligibility;
+
+		public UsersController(IAdminUserService svc, IBettingEligibilityService eligibility)
+		{
+			_svc = svc;
+			_eligibility = eligibility;
+		}
+
+		// Betting access
+
+		[HttpPost("VerifyAge")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> VerifyAge(Guid id, DateTime? dateOfBirth, string? returnUrl, CancellationToken ct)
+		{
+			var (ok, msg) = await _eligibility.AdminVerifyAgeAsync(id, dateOfBirth, ct);
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
+			return BackToList(returnUrl);
+		}
+
+		[HttpPost("ResetAgeVerification")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ResetAgeVerification(Guid id, string? returnUrl, CancellationToken ct)
+		{
+			var (ok, msg) = await _eligibility.AdminResetAgeVerificationAsync(id, ct);
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
+			return BackToList(returnUrl);
+		}
+
+		[HttpPost("SetBettingBlocked")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> SetBettingBlocked(Guid id, bool blocked, string? returnUrl, CancellationToken ct)
+		{
+			var (ok, msg) = await _eligibility.AdminSetBettingBlockedAsync(id, blocked, ct);
+			TempData[ok ? TempDataKeys.SuccessMessage : TempDataKeys.ErrorMessage] = msg;
+			return BackToList(returnUrl);
+		}
+
+		private IActionResult BackToList(string? returnUrl) =>
+			!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+				? LocalRedirect(returnUrl)
+				: RedirectToAction(nameof(ShowUsers));
 
 		[HttpGet("/admin/users", Name = "AdminUsersList")]
 		public async Task<IActionResult> ShowUsers(string? query, string? status, int page = 1, int pageSize = 5)
