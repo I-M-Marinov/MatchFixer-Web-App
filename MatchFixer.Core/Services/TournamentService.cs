@@ -16,12 +16,16 @@ namespace MatchFixer.Core.Services
 		private readonly ITimezoneService _timezone;
 		private readonly ISessionService _session;
 
+		private readonly IBettingEligibilityService _eligibility;
+
 		public TournamentService(
 			MatchFixerDbContext db,
 			IWalletService wallet,
 			ITimezoneService timezone,
-			ISessionService session)
+			ISessionService session,
+			IBettingEligibilityService eligibility)
 		{
+			_eligibility = eligibility;
 			_db = db;
 			_wallet = wallet;
 			_timezone = timezone;
@@ -613,6 +617,10 @@ namespace MatchFixer.Core.Services
 
 		public async Task<(bool Success, string Message)> JoinAsync(Guid tournamentId, Guid currentUserId)
 		{
+			var eligibility = await _eligibility.GetEligibilityAsync(currentUserId);
+			if (!eligibility.CanBet)
+				return (false, eligibility.Message);
+
 			var now = DateTime.UtcNow;
 
 			var t = await _db.Tournaments
@@ -665,6 +673,10 @@ namespace MatchFixer.Core.Services
 			static string Label(MatchEvent m) => $"{m.HomeTeam?.Name ?? "Match"} vs {m.AwayTeam?.Name ?? ""}".Trim();
 
 			var now = DateTime.UtcNow;
+
+			var eligibility = await _eligibility.GetEligibilityAsync(currentUserId);
+			if (!eligibility.CanBet)
+				return (false, eligibility.Message);
 
 			if (legs == null || legs.Count == 0)
 				return (false, "Pick at least one match to bet on.");

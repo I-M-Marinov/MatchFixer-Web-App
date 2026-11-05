@@ -25,6 +25,7 @@ public class BettingService : IBettingService
 	private readonly IAdminInsightsNotifier _notifier;
 	private readonly IEmailSender _emailSender;
 	private readonly IEmailQueueService _emailQueue;
+	private readonly IBettingEligibilityService _eligibility;
 
 
 	public BettingService(MatchFixerDbContext dbContext,
@@ -35,7 +36,8 @@ public class BettingService : IBettingService
 		IOddsBoostService oddsBoostService,
 		IAdminInsightsNotifier notifier,
 		IEmailSender emailSender,
-		IEmailQueueService emailQueue
+		IEmailQueueService emailQueue,
+		IBettingEligibilityService eligibility
 		)
 	{
 		_dbContext = dbContext;
@@ -47,10 +49,15 @@ public class BettingService : IBettingService
 		_notifier = notifier;
 		_emailSender = emailSender;
 		_emailQueue = emailQueue;
+		_eligibility = eligibility;
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default)
 	{
+		var eligibility = await _eligibility.GetEligibilityAsync(userId, ct);
+		if (!eligibility.CanBet)
+			return (eligibility.Message, false);
+
 		var now = DateTime.UtcNow;
 
 		var recent = await _dbContext.BetSlips
