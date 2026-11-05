@@ -62,7 +62,7 @@
 
     <ul class="review-tabs" role="tablist">
         <li><button type="button" class="review-tab @(approvalsActive ? "" : "active")" data-bs-toggle="tab" data-bs-target="#tab-emails"><i class="bi bi-envelope-paper-fill"></i> Emails <span class="review-tab-badge">@Model.PendingCount</span></button></li>
-        <li><button type="button" class="review-tab @(approvalsActive ? "active" : "")" data-bs-toggle="tab" data-bs-target="#tab-approvals"><i class="bi bi-person-check-fill"></i> Approvals <span class="review-tab-badge">@Model.ChangeRequestsPendingCount</span></button></li>
+        <li><button type="button" class="review-tab @(approvalsActive ? "active" : "")" data-bs-toggle="tab" data-bs-target="#tab-approvals"><i class="bi bi-person-check-fill"></i> Approvals <span class="review-tab-badge" id="approvalsTabBadge">@Model.ChangeRequestsPendingCount</span></button></li>
     </ul>
 
     <div class="tab-content">
@@ -157,16 +157,11 @@
     </div><!-- /tab-emails -->
 
     <div class="tab-pane fade @(approvalsActive ? "show active" : "")" id="tab-approvals" role="tabpanel">
-        @if (!Model.ChangeRequests.Any())
-        {
-            <div class="qa-empty">No change requests awaiting approval.</div>
-        }
-        else
-        {
-            <div class="qa-card-list">
+        <div class="qa-empty" id="approvalsEmpty" style="@(Model.ChangeRequests.Any() ? "display:none;" : "")">No change requests awaiting approval.</div>
+        <div class="qa-card-list" id="approvalsList" style="@(Model.ChangeRequests.Any() ? "" : "display:none;")">
                 @foreach (var r in Model.ChangeRequests)
                 {
-                    <div class="qa-card cr-card">
+                    <div class="qa-card cr-card" data-request-id="@r.Id">
                         <div class="qa-card-main">
                             <div class="qa-card-recipient"><i class="bi bi-person-fill me-1"></i>@r.UserName<span class="cr-email">@r.UserEmail</span></div>
                             <div class="qa-card-subject"><span class="badge bg-info text-dark me-1">@r.TypeLabel</span> @r.Summary</div>
@@ -184,8 +179,7 @@
                         </form>
                     </div>
                 }
-            </div>
-        }
+        </div>
     </div><!-- /tab-approvals -->
     </div><!-- /tab-content -->
 </div>
