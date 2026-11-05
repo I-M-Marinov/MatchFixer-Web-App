@@ -12,6 +12,8 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public string LastName { get; set; } = null!;
 		public string FullName => $"{FirstName} {LastName}";
 		public DateTime DateOfBirth { get; set; }
+
+		public bool IsAgeVerified { get; set; }
 		public string Country { get; set; } = null!;
 		[Required(ErrorMessage = "Time Zone is required. Please select the time zone.")]
 		public string TimeZone { get; set; } = null!;
@@ -25,6 +27,10 @@ namespace MatchFixer.Core.ViewModels.Profile
 		public int LogoQuizScore { get; set; }
 		public bool HasPendingNameChange { get; set; }
 		public string? PendingNameChangeText { get; set; }
+		public bool HasPendingDateOfBirthChange { get; set; }
+		public string? PendingDateOfBirthText { get; set; }
+		public DateTime? PendingDateOfBirthRequestedUtc { get; set; }
+		public bool PendingDateOfBirthIsUnderage { get; set; }
 		public decimal TournamentPrizeTotal { get; set; }
 		public int TournamentWins { get; set; }
 		public int TournamentPodiums { get; set; }

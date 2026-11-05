@@ -2,6 +2,7 @@
 {
 	public enum ChangeRequestType
 	{
-		NameChange = 0
+		NameChange = 0,
+		DateOfBirthChange = 1
 	}
 }

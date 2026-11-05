@@ -23,6 +23,7 @@ using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Common.FootballLeagues;
 using MatchFixer.Common.FootballCompetitions;
 using MatchFixer.Common.Enums;
+using MatchFixer.Common.GeneralConstants;
 using Country = ISO3166.Country;
 
 
@@ -267,6 +268,7 @@ namespace MatchFixer.Core.Services
 			var tourPlayed = tourEntries.Count;
 
 			var pendingName = await _changeRequests.GetPendingNameChangeAsync(user.Id);
+			var pendingDob = await _changeRequests.GetPendingDateOfBirthChangeAsync(user.Id);
 
 			return new ProfileViewModel
 			{
@@ -275,6 +277,7 @@ namespace MatchFixer.Core.Services
 				LastName = user.LastName,
 				Email = user.Email!,
 				DateOfBirth = user.DateOfBirth,
+				IsAgeVerified = user.IsAgeVerified,
 				Country = user.Country,
 				TimeZone = user.TimeZone,
 				CreatedOn = user.CreatedOn,
@@ -283,6 +286,11 @@ namespace MatchFixer.Core.Services
 				LogoQuizScore = user.LogoQuizScore,
 				HasPendingNameChange = pendingName != null,
 				PendingNameChangeText = pendingName?.ProposedValue,
+				HasPendingDateOfBirthChange = pendingDob != null,
+				PendingDateOfBirthText = pendingDob?.ProposedValue,
+				PendingDateOfBirthRequestedUtc = pendingDob?.RequestedAtUtc,
+				PendingDateOfBirthIsUnderage = pendingDob?.ProposedDate is { } pd &&
+					BettingEligibilityService.CalculateAge(pd, DateTime.UtcNow) < AgeVerificationConstants.MinimumBettingAge,
 				TournamentPrizeTotal = tourPrize,
 				TournamentWins = tourWins,
 				TournamentPodiums = tourPodiums,
@@ -325,11 +333,14 @@ namespace MatchFixer.Core.Services
 					changes.Add("Email");
 				}
 
-				// Check if user changed the date of birth and if yes update it
-				if (user.DateOfBirth != model.DateOfBirth)
+				// DOB changes always go through admin approval
+				string? dobRequestMessage = null;
+				var dobRequestOk = false;
+				if (user.DateOfBirth.Date != model.DateOfBirth.Date &&
+				    BettingEligibilityService.HasRealDateOfBirth(model.DateOfBirth))
 				{
-					user.DateOfBirth = model.DateOfBirth;
-					changes.Add("Date of Birth");
+					(dobRequestOk, dobRequestMessage) =
+						await _changeRequests.SubmitDateOfBirthChangeAsync(user.Id, model.DateOfBirth);
 				}
 
 				// Check if user changed the timezone and if yes update it 
@@ -361,7 +372,9 @@ namespace MatchFixer.Core.Services
 				// If no changes were detected, return a message
 				if (changes.Count == 0)
 				{
-					return (false, NoChangesMadeToProfile);
+					return dobRequestMessage != null
+						? (dobRequestOk, dobRequestMessage)
+						: (false, NoChangesMadeToProfile);
 				}
 
 				// Save the changes to the database
@@ -375,6 +388,8 @@ namespace MatchFixer.Core.Services
 				// If changes were made, return a message with the updated properties
 				string message = ProfileUpdatedSuccessfully +
 								 string.Join(", ", changes);
+				if (dobRequestMessage != null)
+					message += ". " + dobRequestMessage;
 				return (true, message);
 			}
 

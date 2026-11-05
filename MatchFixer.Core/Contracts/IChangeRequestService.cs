@@ -10,6 +10,12 @@ namespace MatchFixer.Core.Contracts
 		// The user's pending name-change request (for the profile status), or null.
 		Task<ChangeRequestInfo?> GetPendingNameChangeAsync(Guid userId);
 
+		// User submits a date-of-birth change for approval. Fails if invalid or one is already pending.
+		Task<(bool Success, string Message)> SubmitDateOfBirthChangeAsync(Guid userId, DateTime dateOfBirth);
+
+		// The user's pending date-of-birth request (for the profile status), or null.
+		Task<ChangeRequestInfo?> GetPendingDateOfBirthChangeAsync(Guid userId);
+
 		// Admin: all pending requests (oldest first).
 		Task<IReadOnlyList<ChangeRequestInfo>> GetPendingAsync();
 
