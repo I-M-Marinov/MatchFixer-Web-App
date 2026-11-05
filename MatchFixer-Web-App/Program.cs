@@ -144,6 +144,7 @@ builder.Services.AddScoped<IMatchGuessGameService, MatchGuessGameService>();	// 
 builder.Services.AddScoped<IOddsGeneratorService, OddsGeneratorService>();		// Add the Odds Generator Service
 builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();                // Add the Logo Quiz Service
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
+builder.Services.AddScoped<IBettingEligibilityService, BettingEligibilityService>(); // Add the Betting Eligibility Service
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IAutoScoringService, AutoScoringService>();     // Add the Auto Scoring Service ( API-driven result settlement )
@@ -239,6 +240,7 @@ builder.Services.AddCors(o =>
 
 // Admin Insights Notifier 
 builder.Services.AddScoped<IAdminInsightsNotifier, AdminInsightsNotifier>();
+builder.Services.AddScoped<IChangeRequestNotifier, ChangeRequestNotifier>();     // Add the Change Request Notifier ( SignalR )
 
 builder.Services.AddScoped<IBoostQueryService, BoostQueryService>();
 
@@ -354,6 +356,7 @@ app.UseAuthorization();
 
 app.MapHub<MatchEventHub>("/matchEventHub");
 app.MapHub<AdminInsightsHub>("/hubs/admin-insights").RequireAuthorization("AdminOnly");
+app.MapHub<AdminReviewHub>("/hubs/admin-review").RequireAuthorization("AdminOnly");
 
 // custom middleware for handling the session  
 app.UseMiddleware<SessionInitializationMiddleware>();
