@@ -28,6 +28,8 @@
 
 
 		
+	@await Html.PartialAsync("_AgeVerificationNotice", "banner")
+
 	@await Html.PartialAsync("_WikipediaTooltipPartial")
 
 	<div class="container events-scroll-container">
@@ -209,7 +211,7 @@
 							     class="live-events-team-logo hoverable-logo mb-2 @(match.IsInternational ? "team-logo-international" : "")"
 							     data-team-name="@match.HomeTeam"
 							     data-team-side="home"
-							     onerror="this.onerror=null;this.src='/images/add-match/question-mark.png'" />
+							     onerror="this.onerror=null;this.src='@MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge'" />
 							<div class="event-team-name">@match.HomeTeam</div>
 						</div>
 					</div>
@@ -224,7 +226,7 @@
 							     class="live-events-team-logo hoverable-logo mb-2 @(match.IsInternational ? "team-logo-international" : "")"
 							     data-team-name="@match.AwayTeam"
 							     data-team-side="away"
-							     onerror="this.onerror=null;this.src='/images/add-match/question-mark.png'" />
+							     onerror="this.onerror=null;this.src='@MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge'" />
 							<div class="event-team-name">@match.AwayTeam</div>
 						</div>
 					</div>

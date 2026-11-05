@@ -1,0 +1,45 @@
+﻿@* Why the user can't bet. Model: "banner" or "compact" *@
+@using MatchFixer.Core.DTOs.Betting
+@using System.Security.Claims
+@model string
+@inject MatchFixer.Core.Contracts.IBettingEligibilityService Eligibility
+
+@{
+	BettingEligibility? status = null;
+
+	if (User.Identity?.IsAuthenticated == true &&
+	    Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
+	{
+		const string key = "__BettingEligibility";
+		status = Context.Items[key] as BettingEligibility;
+		if (status == null)
+		{
+			status = await Eligibility.GetEligibilityAsync(uid);
+			Context.Items[key] = status;
+		}
+	}
+
+	var variant = string.IsNullOrWhiteSpace(Model) ? "banner" : Model;
+}
+
+@if (status is { CanBet: false } && status.Reason != BettingBlockReason.NotSignedIn)
+{
+	var isVerifyCase = status.Reason == BettingBlockReason.AgeNotVerified;
+
+	<div class="age-notice age-notice-@variant @(isVerifyCase ? "is-verify" : "is-blocked")" role="status">
+		<div class="age-notice-body">
+			<div class="age-notice-title">
+				<i class="bi @(isVerifyCase ? "bi-shield-exclamation" : "bi-slash-circle") age-notice-icon"></i>
+				<span>@(isVerifyCase ? "Verify your age to bet" : "Betting unavailable")</span>
+			</div>
+			<div class="age-notice-text">@status.Message</div>
+		</div>
+		@if (isVerifyCase)
+		{
+			<button type="button" class="btn btn-sm btn-warning age-notice-btn"
+			        data-bs-toggle="modal" data-bs-target="#ageVerifyModal">
+				Verify now
+			</button>
+		}
+	</div>
+}

@@ -1,0 +1,159 @@
+﻿/* ---------- Age verification modal ---------- */
+#ageVerifyModal .modal-dialog { max-width: 420px; }
+
+.age-verify-modal {
+    position: relative;
+    background: #1f2328;
+    color: #f1f3f5;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.75rem 1.5rem 1.4rem;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.45;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+/* Override the global .btn-close from start-game-screen.css */
+.age-verify-modal .age-verify-close {
+    position: absolute !important;
+    top: 0.9rem !important;
+    right: 0.9rem !important;
+    width: 1em !important;
+    height: 1em !important;
+    box-sizing: content-box;
+    padding: 0.35rem;
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+.age-verify-modal .age-verify-close:hover { opacity: 1; }
+
+.age-verify-icon {
+    font-size: 2.3rem;
+    color: #01c382;
+    line-height: 1;
+    margin-bottom: 0.6rem;
+}
+
+.age-verify-icon.is-blocked { color: #ff7b86; }
+
+.age-verify-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.4rem;
+}
+
+.age-verify-text {
+    color: rgba(241, 243, 245, 0.72);
+    font-size: 0.92rem;
+    margin: 0 0 1.1rem;
+}
+
+.age-verify-error {
+    background: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.45);
+    color: #ff9aa2;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.age-verify-form { text-align: left; }
+
+.age-verify-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(241, 243, 245, 0.85);
+    margin-bottom: 0.35rem;
+}
+
+.age-verify-check {
+    margin: 0.9rem 0 1rem;
+}
+
+.age-verify-check .form-check-label {
+    font-size: 0.8rem;
+    color: rgba(241, 243, 245, 0.72);
+}
+
+.age-verify-fineprint {
+    margin: 0.85rem 0 0;
+    font-size: 0.75rem;
+    color: rgba(241, 243, 245, 0.45);
+}
+
+/* ---------- Age notice ---------- */
+.age-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    text-align: start;
+    font-family: inherit;
+}
+
+.age-notice.is-verify  { background: #f5b700; color: #1d1a10; }
+.age-notice.is-blocked { background: #d6404e; }
+
+.age-notice-body { flex: 1 1 auto; min-width: 0; }
+
+.age-notice-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.age-notice-icon { font-size: 1.15em; flex-shrink: 0; }
+
+.age-notice-text {
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    opacity: 0.85;
+}
+
+.age-notice-btn {
+    flex-shrink: 0;
+    background: #1d1a10 !important;
+    border-color: #1d1a10 !important;
+    color: #ffd54a !important;
+    font-weight: 700;
+}
+
+.age-notice-btn:hover { background: #000 !important; color: #ffe27a !important; }
+
+/* Events board banner */
+.age-notice-banner {
+    max-width: 900px;
+    margin: 5.5rem auto 1rem;
+    position: relative;
+    z-index: 5;
+}
+
+/* Bet slip / tournament */
+.age-notice-compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border-radius: 10px;
+}
+
+.age-notice-compact .age-notice-title { font-size: 0.92rem; }
+.age-notice-compact .age-notice-text  { font-size: 0.78rem; }
+.age-notice-compact .age-notice-btn   { width: 100%; padding: 0.4rem 0.75rem; font-size: 0.85rem; }
+
+@media (max-width: 576px) {
+    .age-notice-banner { flex-wrap: wrap; margin-left: 16px; margin-right: 16px; }
+    .age-notice-banner .age-notice-btn { width: 100%; }
+}

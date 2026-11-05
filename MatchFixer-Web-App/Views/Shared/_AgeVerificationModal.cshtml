@@ -1,0 +1,97 @@
+﻿@* Age verification modal, rendered once in _Layout. Open with data-bs-target="#ageVerifyModal" *@
+@using MatchFixer.Core.DTOs.Betting
+@using MatchFixer.Common.GeneralConstants
+@using System.Security.Claims
+@inject MatchFixer.Core.Contracts.IBettingEligibilityService Eligibility
+
+@{
+	BettingEligibility? status = null;
+
+	if (User.Identity?.IsAuthenticated == true &&
+	    Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var uid))
+	{
+		const string key = "__BettingEligibility";
+		status = Context.Items[key] as BettingEligibility;
+		if (status == null)
+		{
+			status = await Eligibility.GetEligibilityAsync(uid);
+			Context.Items[key] = status;
+		}
+	}
+
+	var autoOpen = TempData["AgeVerifyOpen"] is true or "True" or "true";
+	var modalError = TempData["AgeVerifyError"] as string;
+	var returnUrl = Context.Request.Path + Context.Request.QueryString;
+	var latestDob = DateTime.UtcNow.Date.AddYears(-AgeVerificationConstants.MinimumBettingAge);
+}
+
+@{
+	var needsVerification = status is { CanBet: false, Reason: BettingBlockReason.AgeNotVerified };
+	var showOutcomeOnly = !needsVerification && autoOpen && status is { CanBet: false };
+}
+
+@if (needsVerification || showOutcomeOnly)
+{
+	<div class="modal fade" id="ageVerifyModal" tabindex="-1" aria-labelledby="ageVerifyTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content age-verify-modal">
+				<button type="button" class="btn-close btn-close-white age-verify-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+				@if (showOutcomeOnly)
+				{
+					<div class="age-verify-icon is-blocked"><i class="bi bi-slash-circle"></i></div>
+					<h2 class="age-verify-title" id="ageVerifyTitle">Betting not available</h2>
+					<p class="age-verify-text">@(modalError ?? status!.Message)</p>
+					<p class="age-verify-text">You can still browse the board, play the games and follow results.</p>
+					<button type="button" class="btn btn-outline-light w-100" data-bs-dismiss="modal">OK</button>
+				}
+				else
+				{
+				<div class="age-verify-icon"><i class="bi bi-shield-check"></i></div>
+				<h2 class="age-verify-title" id="ageVerifyTitle">Verify your age</h2>
+				<p class="age-verify-text">
+					You need to be <strong>@AgeVerificationConstants.MinimumBettingAge or older</strong> to place bets.
+					Enter your date of birth to unlock betting.
+				</p>
+
+				@if (!string.IsNullOrWhiteSpace(modalError))
+				{
+					<div class="age-verify-error" role="alert"><i class="bi bi-exclamation-circle me-1"></i>@modalError</div>
+				}
+
+				<form asp-controller="AgeVerification" asp-action="Verify" method="post" class="age-verify-form">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="returnUrl" value="@returnUrl" />
+
+					<label for="ageVerifyDob" class="age-verify-label">Date of birth</label>
+					<input type="date" id="ageVerifyDob" name="dateOfBirth" class="form-control"
+					       min="1901-01-01" max="@DateTime.UtcNow.ToString("yyyy-MM-dd")" required />
+
+					<div class="form-check age-verify-check">
+						<input class="form-check-input" type="checkbox" value="true" id="ageVerifyConfirm" name="confirm" required />
+						<label class="form-check-label" for="ageVerifyConfirm">
+							I confirm this is my real date of birth. Any later change needs admin approval.
+						</label>
+					</div>
+
+					<button type="submit" class="btn btn-success w-100">
+						<i class="bi bi-check2-circle me-1"></i> Verify and enable betting
+					</button>
+				</form>
+
+				<p class="age-verify-fineprint">Players must be born on or before @latestDob.ToString("dd MMM yyyy").</p>
+				}
+			</div>
+		</div>
+	</div>
+
+	@if (autoOpen)
+	{
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const el = document.getElementById('ageVerifyModal');
+				if (el && window.bootstrap) bootstrap.Modal.getOrCreateInstance(el).show();
+			});
+		</script>
+	}
+}

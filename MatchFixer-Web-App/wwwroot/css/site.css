@@ -1,4 +1,4 @@
-
+﻿
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Nunito:ital,wght@0,606;1,606&family=Orbitron:wght@400..900&family=Special+Gothic+Expanded+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&display=swap');
 
@@ -22,6 +22,7 @@
 @import "/css/match-events/live-events.css";
 @import "/css/wiki-tooltip/wiki-tooltip.css";
 @import "/css/bet-slip/bet-slip.css";
+@import "/css/age-verification/age-verification.css?v=3";
 @import "/css/no-feedback.css";
 @import "/css/wallet/wallet.css";
 @import "/css/logo-quiz/logo-quiz.css";

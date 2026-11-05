@@ -1,6 +1,19 @@
 ﻿@model MatchFixer.Core.DTOs.Bets.BetSlipState
+@using System.Security.Claims
+@inject MatchFixer.Core.Contracts.IBettingEligibilityService BetEligibility
+@{
+	var slipCanBet = true;
+	if (User.Identity?.IsAuthenticated == true &&
+	    Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var slipUserId))
+	{
+		var slipStatus = Context.Items["__BettingEligibility"] as MatchFixer.Core.DTOs.Betting.BettingEligibility
+		                 ?? await BetEligibility.GetEligibilityAsync(slipUserId);
+		Context.Items["__BettingEligibility"] = slipStatus;
+		slipCanBet = slipStatus.CanBet;
+	}
+}
 
-<form asp-controller="Bet" asp-action="PlaceBet" method="post" id="betSlipForm">
+<form asp-controller="Bet" asp-action="PlaceBet" method="post" id="betSlipForm" class="@(slipCanBet ? null : "betslip-locked")" data-betting-locked="@(slipCanBet ? "false" : "true")">
 	@Html.AntiForgeryToken()
 	<div id="betSlipPanel" class="bet-slip-panel shadow-lg">
 		<div class="bet-slip-header d-flex justify-content-between align-items-center p-3">
@@ -66,10 +79,39 @@
 				</div>
 			</div>
 
-			<button type="submit" id="placeBetBtn" class="btn btn-success w-100 d-flex justify-content-center align-items-center gap-2">
-				<span id="btnText">Submit slip</span>
-				<i id="btnIcon" class="bi bi-lightning-charge-fill d-none"></i>
-			</button>
+			@if (slipCanBet)
+			{
+				<button type="submit" id="placeBetBtn" class="btn btn-success w-100 d-flex justify-content-center align-items-center gap-2">
+					<span id="btnText">Submit slip</span>
+					<i id="btnIcon" class="bi bi-lightning-charge-fill d-none"></i>
+				</button>
+			}
+			else
+			{
+				@* Inline so it isn't served stale from the @import cache *@
+				<style>
+					#betSlipForm.betslip-locked #amountContainer {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+					}
+					#betSlipForm.betslip-locked #amountContainer .clear-all-bets {
+						position: static !important;
+						transform: none !important;
+						order: -1;
+						margin: 0 0 0.4rem !important;
+						bottom: auto !important;
+						left: auto !important;
+					}
+					#betSlipForm.betslip-locked #potentialReturnOddsContainer {
+						margin-bottom: 0.75rem !important;
+					}
+				</style>
+
+				<div class="w-100">
+					@await Html.PartialAsync("_AgeVerificationNotice", "compact")
+				</div>
+			}
 		</div>
 	</div>
 </form>
@@ -191,6 +233,13 @@
 	}
 
 		let isSubmitting = false;
+
+	// Block Enter-to-submit on a locked slip
+	document.addEventListener('submit', e => {
+		if (e.target.id === 'betSlipForm' && e.target.dataset.bettingLocked === 'true') {
+			e.preventDefault();
+		}
+	}, true);
 
 	document.addEventListener("DOMContentLoaded", () => {
 		const form = document.getElementById("betSlipForm");

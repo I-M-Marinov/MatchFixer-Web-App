@@ -105,6 +105,7 @@
 				}
 				else if (Model.CanJoin)
 				{
+					@await Html.PartialAsync("_AgeVerificationNotice", "compact")
 					<form asp-action="Join" asp-route-id="@Model.Id" method="post" class="join-cta">
 						<div class="join-cta-fee">@(Model.EntryFee <= 0 ? "Free entry" : "Entry " + Money(Model.EntryFee))</div>
 						<button type="submit" class="btn btn-mint w-100"><i class="bi bi-box-arrow-in-right"></i> Join &amp; get @Chips(Model.StartingBankroll) chips</button>
@@ -257,6 +258,7 @@
 		<!-- Betting area -->
 		@if (Model.CanBet)
 		{
+			<div class="mb-3">@await Html.PartialAsync("_AgeVerificationNotice", "compact")</div>
 			<div class="t-card">
 				<h3 class="section-h">
 					<i class="bi bi-cash-stack"></i> Place a bet
