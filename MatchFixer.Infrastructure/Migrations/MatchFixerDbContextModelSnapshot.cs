@@ -31,6 +31,10 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("AgeVerifiedOnUtc")
+                        .HasColumnType("datetime2")
+                        .HasComment("UTC date the user's age was verified");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -65,6 +69,14 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasComment("Indicates if the user's account is deactivated or active");
+
+                    b.Property<bool>("IsAgeVerified")
+                        .HasColumnType("bit")
+                        .HasComment("Indicates if the user has verified their date of birth (18+) and may place bets");
+
+                    b.Property<bool>("IsBettingBlocked")
+                        .HasColumnType("bit")
+                        .HasComment("Indicates if an admin has blocked this user from placing bets");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")

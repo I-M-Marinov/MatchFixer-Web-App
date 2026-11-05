@@ -526,6 +526,8 @@ namespace MatchFixer.Infrastructure.SeedData
 					Country = country,
 					TimeZone = tz,
 					DateOfBirth = dob,
+					IsAgeVerified = true,
+					AgeVerifiedOnUtc = DateTime.UtcNow,
 					ProfilePictureId = DefaultImageId, // add the default image to the admin user
 				};
 

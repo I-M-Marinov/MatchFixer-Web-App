@@ -57,6 +57,15 @@ namespace MatchFixer.Infrastructure.Entities
 
 		[Comment("Indicates if the user was deactivated by an admin (vs. self-deactivation)")]
 		public bool WasDeactivatedByAdmin { get; set; } = false;
+
+		[Comment("Indicates if the user has verified their date of birth (18+) and may place bets")]
+		public bool IsAgeVerified { get; set; } = false;
+
+		[Comment("UTC date the user's age was verified")]
+		public DateTime? AgeVerifiedOnUtc { get; set; }
+
+		[Comment("Indicates if an admin has blocked this user from placing bets")]
+		public bool IsBettingBlocked { get; set; } = false;
 		public ICollection<BetSlip> BetSlips { get; set; } = new List<BetSlip>();
 		public ICollection<UserTrophy> UserTrophies { get; set; } = new List<UserTrophy>(); // user trophies
 		public ICollection<UserFavoriteTeam> FavoriteTeams { get; set; } = new List<UserFavoriteTeam>(); // user favorite teams
