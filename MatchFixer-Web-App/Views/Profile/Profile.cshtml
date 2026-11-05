@@ -250,15 +250,65 @@
 			<div class="row mb-3 profile-detail">
 				<div class="row text-center">
 					<div class="col-sm-4 fw-lighter">Date of Birth:</div>
-					<div class="col-sm-8 d-flex gap-2 justify-content-center">
-						<span class="profile-value">@Model.DateOfBirth.ToString("dd MMMM yyyy")</span>
+					<div class="col-sm-8 d-flex gap-2 justify-content-center align-items-center dob-value-row">
+						@{ var hasRealDob = Model.DateOfBirth.Year > 1900; }
+						<span class="profile-value">@(hasRealDob ? Model.DateOfBirth.ToString("dd MMMM yyyy") : "Not provided")</span>
 						<input type="date" class="d-none form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" name="DateOfBirth" id="dateOfBirth-input"/>
-						<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
-							<span class="custom-tooltip-wrapper">
-								<i class="ri-edit-2-line"></i>
-								<span class="custom-tooltip">Edit date of birth</span>
+						@if (Model.HasPendingDateOfBirthChange)
+						{
+							<span class="dob-pending-badge align-self-center @(Model.PendingDateOfBirthIsUnderage ? "is-underage" : "")"
+							      tabindex="0"
+							      aria-describedby="dobPendingTip">
+								<i class="bi bi-hourglass-split"></i> Pending approval
+								<span class="dob-pending-tip" id="dobPendingTip" role="tooltip">
+									<span class="dob-pending-tip-title">Date of birth change requested</span>
+									<span class="dob-pending-tip-row">
+										@(hasRealDob ? Model.DateOfBirth.ToString("dd MMM yyyy") : "Not provided")
+										<i class="bi bi-arrow-right"></i>
+										<strong>@Model.PendingDateOfBirthText</strong>
+									</span>
+									@if (Model.PendingDateOfBirthRequestedUtc is { } reqAt)
+									{
+										<span class="dob-pending-tip-meta">Requested @reqAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+									}
+									<span class="dob-pending-tip-note">
+										@if (Model.PendingDateOfBirthIsUnderage)
+										{
+											@:The new date makes you under 18, so betting is paused until an admin reviews the change.
+										}
+										else
+										{
+											@:An admin will review this shortly. Your current date of birth stays in place until then.
+										}
+									</span>
+								</span>
 							</span>
-						</button>
+						}
+						else if (Model.IsAgeVerified)
+						{
+							<span class="dob-verified-badge" tabindex="0" aria-label="Date of birth verified">
+								<i class="bi bi-shield-fill-check"></i>
+								<span class="dob-verified-tip" role="tooltip">Verified</span>
+							</span>
+						}
+						else if (!hasRealDob)
+						{
+							<button type="button" class="btn btn-sm btn-warning align-self-center"
+							        data-bs-toggle="modal" data-bs-target="#ageVerifyModal"
+							        title="Verify your age to enable betting">
+								<i class="bi bi-shield-exclamation"></i> Verify age
+							</button>
+						}
+
+						@if (!Model.HasPendingDateOfBirthChange)
+						{
+							<button type="button" class="btn btn-sm btn-outline-primary edit-toggle-btn">
+								<span class="custom-tooltip-wrapper">
+									<i class="ri-edit-2-line"></i>
+									<span class="custom-tooltip">Request a date of birth change (needs admin approval)</span>
+								</span>
+							</button>
+						}
 					</div>
 				</div>
 			</div>

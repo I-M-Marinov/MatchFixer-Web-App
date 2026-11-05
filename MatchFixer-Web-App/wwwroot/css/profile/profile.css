@@ -1317,3 +1317,141 @@ form[action$="UploadProfilePicture"]:hover .upload-picture-btn {
 .profile-info-container .profile-detail select option {
     font-size: 0.82rem;
 }
+
+/* --- Date of birth: pending approval badge --- */
+.dob-pending-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: #3a2a00;
+    background: #ffc93c;
+    cursor: help;
+    outline: none;
+}
+
+.dob-pending-badge.is-underage {
+    color: #fff;
+    background: #e05252;
+}
+
+.dob-pending-badge:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255, 201, 60, 0.45);
+}
+
+.dob-pending-tip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
+    background: #1d2125;
+    color: #e9ecef;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dob-pending-tip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1d2125;
+}
+
+.dob-pending-badge:hover .dob-pending-tip,
+.dob-pending-badge:focus .dob-pending-tip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.dob-pending-tip-title { font-weight: 700; color: #ffc93c; }
+.dob-pending-badge.is-underage .dob-pending-tip-title { color: #ff8a8a; }
+.dob-pending-tip-row { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+.dob-pending-tip-meta { color: rgba(233, 236, 239, 0.55); font-size: 0.7rem; }
+.dob-pending-tip-note { color: rgba(233, 236, 239, 0.85); }
+
+/* --- Date of birth: verified badge --- */
+.dob-value-row .profile-value { line-height: 1.2; }
+
+.dob-verified-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: #198754;
+    color: #fff;
+    font-size: 0.85rem;
+    line-height: 1;
+    text-shadow: none;
+    cursor: help;
+    outline: none;
+    flex-shrink: 0;
+}
+
+.dob-verified-badge:focus-visible { box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.45); }
+
+.dob-verified-tip {
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%) translateY(3px);
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    background: #1d2125;
+    color: #e9ecef;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-shadow: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dob-verified-tip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1d2125;
+}
+
+.dob-verified-badge:hover .dob-verified-tip,
+.dob-verified-badge:focus .dob-verified-tip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
