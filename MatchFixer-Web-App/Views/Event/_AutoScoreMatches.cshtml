@@ -2,7 +2,7 @@
 @model MatchFixer.Core.ViewModels.MatchResults.AutoScorePreviewViewModel
 
 @{
-	const string logoFallback = "/images/add-match/question-mark.png";
+	const string logoFallback = MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge;
 }
 
 @if (Model.Rows == null || Model.Rows.Count == 0)
