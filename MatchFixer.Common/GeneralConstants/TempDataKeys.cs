@@ -6,5 +6,6 @@
 		public const string ErrorMessage = "ErrorMessage";
 		public const string SkippedMatches = "SkippedMatches";
 		public const string AutoScoreMessages = "AutoScoreMessages";
+		public const string AutoScoreSummaryCachePrefix = "autoscore:summary:";
 	}
 }

@@ -276,6 +276,11 @@ namespace MatchFixer.Core.Services
 					row.Detail = ex.Message;
 					result.Messages.Add($"{label}: error - {ex.Message}");
 				}
+				finally
+				{
+					// Keep each match isolated so one failure can't break the rest of the batch
+					_dbContext.ChangeTracker.Clear();
+				}
 
 				result.Rows.Add(row);
 			}

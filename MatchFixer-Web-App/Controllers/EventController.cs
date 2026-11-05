@@ -447,7 +447,9 @@ namespace MatchFixer_Web_App.Controllers
 		[Authorize]
 		[AdminOnly]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> ConfirmAutoScores(Guid[] matchIds)
+		public async Task<IActionResult> ConfirmAutoScores(
+			Guid[] matchIds,
+			[FromServices] Microsoft.Extensions.Caching.Memory.IMemoryCache cache)
 		{
 			if (matchIds == null || matchIds.Length == 0)
 			{
@@ -461,7 +463,14 @@ namespace MatchFixer_Web_App.Controllers
 
 				// The Auto Scoring Summary modal (built from this payload) carries the full outcome,
 				// so no separate success/error banners are set for the scored path.
-				TempData[TempDataKeys.AutoScoreMessages] = System.Text.Json.JsonSerializer.Serialize(result);
+				// Summary lives in the cache, TempData only holds the key
+				var summaryKey = Guid.NewGuid().ToString("N");
+				Microsoft.Extensions.Caching.Memory.CacheExtensions.Set(
+					cache,
+					TempDataKeys.AutoScoreSummaryCachePrefix + summaryKey,
+					result,
+					TimeSpan.FromMinutes(15));
+				TempData[TempDataKeys.AutoScoreMessages] = summaryKey;
 			}
 			catch (Exception ex)
 			{

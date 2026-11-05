@@ -2,6 +2,8 @@
 @using MatchFixer.Core.ViewModels.LiveEvents
 @using MatchFixer.Core.ViewModels.MatchResults
 @model MatchEventFormModel
+@using Microsoft.Extensions.Caching.Memory
+@inject IMemoryCache MemoryCache
 
 @{
 	ViewData["Title"] = "Create and View Events";
@@ -38,10 +40,22 @@
 		</div>
 	}
 
-	@if (TempData["AutoScoreMessages"] != null)
+	@{
+		AutoScoreConfirmResultViewModel? autoScoreSummary = null;
+		if (TempData[MatchFixer.Common.GeneralConstants.TempDataKeys.AutoScoreMessages] is string autoScoreKey)
+		{
+			var cacheKey = MatchFixer.Common.GeneralConstants.TempDataKeys.AutoScoreSummaryCachePrefix + autoScoreKey;
+			if (MemoryCache.TryGetValue(cacheKey, out AutoScoreConfirmResultViewModel? cachedSummary))
+			{
+				autoScoreSummary = cachedSummary;
+				MemoryCache.Remove(cacheKey);
+			}
+		}
+	}
+
+	@if (autoScoreSummary != null)
 	{
-		var autoScoreSummary = System.Text.Json.JsonSerializer.Deserialize<AutoScoreConfirmResultViewModel>(TempData["AutoScoreMessages"]!.ToString()!);
-		var assLogoFallback = "/images/add-match/question-mark.png";
+		var assLogoFallback = MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge;
 
 		<style>
 			.ass-modal{ border:none; border-radius:.85rem; overflow:hidden; }
@@ -1437,23 +1451,33 @@
 
 	<script>
 
+		const genericTeamBadge = '@MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge';
+
 		function logoChange(selectId, logoImgId, placeholder) {
 			const select = document.getElementById(selectId);
 			const logoImg = document.getElementById(logoImgId);
+
+			logoImg.addEventListener('error', () => {
+				if (!logoImg.src.endsWith(genericTeamBadge) && select.value !== "") {
+					logoImg.src = genericTeamBadge;
+				}
+			});
 
 			select.addEventListener('change', function () {
 				const selectedOption = select.options[select.selectedIndex];
 				const logoUrl = selectedOption.getAttribute('data-logo');
 
-				if (selectedOption.value === "" || !logoUrl) {
+				if (selectedOption.value === "") {
 					logoImg.src = placeholder;
+				} else if (!logoUrl) {
+					logoImg.src = genericTeamBadge;
 				} else {
 					logoImg.src = logoUrl;
 				}
 			});
 		}
 
-		const placeholderImage = '/images/add-match/question-mark.png';
+		const placeholderImage = '@MatchFixer.Common.GeneralConstants.TeamLogoConstants.NoTeamSelectedPlaceholder';
 
 		logoChange('home-team-select', 'home-team-logo', placeholderImage);
 		logoChange('away-team-select', 'away-team-logo', placeholderImage);
