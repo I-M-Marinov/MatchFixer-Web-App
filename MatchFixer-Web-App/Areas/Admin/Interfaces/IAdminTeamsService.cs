@@ -26,6 +26,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Interfaces
 
 		Task<bool> UpdateTeamAsync(TeamEditorVm vm);
 
+		Task<bool> SetTeamLogoUrlAsync(Guid teamId, string logoUrl, CancellationToken ct = default);
+
 	Task<bool> DeleteTeamAsync(Guid teamId, CancellationToken ct = default);
 
 	Task<bool> AddTeamManuallyAsync(

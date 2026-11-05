@@ -193,7 +193,7 @@
 								    role="button"
 								    tabindex="0">
 
-									<td class="text-center"><img src="@t.EffectiveLogoUrl" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name"/></td>
+									<td class="text-center"><img src="@t.EffectiveLogoUrl" data-fallback="@t.LogoUrl" onerror="this.onerror=null;if(this.dataset.fallback)this.src=this.dataset.fallback;" alt="" style="width:40px;height:40px;object-fit:contain" title="@t.Name"/></td>
 									<td class="text-center">@t.Name</td>
 									<td class="text-center align-middle">
 										<span class="badge api-id d-inline-flex align-items-center justify-content-center"
@@ -638,6 +638,123 @@
 		}
 
 		_pendingDeleteId = _pendingDeleteName = _pendingDeleteToken = null;
+	});
+
+	// Team logo management
+	function logoToken() {
+		return document.getElementById('teamEditorForm')
+			?.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+	}
+
+	function setLogoMessage(text, isError) {
+		const el = document.getElementById('teamLogoMessage');
+		if (!el) return;
+		el.textContent = text;
+		el.classList.toggle('is-error', !!isError);
+		el.classList.toggle('is-success', !isError && !!text);
+	}
+
+	function setLogoPreview(url, statusText, statusClass) {
+		const img = document.getElementById('teamLogoPreview');
+		if (img) {
+			img.closest('.team-logo-card')?.classList.remove('is-broken');
+			img.src = url;
+		}
+		const status = document.getElementById('teamLogoStatus');
+		if (status) {
+			status.textContent = statusText;
+			status.className = `team-logo-status ${statusClass}`;
+		}
+		_logoChanged = true;
+	}
+
+	async function postLogo(url, body, buttons) {
+		buttons.forEach(b => b.disabled = true);
+		setLogoMessage('Working…', false);
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: { 'RequestVerificationToken': logoToken() },
+				body
+			});
+			if (!res.ok) {
+				setLogoMessage(await res.text() || 'Something went wrong.', true);
+				return null;
+			}
+			return await res.json();
+		} catch {
+			setLogoMessage('Network error.', true);
+			return null;
+		} finally {
+			buttons.forEach(b => b.disabled = false);
+		}
+	}
+
+	let _logoChanged = false;
+
+	document.addEventListener('click', e => {
+		if (e.target.closest('.team-logo-upload-btn')) {
+			document.getElementById('teamLogoFile')?.click();
+			return;
+		}
+
+		if (e.target.closest('.team-logo-use-api-btn')) {
+			const apiId = document.querySelector('#teamEditorForm input[name="ApiTeamId"]')?.value?.trim();
+			const input = document.getElementById('teamLogoUrlInput');
+			if (!apiId) {
+				setLogoMessage('Enter an API Team ID first.', true);
+				return;
+			}
+			input.value = `https://media.api-sports.io/football/teams/${apiId}.png`;
+			setLogoMessage('URL filled in – click Re-download or Save.', false);
+			return;
+		}
+
+		const redl = e.target.closest('.team-logo-redownload-btn');
+		if (redl) {
+			const panel = document.getElementById('teamLogoPanel');
+			const fd = new FormData();
+			fd.append('teamId', panel.dataset.teamId);
+			fd.append('logoUrl', document.getElementById('teamLogoUrlInput')?.value?.trim() ?? '');
+
+			postLogo('/Admin/AdminTeams/RedownloadLogo', fd, [redl]).then(json => {
+				if (!json) return;
+				setLogoPreview(json.url, 'Cached locally', 'is-cached');
+				setLogoMessage(json.message, false);
+			});
+		}
+	});
+
+	document.addEventListener('change', e => {
+		if (e.target.id !== 'teamLogoFile') return;
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		if (file.size > 2 * 1024 * 1024) {
+			setLogoMessage('Logo must be 2 MB or smaller.', true);
+			e.target.value = '';
+			return;
+		}
+
+		const panel = document.getElementById('teamLogoPanel');
+		const fd = new FormData();
+		fd.append('teamId', panel.dataset.teamId);
+		fd.append('logo', file);
+
+		const btn = panel.querySelector('.team-logo-upload-btn');
+		postLogo('/Admin/AdminTeams/UploadLogo', fd, [btn]).then(json => {
+			e.target.value = '';
+			if (!json) return;
+			setLogoPreview(json.url, 'Custom upload', 'is-custom');
+			setLogoMessage(json.message, false);
+		});
+	});
+
+	document.getElementById('teamEditorModal')?.addEventListener('hidden.bs.modal', () => {
+		if (_logoChanged) {
+			_logoChanged = false;
+			location.reload();
+		}
 	});
 
 	document.addEventListener('submit', async e => {

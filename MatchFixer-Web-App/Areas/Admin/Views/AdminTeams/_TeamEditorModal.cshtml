@@ -11,9 +11,66 @@
         <!-- LEFT -->
         <div class="team-editor-logo-column">
 
-	        <div class="team-logo-card">
-		        <img src="@Model.EffectiveLogoUrl"
-		             alt="@Model.Name" />
+	        @{
+		        string logoStatusText;
+		        string logoStatusClass;
+
+		        if (!string.IsNullOrWhiteSpace(Model.LocalLogoUrl) && !Model.LocalLogoFileExists)
+		        {
+			        logoStatusText = "Local file missing";
+			        logoStatusClass = "is-missing";
+		        }
+		        else if (Model.IsCustomLogo)
+		        {
+			        logoStatusText = "Custom upload";
+			        logoStatusClass = "is-custom";
+		        }
+		        else if (Model.LocalLogoFileExists)
+		        {
+			        logoStatusText = "Cached locally";
+			        logoStatusClass = "is-cached";
+		        }
+		        else
+		        {
+			        logoStatusText = "Remote only";
+			        logoStatusClass = "is-remote";
+		        }
+	        }
+
+	        <div class="team-logo-panel" id="teamLogoPanel" data-team-id="@Model.TeamId">
+		        <div class="team-logo-card">
+			        <img id="teamLogoPreview"
+			             src="@Model.EffectiveLogoUrl"
+			             data-fallback="@Model.LogoUrl"
+			             alt="@Model.Name"
+			             onerror="if(this.dataset.fallback && this.src.indexOf(this.dataset.fallback)===-1){this.src=this.dataset.fallback;}else{this.onerror=null;this.closest('.team-logo-card').classList.add('is-broken');}" />
+			        <span class="team-logo-broken-text">No logo</span>
+		        </div>
+
+		        <span class="team-logo-status @logoStatusClass" id="teamLogoStatus">@logoStatusText</span>
+
+		        @if (Model.LogoLastSyncedUtc != null)
+		        {
+			        <span class="team-logo-synced">
+				        Updated @Model.LogoLastSyncedUtc.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+			        </span>
+		        }
+
+		        <div class="team-logo-actions">
+			        <input type="file"
+			               id="teamLogoFile"
+			               accept="image/png,image/jpeg,image/gif,image/webp"
+			               hidden />
+			        <button type="button" class="btn btn-sm btn-outline-info team-logo-upload-btn">
+				        <i class="bi bi-upload me-1"></i> Upload logo
+			        </button>
+			        <button type="button" class="btn btn-sm btn-outline-warning team-logo-redownload-btn"
+			                title="Download again from the Logo source URL">
+				        <i class="bi bi-arrow-repeat me-1"></i> Re-download
+			        </button>
+		        </div>
+
+		        <div class="team-logo-message" id="teamLogoMessage" role="status"></div>
 	        </div>
 
 	        @if (!string.IsNullOrWhiteSpace(Model.WikiImageUrl))
@@ -47,6 +104,25 @@
                            type="number"
                            value="@Model.ApiTeamId"
                            placeholder="e.g. 855" />
+                </div>
+
+                <div class="mb-3">
+	                <label>Logo source URL</label>
+	                <div class="input-group">
+		                <input class="form-control"
+		                       name="LogoUrl"
+		                       id="teamLogoUrlInput"
+		                       type="url"
+		                       maxlength="250"
+		                       value="@Model.LogoUrl"
+		                       placeholder="https://…/logo.png" />
+		                <button type="button"
+		                        class="btn btn-outline-secondary team-logo-use-api-btn"
+		                        title="Fill in the API-Football logo URL for the API Team ID">
+			                API URL
+		                </button>
+	                </div>
+	                <small class="text-muted">Changing this and saving downloads the new image. Uploading a file overrides it.</small>
                 </div>
 
                 <div class="mb-3">

@@ -312,9 +312,68 @@
 }
 
 .team-logo-card{
-    margin-top: -5em;
-    margin-bottom: 10em;
+    position: relative;
 }
+
+/* ---- Logo management panel (team editor) ---- */
+.team-logo-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: -5em;
+    margin-bottom: 3em;
+}
+
+.team-logo-card .team-logo-broken-text {
+    display: none;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.team-logo-card.is-broken img { display: none; }
+.team-logo-card.is-broken .team-logo-broken-text { display: block; }
+
+.team-logo-status {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+}
+
+.team-logo-status.is-cached  { color: #01c382; }
+.team-logo-status.is-custom  { color: #4dc3ff; }
+.team-logo-status.is-remote  { color: #d4b700; }
+.team-logo-status.is-missing { color: #ff6b6b; }
+
+.team-logo-synced {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.45);
+}
+
+.team-logo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 150px;
+}
+
+.team-logo-actions .btn { width: 100%; }
+
+.team-logo-message {
+    width: 150px;
+    min-height: 1.2em;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.team-logo-message.is-error   { color: #ff6b6b; }
+.team-logo-message.is-success { color: #01c382; }
 
 .team-logo-card:hover,
 .wiki-logo-card:hover {

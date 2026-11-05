@@ -14,5 +14,15 @@ namespace MatchFixer.Core.Contracts
 			Guid teamId,
 			bool forceRedownload = false,
 			CancellationToken ct = default);
+
+		Task<string> SaveCustomLogoAsync(
+			Guid teamId,
+			Stream content,
+			long length,
+			CancellationToken ct = default);
+
+		bool LocalLogoExists(string? relativeUrl);
+
+		bool IsCustomLogo(string? relativeUrl);
 	}
 }

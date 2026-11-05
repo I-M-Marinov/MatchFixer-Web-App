@@ -1,4 +1,5 @@
-﻿using MatchFixer.Infrastructure;
+﻿using MatchFixer.Core.Contracts;
+using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Entities;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Teams;
@@ -19,6 +20,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 		private readonly MatchFixerDbContext _db;
 		private readonly IMemoryCache _cache;
 		private readonly string _apiKey;
+		private readonly ITeamLogoSyncService _logoSync;
 		public static IReadOnlyDictionary<int, string> LeagueMap => _leagueMap;
 
 		private static readonly IReadOnlyDictionary<int, string> _leagueMap =
@@ -42,11 +44,12 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				{ VirtualLeagues.InternationalId, VirtualLeagues.InternationalName },
 			});
 
-		public AdminTeamsService(HttpClient http, MatchFixerDbContext db, IConfiguration config, IMemoryCache cache)
+		public AdminTeamsService(HttpClient http, MatchFixerDbContext db, IConfiguration config, IMemoryCache cache, ITeamLogoSyncService logoSync)
 		{
 			_http = http;
 			_db = db;
 			_cache = cache;
+			_logoSync = logoSync;
 			_apiKey = config[ConfigKey];
 		}
 
@@ -218,6 +221,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				Name = team.Name,
 				LogoUrl = team.LogoUrl, 
 				LocalLogoUrl = team.LocalLogoUrl,
+				LocalLogoFileExists = _logoSync.LocalLogoExists(team.LocalLogoUrl),
+				IsCustomLogo = _logoSync.IsCustomLogo(team.LocalLogoUrl),
+				LogoLastSyncedUtc = team.LogoLastSyncedUtc,
 				LeagueName = team.LeagueName, 
 				LeagueId = leagueId, 
 				ApiTeamId = team.TeamId,
@@ -288,6 +294,17 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			if (vm.ApiTeamId.HasValue)
 				team.TeamId = vm.ApiTeamId.Value;
 
+			var newLogoUrl = vm.LogoUrl?.Trim();
+			if (!string.IsNullOrWhiteSpace(newLogoUrl) &&
+			    !string.Equals(newLogoUrl, team.LogoUrl, StringComparison.Ordinal))
+			{
+				if (!Uri.TryCreate(newLogoUrl, UriKind.Absolute, out var uri) ||
+				    (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+					return false;
+
+				team.LogoUrl = newLogoUrl;
+			}
+
 			// Resolve league name from static map
 			if (!_leagueMap.TryGetValue(vm.LeagueId, out var leagueName))
 				return false;
@@ -348,6 +365,26 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 
 			await _db.SaveChangesAsync();
 
+			_cache.Remove(TeamsByLeague);
+
+			return true;
+		}
+
+		public async Task<bool> SetTeamLogoUrlAsync(Guid teamId, string logoUrl, CancellationToken ct = default)
+		{
+			var trimmed = logoUrl.Trim();
+
+			if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) ||
+			    (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps) ||
+			    trimmed.Length > 250)
+				return false;
+
+			var team = await _db.Teams.FirstOrDefaultAsync(t => t.Id == teamId, ct);
+			if (team == null)
+				return false;
+
+			team.LogoUrl = trimmed;
+			await _db.SaveChangesAsync(ct);
 			_cache.Remove(TeamsByLeague);
 
 			return true;

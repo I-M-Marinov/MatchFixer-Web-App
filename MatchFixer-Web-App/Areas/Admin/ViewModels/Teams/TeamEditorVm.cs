@@ -10,8 +10,13 @@ namespace MatchFixer_Web_App.Areas.Admin.ViewModels.Teams
 		public string Name { get; set; } = "";
 		public string LogoUrl { get; set; } = "";
 		public string? LocalLogoUrl { get; init; }         // Local stored logo
+
+		public bool LocalLogoFileExists { get; init; }
+		public bool IsCustomLogo { get; init; }
+		public DateTime? LogoLastSyncedUtc { get; init; }
+
 		public string EffectiveLogoUrl =>
-			!string.IsNullOrWhiteSpace(LocalLogoUrl)
+			!string.IsNullOrWhiteSpace(LocalLogoUrl) && LocalLogoFileExists
 				? LocalLogoUrl
 				: LogoUrl;
 

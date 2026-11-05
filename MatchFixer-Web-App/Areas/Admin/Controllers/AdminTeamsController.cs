@@ -101,12 +101,74 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(InvalidTeamData);
 
+			var before = await _teamService.GetTeamEditorVmAsync(vm.TeamId, ct);
+
 			var ok = await _teamService.UpdateTeamAsync(vm);
 
 			if (!ok)
 				return BadRequest(TeamUpdateFailed);
 
+			// Source URL changed, fetch the new logo
+			if (before != null &&
+			    !string.IsNullOrWhiteSpace(vm.LogoUrl) &&
+			    !string.Equals(before.LogoUrl, vm.LogoUrl.Trim(), StringComparison.Ordinal))
+			{
+				await _logoSyncService.SyncTeamLogoAsync(vm.TeamId, forceRedownload: true, ct);
+			}
+
 			return Ok();
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[RequestSizeLimit(3 * 1024 * 1024)]
+		public async Task<IActionResult> UploadLogo(Guid teamId, IFormFile? logo, CancellationToken ct)
+		{
+			if (logo == null || logo.Length == 0)
+				return BadRequest("Choose an image file to upload.");
+
+			try
+			{
+				await using var stream = logo.OpenReadStream();
+				var url = await _logoSyncService.SaveCustomLogoAsync(teamId, stream, logo.Length, ct);
+				return Json(new { url, message = "Custom logo saved." });
+			}
+			catch (InvalidOperationException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (IOException)
+			{
+				return BadRequest("Could not write the logo file. Check the logos folder is writable.");
+			}
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RedownloadLogo(Guid teamId, string? logoUrl, CancellationToken ct)
+		{
+			if (!string.IsNullOrWhiteSpace(logoUrl))
+			{
+				var ok = await _teamService.SetTeamLogoUrlAsync(teamId, logoUrl, ct);
+				if (!ok)
+					return BadRequest("Logo URL must be a full http(s) link.");
+			}
+
+			try
+			{
+				var result = await _logoSyncService.SyncTeamLogoAsync(teamId, forceRedownload: true, ct);
+
+				if (result.Downloaded == 0)
+					return BadRequest(result.Errors.FirstOrDefault() ?? "Logo could not be downloaded.");
+
+				var vm = await _teamService.GetTeamEditorVmAsync(teamId, ct);
+				var url = $"{vm?.EffectiveLogoUrl}?v={DateTime.UtcNow.Ticks}";
+				return Json(new { url, message = "Logo downloaded from source URL." });
+			}
+			catch (InvalidOperationException ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
 		[HttpPost]
@@ -143,9 +205,19 @@ namespace MatchFixer_Web_App.Areas.Admin.Controllers
 		{
 			var result = await _logoSyncService.SyncAllTeamLogosAsync(force, ct);
 
-			TempData[TempDataKeys.SuccessMessage] =
+			var message =
 				$"Logo sync completed. Downloaded: {result.Downloaded}, " +
 				$"Skipped: {result.Skipped}, Failed: {result.Failed}.";
+
+			var failures = result.Errors
+				.Where(e => !e.EndsWith("has no TeamId.", StringComparison.Ordinal))
+				.ToList();
+
+			if (failures.Count > 0)
+				message += " Failed: " + string.Join("; ", failures.Take(5)) +
+				           (failures.Count > 5 ? $" (+{failures.Count - 5} more)" : "");
+
+			TempData[failures.Count > 0 ? TempDataKeys.ErrorMessage : TempDataKeys.SuccessMessage] = message;
 
 			return RedirectToAction(nameof(TeamsIndex));
 		}
