@@ -175,6 +175,15 @@ namespace MatchFixer.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasComment("The exact time the bet was placed");
 
+                    b.Property<decimal?>("Line")
+                        .HasPrecision(4, 1)
+                        .HasColumnType("decimal(4,1)")
+                        .HasComment("Goals line for Over/Under bets");
+
+                    b.Property<int>("Market")
+                        .HasColumnType("int")
+                        .HasComment("Betting market of this bet (0 = Match Result)");
+
                     b.Property<Guid>("MatchEventId")
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Id of match event user is placing a bet for");
@@ -190,6 +199,11 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<int>("Pick")
                         .HasColumnType("int")
                         .HasComment("The chosen outcome the user will choose for the bet");
+
+                    b.Property<string>("Selection")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasComment("Selection code for non 1X2 markets (null for Match Result, which uses Pick)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int")
@@ -343,13 +357,22 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<Guid>("AwayTeamId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("BothTeamsToScoreEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<string>("CompetitionName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("DoubleChanceEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<decimal?>("DrawOdds")
                         .HasPrecision(7, 2)
                         .HasColumnType("decimal(7,2)");
+
+                    b.Property<bool>("ExtraMarketsEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("FinishedAtUtc")
                         .HasColumnType("datetime2");
@@ -370,10 +393,16 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Property<bool>("IsPostponed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("MarketOddsManual")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("MatchDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("NoDraw")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("OverUnderEnabled")
                         .HasColumnType("bit");
 
                     b.Property<int?>("PrePostponeStatus")
@@ -426,6 +455,142 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.HasIndex("MatchEventId");
 
                     b.ToTable("MatchEventLogs");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.BettingLimitSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("BothTeamsToScoreEnabled")
+                        .HasColumnType("bit")
+                        .HasComment("Both Teams To Score market offered on the site");
+
+                    b.Property<bool>("DoubleChanceEnabled")
+                        .HasColumnType("bit")
+                        .HasComment("Double Chance market offered on the site");
+
+                    b.Property<bool>("OverUnderEnabled")
+                        .HasColumnType("bit")
+                        .HasComment("Over/Under goals market offered on the site");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BettingLimitSettings");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.LeagueBetLimit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("ExtraMaxStake1")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ExtraMaxStake2")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ExtraMaxStake3")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ExtraMaxStake4")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ExtraMaxStake5Plus")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("LeagueName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("League or competition name, or __default__");
+
+                    b.Property<decimal?>("MaxStake1")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("MaxStake2")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("MaxStake3")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("MaxStake4")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("MaxStake5Plus")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("MaxWin")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)")
+                        .HasComment("Maximum potential return (stake x odds) for a slip");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueName")
+                        .IsUnique();
+
+                    b.ToTable("LeagueBetLimits");
+                });
+
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.MatchOdds", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("Line")
+                        .HasPrecision(4, 1)
+                        .HasColumnType("decimal(4,1)")
+                        .HasComment("Goals line for Over/Under markets, null otherwise");
+
+                    b.Property<int>("Market")
+                        .HasColumnType("int")
+                        .HasComment("Betting market this price belongs to");
+
+                    b.Property<Guid>("MatchEventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Odds")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("decimal(7,2)")
+                        .HasComment("Decimal odds for this selection");
+
+                    b.Property<string>("Selection")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasComment("Selection code within the market, e.g. Over, Yes, 1X");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchEventId", "Market", "Selection")
+                        .IsUnique();
+
+                    b.ToTable("MatchOdds");
                 });
 
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.MatchResult", b =>
@@ -1469,6 +1634,17 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Navigation("MatchEvent");
                 });
 
+            modelBuilder.Entity("MatchFixer.Infrastructure.Entities.MatchOdds", b =>
+                {
+                    b.HasOne("MatchFixer.Infrastructure.Entities.MatchEvent", "MatchEvent")
+                        .WithMany("MarketOdds")
+                        .HasForeignKey("MatchEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MatchEvent");
+                });
+
             modelBuilder.Entity("MatchFixer.Infrastructure.Entities.MatchResult", b =>
                 {
                     b.HasOne("MatchFixer.Infrastructure.Entities.Team", "AwayTeam")
@@ -1742,6 +1918,8 @@ namespace MatchFixer.Infrastructure.Migrations
                     b.Navigation("Bets");
 
                     b.Navigation("LiveResult");
+
+                    b.Navigation("MarketOdds");
 
                     b.Navigation("MatchEventLogs");
 

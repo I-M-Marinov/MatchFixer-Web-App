@@ -40,6 +40,9 @@ namespace MatchFixer.Infrastructure
 		public virtual DbSet<TournamentEntry> TournamentEntries { get; set; }
 		public virtual DbSet<TournamentMessage> TournamentMessages { get; set; }
 		public virtual DbSet<ChangeRequest> ChangeRequests { get; set; }
+		public virtual DbSet<MatchOdds> MatchOdds { get; set; }
+		public virtual DbSet<BettingLimitSettings> BettingLimitSettings { get; set; }
+		public virtual DbSet<LeagueBetLimit> LeagueBetLimits { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -72,6 +75,43 @@ namespace MatchFixer.Infrastructure
 			builder.Entity<Bet>(entity =>
 			{
 				entity.Property(e => e.Odds).HasPrecision(7, 2);  // new property for odds per bet
+				entity.Property(e => e.Line).HasPrecision(4, 1);
+			});
+
+			builder.Entity<MatchOdds>(entity =>
+			{
+				entity.Property(e => e.Odds).HasPrecision(7, 2);
+				entity.Property(e => e.Line).HasPrecision(4, 1);
+
+				entity.HasOne(e => e.MatchEvent)
+					.WithMany(me => me.MarketOdds)
+					.HasForeignKey(e => e.MatchEventId)
+					.OnDelete(DeleteBehavior.Cascade);
+
+				entity.HasIndex(e => new { e.MatchEventId, e.Market, e.Selection })
+					.IsUnique();
+			});
+
+			builder.Entity<BettingLimitSettings>(entity =>
+			{
+				entity.Property(e => e.Id).ValueGeneratedNever();
+			});
+
+			builder.Entity<LeagueBetLimit>(entity =>
+			{
+				entity.HasIndex(e => e.LeagueName).IsUnique();
+
+				entity.Property(e => e.MaxStake1).HasPrecision(10, 2);
+				entity.Property(e => e.MaxStake2).HasPrecision(10, 2);
+				entity.Property(e => e.MaxStake3).HasPrecision(10, 2);
+				entity.Property(e => e.MaxStake4).HasPrecision(10, 2);
+				entity.Property(e => e.MaxStake5Plus).HasPrecision(10, 2);
+				entity.Property(e => e.ExtraMaxStake1).HasPrecision(10, 2);
+				entity.Property(e => e.ExtraMaxStake2).HasPrecision(10, 2);
+				entity.Property(e => e.ExtraMaxStake3).HasPrecision(10, 2);
+				entity.Property(e => e.ExtraMaxStake4).HasPrecision(10, 2);
+				entity.Property(e => e.ExtraMaxStake5Plus).HasPrecision(10, 2);
+				entity.Property(e => e.MaxWin).HasPrecision(12, 2);
 			});
 
 			builder.Entity<BetSlip>(entity =>

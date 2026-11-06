@@ -44,6 +44,30 @@ namespace MatchFixer.Infrastructure.Entities
 		/// </summary>
 		public bool NoDraw { get; set; } = false;
 
+		/// <summary>
+		/// True when an admin set the extra-market prices (O/U, BTTS, Double Chance) by hand.
+		/// Editing the 1X2 odds then leaves them alone; "Regenerate" clears the flag.
+		/// </summary>
+		public bool MarketOddsManual { get; set; } = false;
+
+		/// <summary>When false the extra markets (O/U, BTTS, Double Chance) are not offered for this match.</summary>
+		public bool ExtraMarketsEnabled { get; set; } = true;
+
+		// Per-match switches for each extra market (the site-wide ones are on the admin Limits page)
+		public bool OverUnderEnabled { get; set; } = true;
+		public bool BothTeamsToScoreEnabled { get; set; } = true;
+		public bool DoubleChanceEnabled { get; set; } = true;
+
+		/// <summary>True when this match offers the market (Match Result always; extra markets need both switches on).</summary>
+		public bool IsMarketEnabled(BettingMarket market) => market switch
+		{
+			BettingMarket.MatchResult => true,
+			BettingMarket.OverUnderGoals => ExtraMarketsEnabled && OverUnderEnabled,
+			BettingMarket.BothTeamsToScore => ExtraMarketsEnabled && BothTeamsToScoreEnabled,
+			BettingMarket.DoubleChance => ExtraMarketsEnabled && DoubleChanceEnabled,
+			_ => false
+		};
+
 		[StringLength(100)]
 		public string? CompetitionName { get; set; }
 		[NotMapped]
@@ -51,6 +75,9 @@ namespace MatchFixer.Infrastructure.Entities
 		public ICollection<Bet> Bets { get; set; } = new List<Bet>();
 		public ICollection<OddsBoost> OddsBoosts { get; set; } = new List<OddsBoost>();
 		public ICollection<MatchEventLog> MatchEventLogs { get; set; } = new List<MatchEventLog>();
+
+		/// <summary>Odds for the extra markets (Over/Under, BTTS, Double Chance).</summary>
+		public ICollection<MatchOdds> MarketOdds { get; set; } = new List<MatchOdds>();
 
 	}
 }

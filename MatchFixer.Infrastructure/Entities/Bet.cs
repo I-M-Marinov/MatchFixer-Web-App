@@ -34,6 +34,16 @@ namespace MatchFixer.Infrastructure.Entities
 		[ForeignKey(nameof(BetSlipId))]
 		public BetSlip BetSlip { get; set; }
 
+		[Comment("Betting market of this bet (0 = Match Result)")]
+		public BettingMarket Market { get; set; } = BettingMarket.MatchResult;
+
+		[StringLength(10)]
+		[Comment("Selection code for non 1X2 markets (null for Match Result, which uses Pick)")]
+		public string? Selection { get; set; }
+
+		[Comment("Goals line for Over/Under bets")]
+		public decimal? Line { get; set; }
+
 		[Comment("Odds for this particular pick")]
 		public decimal Odds { get; set; }
 
