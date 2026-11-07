@@ -79,6 +79,9 @@
 				</div>
 			</div>
 
+			@* Max stake / max win for this slip (admin Limits page), filled by betslip.js *@
+			<div id="slipLimits" class="slip-limits d-none mb-2"></div>
+
 			@if (slipCanBet)
 			{
 				<button type="submit" id="placeBetBtn" class="btn btn-success w-100 d-flex justify-content-center align-items-center gap-2">
@@ -163,6 +166,10 @@
 					case 'Away':
 						newOdds = hasBoost && oddsData.EffectiveAwayOdds != null ? oddsData.EffectiveAwayOdds : oddsData.AwayOdds;
 						break;
+					default:
+						// Extra markets (Over/Under, BTTS, Double Chance) — keyed by selection code
+						newOdds = oddsData.MarketOdds ? oddsData.MarketOdds[selectedOption] : undefined;
+						break;
 				}
 
 				newOdds = parseFloat(newOdds);
@@ -188,6 +195,9 @@
 					homeLogoUrl: item.dataset.homeLogoUrl || '',
 					awayLogoUrl: item.dataset.awayLogoUrl || '',
 					option: selectedOption,
+					selectedOption: selectedOption,
+					market: item.dataset.market || 'MatchResult',
+					line: item.dataset.line ? parseFloat(item.dataset.line) : null,
 					odds: newOdds,
 					startUtc: item.dataset.startUtc 
 				});

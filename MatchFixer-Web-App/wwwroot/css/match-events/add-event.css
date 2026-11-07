@@ -1334,3 +1334,267 @@ table.responsive-stack td {
     font-size: 0.85em;
     margin: 0.35em;
 }
+
+
+/* =================================================
+   MANUAL EVENT / MANAGE MATCHES TABS               |
+   =============================================== */
+
+/* Manual Event tab: the add form on its own, centred */
+.events-layout--single {
+    justify-content: center;
+}
+
+/* Manage Matches tab: the events table gets the full width */
+#manageTab .live-events-section {
+    margin-top: 1rem;
+    max-width: 1600px !important;
+}
+
+#manageTab .live-events-table-wrapper {
+    height: calc(100vh - 260px);
+    min-height: 34em;
+}
+
+/* Markets preview (Manual Event) and the Edit markets dialog (Manage Matches)
+   — same teal look as the boost / competition dialogs on this page */
+.markets-preview {
+    width: 100%;
+    max-width: 640px;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.9rem;
+    background: rgba(27, 73, 101, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    text-shadow: none;
+}
+
+.markets-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.markets-preview-title {
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.markets-preview-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 0.4rem;
+}
+
+/* One row per market: name on the left, prices lined up on the right */
+.markets-preview-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.markets-preview-group {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.65rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.markets-preview-group-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #fff;
+    text-align: left;
+    line-height: 1.2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.markets-preview-inputs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.markets-preview-field {
+    flex: 0 0 4.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.markets-preview-field input.form-control {
+    width: 100%;
+    height: 2rem;
+    padding: 0.2rem 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    color: #1B4965;
+    background-color: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(27, 73, 101, 0.35);
+    border-radius: 0.5rem;
+    text-shadow: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.markets-preview-field input.form-control:focus {
+    border-color: #ffd300;
+    box-shadow: 0 0 0 0.15rem rgba(255, 211, 0, 0.45);
+}
+
+.markets-preview-field input.form-control::-webkit-outer-spin-button,
+.markets-preview-field input.form-control::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.markets-preview-field input.form-control:disabled {
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Edit markets dialog ── */
+#editMarketsModal {
+    margin-top: 5em;
+}
+
+#editMarketsModal .modal-content {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
+}
+
+#editMarketsModal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1.1rem;
+    background-color: #2A7B9B;
+    color: #fff;
+    border-bottom: none;
+}
+
+#editMarketsModal .modal-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    min-width: 0;
+}
+
+/* Override the global .btn-close (start-game-screen.css) so the X sits inside the header */
+#editMarketsModal .modal-header .btn-close {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    width: 1em !important;
+    height: 1em !important;
+    box-sizing: content-box;
+    margin: 0 !important;
+    padding: 0.4rem;
+    flex-shrink: 0;
+    font-size: 12px;
+    opacity: 0.85;
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+#editMarketsModal .modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+#editMarketsModal .modal-body {
+    padding: 1.1rem 1.25rem 0.75rem;
+    background: linear-gradient(252deg, rgba(42, 123, 155, 1) 0%, rgba(52, 140, 150, 1) 18%, rgba(61, 156, 145, 1) 41%, rgba(76, 181, 138, 1) 64%, rgba(87, 199, 133, 1) 85%);
+}
+
+#editMarketsModal #editMarketsMessage.text-success {
+    color: #fff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#editMarketsModal #editMarketsMessage.text-danger {
+    color: #ffe0e0 !important;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+#editMarketsModal .markets-offer-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.65rem;
+    background: rgba(27, 73, 101, 0.35);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#editMarketsModal .markets-offer-switch .form-check-input {
+    cursor: pointer;
+}
+
+/* market name with its per-match on/off switch */
+.market-title-with-switch {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.market-title-with-switch .form-check-input {
+    cursor: pointer;
+    margin-top: 0;
+}
+
+#editMarketsModal .market-group-off .markets-preview-inputs,
+#editMarketsModal .market-group-off .market-title-with-switch span {
+    opacity: 0.5;
+}
+
+/* prices stay editable while the match's markets are switched off, just dimmed */
+#editMarketsModal .markets-grid-off {
+    opacity: 0.55;
+}
+
+#editMarketsModal .modal-footer {
+    gap: 0.5rem;
+    background-color: #2A7B9B;
+    border-top: none;
+}
+
+@media (max-width: 576px) {
+    .markets-preview-group {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+
+    .markets-preview-group-title {
+        text-align: center;
+    }
+
+    .markets-preview-inputs {
+        justify-content: center;
+    }
+}

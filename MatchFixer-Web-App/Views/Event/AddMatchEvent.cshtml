@@ -188,6 +188,16 @@
 		<li class="nav-item" role="presentation">
 			<button class="nav-link"
 			        data-bs-toggle="tab"
+			        data-bs-target="#manageTab"
+			        type="button"
+			        role="tab">
+				Manage Matches
+			</button>
+		</li>
+
+		<li class="nav-item" role="presentation">
+			<button class="nav-link"
+			        data-bs-toggle="tab"
 			        data-bs-target="#apiTab"
 			        type="button"
 			        role="tab">
@@ -209,66 +219,6 @@
 	<div class="tab-content">
 
 	<div class="tab-pane fade show active" id="manualTab" role="tabpanel">
-	<div class="modal fade" id="createBoostModal" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<form id="createBoostForm">
-					@Html.AntiForgeryToken()
-					<div class="modal-header">
-						<h5 class="modal-title">Create Odds Boost</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-					</div>
-
-					<div class="modal-body">
-						<input type="hidden" name="MatchEventId" id="MatchEventId" />
-
-						<!-- Boost Value + Duration (same row) -->
-						<div class="row">
-							<div class="col-md-6 mb-3">
-								<label class="form-label">Boost Value</label>
-								<input type="number" step="0.01" class="form-control" name="BoostValue" required />
-							</div>
-							<div class="col-md-6 mb-3">
-								<label class="form-label">Duration (minutes)</label>
-								<input type="number" class="form-control" name="DurationMinutes" value="30" />
-							</div>
-						</div>
-
-						<!-- Max Stake + Max Uses (same row) -->
-						<div class="row">
-							<div class="col-md-6 mb-3">
-								<label class="form-label">Max Stake Per Bet</label>
-								<input type="number" step="0.01" class="form-control" name="MaxStakePerBet" />
-							</div>
-							<div class="col-md-6 mb-3">
-								<label class="form-label">Max Uses Per User</label>
-								<input type="number" class="form-control" name="MaxUsesPerUser" />
-							</div>
-						</div>
-
-						<!-- Start Time -->
-						<div class="mb-3 d-flex flex-column align-items-center">
-							<label class="form-label">Start Time (local)</label>
-							<input type="datetime-local" class="form-control" name="StartTimeLocal" />
-							<small class="form-text text-muted">Leave empty to start immediately.</small>
-						</div>
-
-						<!-- Note -->
-						<div class="mb-3 d-flex flex-column align-items-center">
-							<label class="form-label">Note</label>
-							<input type="text" class="form-control" name="Note" />
-						</div>
-					</div>
-
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary">Create</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-
 	<div class="position-relative">
 	<div id="model-error-add-event" asp-validation-summary="ModelOnly"
 	     class="position-absolute start-50 translate-middle-x"
@@ -276,7 +226,7 @@
 	</div>
 
 	@* <div class="d-flex justify-content-center align-items-start flex-wrap gap-1 mt-1">*@				
-	<div class="events-layout">
+	<div class="events-layout events-layout--single">
 
 
 	<div class="add-match-event-container mt-4">
@@ -391,6 +341,49 @@
 				      style="display:none; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></span>
 			</div>
 
+			@* ── Markets preview: extra-market prices generated from the 1X2 odds, editable before saving ── *@
+			@{
+				decimal? MarketValue(string code) => Model.MarketOdds != null && Model.MarketOdds.TryGetValue(code, out var v) ? v : null;
+				var previewGroups = new[]
+				{
+					(Id: "ou", Title: "Total Goals O/U 2.5", Options: new[] { (Code: "Over", Label: "Over"), (Code: "Under", Label: "Under") }),
+					(Id: "btts", Title: "Both Teams To Score", Options: new[] { (Code: "Yes", Label: "Yes"), (Code: "No", Label: "No") }),
+					(Id: "dc", Title: "Double Chance", Options: new[] { (Code: "1X", Label: "1X"), (Code: "12", Label: "12"), (Code: "X2", Label: "X2") })
+				};
+			}
+			<div id="marketsPreview" class="markets-preview mb-3">
+				<div class="markets-preview-header">
+					<span class="markets-preview-title"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Markets preview</span>
+					<span id="marketsPreviewState" class="badge rounded-pill bg-info">generated</span>
+					<button type="button" id="marketsPreviewReset" class="btn btn-sm btn-outline-light" style="display:none;">
+						<i class="bi bi-arrow-counterclockwise"></i> Reset to generated
+					</button>
+				</div>
+				<p id="marketsPreviewHint" class="markets-preview-hint">Fill in the Home / Draw / Away odds to generate these prices.</p>
+				<div class="markets-preview-grid">
+					@foreach (var pg in previewGroups)
+					{
+						<div class="markets-preview-group" data-group="@pg.Id">
+							<div class="markets-preview-group-title">@pg.Title</div>
+							<div class="markets-preview-inputs">
+								@foreach (var opt in pg.Options)
+								{
+									<label class="markets-preview-field">
+										<span>@opt.Label</span>
+										<input type="number" step="0.01" min="1.01" max="1000"
+										       class="form-control form-control-sm market-preview-input"
+										       name="MarketOdds[@opt.Code]"
+										       data-code="@opt.Code"
+										       value="@(MarketValue(opt.Code)?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))" />
+									</label>
+								}
+							</div>
+						</div>
+					}
+				</div>
+				<input type="hidden" name="MarketOddsEdited" id="MarketOddsEdited" value="@(Model.MarketOddsEdited ? "true" : "false")" />
+			</div>
+
 
 <span class="custom-add-match-tooltip-wrapper">
 				<button type="submit" class="btn add-event-icon-container">
@@ -406,120 +399,11 @@
 
 		</form>
 	</div>
-	
-	
-	<div class="modal fade"
-	     id="confirmPostponeModal"
-	     tabindex="-1">
-
-		<div class="modal-dialog modal-dialog-centered">
-
-			<div class="modal-content border-secondary">
-
-				<div class="modal-header">
-
-					<h5 class="modal-title fw-bold text-secondary">
-
-						<i class="bi bi-pause-circle-fill me-2"></i>
-						Postpone Match
-
-					</h5>
-
-					<button type="button"
-					        class="btn-close"
-					        data-bs-dismiss="modal">
-					</button>
-
-				</div>
-
-				<div class="modal-body text-center">
-
-					<div class="mb-3">
-
-						<i class="bi bi-hourglass-split text-secondary"
-						   style="font-size: 3rem;">
-						</i>
-
-					</div>
-
-					<p class="mb-0">
-						Are you sure you want to postpone this match?
-					</p>
-
-				</div>
-
-				<div class="modal-footer justify-content-center">
-
-					<form id="confirmPostponeForm"
-					      asp-action="PostponeMatchEvent"
-					      asp-controller="Event"
-					      method="post">
-
-						@Html.AntiForgeryToken()
-
-						<input type="hidden"
-						       name="id"
-						       id="postponeEventId" />
-
-						<button type="submit"
-						        class="btn btn-secondary">
-
-							<i class="bi bi-pause-fill me-1"></i>
-							Postpone
-
-						</button>
-
-					</form>
-
-					<button type="button"
-					        class="btn btn-outline-danger"
-					        data-bs-dismiss="modal">
-
-						Cancel
-
-					</button>
-
-				</div>
-
-			</div>
-
-		</div>
+	</div>
+	</div>
 	</div>
 
-	<div class="modal fade" id="revertToUpcomingModal" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<form asp-action="RevertToUpcoming" asp-controller="Event" method="post">
-					@Html.AntiForgeryToken()
-					<input type="hidden" name="id" id="revertEventId" />
-					<div class="modal-header">
-						<h5 class="modal-title fw-bold text-white">
-							<i class="bi bi-arrow-counterclockwise me-2"></i>
-							Move match back to upcoming
-						</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-					</div>
-					<div class="modal-body">
-						<p class="mb-3">
-							Set a new kick-off date &amp; time for <strong id="revertMatchName"></strong>.
-							The match will be moved back to upcoming with this start time.
-						</p>
-						<label for="revertNewKickoff" class="form-label">New kick-off (your local time)</label>
-						<input type="datetime-local" name="newKickoffLocal" id="revertNewKickoff" class="form-control" required />
-					</div>
-					<div class="modal-footer justify-content-center">
-						<button type="submit" class="btn btn-success">
-							<i class="bi bi-arrow-counterclockwise me-1"></i>
-							Move to upcoming
-						</button>
-						<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-
+	<div class="tab-pane fade" id="manageTab" role="tabpanel">
 	<div class="live-events-section mx-auto" style="max-width: 1400px;">
 		<ul class="nav nav-pills justify-content-center mb-3" id="eventDateTabs"></ul>
 		<ul class="nav nav-pills justify-content-center mb-2" id="eventLeagueTabs" style="display:none"></ul>
@@ -538,6 +422,7 @@
 							<th>Home Team</th>
 							<th>Away Team</th>
 							<th>Boost</th>
+							<th>Markets</th>
 							<th>Update</th>
 						</tr>
 						</thead>
@@ -720,6 +605,41 @@
 									}
 								</td>
 								<td>
+									@{
+										var marketsLocked = ev.MatchStatus == MatchStatus.Live || ev.MatchStatus == MatchStatus.FullTime || ev.HasResult;
+										var marketsJson = System.Text.Json.JsonSerializer.Serialize(ev.MarketOdds);
+									}
+									<div class="d-flex flex-column align-items-center gap-1">
+										<span class="custom-tooltip-wrapper">
+											<button type="button"
+											        class="btn btn-sm @(ev.MarketOddsManual ? "btn-primary" : "btn-outline-primary") open-markets-modal"
+											        data-bs-toggle="modal"
+											        data-bs-target="#editMarketsModal"
+											        data-match-id="@ev.Id"
+											        data-match-name="@ev.HomeTeam vs @ev.AwayTeam"
+											        data-no-draw="@ev.NoDraw.ToString().ToLower()"
+											        data-manual="@ev.MarketOddsManual.ToString().ToLower()"
+											        data-extra-enabled="@ev.ExtraMarketsEnabled.ToString().ToLower()"
+											        data-ou-enabled="@ev.OverUnderEnabled.ToString().ToLower()"
+											        data-btts-enabled="@ev.BothTeamsToScoreEnabled.ToString().ToLower()"
+											        data-dc-enabled="@ev.DoubleChanceEnabled.ToString().ToLower()"
+											        data-line="@ev.OverUnderLine.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)"
+											        data-odds="@marketsJson"
+											        @(marketsLocked || !ev.HasMarketOdds ? "disabled" : "")>
+												<i class="bi bi-grid-3x3-gap-fill"></i>
+											</button>
+											<span class="custom-tooltip text-bg-primary">
+												@(marketsLocked ? "Markets are locked for this game." : !ev.HasMarketOdds ? "No market prices yet." : "Review / edit O/U, BTTS and Double Chance prices")
+											</span>
+										</span>
+										<span class="badge rounded-pill bg-manual markets-manual-badge @(ev.MarketOddsManual ? "" : "d-none")">manual</span>
+										@{
+											var someMarketsOff = !ev.OverUnderEnabled || !ev.BothTeamsToScoreEnabled || !ev.DoubleChanceEnabled;
+										}
+										<span class="badge rounded-pill bg-secondary markets-off-badge @(ev.ExtraMarketsEnabled && !someMarketsOff ? "d-none" : "")">@(ev.ExtraMarketsEnabled ? "partly off" : "off")</span>
+									</div>
+								</td>
+								<td>
 									<div class="d-flex justify-content-center align-items-center gap-1">
 
 										<div class="d-flex flex-column gap-1">
@@ -900,80 +820,6 @@
 			</div>
 		}
 
-	</div>
-	</div>
-
-	</div>
-
-
-	<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content border-danger">
-				<div class="modal-header text-danger fw-bold">
-					<h5 class="modal-title" id="confirmCancelLabel">
-						<i class="bi bi-exclamation-triangle-fill me-2"></i>
-						Confirm Cancellation
-					</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body text-center">
-					Are you sure you want to void this event?
-				</div>
-				<div class="modal-footer justify-content-center">
-					<form id="cancelEventForm" asp-action="CancelMatchEvent" asp-controller="Event" method="post">
-						@Html.AntiForgeryToken()
-						<input type="hidden" name="id" id="cancelEventId" value="" />
-						<button type="submit" class="btn btn-danger">Yes, Void</button>
-					</form>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal fade" id="editCompetitionModal" tabindex="-1">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-
-				<form asp-action="UpdateCompetition"
-				      asp-controller="Event"
-				      method="post">
-					
-
-					@Html.AntiForgeryToken()
-
-					<div class="modal-header">
-						<h5 class="modal-title">
-							<i class="bi bi-trophy me-2"></i>
-							Edit Competition
-						</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-					</div>
-
-					<div class="modal-body text-center">
-						
-						<input type="hidden" name="EventId" id="editCompetitionEventId" />
-
-						<label class="form-label">Competition</label>
-						<select name="Competition"
-						        id="editCompetitionSelect"
-						        asp-items="Model.AvailableCompetitions"
-						        class="form-select text-center">
-						</select>
-
-					</div>
-
-					<div class="modal-footer justify-content-center">
-								<button type="submit" class="btn btn btn-primary">
-							<i class="bi bi-check-circle me-1"></i>
-							Save
-						</button>
-					</div>
-
-				</form>
-
-			</div>
-		</div>
 	</div>
 	</div>
 
@@ -1170,6 +1016,323 @@
 		</div>
 
 	</div>
+
+	@* ── Dialogs used by the Manage Matches table (kept outside the tabs so they open from any tab) ── *@
+	<div class="modal fade" id="editMarketsModal" tabindex="-1" aria-labelledby="editMarketsTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editMarketsTitle">
+						<i class="bi bi-grid-3x3-gap-fill me-2"></i>
+						Markets &middot; <span id="editMarketsMatchName"></span>
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="markets-offer-switch mb-2">
+						<div class="form-check form-switch m-0">
+							<input class="form-check-input" type="checkbox" role="switch" id="editMarketsEnabled" />
+							<label class="form-check-label" for="editMarketsEnabled">Offer extra markets for this match</label>
+						</div>
+						<span id="editMarketsState" class="badge rounded-pill bg-info">generated</span>
+					</div>
+					<div class="markets-preview-grid">
+						<div class="markets-preview-group" data-group="ou">
+							<div class="markets-preview-group-title market-title-with-switch">
+								<div class="form-check form-switch m-0">
+									<input class="form-check-input edit-market-switch" type="checkbox" role="switch" data-market="OverUnderGoals" title="Offer this market for this match" />
+								</div>
+								<span>Total Goals O/U <span id="editMarketsLine">2.5</span></span>
+							</div>
+							<div class="markets-preview-inputs">
+								<label class="markets-preview-field"><span>Over</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="Over" /></label>
+								<label class="markets-preview-field"><span>Under</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="Under" /></label>
+							</div>
+						</div>
+						<div class="markets-preview-group" data-group="btts">
+							<div class="markets-preview-group-title market-title-with-switch">
+								<div class="form-check form-switch m-0">
+									<input class="form-check-input edit-market-switch" type="checkbox" role="switch" data-market="BothTeamsToScore" title="Offer this market for this match" />
+								</div>
+								<span>Both Teams To Score</span>
+							</div>
+							<div class="markets-preview-inputs">
+								<label class="markets-preview-field"><span>Yes</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="Yes" /></label>
+								<label class="markets-preview-field"><span>No</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="No" /></label>
+							</div>
+						</div>
+						<div class="markets-preview-group" data-group="dc">
+							<div class="markets-preview-group-title market-title-with-switch">
+								<div class="form-check form-switch m-0">
+									<input class="form-check-input edit-market-switch" type="checkbox" role="switch" data-market="DoubleChance" title="Offer this market for this match" />
+								</div>
+								<span>Double Chance</span>
+							</div>
+							<div class="markets-preview-inputs">
+								<label class="markets-preview-field"><span>1X</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="1X" /></label>
+								<label class="markets-preview-field"><span>12</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="12" /></label>
+								<label class="markets-preview-field"><span>X2</span><input type="number" step="0.01" min="1.01" max="1000" class="form-control form-control-sm edit-market-input" data-code="X2" /></label>
+							</div>
+						</div>
+					</div>
+					<div id="editMarketsMessage" class="small text-center mt-2" style="min-height: 1.2em;"></div>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<button type="button" class="btn btn-outline-light" id="editMarketsRegenerate">
+						<i class="bi bi-arrow-counterclockwise me-1"></i> Regenerate from 1X2
+					</button>
+					<button type="button" class="btn btn-primary" id="editMarketsSave">
+						<i class="bi bi-check-circle me-1"></i> Save
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="createBoostModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="createBoostForm">
+					@Html.AntiForgeryToken()
+					<div class="modal-header">
+						<h5 class="modal-title">Create Odds Boost</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+
+					<div class="modal-body">
+						<input type="hidden" name="MatchEventId" id="MatchEventId" />
+
+						<!-- Boost Value + Duration (same row) -->
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Boost Value</label>
+								<input type="number" step="0.01" class="form-control" name="BoostValue" required />
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Duration (minutes)</label>
+								<input type="number" class="form-control" name="DurationMinutes" value="30" />
+							</div>
+						</div>
+
+						<!-- Max Stake + Max Uses (same row) -->
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Max Stake Per Bet</label>
+								<input type="number" step="0.01" class="form-control" name="MaxStakePerBet" />
+							</div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">Max Uses Per User</label>
+								<input type="number" class="form-control" name="MaxUsesPerUser" />
+							</div>
+						</div>
+
+						<!-- Start Time -->
+						<div class="mb-3 d-flex flex-column align-items-center">
+							<label class="form-label">Start Time (local)</label>
+							<input type="datetime-local" class="form-control" name="StartTimeLocal" />
+							<small class="form-text text-muted">Leave empty to start immediately.</small>
+						</div>
+
+						<!-- Note -->
+						<div class="mb-3 d-flex flex-column align-items-center">
+							<label class="form-label">Note</label>
+							<input type="text" class="form-control" name="Note" />
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary">Create</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div class="modal fade"
+	     id="confirmPostponeModal"
+	     tabindex="-1">
+
+		<div class="modal-dialog modal-dialog-centered">
+
+			<div class="modal-content border-secondary">
+
+				<div class="modal-header">
+
+					<h5 class="modal-title fw-bold text-secondary">
+
+						<i class="bi bi-pause-circle-fill me-2"></i>
+						Postpone Match
+
+					</h5>
+
+					<button type="button"
+					        class="btn-close"
+					        data-bs-dismiss="modal">
+					</button>
+
+				</div>
+
+				<div class="modal-body text-center">
+
+					<div class="mb-3">
+
+						<i class="bi bi-hourglass-split text-secondary"
+						   style="font-size: 3rem;">
+						</i>
+
+					</div>
+
+					<p class="mb-0">
+						Are you sure you want to postpone this match?
+					</p>
+
+				</div>
+
+				<div class="modal-footer justify-content-center">
+
+					<form id="confirmPostponeForm"
+					      asp-action="PostponeMatchEvent"
+					      asp-controller="Event"
+					      method="post">
+
+						@Html.AntiForgeryToken()
+
+						<input type="hidden"
+						       name="id"
+						       id="postponeEventId" />
+
+						<button type="submit"
+						        class="btn btn-secondary">
+
+							<i class="bi bi-pause-fill me-1"></i>
+							Postpone
+
+						</button>
+
+					</form>
+
+					<button type="button"
+					        class="btn btn-outline-danger"
+					        data-bs-dismiss="modal">
+
+						Cancel
+
+					</button>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+	<div class="modal fade" id="revertToUpcomingModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form asp-action="RevertToUpcoming" asp-controller="Event" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="revertEventId" />
+					<div class="modal-header">
+						<h5 class="modal-title fw-bold text-white">
+							<i class="bi bi-arrow-counterclockwise me-2"></i>
+							Move match back to upcoming
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<p class="mb-3">
+							Set a new kick-off date &amp; time for <strong id="revertMatchName"></strong>.
+							The match will be moved back to upcoming with this start time.
+						</p>
+						<label for="revertNewKickoff" class="form-label">New kick-off (your local time)</label>
+						<input type="datetime-local" name="newKickoffLocal" id="revertNewKickoff" class="form-control" required />
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="submit" class="btn btn-success">
+							<i class="bi bi-arrow-counterclockwise me-1"></i>
+							Move to upcoming
+						</button>
+						<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div class="modal fade" id="confirmCancelModal" tabindex="-1" aria-labelledby="confirmCancelLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-danger">
+				<div class="modal-header text-danger fw-bold">
+					<h5 class="modal-title" id="confirmCancelLabel">
+						<i class="bi bi-exclamation-triangle-fill me-2"></i>
+						Confirm Cancellation
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body text-center">
+					Are you sure you want to void this event?
+				</div>
+				<div class="modal-footer justify-content-center">
+					<form id="cancelEventForm" asp-action="CancelMatchEvent" asp-controller="Event" method="post">
+						@Html.AntiForgeryToken()
+						<input type="hidden" name="id" id="cancelEventId" value="" />
+						<button type="submit" class="btn btn-danger">Yes, Void</button>
+					</form>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="editCompetitionModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+
+				<form asp-action="UpdateCompetition"
+				      asp-controller="Event"
+				      method="post">
+					
+
+					@Html.AntiForgeryToken()
+
+					<div class="modal-header">
+						<h5 class="modal-title">
+							<i class="bi bi-trophy me-2"></i>
+							Edit Competition
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+
+					<div class="modal-body text-center">
+						
+						<input type="hidden" name="EventId" id="editCompetitionEventId" />
+
+						<label class="form-label">Competition</label>
+						<select name="Competition"
+						        id="editCompetitionSelect"
+						        asp-items="Model.AvailableCompetitions"
+						        class="form-select text-center">
+						</select>
+
+					</div>
+
+					<div class="modal-footer justify-content-center">
+								<button type="submit" class="btn btn btn-primary">
+							<i class="bi bi-check-circle me-1"></i>
+							Save
+						</button>
+					</div>
+
+				</form>
+
+			</div>
+		</div>
+	</div>
+
 	<div class="modal fade" id="reviewUpcomingModal" tabindex="-1">
 		<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
 			<div class="modal-content">
@@ -2887,4 +3050,348 @@
 
 		});
 	</script>
+	<script>
+		// ── Tabs: reopen the tab the admin was on after a save / redirect ──────────────
+		document.addEventListener("DOMContentLoaded", function () {
+			const KEY = "mf.addEvent.activeTab";
+			const tabButtons = document.querySelectorAll('#eventTabs [data-bs-toggle="tab"]');
+
+			tabButtons.forEach(btn => btn.addEventListener("shown.bs.tab", e => {
+				try { sessionStorage.setItem(KEY, e.target.getAttribute("data-bs-target")); } catch (err) { }
+			}));
+
+			// A re-rendered Manual Event form (validation error on add) always opens on that tab
+			const forceManual = @(Context.Request.Method == "POST" ? "true" : "false");
+			if (forceManual) {
+				try { sessionStorage.setItem(KEY, "#manualTab"); } catch (err) { }
+				return;
+			}
+
+			let saved = null;
+			try { saved = sessionStorage.getItem(KEY); } catch (err) { }
+
+			if (saved && saved !== "#manualTab" && window.bootstrap) {
+				const btn = document.querySelector(`#eventTabs [data-bs-target="${saved}"]`);
+				if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+			}
+		});
+
+		// ── Manual Event: Markets preview (O/U 2.5, BTTS, Double Chance) ──────────────
+		(function () {
+			const panel   = document.getElementById("marketsPreview");
+			const homeEl  = document.getElementById("HomeOdds");
+			const drawEl  = document.getElementById("DrawOdds");
+			const awayEl  = document.getElementById("AwayOdds");
+			const noDrawEl = document.getElementById("NoDrawHidden");
+			if (!panel || !homeEl || !drawEl || !awayEl || !noDrawEl) return;
+
+			const inputs   = [...panel.querySelectorAll(".market-preview-input")];
+			const editedEl = document.getElementById("MarketOddsEdited");
+			const stateEl  = document.getElementById("marketsPreviewState");
+			const resetBtn = document.getElementById("marketsPreviewReset");
+			const hintEl   = document.getElementById("marketsPreviewHint");
+			const dcGroup  = panel.querySelector('[data-group="dc"]');
+
+			let generated = {};
+			let lastSig = null;
+			let requestNo = 0;
+
+			// Form re-rendered after a failed save: keep the admin's own prices
+			if (editedEl.value === "true") {
+				inputs.forEach(i => { if (i.value !== "") i.dataset.userEdited = "true"; });
+			}
+
+			function refreshState() {
+				const anyEdited = inputs.some(i => !i.disabled && i.dataset.userEdited === "true");
+				editedEl.value = anyEdited ? "true" : "false";
+				stateEl.textContent = anyEdited ? "edited" : "generated";
+				stateEl.className = "badge rounded-pill " + (anyEdited ? "bg-warning text-dark" : "bg-info");
+				resetBtn.style.display = anyEdited ? "" : "none";
+			}
+
+			function applyNoDraw(noDraw) {
+				if (!dcGroup) return;
+				dcGroup.style.display = noDraw ? "none" : "";
+				// disabled inputs are not posted, so No Draw matches get no Double Chance
+				dcGroup.querySelectorAll("input").forEach(i => { i.disabled = noDraw; });
+			}
+
+			function fill(force) {
+				inputs.forEach(i => {
+					if (i.disabled) return;
+					if (force) delete i.dataset.userEdited;
+					if (i.dataset.userEdited === "true") return;
+
+					const v = generated[i.dataset.code];
+					i.value = v !== undefined && v !== null ? Number(v).toFixed(2) : "";
+				});
+				refreshState();
+			}
+
+			async function update() {
+				const h = homeEl.value, d = drawEl.value, a = awayEl.value;
+				const noDraw = noDrawEl.value === "true";
+				const sig = [h, d, a, noDraw].join("|");
+				if (sig === lastSig) return;
+				lastSig = sig;
+
+				applyNoDraw(noDraw);
+				const myRequest = ++requestNo;
+
+				if (!h || !a || (!noDraw && !d)) {
+					generated = {};
+					hintEl.style.display = "";
+					fill(false);
+					return;
+				}
+
+				try {
+					const url = `/Event/PreviewMarketOdds?homeOdds=${encodeURIComponent(h)}&drawOdds=${encodeURIComponent(d)}&awayOdds=${encodeURIComponent(a)}&noDraw=${noDraw}`;
+					const res = await fetch(url);
+					if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+					const data = await res.json();
+					if (myRequest !== requestNo) return; // a newer request is on its way
+
+					generated = data.odds || {};
+					hintEl.style.display = data.success ? "none" : "";
+					fill(false);
+				} catch (err) {
+					console.error("PreviewMarketOdds failed:", err);
+				}
+			}
+
+			inputs.forEach(i => i.addEventListener("input", () => {
+				i.dataset.userEdited = "true";
+				refreshState();
+			}));
+
+			resetBtn.addEventListener("click", () => fill(true));
+
+			// The 1X2 inputs are also filled by script (Auto-generate odds, Draw toggle), so watch their values
+			setInterval(update, 400);
+			update();
+		})();
+
+		// ── Manage Matches: edit a match's extra-market prices ─────────────────────────
+		(function () {
+			const modal = document.getElementById("editMarketsModal");
+			if (!modal) return;
+
+			const inputs   = [...modal.querySelectorAll(".edit-market-input")];
+			const nameEl   = document.getElementById("editMarketsMatchName");
+			const lineEl   = document.getElementById("editMarketsLine");
+			const stateEl  = document.getElementById("editMarketsState");
+			const msgEl    = document.getElementById("editMarketsMessage");
+			const saveBtn  = document.getElementById("editMarketsSave");
+			const regenBtn = document.getElementById("editMarketsRegenerate");
+			const dcGroup  = modal.querySelector('[data-group="dc"]');
+			const enabledSw = document.getElementById("editMarketsEnabled");
+			const grid     = modal.querySelector(".markets-preview-grid");
+
+			let currentBtn = null;
+
+			const marketSwitches = [...modal.querySelectorAll(".edit-market-switch")];
+			const marketDataKey = { OverUnderGoals: "ouEnabled", BothTeamsToScore: "bttsEnabled", DoubleChance: "dcEnabled" };
+
+			function applyEnabled(enabled) {
+				enabledSw.checked = enabled;
+				grid.classList.toggle("markets-grid-off", !enabled);
+				marketSwitches.forEach(sw => { sw.disabled = !enabled; });
+			}
+
+			function applyMarketSwitch(sw, on) {
+				sw.checked = on;
+				sw.closest(".markets-preview-group")?.classList.toggle("market-group-off", !on);
+			}
+
+			// "off" when the whole match is off, "partly off" when some markets are
+			function refreshRowBadge() {
+				const badge = currentBtn?.closest("td")?.querySelector(".markets-off-badge");
+				if (!badge) return;
+
+				const allOff = currentBtn.dataset.extraEnabled === "false";
+				const someOff = Object.values(marketDataKey).some(k => currentBtn.dataset[k] === "false");
+
+				badge.textContent = allOff ? "off" : "partly off";
+				badge.classList.toggle("d-none", !allOff && !someOff);
+			}
+
+			async function postSwitch(body) {
+				const res = await fetch("/Event/SetExtraMarkets", {
+					method: "POST",
+					headers: { "Content-Type": "application/json", "RequestVerificationToken": token() },
+					body: JSON.stringify(body)
+				});
+				try { return await res.json(); }
+				catch (err) { return { success: false, message: `Server error ${res.status}` }; }
+			}
+
+			marketSwitches.forEach(sw => sw.addEventListener("change", async () => {
+				if (!currentBtn) return;
+				const on = sw.checked;
+				sw.disabled = true;
+
+				try {
+					const data = await postSwitch({ MatchEventId: currentBtn.dataset.matchId, Enabled: on, Market: sw.dataset.market });
+					if (!data.success) {
+						applyMarketSwitch(sw, !on);
+						showMessage(data.message || "Could not change the setting.", false);
+						return;
+					}
+
+					currentBtn.dataset[marketDataKey[sw.dataset.market]] = on ? "true" : "false";
+					applyMarketSwitch(sw, on);
+					refreshRowBadge();
+					showMessage(data.message, true);
+				} catch (err) {
+					console.error("SetExtraMarkets failed:", err);
+					applyMarketSwitch(sw, !on);
+					showMessage("Could not reach the server.", false);
+				} finally {
+					sw.disabled = !enabledSw.checked;
+				}
+			}));
+
+			function token() {
+				const input = document.querySelector('input[name="__RequestVerificationToken"]');
+				return input ? input.value : "";
+			}
+
+			function showMessage(text, ok) {
+				msgEl.className = "small text-center mt-2 " + (ok ? "text-success" : "text-danger");
+				msgEl.textContent = text || "";
+			}
+
+			function load(odds, manual) {
+				const noDraw = currentBtn && currentBtn.dataset.noDraw === "true";
+
+				inputs.forEach(i => {
+					const v = odds ? odds[i.dataset.code] : undefined;
+					i.value = v !== undefined && v !== null ? Number(v).toFixed(2) : "";
+				});
+
+				if (dcGroup) {
+					dcGroup.style.display = noDraw ? "none" : "";
+					dcGroup.querySelectorAll("input").forEach(i => { i.disabled = noDraw; });
+				}
+
+				stateEl.textContent = manual ? "set by hand" : "generated from 1X2";
+				stateEl.className = "badge rounded-pill " + (manual ? "bg-warning text-dark" : "bg-info");
+				lineEl.textContent = (currentBtn && currentBtn.dataset.line) || "2.5";
+			}
+
+			modal.addEventListener("show.bs.modal", e => {
+				currentBtn = e.relatedTarget || null;
+				if (!currentBtn) return;
+
+				let odds = {};
+				try { odds = JSON.parse(currentBtn.dataset.odds || "{}"); } catch (err) { }
+
+				nameEl.textContent = currentBtn.dataset.matchName || "";
+				showMessage("", true);
+				load(odds, currentBtn.dataset.manual === "true");
+				applyEnabled(currentBtn.dataset.extraEnabled !== "false");
+				marketSwitches.forEach(sw => applyMarketSwitch(sw, currentBtn.dataset[marketDataKey[sw.dataset.market]] !== "false"));
+			});
+
+			enabledSw.addEventListener("change", async () => {
+				if (!currentBtn) return;
+				const enabled = enabledSw.checked;
+				enabledSw.disabled = true;
+
+				try {
+					const data = await postSwitch({ MatchEventId: currentBtn.dataset.matchId, Enabled: enabled });
+
+					if (!data.success) {
+						applyEnabled(!enabled);
+						showMessage(data.message || "Could not change the setting.", false);
+						return;
+					}
+
+					currentBtn.dataset.extraEnabled = enabled ? "true" : "false";
+					refreshRowBadge();
+					applyEnabled(enabled);
+					showMessage(data.message, true);
+				} catch (err) {
+					console.error("SetExtraMarkets failed:", err);
+					applyEnabled(!enabled);
+					showMessage("Could not reach the server.", false);
+				} finally {
+					enabledSw.disabled = false;
+				}
+			});
+
+			function applyResult(data) {
+				if (!data || !data.success) {
+					showMessage((data && data.message) || "Could not save the prices.", false);
+					return;
+				}
+
+				load(data.odds, data.manual);
+
+				// keep the row button in sync so reopening shows the stored prices
+				currentBtn.dataset.odds = JSON.stringify(data.odds || {});
+				currentBtn.dataset.manual = data.manual ? "true" : "false";
+				currentBtn.classList.toggle("btn-primary", !!data.manual);
+				currentBtn.classList.toggle("btn-outline-primary", !data.manual);
+
+				const badge = currentBtn.closest("td")?.querySelector(".markets-manual-badge");
+				if (badge) badge.classList.toggle("d-none", !data.manual);
+
+				showMessage(data.message, true);
+			}
+
+			async function post(url, body, button) {
+				if (!currentBtn) return;
+				saveBtn.disabled = regenBtn.disabled = true;
+
+				try {
+					const res = await fetch(url, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"RequestVerificationToken": token()
+						},
+						body: JSON.stringify(body)
+					});
+
+					let data;
+					try { data = await res.json(); }
+					catch (err) { data = { success: false, message: `Server error ${res.status}` }; }
+
+					applyResult(data);
+				} catch (err) {
+					console.error(url, err);
+					showMessage("Could not reach the server.", false);
+				} finally {
+					saveBtn.disabled = regenBtn.disabled = false;
+				}
+			}
+
+			saveBtn.addEventListener("click", () => {
+				if (!currentBtn) return;
+
+				const odds = {};
+				for (const i of inputs) {
+					if (i.disabled) continue;
+					const v = parseFloat(i.value);
+					if (isNaN(v) || v < 1.01 || v > 1000) {
+						showMessage(`Enter odds between 1.01 and 1000 for ${i.dataset.code}.`, false);
+						i.focus();
+						return;
+					}
+					odds[i.dataset.code] = Math.round(v * 100) / 100;
+				}
+
+				post("/Event/UpdateMarketOdds", { MatchEventId: currentBtn.dataset.matchId, Odds: odds }, saveBtn);
+			});
+
+			regenBtn.addEventListener("click", () => {
+				if (!currentBtn) return;
+				post("/Event/RegenerateMarketOdds", { MatchEventId: currentBtn.dataset.matchId }, regenBtn);
+			});
+		})();
+	</script>
+
 }

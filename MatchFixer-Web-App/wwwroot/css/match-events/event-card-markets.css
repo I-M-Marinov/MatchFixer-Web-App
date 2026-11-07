@@ -1,0 +1,299 @@
+/* ───────── Event card flip: extra markets on the back ───────── */
+
+/* The flip wrapper takes the place of .card-body as the flex child of .live-event-card */
+.event-card-flip {
+    flex: 1 1 auto;
+    display: flex;
+    min-width: 0;
+}
+
+.event-card-flip-inner {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    min-width: 0;
+    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+/* 3D context only while flipping / flipped (keeps front tooltips out of a stacking context) */
+.event-card-flip.flip-active {
+    perspective: 1000px;
+}
+
+.event-card-flip.flip-active .event-card-flip-inner {
+    transform-style: preserve-3d;
+}
+
+.event-card-flip.flipped .event-card-flip-inner {
+    transform: rotateY(180deg);
+}
+
+.event-card-face {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.event-card-front {
+    flex: 1 1 auto;
+}
+
+.event-card-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.7rem 0.9rem 0.6rem;
+    border-radius: 5% 10%;
+    background: linear-gradient(160deg, #CAE9FF 0%, #b4dcf7 100%);
+    overflow: hidden; /* compact layout fits the card, no scrollbar */
+}
+
+/* the face that is turned away never takes clicks */
+.event-card-flip:not(.flipped) .event-card-back,
+.event-card-flip.flipped .event-card-front {
+    pointer-events: none;
+}
+
+/* ───────── Back face content ───────── */
+
+.markets-back-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.markets-back-logo {
+    height: 26px;
+    width: auto;
+    object-fit: contain;
+}
+
+.markets-back-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.15;
+    font-weight: 800;
+    color: #1B4965;
+    text-align: center;
+    font-size: 0.85em;
+}
+
+.markets-back-title small {
+    font-weight: 600;
+    color: #5f7d95;
+    font-size: 0.75em;
+}
+
+.market-group {
+    background: rgba(255, 255, 255, 0.65);
+    border-radius: 0.65rem;
+    padding: 0.3rem 0.5rem 0.4rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.market-group-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-weight: 800;
+    font-size: 0.85em;
+    color: #1B4965;
+    margin-bottom: 0.2rem;
+}
+
+.market-group-title small {
+    font-weight: 600;
+    color: #5f7d95;
+}
+
+.market-options {
+    display: grid;
+    gap: 0.3rem;
+}
+
+.market-options-2 { grid-template-columns: repeat(2, 1fr); }
+.market-options-3 { grid-template-columns: repeat(3, 1fr); }
+
+.market-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0.2rem 0.2rem;
+    line-height: 1.2;
+    border: none;
+    border-radius: 0.6rem;
+    background-color: #1B4965;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.market-btn:hover:not(:disabled) {
+    background-color: #0d6efd;
+    transform: translateY(-1px);
+}
+
+.market-btn:disabled {
+    background-color: #9aa9b5;
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+.market-btn-label {
+    font-size: 0.75em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.market-btn-odds {
+    font-size: 1em;
+    font-weight: 900;
+    color: #ffd300;
+    text-shadow: 0 1px 1px #000;
+}
+
+.market-btn.market-odds-up { animation: market-flash-up 1.2s ease; }
+.market-btn.market-odds-down { animation: market-flash-down 1.2s ease; }
+
+@keyframes market-flash-up {
+    0%, 100% { box-shadow: none; }
+    30% { box-shadow: 0 0 0 3px #28a745; }
+}
+
+@keyframes market-flash-down {
+    0%, 100% { box-shadow: none; }
+    30% { box-shadow: 0 0 0 3px #dc3545; }
+}
+
+/* ───────── Flip toggles ───────── */
+
+/* Left-aligned, inset far enough to clear the card's rounded corners */
+.flip-toggle-row {
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 1.1rem;
+}
+
+.flip-toggle {
+    border: none;
+    border-radius: 50rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8em;
+    font-weight: 800;
+    color: #fff;
+    background-color: #1B4965;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+}
+
+.flip-toggle:hover {
+    background-color: #0d6efd;
+}
+
+/* Round "More" bubble pinned to the front's bottom-left corner */
+.flip-to-markets {
+    position: absolute;
+    left: 1em;
+    bottom: 1em;
+    z-index: 2;
+    width: 3.4em;
+    height: 3.4em;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 0.85em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .event-card-flip-inner { transition: none; }
+}
+
+/* ───────── Bet slip pill for extra-market picks ───────── */
+
+.pill-brand-market {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 800;
+    line-height: 1.5;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 50rem;
+    background-color: #1B4965;
+    text-shadow: 0px 1px 1px black;
+}
+
+/* ───────── "More" bubble: attention effect ─────────
+   A ring ripples out every few seconds with a soft glow.
+   Calms down once the player has opened markets once (body.markets-seen),
+   and respects reduced-motion settings. */
+
+.flip-to-markets {
+    overflow: visible;
+    background: linear-gradient(145deg, #1B4965 0%, #0d6efd 100%);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 211, 0, 0.55);
+    animation: more-glow 2.4s ease-in-out infinite;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flip-to-markets::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid #ffd300;
+    opacity: 0;
+    pointer-events: none;
+    animation: more-ripple 2.4s ease-out infinite;
+}
+
+.flip-to-markets:hover {
+    transform: translateY(-2px) scale(1.08);
+    background: linear-gradient(145deg, #0d6efd 0%, #1B4965 100%);
+}
+
+.flip-to-markets:hover::after {
+    animation-play-state: paused;
+    opacity: 0;
+}
+
+@keyframes more-ripple {
+    0%   { transform: scale(1);    opacity: 0.85; }
+    70%  { transform: scale(1.65); opacity: 0; }
+    100% { transform: scale(1.65); opacity: 0; }
+}
+
+@keyframes more-glow {
+    0%, 100% { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 211, 0, 0); }
+    50%      { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 14px 2px rgba(255, 211, 0, 0.55); }
+}
+
+/* after the first look: keep only a slow, subtle glow */
+body.markets-seen .flip-to-markets {
+    animation-duration: 4s;
+}
+
+body.markets-seen .flip-to-markets::after {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flip-to-markets,
+    .flip-to-markets::after {
+        animation: none;
+    }
+}

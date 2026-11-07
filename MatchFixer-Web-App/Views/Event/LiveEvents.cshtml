@@ -1,6 +1,7 @@
 ﻿@using MatchFixer.Common.FootballCompetitions
 @using MatchFixer.Common.VirtualLeagues
 @using MatchFixer.Core.ViewModels.LiveEvents
+@using System.Globalization
 @model IEnumerable<LiveEventViewModel>
 
 @{
@@ -93,7 +94,9 @@
 
 
 			<div class="live-event-card tw-card tw-shadow-sm tw-h-100 gap-2">
-			<div class="card-body d-flex flex-column justify-content-around
+			<div class="event-card-flip">
+			<div class="event-card-flip-inner">
+			<div class="event-card-face event-card-front card-body d-flex flex-column justify-content-around
 											@(match.ActiveBoost != null
 												? "boosted-match-container-effects"
 												: !string.IsNullOrWhiteSpace(match.CompetitionName)
@@ -424,8 +427,93 @@
 				</div>
 
 			</div>
+			@if (match.HasMarketOdds)
+			{
+				<button type="button" class="flip-toggle flip-to-markets @(match.IsPostponed ? "d-none" : "")"
+				        aria-label="More">
+					More
+				</button>
+			}
+
 			<!-- Event content -->
 			<div id="event-countdown" class="countdown text-danger fw-bold d-flex justify-content-center align-items-center"></div>
+			</div>
+
+			@* ── Card back: extra markets (Over/Under, BTTS, Double Chance) ── *@
+			@if (match.HasMarketOdds)
+			{
+				var line = match.OverUnderLine.ToString("0.0", CultureInfo.InvariantCulture);
+				var kickoffIso = match.KickoffTime?.ToString("o") ?? "";
+				var marketGroups = new[]
+				{
+					(Market: "OverUnderGoals", Title: "Total Goals", Sub: $"Over / Under {line}", Line: line,
+						Options: new[] { (Code: "Over", Label: $"Over {line}"), (Code: "Under", Label: $"Under {line}") }),
+					(Market: "BothTeamsToScore", Title: "Both Teams To Score", Sub: "", Line: "",
+						Options: new[] { (Code: "Yes", Label: "Yes"), (Code: "No", Label: "No") }),
+					(Market: "DoubleChance", Title: "Double Chance", Sub: "", Line: "",
+						Options: new[] { (Code: "1X", Label: "1X · Home/Draw"), (Code: "12", Label: "12 · Home/Away"), (Code: "X2", Label: "X2 · Draw/Away") })
+				};
+
+				<div class="event-card-face event-card-back" inert>
+					<div class="markets-back-header">
+						<img src="@match.EffectiveHomeTeamLogo" alt="@match.HomeTeam" class="markets-back-logo"
+						     onerror="this.onerror=null;this.src='@MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge'" />
+						<div class="markets-back-title">
+							<span>@match.HomeTeam</span>
+							<small>vs</small>
+							<span>@match.AwayTeam</span>
+						</div>
+						<img src="@match.EffectiveAwayTeamLogo" alt="@match.AwayTeam" class="markets-back-logo"
+						     onerror="this.onerror=null;this.src='@MatchFixer.Common.GeneralConstants.TeamLogoConstants.GenericTeamBadge'" />
+					</div>
+
+					@foreach (var mg in marketGroups)
+					{
+						var groupHasOdds = mg.Options.Any(o => match.MarketOdds.ContainsKey(o.Code));
+
+						<div class="market-group" data-market="@mg.Market" style="@(groupHasOdds ? "" : "display:none;")">
+							<div class="market-group-title">
+								@mg.Title
+								@if (!string.IsNullOrEmpty(mg.Sub))
+								{
+									<small>@mg.Sub</small>
+								}
+							</div>
+							<div class="market-options market-options-@mg.Options.Length">
+								@foreach (var opt in mg.Options)
+								{
+									var has = match.MarketOdds.TryGetValue(opt.Code, out var price);
+									var priceStr = has ? price.ToString("0.00", CultureInfo.InvariantCulture) : "";
+
+									<button type="button"
+									        class="market-btn bet-trigger"
+									        data-match-id="@match.Id"
+									        data-home="@match.HomeTeam"
+									        data-away="@match.AwayTeam"
+									        data-home-logo-url="@match.EffectiveHomeTeamLogo"
+									        data-away-logo-url="@match.EffectiveAwayTeamLogo"
+									        data-start-time="@kickoffIso"
+									        data-market="@mg.Market"
+									        data-option="@opt.Code"
+									        data-line="@mg.Line"
+									        data-odds="@priceStr"
+									        disabled="@(!has)">
+										<span class="market-btn-label">@opt.Label</span>
+										<span class="market-btn-odds">@(has ? priceStr : "–")</span>
+									</button>
+								}
+							</div>
+						</div>
+					}
+
+					<div class="flip-toggle-row mt-auto">
+						<button type="button" class="flip-toggle flip-to-front" aria-label="Back to match result">
+							<i class="bi bi-arrow-left"></i> Match result
+						</button>
+					</div>
+				</div>
+			}
+			</div>
 			</div>
 
 			<!-- Hidden mask shown on match start -->
@@ -449,6 +537,119 @@
 <button id="backToTopBtn" class="back-to-top">
 	<i class="bi bi-arrow-up"></i>
 </button>
+
+<script>
+	// ── Flip card: extra markets on the back (O/U 2.5, BTTS, Double Chance) ──────
+
+	function setCardFlipped(card, flipped) {
+		const flip = card?.querySelector('.event-card-flip');
+		if (!flip) return;
+
+		const front = flip.querySelector('.event-card-front');
+		const back = flip.querySelector('.event-card-back');
+
+		if (flipped) {
+			// 3D context only while flipping / flipped, so tooltips on the front are not trapped in it
+			flip.classList.add('flip-active');
+			requestAnimationFrame(() => flip.classList.add('flipped'));
+		} else {
+			flip.classList.remove('flipped');
+		}
+
+		if (front) front.inert = flipped;
+		if (back) back.inert = !flipped;
+	}
+
+	// Turn the card back to its front and lock the market buttons (match started / postponed)
+	function lockMarkets(card) {
+		if (!card) return;
+
+		const flip = card.querySelector('.event-card-flip');
+		if (flip && flip.classList.contains('flipped')) setCardFlipped(card, false);
+
+		card.querySelectorAll('.market-btn').forEach(btn => { btn.disabled = true; });
+		card.querySelectorAll('.flip-to-markets').forEach(btn => btn.classList.add('d-none'));
+	}
+
+	// Apply fresh extra-market prices (keyed by selection code) to a card's back
+	function updateMarketButtons(card, marketOdds) {
+		if (!card || !marketOdds) return;
+
+		const started = card.dataset.kickoff && new Date(card.dataset.kickoff).getTime() <= Date.now();
+		const postponed = card.dataset.postponed === 'true';
+
+		card.querySelectorAll('.market-btn').forEach(btn => {
+			const code = btn.dataset.option;
+			const oddsEl = btn.querySelector('.market-btn-odds');
+			const raw = marketOdds[code];
+
+			if (raw === undefined || raw === null) {
+				btn.dataset.odds = '';
+				btn.disabled = true;
+				if (oddsEl) oddsEl.textContent = '–';
+				return;
+			}
+
+			const newOdds = Number(raw);
+			const oldOdds = parseFloat(btn.dataset.odds);
+
+			btn.dataset.odds = newOdds.toFixed(2);
+			btn.disabled = started || postponed;
+
+			if (oddsEl) oddsEl.textContent = newOdds.toFixed(2);
+
+			if (!isNaN(oldOdds) && oldOdds !== newOdds) {
+				btn.classList.remove('market-odds-up', 'market-odds-down');
+				void btn.offsetWidth;
+				btn.classList.add(newOdds > oldOdds ? 'market-odds-up' : 'market-odds-down');
+			}
+		});
+
+		// Hide a whole market when none of its selections is priced (e.g. Double Chance on No Draw)
+		let anyMarket = false;
+		card.querySelectorAll('.market-group').forEach(group => {
+			const anyPriced = [...group.querySelectorAll('.market-btn')].some(b => b.dataset.odds !== '');
+			group.style.display = anyPriced ? '' : 'none';
+			if (anyPriced) anyMarket = true;
+		});
+
+		// No market offered any more (switched off by an admin): turn the card back and hide the "More" bubble
+		if (!anyMarket) {
+			setCardFlipped(card, false);
+			card.querySelectorAll('.flip-to-markets').forEach(b => b.classList.add('d-none'));
+		} else if (!started && !postponed) {
+			card.querySelectorAll('.flip-to-markets').forEach(b => b.classList.remove('d-none'));
+		}
+	}
+
+	// Once a player has opened the markets, the "More" bubbles stop rippling (just a slow glow)
+	try {
+		if (localStorage.getItem('mf.marketsSeen') === '1') document.body.classList.add('markets-seen');
+	} catch (err) { }
+
+	document.addEventListener('click', function (e) {
+		const toggle = e.target.closest('.flip-toggle');
+		if (!toggle) return;
+
+		const card = toggle.closest('.event-card');
+		const opening = toggle.classList.contains('flip-to-markets');
+		setCardFlipped(card, opening);
+
+		if (opening) {
+			document.body.classList.add('markets-seen');
+			try { localStorage.setItem('mf.marketsSeen', '1'); } catch (err) { }
+		}
+	});
+
+	// Drop the 3D context once the card has turned back to its front
+	document.addEventListener('transitionend', function (e) {
+		if (!e.target.classList || !e.target.classList.contains('event-card-flip-inner')) return;
+
+		const flip = e.target.closest('.event-card-flip');
+		if (flip && !flip.classList.contains('flipped')) flip.classList.remove('flip-active');
+	});
+
+</script>
 
 <script>
 
@@ -550,6 +751,7 @@
 				countdownEl.textContent = '';
 				mask.classList.remove('d-none');
 				if (oddsTable) oddsTable.classList.add('d-none');
+				lockMarkets(card);
 			} else if (timeDiffMs <= 60 * 60 * 1000) {
 				const mins = Math.floor(timeDiffMs / 1000 / 60);
 				const secs = Math.floor((timeDiffMs / 1000) % 60);
@@ -880,6 +1082,11 @@
 				if (awayHeader) awayHeader.dataset.odds = update.effectiveAwayOdds.toFixed(2);
 			}
 			// else: NoDraw-only toggle on boosted card — leave Home/Away completely untouched
+
+			// Extra markets on the card back (only sent when the 1X2 prices / No Draw were edited)
+			if (update.marketOdds) {
+				updateMarketButtons(card, update.marketOdds);
+			}
 
 			// Handle NoDraw flag change in real-time
 			if (typeof update.noDraw !== 'undefined') {
@@ -1397,6 +1604,8 @@
 
 	function applyPostponedState(card) {
 		if (!card) return;
+
+		lockMarkets(card);
 
 		// dataset is already set elsewhere
 		const oddsTable = card.querySelector('.odds-table');

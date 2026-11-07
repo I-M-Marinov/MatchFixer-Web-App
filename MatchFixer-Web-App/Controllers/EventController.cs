@@ -1,6 +1,7 @@
 ﻿using MatchFixer.Common.FootballCompetitions;
 using MatchFixer.Common.VirtualLeagues;
 using MatchFixer.Core.Contracts;
+using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.ViewModels.DTO;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure.Contracts;
@@ -81,6 +82,67 @@ namespace MatchFixer_Web_App.Controllers
 				drawOdds = odds.DrawOdds,
 				awayOdds = odds.AwayOdds
 			});
+		}
+
+		/// <summary>Extra-market prices generated from 1X2 odds, for the Manual Event "Markets preview" panel.</summary>
+		[HttpGet]
+		[Authorize]
+		[AdminOnly]
+		public IActionResult PreviewMarketOdds(decimal? homeOdds, decimal? drawOdds, decimal? awayOdds, bool noDraw = false)
+		{
+			var odds = _matchEventService.PreviewMarketOdds(homeOdds, drawOdds, awayOdds, noDraw);
+			return Json(new { success = odds.Count > 0, odds });
+		}
+
+		/// <summary>Saves hand-set extra-market prices from the Manage Matches table.</summary>
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateMarketOdds([FromBody] UpdateMarketOddsRequest model)
+		{
+			if (model == null || model.MatchEventId == Guid.Empty)
+				return BadRequest(new { success = false, message = "Invalid match." });
+
+			var result = await _matchEventService.UpdateMarketOddsAsync(model.MatchEventId, model.Odds ?? new());
+			return Json(new { success = result.Success, message = result.Message, odds = result.Odds, manual = result.Manual });
+		}
+
+		/// <summary>Re-generates a match's extra-market prices from its 1X2 odds (clears the manual flag).</summary>
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> RegenerateMarketOdds([FromBody] RegenerateMarketOddsRequest model)
+		{
+			if (model == null || model.MatchEventId == Guid.Empty)
+				return BadRequest(new { success = false, message = "Invalid match." });
+
+			var result = await _matchEventService.RegenerateMarketOddsAsync(model.MatchEventId);
+			return Json(new { success = result.Success, message = result.Message, odds = result.Odds, manual = result.Manual });
+		}
+
+		/// <summary>Per-match switch for the extra markets (Markets dialog on Manage Matches).</summary>
+		[HttpPost]
+		[Authorize]
+		[AdminOnly]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> SetExtraMarkets([FromBody] SetExtraMarketsRequest model)
+		{
+			if (model == null || model.MatchEventId == Guid.Empty)
+				return BadRequest(new { success = false, message = "Invalid match." });
+
+			MatchFixer.Common.Enums.BettingMarket? market = null;
+			if (!string.IsNullOrWhiteSpace(model.Market))
+			{
+				if (!Enum.TryParse<MatchFixer.Common.Enums.BettingMarket>(model.Market, true, out var parsed)
+					|| parsed == MatchFixer.Common.Enums.BettingMarket.MatchResult)
+					return BadRequest(new { success = false, message = "Unknown market." });
+				market = parsed;
+			}
+
+			var result = await _matchEventService.SetExtraMarketsEnabledAsync(model.MatchEventId, model.Enabled, market);
+			return Json(new { success = result.Success, message = result.Message, odds = result.Odds, manual = result.Manual, enabled = model.Enabled, market = model.Market });
 		}
 
 		[HttpPost("/events/manage")]

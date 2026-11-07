@@ -1,6 +1,8 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
+using MatchFixer.Core.DTOs.Limits;
+using MatchFixer.Core.Helpers;
 using MatchFixer.Core.Services;
 using MatchFixer.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +21,51 @@ namespace MatchFixer_Web_App.Controllers
 		private readonly ISessionService _sessionService;
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IOddsBoostService _oddsBoostService;
+		private readonly IBettingLimitsService _limits;
 
 		public BetSlipController(ISessionService sessionService, MatchFixerDbContext dbContext,
-			IOddsBoostService oddsBoostService)
+			IOddsBoostService oddsBoostService, IBettingLimitsService limits)
 		{
 			_sessionService = sessionService;
 			_dbContext = dbContext;
 			_oddsBoostService = oddsBoostService;
+			_limits = limits;
+		}
+
+		public class SlipLimitsRequest
+		{
+			public List<SlipLimitsLeg> Legs { get; set; } = new();
+			public decimal TotalOdds { get; set; }
+		}
+
+		public class SlipLimitsLeg
+		{
+			public Guid MatchId { get; set; }
+			public string? Market { get; set; }
+		}
+
+		/// <summary>Max stake / max win for the slip being built (shown in the bet slip; enforced again on placing).</summary>
+		[HttpPost]
+		public async Task<IActionResult> Limits([FromBody] SlipLimitsRequest request, CancellationToken ct)
+		{
+			var legs = (request?.Legs ?? new())
+				.Where(l => l.MatchId != Guid.Empty)
+				.Select(l => new SlipLeg(l.MatchId,
+					Enum.TryParse<BettingMarket>(l.Market, true, out var m) ? m : BettingMarket.MatchResult))
+				.ToList();
+
+			var limits = await _limits.GetSlipLimitsAsync(legs, request?.TotalOdds ?? 0, ct);
+
+			return new JsonResult(new
+			{
+				legs = limits.Legs,
+				hasExtraMarkets = limits.HasExtraMarkets,
+				maxStake = limits.MaxStake,
+				maxWin = limits.MaxWin,
+				maxStakeForWin = limits.MaxStakeForWin,
+				promoMaxStake = limits.PromoMaxStake,
+				effectiveMaxStake = limits.EffectiveMaxStake
+			});
 		}
 
 		[HttpGet]
@@ -47,6 +87,11 @@ namespace MatchFixer_Web_App.Controllers
 				.Where(m => matchIds.Contains(m.Id))
 				.ToDictionaryAsync(m => m.Id);
 
+			var marketOdds = await dbContext.MatchOdds
+				.AsNoTracking()
+				.Where(o => matchIds.Contains(o.MatchEventId))
+				.ToListAsync();
+
 			// Update session bets with latest effective odds (boosts respected)
 			foreach (var bet in betSlip.Bets)
 			{
@@ -54,6 +99,20 @@ namespace MatchFixer_Web_App.Controllers
 					continue;
 
 				bet.IsPostponed = match.IsPostponed;
+
+				// Extra markets: re-price from MatchOdds (no boosts on these markets)
+				if (bet.Market != BettingMarket.MatchResult)
+				{
+					var latest = marketOdds.FirstOrDefault(o => o.MatchEventId == bet.MatchId
+															 && o.Market == bet.Market
+															 && o.Selection == bet.Selection);
+					if (latest != null)
+					{
+						bet.Odds = latest.Odds;
+						bet.Line = latest.Line;
+					}
+					continue;
+				}
 
 				var (home, draw, away, _) = await oddsBoostService.GetEffectiveOddsAsync(
 					match.Id,
@@ -89,6 +148,12 @@ namespace MatchFixer_Web_App.Controllers
 					homeLogoUrl = b.HomeLogoUrl,
 					awayLogoUrl = b.AwayLogoUrl,
 					selectedOption = b.SelectedOption,
+					market = b.Market.ToString(),
+					selection = b.Selection,
+					line = b.Line,
+					pickLabel = BetMarketHelper.DisplayPick(b.Market,
+						Enum.TryParse<MatchPick>(b.SelectedOption, true, out var p) ? p : default,
+						b.Selection, b.Line),
 					odds = b.Odds,
 					startTimeUtc = b.StartTimeUtc?.ToUniversalTime()
 						.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'"),
@@ -169,13 +234,32 @@ namespace MatchFixer_Web_App.Controllers
 
 
 		[HttpGet]
-		public async Task<IActionResult> GetEffectiveOdds(Guid matchId, string option, CancellationToken ct)
+		public async Task<IActionResult> GetEffectiveOdds(Guid matchId, string option, CancellationToken ct, BettingMarket market = BettingMarket.MatchResult)
 		{
 			var match = await _dbContext.MatchEvents
 				.AsNoTracking()
 				.FirstOrDefaultAsync(e => e.Id == matchId, ct);
 
 			if (match == null) return NotFound();
+
+			// Extra markets: plain price from MatchOdds (boosts only apply to Match Result)
+			if (market != BettingMarket.MatchResult)
+			{
+				var selection = BetMarketHelper.NormalizeSelection(market, option);
+				if (selection == null)
+					return BadRequest("Invalid option or odds unavailable.");
+
+				if (!await _limits.IsMarketOfferedAsync(matchId, market, ct))
+					return BadRequest("This market is not available for this match.");
+
+				var row = await _dbContext.MatchOdds
+					.AsNoTracking()
+					.FirstOrDefaultAsync(o => o.MatchEventId == matchId && o.Market == market && o.Selection == selection, ct);
+
+				if (row == null) return BadRequest("Invalid option or odds unavailable.");
+
+				return new JsonResult(new { odds = row.Odds, line = row.Line, selection, boostId = (Guid?)null });
+			}
 
 			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
 				match.Id,

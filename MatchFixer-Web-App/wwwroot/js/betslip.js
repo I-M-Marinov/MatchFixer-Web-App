@@ -42,12 +42,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 const awayLogoUrl = source.dataset.awayLogoUrl;
                 const selectedOption = source.dataset.option;
                 const startTimeUtc = source.dataset.startTime;
+                // Extra markets (card back) carry data-market / data-line; front 1X2 buttons default to MatchResult
+                const market = el.dataset.market || source.dataset.market || 'MatchResult';
+                const rawLine = el.dataset.line || source.dataset.line || '';
+                const line = rawLine !== '' && !isNaN(parseFloat(rawLine)) ? parseFloat(rawLine) : null;
+
+                if (el.disabled || el.classList.contains('disabled')) return;
 
                 const odds = source.dataset.odds ? parseFloat(source.dataset.odds) : null;
 
                 if (matchId && home && away && homeLogoUrl && awayLogoUrl && selectedOption && startTimeUtc &&
                     !isNaN(Date.parse(startTimeUtc)) && odds !== null && !isNaN(odds)) {
-                    addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, selectedOption, odds, startTimeUtc);
+                    addToBetSlip(matchId, home, away, homeLogoUrl, awayLogoUrl, selectedOption, odds, startTimeUtc, market, line);
                     updateBadge();
                 }
             });
@@ -112,25 +118,43 @@ function onBetSlipMatchPostponed(msg) {
 }
 
 
-async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc) {
+// Short label for a pick: "Home", "Over 2.5", "BTTS Yes", "DC 1X"
+function betPickLabel(bet) {
+    switch (bet.market) {
+        case 'OverUnderGoals':
+            return `${bet.selectedOption} ${Number(bet.line ?? 2.5).toFixed(1)}`;
+        case 'BothTeamsToScore':
+            return `BTTS ${bet.selectedOption}`;
+        case 'DoubleChance':
+            return `DC ${bet.selectedOption}`;
+        default:
+            return bet.selectedOption;
+    }
+}
+
+async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUrl, option, odds, startTimeUtc, market = 'MatchResult', line = null) {
     try {
         //  Fetch effective odds from server
-        const response = await fetch(`/BetSlip/GetEffectiveOdds?matchId=${matchId}&option=${option}`);
+        const response = await fetch(`/BetSlip/GetEffectiveOdds?matchId=${encodeURIComponent(matchId)}&option=${encodeURIComponent(option)}&market=${encodeURIComponent(market)}`);
         if (!response.ok) {
             console.error("Failed to fetch odds:", response.statusText);
             return;
         }
 
-        const data = await response.json(); // { odds: 2.35, boostId: "..." }
+        const data = await response.json(); // { odds: 2.35, boostId: "...", line?: 2.5 }
         const odds = data.odds;
+        if (data.line !== undefined && data.line !== null) line = data.line;
 
-        // See if bet already exists
+        // One pick per match: a new pick replaces whatever was picked on this match (any market)
         const existingBet = betSlip.bets.find(b => b.matchId === matchId);
 
         if (existingBet) {
             const oldOption = existingBet.selectedOption;
 
             existingBet.selectedOption = option;
+            existingBet.market = market;
+            existingBet.selection = market === 'MatchResult' ? null : option;
+            existingBet.line = line;
             existingBet.odds = odds;
             existingBet.homeLogoUrl = homeLogoUrl;
             existingBet.awayLogoUrl = awayLogoUrl;
@@ -147,6 +171,9 @@ async function addToBetSlip(matchId, homeTeam, awayTeam, homeLogoUrl, awayLogoUr
                 homeLogoUrl,
                 awayLogoUrl,
                 selectedOption: option, // ← must match renderBetSlip()
+                market,
+                selection: market === 'MatchResult' ? null : option,
+                line,
                 odds,
                 startTimeUtc
             };
@@ -213,6 +240,9 @@ function addBetToSession(betItem) {
         HomeLogoUrl: betItem.homeLogoUrl,
         AwayLogoUrl: betItem.awayLogoUrl,
         SelectedOption: betItem.selectedOption,  // PascalCase
+        Market: betItem.market || 'MatchResult',
+        Selection: betItem.market && betItem.market !== 'MatchResult' ? betItem.selectedOption : null,
+        Line: betItem.line !== undefined && betItem.line !== null && betItem.line !== '' && !isNaN(Number(betItem.line)) ? Number(betItem.line) : null,
         Odds: betItem.odds,
         StartTimeUtc: betItem.KickoffTime
     };
@@ -354,7 +384,7 @@ function renderBetSlip() {
 
         const br = document.createElement("br");
         const pick = document.createElement("span");
-        pick.textContent = bet.selectedOption;
+        pick.textContent = betPickLabel(bet);
 
         if (bet.selectedOption === "Home"){
             pick.classList.add("pill-brand-blue");
@@ -362,6 +392,8 @@ function renderBetSlip() {
             pick.classList.add("pill-brand-yellow");
         } else if (bet.selectedOption === "Away") {
             pick.classList.add("pill-brand-green");
+        } else {
+            pick.classList.add("pill-brand-market");
         }
 
         const pickText = document.createElement('p');
@@ -413,6 +445,8 @@ function renderBetSlip() {
         item.dataset.startTime = bet.startTimeUtc;
         item.dataset.matchId = bet.matchId;
         item.dataset.option = bet.selectedOption;
+        item.dataset.market = bet.market || 'MatchResult';
+        item.dataset.line = bet.line ?? '';
         item.dataset.isPostponed = bet.isPostponed === true ? "true" : "false";
 
 
@@ -468,9 +502,21 @@ function renderBetSlip() {
         input3.name = `Bets[${index}].Odds`;
         input3.value = bet.odds;
 
+        const input4 = document.createElement("input");
+        input4.type = "hidden";
+        input4.name = `Bets[${index}].Market`;
+        input4.value = bet.market || 'MatchResult';
+
+        const input5 = document.createElement("input");
+        input5.type = "hidden";
+        input5.name = `Bets[${index}].Selection`;
+        input5.value = bet.market && bet.market !== 'MatchResult' ? bet.selectedOption : '';
+
         hiddenInputs.appendChild(input1);
         hiddenInputs.appendChild(input2);
         hiddenInputs.appendChild(input3);
+        hiddenInputs.appendChild(input4);
+        hiddenInputs.appendChild(input5);
 
         item.appendChild(hiddenInputs);
 
@@ -481,6 +527,84 @@ function renderBetSlip() {
     updatePotentialReturn();
     updateBetStatuses();
     updateBadge();
+    refreshSlipLimits();
+}
+
+// ===============================
+// Slip limits (admin Limits page): max stake / max win for the slip being built.
+// The server checks them again when the slip is placed.
+// ===============================
+let slipLimitsTimer = null;
+let slipMaxStake = null;
+
+function refreshSlipLimits() {
+    clearTimeout(slipLimitsTimer);
+    slipLimitsTimer = setTimeout(fetchSlipLimits, 250);
+}
+
+async function fetchSlipLimits() {
+    const box = document.getElementById("slipLimits");
+    if (!box) return;
+
+    if (!betSlip.bets.length) {
+        slipMaxStake = null;
+        box.classList.add("d-none");
+        checkStakeAgainstLimit();
+        return;
+    }
+
+    const totalOdds = betSlip.bets.reduce((acc, b) => acc * Number(b.odds || 1), 1);
+
+    try {
+        const res = await fetch('/BetSlip/Limits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                Legs: betSlip.bets.map(b => ({ MatchId: b.matchId, Market: b.market || 'MatchResult' })),
+                TotalOdds: totalOdds
+            })
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        slipMaxStake = data.effectiveMaxStake ?? null;
+
+        const parts = [];
+        if (data.promoMaxStake != null) {
+            // a promo (odds boost) on the slip overrides the normal limits
+            parts.push(`<i class="ri-fire-fill"></i> Promo max stake <strong>€${Number(data.promoMaxStake).toFixed(2)}</strong>`);
+        } else {
+            if (data.effectiveMaxStake != null) parts.push(`Max stake <strong>€${Number(data.effectiveMaxStake).toFixed(2)}</strong>`);
+            if (data.maxWin != null) parts.push(`Max win <strong>€${Number(data.maxWin).toFixed(2)}</strong>`);
+        }
+
+        box.innerHTML = parts.join(' · ');
+        box.classList.toggle("d-none", parts.length === 0);
+        checkStakeAgainstLimit();
+    } catch (err) {
+        console.error("Failed to load slip limits", err);
+    }
+}
+
+function checkStakeAgainstLimit() {
+    const box = document.getElementById("slipLimits");
+    const btn = document.getElementById("placeBetBtn");
+    const amount = parseFloat(document.getElementById("betAmount")?.value || "0");
+    const over = slipMaxStake != null && amount > slipMaxStake;
+
+    box?.classList.toggle("slip-limits-over", over);
+
+    if (!btn) return;
+    if (over) {
+        btn.disabled = true;
+        btn.dataset.limitBlocked = "true";
+        btn.title = `Lower your stake to €${Number(slipMaxStake).toFixed(2)} or less`;
+    } else if (btn.dataset.limitBlocked === "true") {
+        // only undo what this check did
+        btn.disabled = false;
+        delete btn.dataset.limitBlocked;
+        btn.removeAttribute("title");
+    }
 }
 function removeBet(matchId, selectedOption) {
     // Remove locally
@@ -528,6 +652,7 @@ function updatePotentialReturn() {
     const totalOdds = parseFloat(document.getElementById("totalOdds").innerText || "0");
     const potential = (amount * totalOdds).toFixed(2);
     document.getElementById("potentialReturn").innerText = potential;
+    checkStakeAgainstLimit();
 }
 function updateBadge() {
     const betSlipBadge = document.getElementById('betCountBadge');
