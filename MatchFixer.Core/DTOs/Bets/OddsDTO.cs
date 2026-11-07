@@ -17,5 +17,9 @@ namespace MatchFixer.Core.DTOs.Bets
 
 		public bool HasActiveBoost { get; set; }
 		public bool NoDraw { get; set; }
+
+		// Extra markets keyed by selection code ("Over", "Under", "Yes", "No", "1X", "12", "X2").
+		// Codes are unique across markets, so the selection alone identifies the market. Not boosted.
+		public Dictionary<string, decimal> MarketOdds { get; set; } = new();
 	}
 }

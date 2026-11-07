@@ -5,6 +5,7 @@ using MatchFixer.Common.FootballLeagues;
 using MatchFixer.Common.VirtualLeagues;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
+using MatchFixer.Core.Helpers;
 using MatchFixer.Core.ViewModels.LiveEvents;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
@@ -34,6 +35,7 @@ namespace MatchFixer.Core.Services
 		private readonly ITimezoneService _timezoneService;
 		private readonly INotificationService _notificationService;
 		private readonly IMemoryCache _cache;
+		private readonly IBettingLimitsService _limits;
 
 
 
@@ -47,7 +49,8 @@ namespace MatchFixer.Core.Services
 			IFootballApiService footballApiService,
 			ITimezoneService timezoneService,
 			INotificationService notificationService,
-			IMemoryCache cache)
+			IMemoryCache cache,
+			IBettingLimitsService limits)
 		{
 			_dbContext = dbContext;
 			_userContextService = userContextService;
@@ -58,6 +61,7 @@ namespace MatchFixer.Core.Services
 			_timezoneService = timezoneService;
 			_notificationService = notificationService;
 			_cache = cache;
+			_limits = limits;
 		}
 
 		public async Task<List<LiveEventViewModel>> GetLiveEventsAsync()
@@ -76,11 +80,13 @@ namespace MatchFixer.Core.Services
 				)
 				.Include(e => e.HomeTeam)
 				.Include(e => e.AwayTeam)
+				.Include(e => e.MarketOdds)
 				.OrderBy(e => e.IsPostponed)
 				.ThenBy(e => e.MatchDate)
 				.ToListAsync();
 
 			var result = new List<LiveEventViewModel>();
+			var marketSwitches = await _limits.GetMarketSwitchesAsync();
 
 			var favoriteTeamIds = (await _dbContext.UserFavoriteTeams
 					.Where(x => x.UserId == user.Id)
@@ -156,7 +162,14 @@ namespace MatchFixer.Core.Services
 					ApiFixtureId = e.ApiFixtureId,
 					CompetitionName = e.CompetitionName,
 					LeagueName = e.HomeTeam.LeagueName,
-					IsFavoriteLeague = !string.IsNullOrWhiteSpace(e.HomeTeam.LeagueName) && favoriteLeagueNames.Contains(e.HomeTeam.LeagueName)
+					IsFavoriteLeague = !string.IsNullOrWhiteSpace(e.HomeTeam.LeagueName) && favoriteLeagueNames.Contains(e.HomeTeam.LeagueName),
+					// only markets switched on site-wide and for this match
+					MarketOdds = e.MarketOdds
+						.Where(o => e.IsMarketEnabled(o.Market) && marketSwitches.IsEnabled(o.Market))
+						.ToDictionary(o => o.Selection, o => o.Odds),
+					OverUnderLine = e.MarketOdds.FirstOrDefault(o => o.Market == BettingMarket.OverUnderGoals)?.Line
+						?? MatchFixer.Common.GeneralConstants.MarketSelections.DefaultGoalsLine,
+					ExtraMarketsEnabled = e.ExtraMarketsEnabled
 				});
 			}
 
@@ -192,6 +205,15 @@ namespace MatchFixer.Core.Services
 					.Select(x => x.TeamId)
 					.ToListAsync())
 				.ToHashSet();
+
+			// Extra-market prices for the admin Manage Matches table
+			var eventIds = events.Select(e => e.Id).ToList();
+			var marketOddsByEvent = (await _dbContext.MatchOdds
+					.AsNoTracking()
+					.Where(o => eventIds.Contains(o.MatchEventId))
+					.Select(o => new { o.MatchEventId, o.Market, o.Selection, o.Odds, o.Line })
+					.ToListAsync())
+				.ToLookup(o => o.MatchEventId);
 
 
 			var viewModels = events.Select(e =>
@@ -256,6 +278,14 @@ namespace MatchFixer.Core.Services
 					IsFavoriteMatch = favoriteTeams.Any(),
 					HasResult = e.LiveResult != null,
 					LeagueName = e.HomeTeam.LeagueName,
+					MarketOdds = marketOddsByEvent[e.Id].ToDictionary(o => o.Selection, o => o.Odds),
+					OverUnderLine = marketOddsByEvent[e.Id].FirstOrDefault(o => o.Market == BettingMarket.OverUnderGoals)?.Line
+						?? MatchFixer.Common.GeneralConstants.MarketSelections.DefaultGoalsLine,
+					MarketOddsManual = e.MarketOddsManual,
+					ExtraMarketsEnabled = e.ExtraMarketsEnabled,
+					OverUnderEnabled = e.OverUnderEnabled,
+					BothTeamsToScoreEnabled = e.BothTeamsToScoreEnabled,
+					DoubleChanceEnabled = e.DoubleChanceEnabled,
 					MatchStatus = e.Status == MatchStatus.Scheduled &&
 					              e.MatchDate.HasValue &&
 					              e.MatchDate <= now
@@ -320,6 +350,11 @@ namespace MatchFixer.Core.Services
 				CompetitionName = competitionName
 			};
 
+			// Prices reviewed in the "Markets preview" panel (only kept when the admin changed them)
+			var marketOverrides = ValidMarketOverrides(model.MarketOdds, model.NoDraw);
+			if (model.MarketOddsEdited && marketOverrides.Count > 0)
+				matchEvent.MarketOddsManual = true;
+
 			bool isInternational = homeTeam.IsNationalTeam && awayTeam.IsNationalTeam;
 
 			if (isInternational && string.IsNullOrWhiteSpace(matchEvent.CompetitionName))
@@ -328,6 +363,7 @@ namespace MatchFixer.Core.Services
 			}
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
+			AddGeneratedMarketOdds(matchEvent, matchEvent.MarketOddsManual ? marketOverrides : null);
 			await _dbContext.SaveChangesAsync();
 
 			//  Notify users that have either teams in their favorites 
@@ -361,6 +397,7 @@ namespace MatchFixer.Core.Services
 			};
 
 			await _dbContext.MatchEvents.AddAsync(matchEvent);
+			AddGeneratedMarketOdds(matchEvent);
 			await _dbContext.SaveChangesAsync();
 
 			//  Notify users that have either teams in their favorites 
@@ -491,6 +528,9 @@ namespace MatchFixer.Core.Services
 			if (!anyChange)
 				return false;
 
+			// Extra markets follow the 1X2 prices / No Draw flag
+			var marketOdds = await SyncMarketOddsAsync(match);
+
 			await _dbContext.SaveChangesAsync();
 
 			// Look up any active boost so the client knows the boost is still live
@@ -510,10 +550,359 @@ namespace MatchFixer.Core.Services
 				effectiveDrawOdds: activeBoost != null ? drawOdds + activeBoost.BoostValue : null,
 				effectiveAwayOdds: activeBoost != null ? awayOdds + activeBoost.BoostValue : null,
 				activeBoostId: activeBoost?.Id,
-				noDraw: noDraw
+				noDraw: noDraw,
+				marketOdds: await OfferedMarketOddsAsync(match, marketOdds)
 			);
 
 			return true;
+		}
+
+		/// <summary>The market prices players may see: markets switched on for this match and site-wide.</summary>
+		private async Task<Dictionary<string, decimal>> OfferedMarketOddsAsync(MatchEvent match, Dictionary<string, decimal> stored)
+		{
+			var switches = await _limits.GetMarketSwitchesAsync();
+
+			return stored
+				.Where(kv => TryGetMarketOfSelection(kv.Key, out var market, out _)
+						  && match.IsMarketEnabled(market)
+						  && switches.IsEnabled(market))
+				.ToDictionary(kv => kv.Key, kv => kv.Value);
+		}
+
+		public async Task<MarketOddsResultDto> SetExtraMarketsEnabledAsync(Guid matchEventId, bool enabled, BettingMarket? market = null)
+		{
+			var (match, error) = await LoadEditableMatchAsync(matchEventId);
+			if (match == null)
+				return new MarketOddsResultDto { Success = false, Message = error };
+
+			var stored = await _dbContext.MatchOdds
+				.AsNoTracking()
+				.Where(o => o.MatchEventId == match.Id)
+				.ToDictionaryAsync(o => o.Selection, o => o.Odds);
+
+			// null = the match-wide switch; otherwise one market's switch
+			var (property, current) = market switch
+			{
+				null => (nameof(match.ExtraMarketsEnabled), match.ExtraMarketsEnabled),
+				BettingMarket.OverUnderGoals => (nameof(match.OverUnderEnabled), match.OverUnderEnabled),
+				BettingMarket.BothTeamsToScore => (nameof(match.BothTeamsToScoreEnabled), match.BothTeamsToScoreEnabled),
+				BettingMarket.DoubleChance => (nameof(match.DoubleChanceEnabled), match.DoubleChanceEnabled),
+				_ => (string.Empty, enabled)
+			};
+
+			if (property.Length == 0)
+				return new MarketOddsResultDto { Success = false, Message = "Unknown market." };
+
+			if (current != enabled)
+			{
+				var user = await _userContextService.GetCurrentUserAsync();
+				LogChange(match.Id, property, current, enabled, user.Id);
+
+				switch (market)
+				{
+					case null: match.ExtraMarketsEnabled = enabled; break;
+					case BettingMarket.OverUnderGoals: match.OverUnderEnabled = enabled; break;
+					case BettingMarket.BothTeamsToScore: match.BothTeamsToScoreEnabled = enabled; break;
+					case BettingMarket.DoubleChance: match.DoubleChanceEnabled = enabled; break;
+				}
+
+				await _dbContext.SaveChangesAsync();
+				await NotifyOddsChangedAsync(match, stored);
+			}
+
+			var what = market switch
+			{
+				BettingMarket.OverUnderGoals => "Total Goals O/U",
+				BettingMarket.BothTeamsToScore => "Both Teams To Score",
+				BettingMarket.DoubleChance => "Double Chance",
+				_ => "Extra markets"
+			};
+
+			return new MarketOddsResultDto
+			{
+				Success = true,
+				Message = $"{what} {(enabled ? "offered" : "hidden")} for this match.",
+				Odds = stored,
+				Manual = match.MarketOddsManual
+			};
+		}
+
+		/// <summary>
+		/// Adds generated extra-market odds for a new (not yet saved) match.
+		/// <paramref name="overrides"/> (selection code → price) replaces individual generated prices.
+		/// </summary>
+		private Dictionary<string, decimal> AddGeneratedMarketOdds(MatchEvent match, IReadOnlyDictionary<string, decimal>? overrides = null)
+		{
+			var generated = MarketOddsGenerator.Generate(match.HomeOdds, match.DrawOdds, match.AwayOdds, match.NoDraw);
+			var result = new Dictionary<string, decimal>();
+
+			foreach (var g in generated)
+			{
+				var price = overrides != null && overrides.TryGetValue(g.Selection, out var o) ? o : g.Odds;
+
+				_dbContext.MatchOdds.Add(new MatchOdds
+				{
+					Id = Guid.NewGuid(),
+					MatchEventId = match.Id,
+					Market = g.Market,
+					Selection = g.Selection,
+					Line = g.Line,
+					Odds = price
+				});
+
+				result[g.Selection] = price;
+			}
+
+			return result;
+		}
+
+		/// <summary>Keeps only known, offered selection codes with prices inside the allowed odds range.</summary>
+		private static Dictionary<string, decimal> ValidMarketOverrides(IEnumerable<KeyValuePair<string, decimal?>>? posted, bool noDraw)
+		{
+			var result = new Dictionary<string, decimal>();
+			if (posted == null) return result;
+
+			foreach (var (key, value) in posted)
+			{
+				if (value is not decimal price) continue;
+				if (!TryGetMarketOfSelection(key, out var market, out var code)) continue;
+				if (market == BettingMarket.DoubleChance && noDraw) continue;
+				if (price < MinMarketOdds || price > MaxMarketOdds)
+					throw new Exception($"Odds for {code} must be between {MinMarketOdds} and {MaxMarketOdds}.");
+
+				result[code] = Math.Round(price, 2);
+			}
+
+			return result;
+		}
+
+		private static readonly decimal MinMarketOdds = (decimal)MatchFixer.Common.GeneralConstants.MatchEventValidation.OddsMinValue;
+		private static readonly decimal MaxMarketOdds = (decimal)MatchFixer.Common.GeneralConstants.MatchEventValidation.OddsMaxValue;
+
+		/// <summary>Maps a selection code ("Over", "yes", "1X"...) to its market and canonical code.</summary>
+		private static bool TryGetMarketOfSelection(string? selection, out BettingMarket market, out string code)
+		{
+			foreach (var m in new[] { BettingMarket.OverUnderGoals, BettingMarket.BothTeamsToScore, BettingMarket.DoubleChance })
+			{
+				var normalized = BetMarketHelper.NormalizeSelection(m, selection);
+				if (normalized != null)
+				{
+					market = m;
+					code = normalized;
+					return true;
+				}
+			}
+
+			market = BettingMarket.MatchResult;
+			code = string.Empty;
+			return false;
+		}
+
+		/// <summary>
+		/// Re-generates the extra-market odds of an existing match from its current 1X2 prices:
+		/// updates rows in place, adds missing ones and removes ones no longer offered (e.g. Double Chance after No Draw).
+		/// </summary>
+		private async Task<Dictionary<string, decimal>> SyncMarketOddsAsync(MatchEvent match)
+		{
+			var generated = MarketOddsGenerator.Generate(match.HomeOdds, match.DrawOdds, match.AwayOdds, match.NoDraw);
+
+			var existing = await _dbContext.MatchOdds
+				.Where(o => o.MatchEventId == match.Id)
+				.ToListAsync();
+
+			var result = new Dictionary<string, decimal>();
+
+			foreach (var row in existing)
+			{
+				var g = generated.FirstOrDefault(x => x.Market == row.Market && x.Selection == row.Selection);
+				if (g == null)
+				{
+					_dbContext.MatchOdds.Remove(row); // no longer offered (e.g. Double Chance after No Draw)
+					continue;
+				}
+
+				// Hand-set prices stay as they are; only generated ones follow the 1X2 odds
+				if (!match.MarketOddsManual)
+				{
+					row.Odds = g.Odds;
+					row.Line = g.Line;
+				}
+
+				result[row.Selection] = row.Odds;
+			}
+
+			foreach (var g in generated.Where(g => !existing.Any(e => e.Market == g.Market && e.Selection == g.Selection)))
+			{
+				_dbContext.MatchOdds.Add(new MatchOdds
+				{
+					Id = Guid.NewGuid(),
+					MatchEventId = match.Id,
+					Market = g.Market,
+					Selection = g.Selection,
+					Line = g.Line,
+					Odds = g.Odds
+				});
+
+				result[g.Selection] = g.Odds;
+			}
+
+			return result;
+		}
+
+		public Dictionary<string, decimal> PreviewMarketOdds(decimal? homeOdds, decimal? drawOdds, decimal? awayOdds, bool noDraw)
+			=> MarketOddsGenerator.Generate(homeOdds, drawOdds, awayOdds, noDraw)
+				.ToDictionary(g => g.Selection, g => g.Odds);
+
+		public async Task<MarketOddsResultDto> UpdateMarketOddsAsync(Guid matchEventId, IDictionary<string, decimal> odds)
+		{
+			var (match, error) = await LoadEditableMatchAsync(matchEventId);
+			if (match == null)
+				return new MarketOddsResultDto { Success = false, Message = error };
+
+			Dictionary<string, decimal> overrides;
+			try
+			{
+				overrides = ValidMarketOverrides(odds.Select(kv => new KeyValuePair<string, decimal?>(kv.Key, kv.Value)), match.NoDraw);
+			}
+			catch (Exception ex)
+			{
+				return new MarketOddsResultDto { Success = false, Message = ex.Message };
+			}
+
+			if (overrides.Count == 0)
+				return new MarketOddsResultDto { Success = false, Message = "No valid prices were sent." };
+
+			var user = await _userContextService.GetCurrentUserAsync();
+
+			// Make sure every offered selection has a row first, then apply the admin's prices
+			await SyncMarketOddsAsync(match);
+
+			// Local holds the rows SyncMarketOddsAsync loaded or added (deleted ones are excluded)
+			var rows = _dbContext.MatchOdds.Local
+				.Where(o => o.MatchEventId == match.Id)
+				.ToList();
+
+			foreach (var row in rows)
+			{
+				if (!overrides.TryGetValue(row.Selection, out var price) || row.Odds == price)
+					continue;
+
+				LogChange(match.Id, $"MarketOdds.{row.Selection}", row.Odds, price, user.Id);
+				row.Odds = price;
+			}
+
+			if (!match.MarketOddsManual)
+			{
+				LogChange(match.Id, nameof(match.MarketOddsManual), false, true, user.Id);
+				match.MarketOddsManual = true;
+			}
+
+			await _dbContext.SaveChangesAsync();
+
+			var stored = rows.ToDictionary(r => r.Selection, r => r.Odds);
+			await NotifyOddsChangedAsync(match, stored);
+
+			return new MarketOddsResultDto { Success = true, Message = "Market prices saved.", Odds = stored, Manual = true };
+		}
+
+		public async Task<MarketOddsResultDto> RegenerateMarketOddsAsync(Guid matchEventId)
+		{
+			var (match, error) = await LoadEditableMatchAsync(matchEventId);
+			if (match == null)
+				return new MarketOddsResultDto { Success = false, Message = error };
+
+			var user = await _userContextService.GetCurrentUserAsync();
+
+			if (match.MarketOddsManual)
+			{
+				LogChange(match.Id, nameof(match.MarketOddsManual), true, false, user.Id);
+				match.MarketOddsManual = false;
+			}
+
+			var before = await _dbContext.MatchOdds
+				.AsNoTracking()
+				.Where(o => o.MatchEventId == match.Id)
+				.ToDictionaryAsync(o => o.Selection, o => o.Odds);
+
+			var stored = await SyncMarketOddsAsync(match);
+
+			foreach (var (code, price) in stored)
+			{
+				object? old = before.TryGetValue(code, out var oldPrice) ? oldPrice : null;
+				LogChange(match.Id, $"MarketOdds.{code}", old, price, user.Id); // LogChange skips unchanged values
+			}
+
+			await _dbContext.SaveChangesAsync();
+			await NotifyOddsChangedAsync(match, stored);
+
+			return new MarketOddsResultDto { Success = true, Message = "Market prices regenerated from the 1X2 odds.", Odds = stored, Manual = false };
+		}
+
+		/// <summary>Same rules as editing a match's 1X2 odds: not cancelled, finished, started or settled.</summary>
+		private async Task<(MatchEvent? Match, string Error)> LoadEditableMatchAsync(Guid matchEventId)
+		{
+			var match = await _dbContext.MatchEvents
+				.Include(m => m.LiveResult)
+				.FirstOrDefaultAsync(m => m.Id == matchEventId);
+
+			if (match == null)
+				return (null, "Match not found.");
+
+			if (match.IsCancelled || match.Status == MatchStatus.Cancelled || match.Status == MatchStatus.FullTime || match.LiveResult != null)
+				return (null, MatchUpdateFailed);
+
+			if (!match.IsPostponed && match.MatchDate.HasValue && match.MatchDate.Value <= DateTime.UtcNow)
+				return (null, "The match has already started.");
+
+			return (match, string.Empty);
+		}
+
+		/// <summary>Pushes the match's current odds (1X2 + extra markets) to open event cards.</summary>
+		private async Task NotifyOddsChangedAsync(MatchEvent match, Dictionary<string, decimal> marketOdds)
+		{
+			var now = DateTime.UtcNow;
+			var activeBoost = await _dbContext.OddsBoosts
+				.AsNoTracking()
+				.Where(b => b.MatchEventId == match.Id && b.IsActive && b.StartUtc <= now && b.EndUtc >= now)
+				.OrderByDescending(b => b.StartUtc)
+				.FirstOrDefaultAsync();
+
+			decimal home = match.HomeOdds ?? 0, draw = match.DrawOdds ?? 0, away = match.AwayOdds ?? 0;
+
+			await _notifier.NotifyMatchEventUpdatedAsync(
+				match.Id,
+				home,
+				draw,
+				away,
+				effectiveHomeOdds: activeBoost != null ? home + activeBoost.BoostValue : null,
+				effectiveDrawOdds: activeBoost != null ? draw + activeBoost.BoostValue : null,
+				effectiveAwayOdds: activeBoost != null ? away + activeBoost.BoostValue : null,
+				activeBoostId: activeBoost?.Id,
+				noDraw: match.NoDraw,
+				marketOdds: await OfferedMarketOddsAsync(match, marketOdds)
+			);
+		}
+
+		/// <summary>
+		/// One-off fill for matches created before the extra markets existed: every open match
+		/// with 1X2 odds but no MatchOdds rows gets generated prices. Safe to run repeatedly.
+		/// </summary>
+		public async Task<int> BackfillMarketOddsAsync(CancellationToken ct = default)
+		{
+			var missing = await _dbContext.MatchEvents
+				.Where(m => !m.IsCancelled
+						 && m.LiveResult == null
+						 && m.HomeOdds != null && m.AwayOdds != null
+						 && !m.MarketOdds.Any())
+				.ToListAsync(ct);
+
+			foreach (var match in missing)
+				AddGeneratedMarketOdds(match);
+
+			if (missing.Count > 0)
+				await _dbContext.SaveChangesAsync(ct);
+
+			return missing.Count;
 		}
 
 		public async Task<bool> UpdateCompetitionAsync(Guid eventId, string? competition)
@@ -575,7 +964,7 @@ namespace MatchFixer.Core.Services
 		{
 			var now = DateTime.UtcNow;
 
-			return await _dbContext.MatchEvents
+			var result = await _dbContext.MatchEvents
 				.Where(me => matchIds.Contains(me.Id))
 				.Select(me => new OddsDTO
 				{
@@ -604,6 +993,21 @@ namespace MatchFixer.Core.Services
 					NoDraw = me.NoDraw
 				})
 				.ToDictionaryAsync(x => x.Id, x => x);
+
+			// Extra markets (Over/Under, BTTS, Double Chance)
+			var marketOdds = await _dbContext.MatchOdds
+				.AsNoTracking()
+				.Where(o => matchIds.Contains(o.MatchEventId))
+				.Select(o => new { o.MatchEventId, o.Selection, o.Odds })
+				.ToListAsync();
+
+			foreach (var o in marketOdds)
+			{
+				if (result.TryGetValue(o.MatchEventId, out var dto))
+					dto.MarketOdds[o.Selection] = o.Odds;
+			}
+
+			return result;
 		}
 
 		public Task<List<ApiLeagueSelectViewModel>> GetApiLeaguesAsync()

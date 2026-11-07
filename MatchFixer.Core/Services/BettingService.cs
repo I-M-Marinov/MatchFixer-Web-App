@@ -2,6 +2,8 @@
 using MatchFixer.Common.EmailTemplates;
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
+using MatchFixer.Core.DTOs.Limits;
+using MatchFixer.Core.Helpers;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
@@ -26,6 +28,7 @@ public class BettingService : IBettingService
 	private readonly IEmailSender _emailSender;
 	private readonly IEmailQueueService _emailQueue;
 	private readonly IBettingEligibilityService _eligibility;
+	private readonly IBettingLimitsService _limits;
 
 
 	public BettingService(MatchFixerDbContext dbContext,
@@ -37,7 +40,8 @@ public class BettingService : IBettingService
 		IAdminInsightsNotifier notifier,
 		IEmailSender emailSender,
 		IEmailQueueService emailQueue,
-		IBettingEligibilityService eligibility
+		IBettingEligibilityService eligibility,
+		IBettingLimitsService limits
 		)
 	{
 		_dbContext = dbContext;
@@ -50,6 +54,7 @@ public class BettingService : IBettingService
 		_emailSender = emailSender;
 		_emailQueue = emailQueue;
 		_eligibility = eligibility;
+		_limits = limits;
 	}
 
 	public async Task<(string Message, bool IsSuccess)> PlaceBetAsync(Guid userId, BetSlipDto betSlipDto, string profileUrl, CancellationToken ct = default)
@@ -75,7 +80,10 @@ public class BettingService : IBettingService
 				!recent.Bets.Any(b =>
 					!betSlipDto.Bets.Any(dto =>
 						dto.MatchId == b.MatchEventId &&
-						dto.SelectedOption.Equals(b.Pick.ToString(), StringComparison.OrdinalIgnoreCase)
+						dto.Market == b.Market &&
+						(b.Market == BettingMarket.MatchResult
+							? string.Equals(dto.SelectedOption, b.Pick.ToString(), StringComparison.OrdinalIgnoreCase)
+							: string.Equals(dto.Selection ?? dto.SelectedOption, b.Selection, StringComparison.OrdinalIgnoreCase))
 					));
 
 			if (isSame)
@@ -89,6 +97,10 @@ public class BettingService : IBettingService
 
 		if (betSlipDto.Amount <= 0)
 			return (BetAmountMustBeGreaterThanZero, false);
+
+		// One pick per match on a slip (any market)
+		if (betSlipDto.Bets.GroupBy(b => b.MatchId).Any(g => g.Count() > 1))
+			return ("Only one pick per match is allowed on a slip.", false);
 
 		var betSlip = new BetSlip
 		{
@@ -142,6 +154,47 @@ public class BettingService : IBettingService
 			if (DateTime.UtcNow >= matchEvent.MatchDate)
 				return (EventAlreadyStartedInSlip, false);
 
+			// ── Extra markets (Over/Under, BTTS, Double Chance) ──
+			if (betDto.Market != BettingMarket.MatchResult)
+			{
+				var selection = BetMarketHelper.NormalizeSelection(betDto.Market, betDto.Selection ?? betDto.SelectedOption);
+				if (selection == null)
+					return (InvalidPickOption(betDto.Selection ?? betDto.SelectedOption), false);
+
+				// No Draw matches have no draw outcome, so Double Chance is not offered on them
+				if (betDto.Market == BettingMarket.DoubleChance && matchEvent.NoDraw)
+					return ("Double Chance is not available for this match.", false);
+
+				// Market switched off site-wide (Limits page) or for this match (Manage Matches)
+				if (!matchEvent.IsMarketEnabled(betDto.Market) || !(await _limits.GetMarketSwitchesAsync(ct)).IsEnabled(betDto.Market))
+					return ("This market is not available for this match.", false);
+
+				var marketOdds = await _dbContext.MatchOdds
+					.AsNoTracking()
+					.FirstOrDefaultAsync(o => o.MatchEventId == matchEvent.Id
+										   && o.Market == betDto.Market
+										   && o.Selection == selection, ct);
+
+				if (marketOdds == null)
+					return ("This market is not available for this match.", false);
+
+				betSlip.Bets.Add(new Bet
+				{
+					Id = Guid.NewGuid(),
+					BetSlipId = betSlip.Id,
+					MatchEventId = matchEvent.Id,
+					Market = betDto.Market,
+					Selection = selection,
+					Line = marketOdds.Line,
+					Pick = default, // not used for extra markets
+					Odds = marketOdds.Odds,
+					BetTime = DateTime.UtcNow
+				});
+
+				affectedEventIds.Add(matchEvent.Id);
+				continue;
+			}
+
 			if (!Enum.TryParse<MatchPick>(betDto.SelectedOption, true, out var parsedPick))
 				return (InvalidPickOption(betDto.SelectedOption), false);
 
@@ -189,6 +242,7 @@ public class BettingService : IBettingService
 				Id = Guid.NewGuid(),
 				BetSlipId = betSlip.Id,
 				MatchEventId = matchEvent.Id,
+				Market = BettingMarket.MatchResult,
 				Pick = parsedPick,
 				Odds = (decimal)effectiveOdds,
 				BetTime = DateTime.UtcNow,
@@ -198,6 +252,23 @@ public class BettingService : IBettingService
 			betSlip.Bets.Add(bet);
 			affectedEventIds.Add(matchEvent.Id);
 
+		}
+
+		// Stake / win limits (admin Limits page): league x legs, averaged across the slip's leagues
+		var slipOdds = betSlip.Bets.Aggregate(1m, (acc, b) => acc * b.Odds);
+		var limits = await _limits.GetSlipLimitsAsync(
+			betSlip.Bets.Select(b => new SlipLeg(b.MatchEventId, b.Market)).ToList(), slipOdds, ct);
+
+		// A capped odds-boost promo on the slip overrides the league limits and max win
+		if (limits.EffectiveMaxStake.HasValue && betSlipDto.Amount > limits.EffectiveMaxStake.Value)
+		{
+			var reason = limits.PromoMaxStake.HasValue
+				? " (the promo on this slip sets the limit)"
+				: limits.MaxStakeForWin.HasValue && limits.EffectiveMaxStake == limits.MaxStakeForWin
+					? $" (max win for this slip is €{limits.MaxWin:0.00})"
+					: string.Empty;
+
+			return ($"The maximum stake for this slip is €{limits.EffectiveMaxStake.Value:0.00}{reason}.", false);
 		}
 
 		await _dbContext.BetSlips.AddAsync(betSlip);
@@ -267,9 +338,14 @@ public class BettingService : IBettingService
 						MatchId = b.MatchEventId,
 						HomeTeam = b.MatchEvent.HomeTeam.Name,
 						AwayTeam = b.MatchEvent.AwayTeam.Name,
-						SelectedOption = b.Pick.ToString(),
+						SelectedOption = BetMarketHelper.DisplayPick(b),
+						Market = b.Market,
+						Selection = b.Selection,
+						Line = b.Line,
 						Odds = b.Odds,
-						Outcome = outcome,
+						Outcome = b.Market == BettingMarket.MatchResult || result == null
+							? outcome
+							: $"{result.HomeScore}-{result.AwayScore}",
 						Status = computedStatus.ToString()
 					};
 				}).ToList()
@@ -331,24 +407,7 @@ public class BettingService : IBettingService
 	}
 
 	private static BetStatus ResolveBetStatus(Bet b)
-	{
-		var result = b.MatchEvent.LiveResult;
-
-		if (b.MatchEvent.IsCancelled)
-			return BetStatus.Voided;
-
-		if (result == null)
-			return BetStatus.Pending;
-
-		bool won = result.HomeWonOnPenalties.HasValue
-			? (b.Pick == MatchPick.Home && result.HomeWonOnPenalties.Value) ||
-			  (b.Pick == MatchPick.Away && !result.HomeWonOnPenalties.Value)
-			: (b.Pick == MatchPick.Home && result.HomeScore > result.AwayScore) ||
-			  (b.Pick == MatchPick.Away && result.AwayScore > result.HomeScore) ||
-			  (b.Pick == MatchPick.Draw && result.HomeScore == result.AwayScore);
-
-		return won ? BetStatus.Won : BetStatus.Lost;
-	}
+		=> BetMarketHelper.ResolveBetStatus(b); // handles cancelled / pending / every market
 
 
 	static decimal ComputeTotalOdds(IEnumerable<Bet> bets)
@@ -451,13 +510,7 @@ public class BettingService : IBettingService
 				continue;
 			}
 
-			var actualOutcome = result.HomeWonOnPenalties.HasValue
-				? (result.HomeWonOnPenalties.Value ? MatchPick.Home : MatchPick.Away)
-				: result.HomeScore > result.AwayScore ? MatchPick.Home
-				: result.HomeScore < result.AwayScore ? MatchPick.Away
-				: MatchPick.Draw;
-
-			if (bet.Pick == actualOutcome)
+			if (BetMarketHelper.IsWinningBet(bet, result.HomeScore, result.AwayScore, result.HomeWonOnPenalties))
 			{
 				bet.Status = BetStatus.Won;
 				totalOdds *= bet.Odds;
@@ -616,7 +669,7 @@ public class BettingService : IBettingService
 			var betRows = betSlip.Bets.Select(b => new BetRowEmailData(
 				HomeTeam: b.MatchEvent?.HomeTeam?.Name ?? "Home",
 				AwayTeam: b.MatchEvent?.AwayTeam?.Name ?? "Away",
-				Pick: b.Pick.ToString(),
+				Pick: BetMarketHelper.DisplayPick(b),
 				Status: b.Status.ToString()
 			));
 
@@ -670,16 +723,20 @@ public class BettingService : IBettingService
 			var totalStake = perSlip.Sum(x => x.PerLeg); // in-memory sum (safe)
 
 			var total = await q.CountAsync(ct);
-			var h = await q.CountAsync(b => b.Pick == MatchPick.Home, ct);
-			var d = await q.CountAsync(b => b.Pick == MatchPick.Draw, ct);
-			var a = await q.CountAsync(b => b.Pick == MatchPick.Away, ct);
+
+			// Home / Draw / Away split only covers Match Result bets
+			var q1x2 = q.Where(b => b.Market == BettingMarket.MatchResult);
+			var total1x2 = await q1x2.CountAsync(ct);
+			var h = await q1x2.CountAsync(b => b.Pick == MatchPick.Home, ct);
+			var d = await q1x2.CountAsync(b => b.Pick == MatchPick.Draw, ct);
+			var a = await q1x2.CountAsync(b => b.Pick == MatchPick.Away, ct);
 
 			decimal hp = 0, dp = 0, ap = 0;
-			if (total > 0)
+			if (total1x2 > 0)
 			{
-				hp = Math.Round(100m * h / total, 2);
-				dp = Math.Round(100m * d / total, 2);
-				ap = Math.Round(100m * a / total, 2);
+				hp = Math.Round(100m * h / total1x2, 2);
+				dp = Math.Round(100m * d / total1x2, 2);
+				ap = Math.Round(100m * a / total1x2, 2);
 
 				var drift = 100m - (hp + dp + ap);
 				if (drift != 0)

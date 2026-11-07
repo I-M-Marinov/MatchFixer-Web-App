@@ -34,6 +34,15 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public decimal? AwayOdds { get; set; } 
 		public string? CompetitionName { get; set; }
 		public bool NoDraw { get; set; } = false;
+
+		/// <summary>
+		/// Extra-market prices from the "Markets preview" panel, keyed by selection code
+		/// ("Over", "Under", "Yes", "No", "1X", "12", "X2"). Empty → generated from the 1X2 odds.
+		/// </summary>
+		public Dictionary<string, decimal?> MarketOdds { get; set; } = new();
+
+		/// <summary>True when the admin changed any preview price by hand before saving.</summary>
+		public bool MarketOddsEdited { get; set; }
 		public List<SelectListItem> AvailableCompetitions { get; set; } = new();
 
 		public List<LiveEventViewModel> CurrentEvents { get; set; } = new();

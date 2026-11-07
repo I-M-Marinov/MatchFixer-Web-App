@@ -57,6 +57,20 @@ namespace MatchFixer.Core.ViewModels.LiveEvents
 		public MatchStatus MatchStatus { get; set; } = MatchStatus.Scheduled;
 		public BoostViewModel? BoostActive { get; set; }
 		public int? ApiFixtureId { get; set; }
+
+		/// <summary>Extra markets keyed by selection code ("Over", "Under", "Yes", "No", "1X", "12", "X2").</summary>
+		public Dictionary<string, decimal> MarketOdds { get; set; } = new();
+		public decimal OverUnderLine { get; set; } = MatchFixer.Common.GeneralConstants.MarketSelections.DefaultGoalsLine;
+		public bool HasMarketOdds => MarketOdds.Count > 0;
+
+		/// <summary>True when an admin set the extra-market prices by hand.</summary>
+		public bool MarketOddsManual { get; set; }
+
+		/// <summary>Per-match switch for the extra markets.</summary>
+		public bool ExtraMarketsEnabled { get; set; } = true;
+		public bool OverUnderEnabled { get; set; } = true;
+		public bool BothTeamsToScoreEnabled { get; set; } = true;
+		public bool DoubleChanceEnabled { get; set; } = true;
 		public bool IsFromApi => ApiFixtureId != null;
 
 

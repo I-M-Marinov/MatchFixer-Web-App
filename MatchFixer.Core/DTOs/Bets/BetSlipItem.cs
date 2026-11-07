@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using MatchFixer.Common.Enums;
+using System.Text.Json.Serialization;
 
 namespace MatchFixer.Core.DTOs.Bets
 {
@@ -17,6 +18,15 @@ namespace MatchFixer.Core.DTOs.Bets
 
 		public decimal Odds { get; set; }
 		public DateTime? StartTimeUtc { get; set; }
+
+		/// <summary>Market of this pick. Accepts "OverUnderGoals" or 1 from the client; defaults to Match Result.</summary>
+		[JsonConverter(typeof(JsonStringEnumConverter))]
+		public BettingMarket Market { get; set; } = BettingMarket.MatchResult;
+
+		/// <summary>Selection code for extra markets ("Over", "Yes", "1X"...). Null for Match Result.</summary>
+		public string? Selection { get; set; }
+
+		public decimal? Line { get; set; }
 	}
 
 }
