@@ -2,6 +2,7 @@
 using MatchFixer.Core.Contracts;
 using MatchFixer.Core.DTOs.Bets;
 using MatchFixer.Core.Extensions;
+using MatchFixer.Core.Helpers;
 using MatchFixer.Core.ViewModels.GameSessionState;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,15 @@ namespace MatchFixer.Core.Services
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly MatchFixerDbContext _dbContext;
 		private readonly IOddsBoostService _oddsBoostService;
+		private readonly IBettingLimitsService _limits;
 
-		public SessionService(IHttpContextAccessor httpContextAccessor, MatchFixerDbContext dbContext, IOddsBoostService oddsBoostService)
+		public SessionService(IHttpContextAccessor httpContextAccessor, MatchFixerDbContext dbContext, IOddsBoostService oddsBoostService,
+			IBettingLimitsService limits)
 		{
 			_httpContextAccessor = httpContextAccessor;
 			_dbContext = dbContext;
 			_oddsBoostService = oddsBoostService;
+			_limits = limits;
 		}
 
 		public GameSessionState? GetSessionState()
@@ -82,6 +86,49 @@ namespace MatchFixer.Core.Services
 			if (matchEvent == null)
 				throw new InvalidOperationException($"Match with ID {item.MatchId} not found.");
 
+			// ── Extra markets: price comes from the MatchOdds table, one pick per match per market ──
+			if (item.Market != BettingMarket.MatchResult)
+			{
+				var selection = BetMarketHelper.NormalizeSelection(item.Market, item.Selection ?? item.SelectedOption)
+					?? throw new ArgumentException($"Invalid selection '{item.Selection ?? item.SelectedOption}' for {item.Market}.");
+
+				if (item.Market == BettingMarket.DoubleChance && matchEvent.NoDraw)
+					throw new InvalidOperationException("Double Chance is not available for this match.");
+
+				if (!matchEvent.IsMarketEnabled(item.Market) || !(await _limits.GetMarketSwitchesAsync(ct)).IsEnabled(item.Market))
+					throw new InvalidOperationException("This market is not available for this match.");
+
+				var marketOdds = await _dbContext.MatchOdds
+					.AsNoTracking()
+					.FirstOrDefaultAsync(o => o.MatchEventId == item.MatchId
+										   && o.Market == item.Market
+										   && o.Selection == selection, ct)
+					?? throw new InvalidOperationException("This market is not available for this match.");
+
+				// One pick per match: a new pick replaces whatever was picked on this match (any market)
+				var existingMarketBet = betSlip.Bets.FirstOrDefault(b => b.MatchId == item.MatchId);
+				var target = existingMarketBet ?? new BetSlipItem { MatchId = item.MatchId };
+				target.Market = item.Market;
+
+				target.SelectedOption = selection; // codes are unique across markets, so this stays the slip key
+				target.Selection = selection;
+				target.Line = marketOdds.Line;
+				target.Odds = marketOdds.Odds;
+				target.HomeTeam = item.HomeTeam;
+				target.AwayTeam = item.AwayTeam;
+				target.HomeLogoUrl = item.HomeLogoUrl;
+				target.AwayLogoUrl = item.AwayLogoUrl;
+				target.StartTimeUtc = item.StartTimeUtc.HasValue
+					? DateTime.SpecifyKind(item.StartTimeUtc.Value, DateTimeKind.Utc)
+					: null;
+
+				if (existingMarketBet == null)
+					betSlip.Bets.Add(target);
+
+				SetBetSlipState(betSlip);
+				return;
+			}
+
 			// Get effective odds (including active boosts)
 			var (home, draw, away, boost) = await _oddsBoostService.GetEffectiveOddsAsync(
 				matchEvent.Id,
@@ -102,11 +149,14 @@ namespace MatchFixer.Core.Services
 				_ => throw new ArgumentException($"Unhandled MatchPick value: {pick}")
 			};
 
-			// Update existing bet or add a new one
+			// One pick per match: a new pick replaces whatever was picked on this match (any market)
 			var existingBet = betSlip.Bets.FirstOrDefault(b => b.MatchId == item.MatchId);
 
 			if (existingBet != null)
 			{
+				existingBet.Market = BettingMarket.MatchResult;
+				existingBet.Selection = null;
+				existingBet.Line = null;
 				existingBet.SelectedOption = item.SelectedOption;
 				existingBet.Odds = currentOdds;
 				existingBet.HomeTeam = item.HomeTeam;
