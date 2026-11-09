@@ -1,0 +1,347 @@
+/* =================================================
+   ADMIN · BETTING LIMITS PAGE                      |
+   Same teal background and dark translucent panels
+   as the admin Dashboard / Events History pages.
+   =============================================== */
+
+.limits-page {
+    max-width: 1200px;
+    margin: 3.25em auto 2rem;
+    font-size: 0.9rem;
+}
+
+.limits-hero {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.limits-title {
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+    margin-bottom: 0.25rem;
+}
+
+.limits-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Panels ── */
+.limits-panel {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 0.9rem;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    color: #fff;
+}
+
+.limits-panel-compact {
+    padding: 0.5rem 1.1rem;
+}
+
+.limits-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.limits-panel-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.limits-note {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.75rem;
+}
+
+.limits-note a {
+    color: #ffd300;
+    font-weight: 700;
+}
+
+.limits-changed {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Market tiles ── */
+.limits-market-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.limits-market-tile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 5px solid rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.limits-market-tile.is-on {
+    background: rgba(255, 255, 255, 0.16);
+    border-left-color: var(--tile-color);
+}
+
+.limits-market-tile:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.limits-market-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.limits-market-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.limits-market-sub {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.limits-market-tile .form-check-input {
+    width: 2.4em;
+    height: 1.25em;
+    cursor: pointer;
+}
+
+/* ── Toolbar & legend ── */
+.limits-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.limits-add-select {
+    width: 260px;
+    max-width: 60vw;
+}
+
+.limits-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0.6rem;
+}
+
+.limits-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ── Limits table ── */
+.limits-table-wrap {
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.limits-table {
+    font-size: 0.8rem;
+    color: #1B4965;
+}
+
+.limits-table thead th {
+    background: #1B4965;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    border: none;
+    padding: 0.55rem 0.4rem;
+}
+
+.limits-table td {
+    padding: 0.3rem 0.35rem;
+    border-color: #e6edf3;
+}
+
+.limits-table tbody.limits-league + tbody.limits-league {
+    border-top: 2px solid #c9d8e4;
+}
+
+.limits-table tbody.limits-league-default {
+    background: #f1f7fc;
+}
+
+.limits-league-name {
+    min-width: 10rem;
+    text-align: left;
+    padding-left: 0.75rem !important;
+}
+
+.limits-league-title {
+    font-weight: 800;
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.limits-league-name .limits-changed {
+    color: #7b8fa1;
+}
+
+.limits-table .limit-input {
+    width: 4.6rem;
+    height: 1.9rem;
+    margin: 0 auto;
+    padding: 0.15rem 0.25rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #1B4965;
+    border-radius: 0.45rem;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.limits-table .limit-input::-webkit-outer-spin-button,
+.limits-table .limit-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.limits-table .limit-input::placeholder {
+    font-weight: 400;
+    color: #b0bcc7;
+    font-size: 0.7rem;
+}
+
+.limits-table .limit-input-win {
+    width: 5.6rem;
+}
+
+.limits-remove {
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    background: transparent;
+    padding: 0.15rem 0.45rem;
+}
+
+.limits-remove:hover {
+    color: #fff;
+    background: #dc3545;
+}
+
+.limits-pill {
+    display: inline-block;
+    padding: 0.18em 0.6em;
+    border-radius: 50rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+.limits-pill-standard {
+    background-color: #0d6efd;
+}
+
+.limits-pill-extra {
+    background-color: #6f42c1;
+}
+
+/* ── How it works ── */
+.limits-info-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.35rem 0;
+}
+
+.limits-info-chevron {
+    transition: transform 0.25s ease;
+}
+
+.limits-info-toggle:not(.collapsed) .limits-info-chevron {
+    transform: rotate(180deg);
+}
+
+.limits-rules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.5rem 0 0.6rem;
+}
+
+.limits-rule {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.limits-rule i {
+    color: #ffd300;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+/* ── Save bar ── */
+.limits-savebar {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem auto 0;
+    padding: 0.5rem 0.9rem;
+    width: fit-content;
+    border-radius: 50rem;
+    background: rgba(27, 73, 101, 0.92);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.limits-dirty {
+    color: #ffd300;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 992px) {
+    .limits-market-grid,
+    .limits-rules {
+        grid-template-columns: 1fr;
+    }
+}

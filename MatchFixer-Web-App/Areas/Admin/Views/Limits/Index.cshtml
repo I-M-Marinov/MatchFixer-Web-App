@@ -1,0 +1,375 @@
+@using System.Globalization
+@using MatchFixer.Core.DTOs.Limits
+@using MatchFixer_Web_App.Areas.Admin.ViewModels.Limits
+@model LimitsPageViewModel
+@{
+	Layout = "/Areas/Admin/Views/Shared/_Layout.Admin.cshtml";
+	ViewData["Title"] = "Limits";
+
+	const string DefaultName = "__default__";
+
+	var defaultRow = Model.Config.Leagues.FirstOrDefault(l => l.LeagueName == DefaultName) ?? new LeagueLimitRowDto { LeagueName = DefaultName };
+	var leagueRows = Model.Config.Leagues.Where(l => l.LeagueName != DefaultName).ToList();
+	var usedNames = new HashSet<string>(leagueRows.Select(l => l.LeagueName), StringComparer.OrdinalIgnoreCase);
+	var addable = Model.AvailableLeagues.Where(n => !usedNames.Contains(n)).ToList();
+
+	string V(decimal? v) => v?.ToString("0.##", CultureInfo.InvariantCulture) ?? "";
+
+	var marketCards = new[]
+	{
+		(Id: "OverUnderEnabled", Title: "Total Goals", Sub: "Over / Under 2.5", On: Model.Config.Markets.OverUnderEnabled, Color: "#0d6efd"),
+		(Id: "BothTeamsToScoreEnabled", Title: "Both Teams To Score", Sub: "Yes / No", On: Model.Config.Markets.BothTeamsToScoreEnabled, Color: "#6f42c1"),
+		(Id: "DoubleChanceEnabled", Title: "Double Chance", Sub: "1X / 12 / X2", On: Model.Config.Markets.DoubleChanceEnabled, Color: "#0dab76")
+	};
+
+	var stakeColumns = new[] { ("1", "1 leg"), ("2", "2 legs"), ("3", "3 legs"), ("4", "4 legs"), ("5Plus", "5+ legs") };
+
+	decimal? Field(LeagueLimitRowDto r, string name) => name switch
+	{
+		"MaxStake1" => r.MaxStake1, "MaxStake2" => r.MaxStake2, "MaxStake3" => r.MaxStake3,
+		"MaxStake4" => r.MaxStake4, "MaxStake5Plus" => r.MaxStake5Plus,
+		"ExtraMaxStake1" => r.ExtraMaxStake1, "ExtraMaxStake2" => r.ExtraMaxStake2, "ExtraMaxStake3" => r.ExtraMaxStake3,
+		"ExtraMaxStake4" => r.ExtraMaxStake4, "ExtraMaxStake5Plus" => r.ExtraMaxStake5Plus,
+		"MaxWin" => r.MaxWin,
+		_ => null
+	};
+
+	string Changed(DateTime? at, Guid? by) => at.HasValue
+		? $"Changed {DateTime.SpecifyKind(at.Value, DateTimeKind.Utc).ToLocalTime():g} by {Model.NameOf(by)}"
+		: "Not changed yet";
+}
+
+<div class="background-profile"></div>
+
+<div class="limits-page">
+
+	<div class="limits-hero">
+		<h2 class="limits-title"><i class="bi bi-shield-lock-fill me-2"></i>Betting Limits</h2>
+		<p class="limits-subtitle">Markets on offer, and how much can be staked and won per slip.</p>
+	</div>
+
+	@Html.AntiForgeryToken()
+
+	<div id="limitsAlert" class="alert text-center d-none" role="alert"></div>
+
+	@* ── MARKETS ── *@
+	<section class="limits-panel">
+		<div class="limits-panel-header">
+			<h5><i class="bi bi-toggles me-2"></i>Markets</h5>
+			<span class="limits-changed">@Changed(Model.Config.MarketsUpdatedAtUtc, Model.Config.MarketsUpdatedByUserId)</span>
+		</div>
+		<p class="limits-note">
+			Site-wide switches. Single matches are switched from the Markets button on
+			<a asp-area="" asp-controller="Event" asp-action="AddMatchEvent">Manage Matches</a>. Bets already placed are not affected.
+		</p>
+
+		<div class="limits-market-grid">
+			@foreach (var (id, title, sub, on, color) in marketCards)
+			{
+				<label class="limits-market-tile @(on ? "is-on" : "")" for="@id" style="--tile-color: @color;">
+					<span class="limits-market-text">
+						<span class="limits-market-name">@title</span>
+						<span class="limits-market-sub">@sub</span>
+					</span>
+					<span class="form-check form-switch m-0">
+						<input class="form-check-input market-switch" type="checkbox" role="switch" id="@id" data-field="@id" @(on ? "checked" : "") />
+					</span>
+				</label>
+			}
+		</div>
+	</section>
+
+	@* ── LIMITS PER LEAGUE ── *@
+	<section class="limits-panel">
+		<div class="limits-panel-header">
+			<h5><i class="bi bi-sliders me-2"></i>Stake &amp; win limits</h5>
+			<div class="limits-toolbar">
+				<select id="addLeagueSelect" class="form-select form-select-sm limits-add-select">
+					<option value="">Add a league or competition…</option>
+					@foreach (var name in addable)
+					{
+						<option value="@name">@name</option>
+					}
+				</select>
+				<button type="button" id="addLeagueBtn" class="btn btn-sm btn-primary">
+					<i class="bi bi-plus-lg"></i> Add
+				</button>
+			</div>
+		</div>
+
+		<div class="limits-legend">
+			<span><span class="limits-pill limits-pill-standard">Standard</span> only Home / Draw / Away picks</span>
+			<span><span class="limits-pill limits-pill-extra">Extra markets</span> slip has an O/U, BTTS or Double Chance pick</span>
+			<span><i class="bi bi-dash-square-dotted"></i> blank = Default value · blank Default = no limit</span>
+		</div>
+
+		<div class="limits-table-wrap">
+			<table class="table align-middle text-center mb-0 limits-table" id="limitsTable">
+				<thead>
+				<tr>
+					<th class="text-start">League</th>
+					<th>Slip</th>
+					@foreach (var (_, label) in stakeColumns)
+					{
+						<th>@label</th>
+					}
+					<th>Max win</th>
+					<th></th>
+				</tr>
+				</thead>
+
+				@foreach (var row in new[] { defaultRow }.Concat(leagueRows))
+				{
+					var isDefault = row.LeagueName == DefaultName;
+
+					<tbody class="limits-league @(isDefault ? "limits-league-default" : "")" data-league="@row.LeagueName">
+					<tr>
+						<td rowspan="2" class="limits-league-name">
+							<div class="limits-league-title">
+								@if (isDefault)
+								{
+									<i class="bi bi-globe2 me-1"></i>
+								}
+								@(isDefault ? "Default" : row.LeagueName)
+							</div>
+							<small class="limits-changed">@(isDefault ? "Any league not listed" : Changed(row.UpdatedAtUtc, row.UpdatedByUserId))</small>
+						</td>
+						<td><span class="limits-pill limits-pill-standard">Standard</span></td>
+						@foreach (var (key, _) in stakeColumns)
+						{
+							<td><input type="number" step="0.01" min="0.01" class="form-control form-control-sm limit-input" data-field="@("MaxStake" + key)" value="@V(Field(row, "MaxStake" + key))" /></td>
+						}
+						<td rowspan="2"><input type="number" step="0.01" min="0.01" class="form-control form-control-sm limit-input limit-input-win" data-field="MaxWin" value="@V(row.MaxWin)" /></td>
+						<td rowspan="2">
+							@if (!isDefault)
+							{
+								<button type="button" class="btn btn-sm limits-remove remove-league-btn" title="Remove this league">
+									<i class="ri-delete-bin-2-fill"></i>
+								</button>
+							}
+						</td>
+					</tr>
+					<tr>
+						<td><span class="limits-pill limits-pill-extra">Extra markets</span></td>
+						@foreach (var (key, _) in stakeColumns)
+						{
+							<td><input type="number" step="0.01" min="0.01" class="form-control form-control-sm limit-input" data-field="@("ExtraMaxStake" + key)" value="@V(Field(row, "ExtraMaxStake" + key))" /></td>
+						}
+					</tr>
+					</tbody>
+				}
+			</table>
+		</div>
+		<p class="limits-note mt-2 mb-0 text-center">Stakes and max win in €. Default changed: @Changed(defaultRow.UpdatedAtUtc, defaultRow.UpdatedByUserId).</p>
+	</section>
+
+	@* ── HOW IT WORKS ── *@
+	<section class="limits-panel limits-panel-compact">
+		<button class="limits-info-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#limitsHow" aria-expanded="false">
+			<i class="bi bi-info-circle me-2"></i>How the limits work
+			<i class="bi bi-chevron-down ms-2 limits-info-chevron"></i>
+		</button>
+		<div id="limitsHow" class="collapse">
+			<div class="limits-rules">
+				<div class="limits-rule"><i class="bi bi-diagram-3"></i><span><strong>Legs</strong> are the matches on a slip — one pick per match.</span></div>
+				<div class="limits-rule"><i class="bi bi-trophy"></i><span>A match's <strong>league</strong> is its competition, or else the home team's league.</span></div>
+				<div class="limits-rule"><i class="bi bi-intersect"></i><span><strong>Mixed leagues</strong> use the average of their legs' limits.</span></div>
+				<div class="limits-rule"><i class="bi bi-cash-stack"></i><span><strong>Max win</strong> caps stake × odds, so it lowers the stake on big-odds slips.</span></div>
+				<div class="limits-rule"><i class="bi bi-receipt"></i><span>The bet slip shows the limit live; it's checked again on placing.</span></div>
+				<div class="limits-rule"><i class="bi bi-fire"></i><span>A <strong>promo</strong> (odds boost) with a max stake overrides these limits: the slip can only take what the promo allows.</span></div>
+				<div class="limits-rule"><i class="bi bi-controller"></i><span>Tournament bets are not affected.</span></div>
+			</div>
+		</div>
+	</section>
+
+	<div class="limits-savebar">
+		<span id="limitsDirty" class="limits-dirty d-none"><i class="bi bi-exclamation-circle me-1"></i> Unsaved changes</span>
+		<button type="button" id="saveLimitsBtn" class="btn btn-success px-4">
+			<i class="bi bi-check-circle me-1"></i> Save limits
+		</button>
+	</div>
+</div>
+
+<template id="leagueRowTemplate">
+	<tbody class="limits-league" data-league="">
+	<tr>
+		<td rowspan="2" class="limits-league-name">
+			<div class="limits-league-title"></div>
+			<small class="limits-changed">New — not saved yet</small>
+		</td>
+		<td><span class="limits-pill limits-pill-standard">Standard</span></td>
+		@foreach (var (key, _) in stakeColumns)
+		{
+			<td><input type="number" step="0.01" min="0.01" class="form-control form-control-sm limit-input" data-field="@("MaxStake" + key)" /></td>
+		}
+		<td rowspan="2"><input type="number" step="0.01" min="0.01" class="form-control form-control-sm limit-input limit-input-win" data-field="MaxWin" /></td>
+		<td rowspan="2">
+			<button type="button" class="btn btn-sm limits-remove remove-league-btn" title="Remove this league">
+				<i class="ri-delete-bin-2-fill"></i>
+			</button>
+		</td>
+	</tr>
+	<tr>
+		<td><span class="limits-pill limits-pill-extra">Extra markets</span></td>
+		@foreach (var (key, _) in stakeColumns)
+		{
+			<td><input type="number" step="0.01" min="0.01" class="form-control form-control-sm limit-input" data-field="@("ExtraMaxStake" + key)" /></td>
+		}
+	</tr>
+	</tbody>
+</template>
+
+@section Scripts {
+	<script>
+		(function () {
+			const table    = document.getElementById("limitsTable");
+			const select   = document.getElementById("addLeagueSelect");
+			const addBtn   = document.getElementById("addLeagueBtn");
+			const saveBtn  = document.getElementById("saveLimitsBtn");
+			const dirtyEl  = document.getElementById("limitsDirty");
+			const alertEl  = document.getElementById("limitsAlert");
+			const template = document.getElementById("leagueRowTemplate");
+			if (!table || !saveBtn) return;
+
+			let dirty = false;
+
+			function setDirty() {
+				dirty = true;
+				dirtyEl.classList.remove("d-none");
+			}
+
+			window.addEventListener("beforeunload", e => {
+				if (!dirty) return;
+				e.preventDefault();
+				e.returnValue = "";
+			});
+
+			function showAlert(text, ok) {
+				alertEl.textContent = text;
+				alertEl.className = "alert text-center " + (ok ? "success-message" : "error-message");
+				alertEl.scrollIntoView({ behavior: "smooth", block: "center" });
+			}
+
+			// League rows show the Default value as a hint in their blank cells
+			function defaultTbody() {
+				return table.querySelector('tbody[data-league="__default__"]');
+			}
+
+			function refreshPlaceholders() {
+				const def = defaultTbody();
+				if (!def) return;
+
+				def.querySelectorAll(".limit-input").forEach(i => { i.placeholder = "No limit"; });
+
+				table.querySelectorAll("tbody.limits-league").forEach(tb => {
+					if (tb === def) return;
+					tb.querySelectorAll(".limit-input").forEach(i => {
+						const d = def.querySelector(`.limit-input[data-field="${i.dataset.field}"]`);
+						i.placeholder = d && d.value !== "" ? d.value : "No limit";
+					});
+				});
+			}
+
+			function validate(input) {
+				const bad = input.value !== "" && !(Number(input.value) > 0);
+				input.classList.toggle("is-invalid", bad);
+				return !bad;
+			}
+
+			table.addEventListener("input", e => {
+				if (!e.target.classList.contains("limit-input")) return;
+				validate(e.target);
+				setDirty();
+				if (e.target.closest("tbody") === defaultTbody()) refreshPlaceholders();
+			});
+
+			document.querySelectorAll(".market-switch").forEach(sw => sw.addEventListener("change", () => {
+				sw.closest(".limits-market-tile")?.classList.toggle("is-on", sw.checked);
+				setDirty();
+			}));
+
+			addBtn.addEventListener("click", () => {
+				const name = select.value;
+				if (!name) return;
+
+				const tb = template.content.firstElementChild.cloneNode(true);
+				tb.dataset.league = name;
+				tb.querySelector(".limits-league-title").textContent = name;
+				table.appendChild(tb);
+
+				select.querySelector(`option[value="${CSS.escape(name)}"]`)?.remove();
+				select.value = "";
+
+				refreshPlaceholders();
+				setDirty();
+				tb.querySelector(".limit-input")?.focus();
+			});
+
+			table.addEventListener("click", e => {
+				const btn = e.target.closest(".remove-league-btn");
+				if (!btn) return;
+
+				const tb = btn.closest("tbody");
+				const name = tb.dataset.league;
+				tb.remove();
+
+				// put the league back in the "Add" list
+				const opt = document.createElement("option");
+				opt.value = opt.textContent = name;
+				select.appendChild(opt);
+
+				setDirty();
+			});
+
+			saveBtn.addEventListener("click", async () => {
+				const inputs = [...table.querySelectorAll(".limit-input")];
+				const firstBad = inputs.find(i => !validate(i));
+				if (firstBad) {
+					showAlert("Limits must be greater than 0 — or left blank.", false);
+					firstBad.focus();
+					return;
+				}
+
+				const markets = {};
+				document.querySelectorAll(".market-switch").forEach(sw => { markets[sw.dataset.field] = sw.checked; });
+
+				const leagues = [...table.querySelectorAll("tbody.limits-league")].map(tb => {
+					const row = { LeagueName: tb.dataset.league };
+					tb.querySelectorAll(".limit-input").forEach(i => {
+						row[i.dataset.field] = i.value === "" ? null : Number(i.value);
+					});
+					return row;
+				});
+
+				const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
+
+				saveBtn.disabled = true;
+				try {
+					const res = await fetch("/admin/limits/save", {
+						method: "POST",
+						headers: { "Content-Type": "application/json", "RequestVerificationToken": token },
+						body: JSON.stringify({ Markets: markets, Leagues: leagues })
+					});
+
+					let data;
+					try { data = await res.json(); } catch (err) { data = { success: false, message: `Server error ${res.status}` }; }
+
+					if (data.success) {
+						dirty = false;
+						showAlert(data.message || "Limits saved.", true);
+						setTimeout(() => window.location.reload(), 900); // refresh the "changed by" notes
+					} else {
+						showAlert(data.message || "Could not save the limits.", false);
+					}
+				} catch (err) {
+					console.error("Saving limits failed:", err);
+					showAlert("Could not reach the server.", false);
+				} finally {
+					saveBtn.disabled = false;
+				}
+			});
+
+			refreshPlaceholders();
+		})();
+	</script>
+}
