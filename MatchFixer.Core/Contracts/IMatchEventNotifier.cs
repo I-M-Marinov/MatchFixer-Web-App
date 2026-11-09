@@ -13,7 +13,8 @@ namespace MatchFixer.Core.Contracts
 			decimal? effectiveDrawOdds = null,
 			decimal? effectiveAwayOdds = null,
 			Guid? activeBoostId = null,
-			bool noDraw = false);
+			bool noDraw = false,
+			IReadOnlyDictionary<string, decimal>? marketOdds = null);
 
 		Task NotifyBoostStartedAsync(
 			Guid matchEventId,

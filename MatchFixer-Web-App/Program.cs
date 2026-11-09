@@ -145,6 +145,7 @@ builder.Services.AddScoped<IOddsGeneratorService, OddsGeneratorService>();		// A
 builder.Services.AddScoped<ILogoQuizService, LogoQuizService>();                // Add the Logo Quiz Service
 builder.Services.AddScoped<IMatchFixScoreService, MatchFixScoreService>();		// Add the MatchFix Score Service 
 builder.Services.AddScoped<IBettingEligibilityService, BettingEligibilityService>(); // Add the Betting Eligibility Service
+builder.Services.AddScoped<IBettingLimitsService, BettingLimitsService>();           // Betting limits (admin Limits page)
 builder.Services.AddScoped<IBettingService, BettingService>();                  // Add the Betting Service 
 builder.Services.AddScoped<ILiveMatchResultService, LiveMatchResultService>();  // Add the Live Match Result Service 
 builder.Services.AddScoped<IAutoScoringService, AutoScoringService>();     // Add the Auto Scoring Service ( API-driven result settlement )
@@ -312,6 +313,16 @@ using (var scope = app.Services.CreateScope())
 	await SeedWorldCupMatchesAsync(services);			        // Seed all the World Cup 2026 matches
 	// auto-refresh knockout bracket if any slot still shows TBD team names
 	await RefreshKnockoutBracketIfStaleAsync(services);         // Fix stale TBD knockout slots on startup
+	// extra betting markets (O/U 2.5, BTTS, Double Chance) for matches created before they existed
+	try
+	{
+		await services.GetRequiredService<IMatchEventService>().BackfillMarketOddsAsync();
+	}
+	catch (Exception ex)
+	{
+		// e.g. the AddMatchOddsTable migration has not been applied yet
+		services.GetRequiredService<ILogger<Program>>().LogWarning(ex, "Market odds backfill skipped.");
+	}
 
 }
 

@@ -26,7 +26,8 @@ namespace MatchFixer_Web_App.Hubs
 			decimal? effectiveDrawOdds = null,
 			decimal? effectiveAwayOdds = null,
 			Guid? activeBoostId = null,
-			bool noDraw = false)
+			bool noDraw = false,
+			IReadOnlyDictionary<string, decimal>? marketOdds = null)
 		{
 			var payload = new
 			{
@@ -38,7 +39,8 @@ namespace MatchFixer_Web_App.Hubs
 				effectiveDrawOdds = effectiveDrawOdds ?? drawOdds,
 				effectiveAwayOdds = effectiveAwayOdds ?? awayOdds,
 				activeBoostId,
-				noDraw
+				noDraw,
+				marketOdds // extra markets keyed by selection code (null when unchanged)
 			};
 
 			return Task.WhenAll(
