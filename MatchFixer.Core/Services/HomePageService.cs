@@ -55,6 +55,9 @@ namespace MatchFixer.Core.Services
 						HomeTeamImageUrl = b.MatchEvent.HomeTeam.LocalLogoUrl,
 						AwayTeamImageUrl = b.MatchEvent.AwayTeam.LocalLogoUrl,
 						Pick = b.Pick,
+						Market = b.Market,
+						Selection = b.Selection,
+						Line = b.Line,
 						Odds = b.Odds,
 						Status = b.Status,
 

@@ -93,11 +93,11 @@
 								</div>
 
 								<div class="bet-pick
-								    @(bet.Pick.ToString() == "Home" ? "pill-brand-blue" : "")
-								    @(bet.Pick.ToString() == "Draw" ? "pill-brand-yellow" : "")
-								    @(bet.Pick.ToString() == "Away" ? "pill-brand-green" : "")">
+								    @(bet.PickLabel == "Home" ? "pill-brand-blue" : "")
+								    @(bet.PickLabel == "Draw" ? "pill-brand-yellow" : "")
+								    @(bet.PickLabel == "Away" ? "pill-brand-green" : "")">
 
-									@bet.Pick
+									@bet.PickLabel
 
 								</div>
 

@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Helpers;
 
 namespace MatchFixer.Core.ViewModels.Index
 {
@@ -11,6 +12,13 @@ namespace MatchFixer.Core.ViewModels.Index
 		public string? AwayTeamImageUrl { get; set; }
 
 		public MatchPick Pick { get; set; }
+
+		public BettingMarket Market { get; set; } = BettingMarket.MatchResult;
+		public string? Selection { get; set; }
+		public decimal? Line { get; set; }
+
+		/// <summary>Display label for the pick ("Home", "Over 2.5", "BTTS Yes"...).</summary>
+		public string PickLabel => BetMarketHelper.DisplayPick(Market, Pick, Selection, Line);
 
 		public decimal Odds { get; set; }
 

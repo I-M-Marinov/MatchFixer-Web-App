@@ -204,6 +204,7 @@ namespace MatchFixer.Core.Services
 				.Select(b => new
 				{
 					b.Pick,
+					b.Market,
 					Competition = b.MatchEvent.CompetitionName,
 					League = b.MatchEvent.HomeTeam.LeagueName,
 					HomeId = b.MatchEvent.HomeTeamId,
@@ -237,6 +238,9 @@ namespace MatchFixer.Core.Services
 			var backedTeams = new List<(Guid TeamId, string Name, string Logo)>();
 			foreach (var b in betRows)
 			{
+				if (b.Market != BettingMarket.MatchResult)
+					continue; // extra markets (O/U, BTTS, Double Chance) don't back a single team
+
 				if (b.Pick == MatchPick.Home)
 					backedTeams.Add((b.HomeId, b.HomeName, string.IsNullOrWhiteSpace(b.HomeLocalLogo) ? b.HomeLogo : b.HomeLocalLogo));
 				else if (b.Pick == MatchPick.Away)
