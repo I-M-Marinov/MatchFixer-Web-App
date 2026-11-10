@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Core.Helpers;
 using MatchFixer.Infrastructure;
 using MatchFixer.Infrastructure.Contracts;
 using MatchFixer.Infrastructure.Entities;
@@ -144,7 +145,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				Selections = slip.Bets.Select(b => new AdminBetSlipSelectionDto
 				{
 					MatchName = $"{b.MatchEvent.HomeTeam.Name} vs {b.MatchEvent.AwayTeam.Name}",
-					Pick = b.Pick.ToString(),
+					Pick = BetMarketHelper.DisplayPick(b),
 					Odds = b.Odds,
 					HomeTeamLogoUrl = b.MatchEvent.HomeTeam.LogoUrl,
 					AwayTeamLogoUrl = b.MatchEvent.AwayTeam.LogoUrl,

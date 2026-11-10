@@ -1,5 +1,6 @@
 ﻿using MatchFixer.Common.Enums;
 using MatchFixer.Core.DTOs.Bets;
+using MatchFixer.Core.Helpers;
 using MatchFixer.Infrastructure;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Events;
@@ -143,12 +144,8 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 						}
 						else if (matchResult != null)
 						{
-							bool won = matchResult.HomeWonOnPenalties.HasValue
-								? (b.Pick == MatchPick.Home &&  matchResult.HomeWonOnPenalties.Value) ||
-								  (b.Pick == MatchPick.Away && !matchResult.HomeWonOnPenalties.Value)
-								: (b.Pick == MatchPick.Home && matchResult.HomeScore > matchResult.AwayScore) ||
-								  (b.Pick == MatchPick.Away && matchResult.AwayScore > matchResult.HomeScore) ||
-								  (b.Pick == MatchPick.Draw && matchResult.HomeScore == matchResult.AwayScore);
+							bool won = BetMarketHelper.IsWinningBet(
+								b, matchResult.HomeScore, matchResult.AwayScore, matchResult.HomeWonOnPenalties);
 
 							computedStatus = won ? BetStatus.Won.ToString() : BetStatus.Lost.ToString();
 						}
@@ -184,7 +181,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 							BetId = b.Id,
 							Username = b.BetSlip.User.UserName,
 							FullName = b.BetSlip.User.FullName,
-							Pick = b.Pick.ToString(),
+							Pick = BetMarketHelper.DisplayPick(b),
 							Odds = b.Odds,
 							BetStatus = computedStatus,
 							BetSlipStatus = slipStatus.ToString(),
@@ -307,6 +304,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					!b.MatchEvent.IsPostponed &&
 					(b.MatchEvent.LiveResult != null || b.MatchEvent.IsCancelled) &&
 					(b.Status == BetStatus.Won || b.Status == BetStatus.Lost) && 
+					b.Market == BettingMarket.MatchResult &&   // team stats only make sense for 1X2 picks
 					b.Pick != MatchPick.Draw);  // ignore draws
 
 

@@ -111,9 +111,9 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					e.AwayOdds,
 
 					TotalBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null),
-					HomeBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Pick == MatchPick.Home),
-					DrawBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Pick == MatchPick.Draw),
-					AwayBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Pick == MatchPick.Away),
+					HomeBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult && b.Pick == MatchPick.Home),
+					DrawBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult && b.Pick == MatchPick.Draw),
+					AwayBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult && b.Pick == MatchPick.Away),
 				})
 				.ToListAsync(ct);
 
