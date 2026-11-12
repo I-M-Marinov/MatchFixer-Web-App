@@ -118,6 +118,8 @@ The application also features two mini-games — <strong>The MatchFixer Game</st
           <img src="./assets/updated-live-events-board.png" width="1200px"/>
         <h4>Already started events</h4>
           <img src="./assets/matchfixer-started-events.png" width="1000px" />
+         <h4>New Markets</h4>
+        <img src="./assets/new-markets.png" width="1000px" />
     </div>
 </details>
 
