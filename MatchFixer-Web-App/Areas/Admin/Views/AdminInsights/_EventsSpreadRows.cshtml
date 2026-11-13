@@ -19,18 +19,34 @@
 		{ "Swiss League", "https://media.api-sports.io/flags/ch.svg" }
 	};
 
+	var ie = new System.Globalization.CultureInfo("en-IE");
 }
 
 @foreach (var r in Model)
 {
-	<tr data-event-id="@r.EventId"
+	var marketBetCount = r.Markets.Sum(m => m.TotalBets);
+	var marketStake = r.Markets.Sum(m => m.TotalStake);
+
+	<tr class="spread-row@(r.Markets.Any() ? "" : " no-markets")"
+	    data-event-id="@r.EventId"
 	    data-league="@r.LeagueName"
 	    data-competition="@r.CompetitionName"
 	    data-kickoff="@(r.KickoffUtc?.ToString("o") ?? "")"
 	    data-stake="@r.TotalStake"
-	    data-bets="@r.TotalBets">
+	    data-bets="@r.TotalBets"
+	    role="button"
+	    aria-expanded="false"
+	    title="Click to see the other markets">
 
 		<td class="text-center position-relative">
+			<span class="spread-caret" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+			@if (r.Markets.Any())
+			{
+				<span class="markets-badge"
+				      title="@marketBetCount market bet@(marketBetCount == 1 ? "" : "s") · @marketStake.ToString("C", ie)">
+					@marketBetCount
+				</span>
+			}
 			@if (r.IsLive)
 			{
 				<span class="admin-live-indicator admin-live-dot" title="Live"></span>
@@ -137,6 +153,52 @@
 			</div>
 		</td>
 
+	</tr>
+
+	<tr class="market-detail-row" data-detail-for="@r.EventId">
+		<td colspan="6" class="p-0 market-detail-cell">
+			<div class="market-detail-wrap">
+				@if (r.Markets.Any())
+				{
+					<div class="market-grid">
+						@foreach (var mk in r.Markets)
+						{
+							<div class="market-block">
+								<div class="market-head">
+									<span class="market-name">@mk.MarketName</span>
+									<span class="market-meta">
+										<span class="market-bets">@mk.TotalBets bet@(mk.TotalBets == 1 ? "" : "s")</span>
+										<span class="market-stake">@mk.TotalStake.ToString("C", ie)</span>
+									</span>
+								</div>
+								<table class="market-selections">
+									<tbody>
+									@foreach (var s in mk.Selections)
+									{
+										<tr>
+											<td class="sel-label">@s.Label</td>
+											<td class="sel-bar">
+												<div class="sel-track"><div class="sel-fill" style="width:@s.Pct%"></div></div>
+											</td>
+											<td class="sel-pct">@s.Pct.ToString("0.##")%</td>
+											<td class="sel-bets">@s.Bets bet@(s.Bets == 1 ? "" : "s")</td>
+											<td class="sel-stake">@s.Stake.ToString("C", ie)</td>
+										</tr>
+									}
+									</tbody>
+								</table>
+							</div>
+						}
+					</div>
+				}
+				else
+				{
+					<div class="market-empty text-center py-3">
+						No additional-market bets on this event yet.
+					</div>
+				}
+			</div>
+		</td>
 	</tr>
 }
 

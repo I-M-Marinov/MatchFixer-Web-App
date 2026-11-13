@@ -39,5 +39,27 @@
 		public decimal HomePct { get; set; }
 		public decimal DrawPct { get; set; }
 		public decimal AwayPct { get; set; }
+
+		// Breakdown of the extra betting markets (Over/Under, BTTS, Double Chance)
+		// shown in the expandable accordion. Empty when the event has no market bets.
+		public List<EventMarketBreakdown> Markets { get; set; } = new();
+	}
+
+	public sealed class EventMarketBreakdown
+	{
+		public MatchFixer.Common.Enums.BettingMarket Market { get; set; }
+		public string MarketName { get; set; } = "";
+		public int TotalBets { get; set; }
+		public decimal TotalStake { get; set; }
+		public List<EventMarketSelectionStat> Selections { get; set; } = new();
+	}
+
+	public sealed class EventMarketSelectionStat
+	{
+		public string Selection { get; set; } = "";
+		public string Label { get; set; } = "";
+		public int Bets { get; set; }
+		public decimal Stake { get; set; }
+		public decimal Pct { get; set; }
 	}
 }

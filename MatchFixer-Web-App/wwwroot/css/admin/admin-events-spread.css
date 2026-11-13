@@ -227,3 +227,207 @@
     }
 }
 
+/* -----------------------------------------------------------
+   MARKET ACCORDION  (expandable "other markets" per event)
+----------------------------------------------------------- */
+.spread-row {
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+.spread-row:hover {
+    background-color: rgba(13, 110, 253, 0.06);
+}
+
+.spread-row.no-markets {
+    cursor: default;
+}
+
+.spread-caret {
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    color: var(--primary-color);
+    font-size: 1.05em;
+    font-weight: 700;
+    transition: transform .2s ease, opacity .15s ease;
+    opacity: 0.9;
+}
+
+.spread-row:hover .spread-caret {
+    opacity: 1;
+    color: #0a58ca;
+}
+
+.spread-row.open .spread-caret {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.spread-row.no-markets .spread-caret {
+    opacity: 0.3;
+    color: #9aa4b2;
+}
+
+/* Collapsed-row flag: shows at a glance that money came in on the extra markets. */
+.markets-badge {
+    position: absolute;
+    left: 4px;
+    top: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    background: #6f42c1;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1.5px #fff;
+    pointer-events: none;
+}
+
+/* The detail row is hidden until its parent event row is clicked. */
+.market-detail-row {
+    display: none;
+}
+
+.market-detail-row.open {
+    display: table-row;
+}
+
+.market-detail-cell {
+    background: #f6f8fb;
+    border-top: none !important;
+}
+
+.market-detail-wrap {
+    padding: 0.75em 1em 1em;
+}
+
+.market-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.75em;
+}
+
+.market-block {
+    flex: 1 1 0;
+    min-width: 0;
+    background: #ffffff;
+    border: 1px solid #e3e8ef;
+    border-radius: 0.5em;
+    padding: 0.6em 0.75em;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+    .market-grid {
+        flex-wrap: wrap;
+    }
+
+    .market-block {
+        flex: 1 1 100%;
+    }
+}
+
+.market-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5em;
+    margin-bottom: 0.4em;
+    padding-bottom: 0.35em;
+    border-bottom: 1px dashed #e3e8ef;
+}
+
+.market-head .market-name {
+    font-weight: 700;
+    font-size: 0.9em;
+    color: #1f2a37;
+}
+
+.market-head .market-meta {
+    display: flex;
+    gap: 0.5em;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+.market-head .market-bets {
+    font-size: 0.72em;
+    color: #6b7280;
+}
+
+.market-head .market-stake {
+    font-weight: 700;
+    font-size: 0.82em;
+    color: var(--primary-color);
+}
+
+.market-selections {
+    width: 100%;
+    margin: 0;
+    font-size: 0.8em;
+}
+
+.market-selections td {
+    padding: 0.22em 0.3em !important;
+    border: none !important;
+    vertical-align: middle !important;
+    font-size: 1em !important;
+}
+
+.market-selections .sel-label {
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.market-selections .sel-bar {
+    width: 100%;
+}
+
+.market-selections .sel-track {
+    background: #eef1f6;
+    border-radius: 999px;
+    height: 9px;
+    overflow: hidden;
+}
+
+.market-selections .sel-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+}
+
+.market-selections .sel-pct {
+    text-align: right;
+    color: #111827;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.market-selections .sel-bets {
+    text-align: right;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.market-selections .sel-stake {
+    text-align: right;
+    font-weight: 700;
+    color: #1f2a37;
+    white-space: nowrap;
+}
+
+.market-empty {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 0.85em;
+}
+

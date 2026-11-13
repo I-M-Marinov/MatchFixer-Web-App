@@ -527,6 +527,27 @@ const leagueLogoMap = @Html.Raw(
 		return leagueTotal + competitionTotal;
 	}
 
+	/* -----------------------------
+	   MARKET ACCORDION (expand a row to see the other markets)
+	   Delegated on document so it keeps working after the rows
+	   are re-rendered by the sort/AJAX refresh.
+	-------------------------------- */
+	document.addEventListener("click", e => {
+		const row = e.target.closest("tr.spread-row");
+		if (!row) return;
+
+		const id = row.getAttribute("data-event-id");
+		if (!id) return;
+
+		const detail = document.querySelector(
+			`tr.market-detail-row[data-detail-for="${id}"]`);
+		if (!detail) return;
+
+		const open = detail.classList.toggle("open");
+		row.classList.toggle("open", open);
+		row.setAttribute("aria-expanded", open ? "true" : "false");
+	});
+
 	function switchToRealSpread(row) {
 		const bars = row.querySelectorAll(".progress-bar");
 

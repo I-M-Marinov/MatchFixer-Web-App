@@ -1,4 +1,5 @@
 ﻿using MatchFixer.Common.Enums;
+using MatchFixer.Common.GeneralConstants;
 using MatchFixer.Infrastructure;
 using MatchFixer_Web_App.Areas.Admin.Interfaces;
 using MatchFixer_Web_App.Areas.Admin.ViewModels.Events;
@@ -110,7 +111,7 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 					e.DrawOdds,
 					e.AwayOdds,
 
-					TotalBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null),
+					TotalBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult),
 					HomeBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult && b.Pick == MatchPick.Home),
 					DrawBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult && b.Pick == MatchPick.Draw),
 					AwayBets = e.Bets.Count(b => b.BetSlip.TournamentEntryId == null && b.Market == BettingMarket.MatchResult && b.Pick == MatchPick.Away),
@@ -177,25 +178,62 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 			{
 				var eventIds = rows.Select(r => r.EventId).ToList();
 
-				var perLeg = await _db.Bets
+				// Every non-tournament bet leg on these events, with its per-leg stake:
+				// the slip amount split evenly across all legs in the slip
+				// (same convention used across the rest of the admin area).
+				var legs = await _db.Bets
 					.AsNoTracking()
 					.Where(b => eventIds.Contains(b.MatchEventId) && b.BetSlip.TournamentEntryId == null)
-					.GroupBy(b => new { b.BetSlipId, b.MatchEventId })
-					.Select(g => new
+					.Select(b => new
 					{
-						g.Key.MatchEventId,
-						PerLeg = g.Select(x => x.BetSlip.Amount).FirstOrDefault() / (decimal)g.Count()
+						b.MatchEventId,
+						b.Market,
+						b.Selection,
+						PerLeg = b.BetSlip.Amount / b.BetSlip.Bets.Count
 					})
 					.ToListAsync(ct);
 
-				var totalStakeByEvent = perLeg
+				var legsByEvent = legs
 					.GroupBy(x => x.MatchEventId)
-					.ToDictionary(g => g.Key, g => g.Sum(x => x.PerLeg));
+					.ToDictionary(g => g.Key, g => g.ToList());
 
 				foreach (var r in rows)
 				{
-					if (totalStakeByEvent.TryGetValue(r.EventId, out var stake))
-						r.TotalStake = stake;
+					if (!legsByEvent.TryGetValue(r.EventId, out var evLegs))
+						continue;
+
+					// Main row stays pure 1X2: Total Stake counts Match Result legs only.
+					r.TotalStake = evLegs
+						.Where(x => x.Market == BettingMarket.MatchResult)
+						.Sum(x => x.PerLeg);
+
+					// Accordion breakdown: the extra markets, bets + stake per selection.
+					r.Markets = evLegs
+						.Where(x => x.Market != BettingMarket.MatchResult)
+						.GroupBy(x => x.Market)
+						.OrderBy(g => (int)g.Key)
+						.Select(mg => new EventMarketBreakdown
+						{
+							Market = mg.Key,
+							MarketName = MarketDisplayName(mg.Key),
+							TotalBets = mg.Count(),
+							TotalStake = mg.Sum(x => x.PerLeg),
+							Selections = mg
+								.GroupBy(x => x.Selection ?? "")
+								.OrderBy(sg => SelectionOrder(mg.Key, sg.Key))
+								.Select(sg => new EventMarketSelectionStat
+								{
+									Selection = sg.Key,
+									Label = SelectionLabel(mg.Key, sg.Key),
+									Bets = sg.Count(),
+									Stake = sg.Sum(x => x.PerLeg),
+									Pct = mg.Count() > 0
+										? Math.Round(100m * sg.Count() / mg.Count(), 2)
+										: 0m
+								})
+								.ToList()
+						})
+						.ToList();
 				}
 			}
 
@@ -233,6 +271,45 @@ namespace MatchFixer_Web_App.Areas.Admin.Services
 				CompetitionCounts = competitionCounts 
 
 			};
+		}
+
+		private static string MarketDisplayName(BettingMarket m) => m switch
+		{
+			BettingMarket.OverUnderGoals => $"Over / Under {MarketSelections.DefaultGoalsLine}",
+			BettingMarket.BothTeamsToScore => "Both Teams To Score",
+			BettingMarket.DoubleChance => "Double Chance",
+			_ => m.ToString()
+		};
+
+		private static string SelectionLabel(BettingMarket m, string sel) => m switch
+		{
+			BettingMarket.OverUnderGoals =>
+				sel == MarketSelections.Over ? $"Over {MarketSelections.DefaultGoalsLine}" :
+				sel == MarketSelections.Under ? $"Under {MarketSelections.DefaultGoalsLine}" : sel,
+			BettingMarket.BothTeamsToScore =>
+				sel == MarketSelections.Yes ? "Yes" :
+				sel == MarketSelections.No ? "No" : sel,
+			BettingMarket.DoubleChance => sel switch
+			{
+				MarketSelections.HomeOrDraw => "Home or Draw (1X)",
+				MarketSelections.HomeOrAway => "Home or Away (12)",
+				MarketSelections.DrawOrAway => "Draw or Away (X2)",
+				_ => sel
+			},
+			_ => sel
+		};
+
+		private static int SelectionOrder(BettingMarket m, string sel)
+		{
+			var order = m switch
+			{
+				BettingMarket.OverUnderGoals => MarketSelections.OverUnder,
+				BettingMarket.BothTeamsToScore => MarketSelections.BothTeamsToScore,
+				BettingMarket.DoubleChance => MarketSelections.DoubleChance,
+				_ => Array.Empty<string>()
+			};
+			var idx = Array.IndexOf(order, sel);
+			return idx < 0 ? 999 : idx;
 		}
 
 	}
