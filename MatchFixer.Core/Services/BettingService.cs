@@ -712,21 +712,19 @@ public class BettingService : IBettingService
 						 && b.Status == BetStatus.Pending
 						 && b.BetSlip.TournamentEntryId == null); // exclude tournament bankroll bets from the public mix
 
-			var perSlip = await q
-				.GroupBy(b => b.BetSlipId)
-				.Select(g => new
-				{
-					PerLeg = g.Select(x => x.BetSlip.Amount).FirstOrDefault() / (decimal)g.Count()
-				})
+			// The public mix keeps the headline numbers pure 1X2 (extra markets are
+			// summarised separately in the admin accordion), so Total Bets / Total Stake
+			// here count Match Result legs only.
+			var q1x2 = q.Where(b => b.Market == BettingMarket.MatchResult);
+
+			var perLegStakes = await q1x2
+				.Select(b => b.BetSlip.Amount / b.BetSlip.Bets.Count)
 				.ToListAsync(ct);
 
-			var totalStake = perSlip.Sum(x => x.PerLeg); // in-memory sum (safe)
+			var totalStake = perLegStakes.Sum(); // in-memory sum (safe)
 
-			var total = await q.CountAsync(ct);
-
-			// Home / Draw / Away split only covers Match Result bets
-			var q1x2 = q.Where(b => b.Market == BettingMarket.MatchResult);
 			var total1x2 = await q1x2.CountAsync(ct);
+			var total = total1x2;
 			var h = await q1x2.CountAsync(b => b.Pick == MatchPick.Home, ct);
 			var d = await q1x2.CountAsync(b => b.Pick == MatchPick.Draw, ct);
 			var a = await q1x2.CountAsync(b => b.Pick == MatchPick.Away, ct);
