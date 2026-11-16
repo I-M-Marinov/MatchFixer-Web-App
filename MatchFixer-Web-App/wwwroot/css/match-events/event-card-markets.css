@@ -244,8 +244,13 @@
 
 .flip-to-markets {
     overflow: visible;
-    background: linear-gradient(145deg, #1B4965 0%, #0d6efd 100%);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 211, 0, 0.55);
+    /* Colour knobs — overridden per competition below so the bubble
+       coordinates with each card's background. Default = blue + gold. */
+    --more-base1: #1B4965;
+    --more-base2: #0d6efd;
+    --more-accent: 255, 211, 0;
+    background: linear-gradient(145deg, var(--more-base1) 0%, var(--more-base2) 100%);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(var(--more-accent), 0.55);
     animation: more-glow 2.4s ease-in-out infinite;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -255,7 +260,7 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 2px solid #ffd300;
+    border: 2px solid rgba(var(--more-accent), 1);
     opacity: 0;
     pointer-events: none;
     animation: more-ripple 2.4s ease-out infinite;
@@ -263,7 +268,7 @@
 
 .flip-to-markets:hover {
     transform: translateY(-2px) scale(1.08);
-    background: linear-gradient(145deg, #0d6efd 0%, #1B4965 100%);
+    background: linear-gradient(145deg, var(--more-base2) 0%, var(--more-base1) 100%);
 }
 
 .flip-to-markets:hover::after {
@@ -278,8 +283,47 @@
 }
 
 @keyframes more-glow {
-    0%, 100% { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(255, 211, 0, 0); }
-    50%      { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 14px 2px rgba(255, 211, 0, 0.55); }
+    0%, 100% { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(var(--more-accent), 0); }
+    50%      { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 14px 2px rgba(var(--more-accent), 0.55); }
+}
+
+/* ───────── Per-competition "More" bubble colours ─────────
+   Each bubble's gradient + glow + ripple is tuned to match
+   its card's background accent. Keeps white label readable. */
+.event-card[data-competition="UEFA Champions League"] .flip-to-markets {
+    --more-base1: #0b6e4f;
+    --more-base2: #10b981;
+    --more-accent: 16, 185, 129;
+}
+
+.event-card[data-competition="UEFA Europa League"] .flip-to-markets {
+    --more-base1: #b34700;
+    --more-base2: #ff7a1a;
+    --more-accent: 255, 122, 26;
+}
+
+.event-card[data-competition="UEFA Europa Conference League"] .flip-to-markets {
+    --more-base1: #015c3a;
+    --more-base2: #00a86b;
+    --more-accent: 0, 168, 107;
+}
+
+.event-card[data-competition="International"] .flip-to-markets {
+    --more-base1: #0e7490;
+    --more-base2: #0891b2;
+    --more-accent: 34, 211, 238;
+}
+
+.event-card[data-competition="FIFA World Cup"] .flip-to-markets {
+    --more-base1: #7a5e12;
+    --more-base2: #c99a2e;
+    --more-accent: 240, 200, 60;
+}
+
+.event-card[data-competition="UEFA Euro"] .flip-to-markets {
+    --more-base1: #002f8f;
+    --more-base2: #0066ff;
+    --more-accent: 0, 102, 255;
 }
 
 /* after the first look: keep only a slow, subtle glow */
