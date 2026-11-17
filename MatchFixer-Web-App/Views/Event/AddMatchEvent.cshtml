@@ -232,116 +232,7 @@
 	<div class="add-match-event-container mt-4">
 		<form id="team-selection-form" asp-action="AddMatchEvent" asp-controller="Event" method="post" class="needs-validation" novalidate>
 			@Html.AntiForgeryToken()
-			<div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
-				<div class="col">
-					<div class="text-center my-2">
-						<img id="home-team-logo"
-						     src="/images/add-match/question-mark.png"
-						     alt="Home Team Logo"
-						     class="adding-team-logo"
-						     style="max-height: 75px; margin-bottom:1em;"/>
-					</div>
-					<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
-						<option value="">-- Select Home Team --</option>
-						@foreach (var league in Model.TeamsByLeague)
-						{
-							<optgroup class="add-team-league-label" label="@league.Key">
-								@foreach (var team in league.Value)
-								{
-									var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-									var teamName = team.Text.Split('|').FirstOrDefault();
-									<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
-								}
-							</optgroup>
-						}
-					</select>
-					<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
-				</div>
-
-				<div class="col">
-					<div class="text-center my-2">
-						<img id="away-team-logo"
-						     src="/images/add-match/question-mark.png"
-						     alt="Away Team Logo"
-						     class="adding-team-logo"
-						     style="max-height: 75px; margin-bottom:1em;"/>
-					</div>
-					<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
-						<option value="">-- Select Away Team --</option>
-						@foreach (var league in Model.TeamsByLeague)
-						{
-							<optgroup class="add-team-league-label" label="@league.Key">
-								@foreach (var team in league.Value)
-								{
-									var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
-									var teamName = team.Text.Split('|').FirstOrDefault();
-									<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
-								}
-							</optgroup>
-						}
-					</select>
-					<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
-				</div>
-			</div>
-			
-			<div class="match-event-competiton mb-1 text-center">
-				<label asp-for="CompetitionName" class="form-label">
-					Competition
-				</label>
-
-				<select asp-for="CompetitionName"
-				        asp-items="Model.AvailableCompetitions"
-				        id="match-event-competition-select"
-				        class="form-control">
-				</select>
-			</div>
-
-			<div id="dateAndTime" class="mb-3">
-				<label asp-for="MatchDate" class="form-label">Date and Time</label>
-				<input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
-				<span asp-validation-for="MatchDate" class="bg-info validation-add-event centered-validation"></span>
-			</div>
-
-			<div class="d-flex justify-content-center align-items-center row mb-3">
-				<div class="home-odds col">
-					<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
-					<input asp-for="HomeOdds" class="form-control"/>
-					<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
-				</div>
-				<div class="draw-odds col">
-					<div class="d-flex align-items-center justify-content-center gap-2 mb-1">
-						<label asp-for="DrawOdds" class="form-label mb-0">Draw</label>
-						<div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
-							<input class="form-check-input" type="checkbox" role="switch"
-							       id="DrawEnabled"
-							       @(Model.NoDraw ? "" : "checked") />
-							<input type="hidden" name="NoDraw" id="NoDrawHidden" value="@(Model.NoDraw ? "true" : "false")" />
-						</div>
-					</div>
-					<input asp-for="DrawOdds" class="form-control"/>
-					<span asp-validation-for="DrawOdds" class="bg-info validation-add-event centered-validation"></span>
-				</div>
-				<div class="away-odds col">
-					<label asp-for="AwayOdds" class="form-label">Away Team Win</label>
-					<input asp-for="AwayOdds" class="form-control"/>
-					<span asp-validation-for="AwayOdds" class="bg-info validation-add-event centered-validation"></span>
-
-				</div>
-			</div>
-
-			<div class="d-flex justify-content-center align-items-center gap-3 mb-2">
-				<button type="button"
-				        id="auto-odds-btn"
-				        class="btn btn-info btn-sm px-3 fw-semibold"
-				        style="box-shadow: 0 3px 10px rgba(13,202,240,0.45); letter-spacing: 0.3px;">
-					<i class="bi bi-stars me-1"></i> Auto-generate odds
-				</button>
-				<span id="auto-odds-status"
-				      class="badge rounded-pill"
-				      style="display:none; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></span>
-			</div>
-
-			@* ── Markets preview: extra-market prices generated from the 1X2 odds, editable before saving ── *@
+			@* ── Markets preview data (rendered in the right-hand column) ── *@
 			@{
 				decimal? MarketValue(string code) => Model.MarketOdds != null && Model.MarketOdds.TryGetValue(code, out var v) ? v : null;
 				var previewGroups = new[]
@@ -351,37 +242,156 @@
 					(Id: "dc", Title: "Double Chance", Options: new[] { (Code: "1X", Label: "1X"), (Code: "12", Label: "12"), (Code: "X2", Label: "X2") })
 				};
 			}
-			<div id="marketsPreview" class="markets-preview mb-3">
-				<div class="markets-preview-header">
-					<span class="markets-preview-title"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Markets preview</span>
-					<span id="marketsPreviewState" class="badge rounded-pill bg-info">generated</span>
-					<button type="button" id="marketsPreviewReset" class="btn btn-sm btn-outline-light" style="display:none;">
-						<i class="bi bi-arrow-counterclockwise"></i> Reset to generated
-					</button>
-				</div>
-				<p id="marketsPreviewHint" class="markets-preview-hint">Fill in the Home / Draw / Away odds to generate these prices.</p>
-				<div class="markets-preview-grid">
-					@foreach (var pg in previewGroups)
-					{
-						<div class="markets-preview-group" data-group="@pg.Id">
-							<div class="markets-preview-group-title">@pg.Title</div>
-							<div class="markets-preview-inputs">
-								@foreach (var opt in pg.Options)
-								{
-									<label class="markets-preview-field">
-										<span>@opt.Label</span>
-										<input type="number" step="0.01" min="1.01" max="1000"
-										       class="form-control form-control-sm market-preview-input"
-										       name="MarketOdds[@opt.Code]"
-										       data-code="@opt.Code"
-										       value="@(MarketValue(opt.Code)?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))" />
-									</label>
-								}
+
+			<div class="row g-4 manual-event-row align-items-stretch mb-2">
+
+				@* ════════ LEFT: teams, competition, date and 1X2 odds ════════ *@
+				<div class="col-12 col-lg-7 manual-left-col">
+
+					<div class="teams-information d-flex justify-content-center align-items-center gap-5 mb-3">
+						<div class="col">
+							<div class="text-center my-2">
+								<img id="home-team-logo"
+								     src="/images/add-match/question-mark.png"
+								     alt="Home Team Logo"
+								     class="adding-team-logo"
+								     style="max-height: 75px; margin-bottom:1em;"/>
 							</div>
+							<select asp-for="HomeTeamId" id="home-team-select" class="form-control">
+								<option value="">-- Select Home Team --</option>
+								@foreach (var league in Model.TeamsByLeague)
+								{
+									<optgroup class="add-team-league-label" label="@league.Key">
+										@foreach (var team in league.Value)
+										{
+											var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+											var teamName = team.Text.Split('|').FirstOrDefault();
+											<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+										}
+									</optgroup>
+								}
+							</select>
+							<span asp-validation-for="HomeTeamId" class="bg-info validation-add-event centered-validation"></span>
 						</div>
-					}
+
+						<div class="col">
+							<div class="text-center my-2">
+								<img id="away-team-logo"
+								     src="/images/add-match/question-mark.png"
+								     alt="Away Team Logo"
+								     class="adding-team-logo"
+								     style="max-height: 75px; margin-bottom:1em;"/>
+							</div>
+							<select asp-for="AwayTeamId" id="away-team-select" class="form-control">
+								<option value="">-- Select Away Team --</option>
+								@foreach (var league in Model.TeamsByLeague)
+								{
+									<optgroup class="add-team-league-label" label="@league.Key">
+										@foreach (var team in league.Value)
+										{
+											var logoUrl = team.Text.Split('|').ElementAtOrDefault(1);
+											var teamName = team.Text.Split('|').FirstOrDefault();
+											<option value="@team.Value" data-logo="@logoUrl">@teamName</option>
+										}
+									</optgroup>
+								}
+							</select>
+							<span asp-validation-for="AwayTeamId" class="bg-info validation-add-event centered-validation"></span>
+						</div>
+					</div>
+
+					<div class="match-event-competiton mb-1 text-center">
+						<label asp-for="CompetitionName" class="form-label">
+							Competition
+						</label>
+
+						<select asp-for="CompetitionName"
+						        asp-items="Model.AvailableCompetitions"
+						        id="match-event-competition-select"
+						        class="form-control">
+						</select>
+					</div>
+
+					<div id="dateAndTime" class="mb-3">
+						<label asp-for="MatchDate" class="form-label">Date and Time</label>
+						<input asp-for="MatchDate" class="form-control" type="datetime-local" value="@Model.MatchDate.ToString("yyyy-MM-ddTHH:mm")"/>
+						<span asp-validation-for="MatchDate" class="bg-info validation-add-event centered-validation"></span>
+					</div>
+
+					<div class="d-flex justify-content-center align-items-center row mb-3">
+						<div class="home-odds col">
+							<label asp-for="HomeOdds" class="form-label">Home Team Win</label>
+							<input asp-for="HomeOdds" class="form-control"/>
+							<span asp-validation-for="HomeOdds" class="bg-info validation-add-event centered-validation"></span>
+						</div>
+						<div class="draw-odds col">
+							<div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+								<label asp-for="DrawOdds" class="form-label mb-0">Draw</label>
+								<div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+									<input class="form-check-input" type="checkbox" role="switch"
+									       id="DrawEnabled"
+									       @(Model.NoDraw ? "" : "checked") />
+									<input type="hidden" name="NoDraw" id="NoDrawHidden" value="@(Model.NoDraw ? "true" : "false")" />
+								</div>
+							</div>
+							<input asp-for="DrawOdds" class="form-control"/>
+							<span asp-validation-for="DrawOdds" class="bg-info validation-add-event centered-validation"></span>
+						</div>
+						<div class="away-odds col">
+							<label asp-for="AwayOdds" class="form-label">Away Team Win</label>
+							<input asp-for="AwayOdds" class="form-control"/>
+							<span asp-validation-for="AwayOdds" class="bg-info validation-add-event centered-validation"></span>
+						</div>
+					</div>
+
+					<div class="d-flex justify-content-center align-items-center gap-3 mb-0">
+						<button type="button"
+						        id="auto-odds-btn"
+						        class="btn btn-info btn-sm px-3 fw-semibold"
+						        style="box-shadow: 0 3px 10px rgba(13,202,240,0.45); letter-spacing: 0.3px;">
+							<i class="bi bi-stars me-1"></i> Auto-generate odds
+						</button>
+						<span id="auto-odds-status"
+						      class="badge rounded-pill"
+						      style="display:none; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></span>
+					</div>
 				</div>
-				<input type="hidden" name="MarketOddsEdited" id="MarketOddsEdited" value="@(Model.MarketOddsEdited ? "true" : "false")" />
+
+				@* ════════ RIGHT: additional markets ════════ *@
+				<div class="col-12 col-lg-5 manual-markets-col d-flex">
+					<div id="marketsPreview" class="markets-preview mb-0 w-100 h-100">
+						<div class="markets-preview-header">
+							<span class="markets-preview-title"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Markets preview</span>
+							<span id="marketsPreviewState" class="badge rounded-pill bg-info">generated</span>
+							<button type="button" id="marketsPreviewReset" class="btn btn-sm btn-outline-light" style="display:none;">
+								<i class="bi bi-arrow-counterclockwise"></i> Reset to generated
+							</button>
+						</div>
+						<p id="marketsPreviewHint" class="markets-preview-hint">Fill in the Home / Draw / Away odds to generate these prices.</p>
+						<div class="markets-preview-grid">
+							@foreach (var pg in previewGroups)
+							{
+								<div class="markets-preview-group" data-group="@pg.Id">
+									<div class="markets-preview-group-title">@pg.Title</div>
+									<div class="markets-preview-inputs">
+										@foreach (var opt in pg.Options)
+										{
+											<label class="markets-preview-field">
+												<span>@opt.Label</span>
+												<input type="number" step="0.01" min="1.01" max="1000"
+												       class="form-control form-control-sm market-preview-input"
+												       name="MarketOdds[@opt.Code]"
+												       data-code="@opt.Code"
+												       value="@(MarketValue(opt.Code)?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))" />
+											</label>
+										}
+									</div>
+								</div>
+							}
+						</div>
+						<input type="hidden" name="MarketOddsEdited" id="MarketOddsEdited" value="@(Model.MarketOddsEdited ? "true" : "false")" />
+					</div>
+				</div>
 			</div>
 
 

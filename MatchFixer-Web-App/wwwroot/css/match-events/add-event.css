@@ -12,6 +12,15 @@
 .teams-information{
     max-width: 66.6%;
     min-width: 25em;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Competition dropdown: narrower and centered in the left column. */
+.match-event-competiton select {
+    max-width: 22em;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .add-team-league-label {
@@ -837,9 +846,15 @@ table.responsive-stack td {
 }
 
 .add-match-event-container {
-    flex: 0 0 720px;
-    max-width: 750px;
+    flex: 0 1 1060px;
+    max-width: 1100px;
+    width: 100%;
     margin-top: 3rem;
+}
+
+/* Let the form fill the (now wider) container so the two columns can spread. */
+.add-match-event-container > #team-selection-form {
+    width: 100%;
 }
 
 .add-event-navigation-tabs {
@@ -1595,6 +1610,29 @@ table.responsive-stack td {
     }
 
     .markets-preview-inputs {
+        justify-content: center;
+    }
+}
+
+/* ── Manual Event: odds (left) + markets preview (right) two-column layout ── */
+.manual-markets-col .markets-preview {
+    max-width: 100%;
+}
+
+@media (min-width: 992px) {
+    /* In the two-column layout the right column is narrow, so stack each
+       market tile (title over its prices, centered) to avoid overflow. */
+    .manual-markets-col .markets-preview-group {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+    }
+
+    .manual-markets-col .markets-preview-group-title {
+        text-align: center;
+    }
+
+    .manual-markets-col .markets-preview-inputs {
         justify-content: center;
     }
 }
